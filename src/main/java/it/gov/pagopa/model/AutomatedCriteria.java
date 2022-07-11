@@ -1,0 +1,16 @@
+package it.gov.pagopa.model;
+
+import lombok.*;
+import org.springframework.validation.annotation.Validated;
+
+@Getter
+@Setter
+public class AutomatedCriteria {
+
+  private String authority;
+  private String code ;
+  private Boolean field;
+  private String operator;
+  private String value;
+
+}
