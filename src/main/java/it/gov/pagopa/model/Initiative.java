@@ -1,13 +1,16 @@
 package it.gov.pagopa.model;
 
 import it.gov.pagopa.dto.InitiativeBeneficiaryRuleDTO;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Getter
-@Setter
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode
+@ToString
+@Builder
 @Document("initiative")
 public class Initiative {
 
@@ -22,6 +25,7 @@ public class Initiative {
     private Boolean autocertificationCheck;
     private Boolean beneficiaryRanking;
     private InitiativeGeneral general;
+    private InitiativeAdditional additionalInfo;
     private InitiativeBeneficiaryRule beneficiaryRule;
     private InitiativeLegal legal;
 

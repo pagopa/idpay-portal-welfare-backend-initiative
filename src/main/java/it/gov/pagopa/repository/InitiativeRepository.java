@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface InitiativeRepository extends MongoRepository<Initiative, String> {
 
-    @Query(value="{organizationId : ?0}", fields="{initiativeId : 1, initiativeName : 1, status : 1}")
+    @Query(value="{organizationId : ?0}", fields="{initiativeId : 1, initiativeName : 1, status : 1, 'additionalInfo.serviceName' : 1}")
     public List<Initiative> retrieveInitiativeSummary(String organizationId);
 }

@@ -1,13 +1,8 @@
-package it.gov.pagopa.dto;
+package it.gov.pagopa.model;
 
-import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
 
 /**
  * InitiativeAdditionalDTO
@@ -21,18 +16,11 @@ import javax.validation.constraints.*;
 @EqualsAndHashCode
 @ToString
 @Builder
-public class InitiativeAdditionalDTO   {
+public class InitiativeAdditional {
 
-  @JsonProperty("serviceId")
   private String serviceId;
-
-  @JsonProperty("serviceName")
   private String serviceName;
-
-  @JsonProperty("argument")
   private String argument;
-
-  @JsonProperty("description")
   private String description;
 
 }

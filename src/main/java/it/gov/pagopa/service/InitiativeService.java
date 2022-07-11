@@ -9,4 +9,6 @@ import java.util.List;
 public interface InitiativeService {
 
     public List<Initiative> retrieveInitiativeSummary(String organizationId);
+
+    public Initiative insertInitiative(Initiative initiative);
 }

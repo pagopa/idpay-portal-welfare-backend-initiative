@@ -1,6 +1,8 @@
 package it.gov.pagopa.dto;
 
 import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -21,6 +23,7 @@ import javax.validation.constraints.*;
 @EqualsAndHashCode
 @ToString
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class InitiativeDTO   {
 
   @JsonProperty("initiativeId")

@@ -6,8 +6,12 @@ import lombok.*;
 import org.springframework.validation.annotation.Validated;
 
 
-@Getter
-@Setter
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode
+@ToString
+@Builder
 public class SelfCriteriaBool implements ISelfDeclarationCriteria {
 
   private TypeEnum _type;

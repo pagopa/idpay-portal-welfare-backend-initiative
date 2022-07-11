@@ -9,8 +9,12 @@ import javax.validation.Valid;
 import java.util.List;
 
 
-@Getter
-@Setter
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode
+@ToString
+@Builder
 public class SelfCriteriaMulti implements ISelfDeclarationCriteria {
 
   private TypeEnum _type;
