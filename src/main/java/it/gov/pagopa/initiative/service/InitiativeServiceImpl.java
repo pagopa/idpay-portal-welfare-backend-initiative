@@ -39,6 +39,15 @@ public class InitiativeServiceImpl implements InitiativeService {
     }
 
     @Override
+    public Initiative getInitiativeBeneficiaryView(String initiativeId) {
+        return initiativeRepository.retrieveInitiativeBeneficiaryView(initiativeId)
+                .orElseThrow(() -> new InitiativeException(
+                        String.format(InitiativeConstants.Exception.NOT_FOUND, initiativeId),
+                        InitiativeConstants.Exception.NOT_FOUND_MESSAGE,
+                        HttpStatus.NOT_FOUND));
+    }
+
+    @Override
     public void updateInitiativeGeneralInfo(String organizationId, String initiativeId, Initiative initiativeInfoModel) {
         Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeId(organizationId, initiativeId)
                 .orElseThrow(() -> new InitiativeException(

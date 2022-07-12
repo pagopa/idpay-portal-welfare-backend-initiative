@@ -130,5 +130,23 @@ public interface InitiativeApi {
             method = RequestMethod.PATCH)
     ResponseEntity<Void> updateInitiativeGeneralInfo(@PathVariable("organizationId") String organizationId, @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId, @Parameter(in = ParameterIn.DEFAULT, description = "Unique identifier of the subscribed initiative, IBAN of the citizen", schema = @Schema()) @Valid @RequestBody InitiativeInfoDTO body);
 
+
+    @Operation(summary = "Returns the detail of an active initiative", description = "", security = {
+            @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = InitiativeDTO.class))),
+
+            @ApiResponse(responseCode = "401", description = "Authentication failed", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+
+            @ApiResponse(responseCode = "404", description = "The requested ID was not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+
+            @ApiResponse(responseCode = "429", description = "Too many Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+
+            @ApiResponse(responseCode = "500", description = "Server ERROR", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))})
+    @RequestMapping(value = "/idpay/initiative/{initiativeId}/beneficiary/view",
+            produces = {"application/json"},
+            method = RequestMethod.GET)
+    ResponseEntity<InitiativeDTO> getInitiativeBeneficiaryView(@PathVariable("initiativeId") String initiativeId);
+
 }
 

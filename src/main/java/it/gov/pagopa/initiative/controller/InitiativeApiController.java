@@ -67,4 +67,9 @@ public class InitiativeApiController implements InitiativeApi {
         return ResponseEntity.ok().build();
     }
 
+    @Override
+    public ResponseEntity<InitiativeDTO> getInitiativeBeneficiaryView(String initiativeId) {
+        return ResponseEntity.ok(this.mapper.toInitiativeDto(this.initiativeService.getInitiativeBeneficiaryView(initiativeId)));
+    }
+
 }

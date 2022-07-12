@@ -14,6 +14,8 @@ public interface InitiativeService {
 
     Initiative getInitiative(String organizationId, String initiativeId);
 
+    Initiative getInitiativeBeneficiaryView(String initiativeId);
+
     void updateInitiativeGeneralInfo(String organizationId, String initiativeId, Initiative initiativeInfoModel);
 
     void updateInitiativeBeneficiary(String organizationId, String initiativeId, Initiative toBeneficiaryRuleModel);
