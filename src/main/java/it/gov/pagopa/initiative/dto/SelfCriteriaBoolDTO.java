@@ -30,11 +30,4 @@ public class SelfCriteriaBoolDTO implements AnyOfInitiativeBeneficiaryRuleDTOSel
   @JsonProperty("code")
   private String code;
 
-  public TypeEnum getType() {
-    return _type;
-  }
-
-  public void setType(TypeEnum _type) {
-    this._type = _type;
-  }
 }

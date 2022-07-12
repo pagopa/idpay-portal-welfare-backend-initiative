@@ -1,33 +1,41 @@
 package it.gov.pagopa.initiative.dto;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.annotation.*;
+import lombok.Data;
+import lombok.ToString;
 
 /**
  * Gets or Sets _type
  */
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum TypeEnum {
 
+    @JsonProperty("boolean")
     BOOLEAN("boolean"),
-
+    @JsonProperty("multi")
     MULTI("multi");
 
-    private String value;
-
-    TypeEnum(String value) {
-        this.value = value;
-    }
+    @JsonProperty("_type")
+    private String type;
 
     @Override
-    @JsonValue
     public String toString() {
-        return String.valueOf(value);
+        return String.valueOf(type);
     }
 
-    @JsonCreator
-    public static TypeEnum fromValue(String text) {
+    TypeEnum(String type) {
+        this.type = type;
+    }
+
+    @JsonValue
+    public String getType() {
+        return type;
+    }
+
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    public static TypeEnum fromValue(String type) {
         for (TypeEnum b : TypeEnum.values()) {
-            if (String.valueOf(b.value).equals(text)) {
+            if (String.valueOf(b.type).equals(type)) {
                 return b;
             }
         }
