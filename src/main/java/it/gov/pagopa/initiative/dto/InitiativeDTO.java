@@ -48,7 +48,7 @@ public class InitiativeDTO   {
   private InitiativeGeneralDTO general;
 
   @JsonProperty("additionalInfo")
-  private InitiativeAdditionalDTO additionalInfo = null;
+  private InitiativeAdditionalDTO additionalInfo;
 
   @JsonProperty("beneficiaryRule")
   private InitiativeBeneficiaryRuleDTO beneficiaryRule;
