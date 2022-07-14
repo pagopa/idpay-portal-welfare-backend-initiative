@@ -19,7 +19,7 @@ public class RestResponseExceptionHandler  {
     @ExceptionHandler({InitiativeException.class})
     public ResponseEntity<ErrorDTO> handleException(InitiativeException ex) {
         return new ResponseEntity<>(new ErrorDTO(ex.getCode(), ex.getMessage()),
-                ex.getStatus());
+                ex.getHttpStatus());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

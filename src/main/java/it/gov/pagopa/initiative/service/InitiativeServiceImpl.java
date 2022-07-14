@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.text.MessageFormat;
 import java.util.List;
 
 @Service
@@ -18,7 +19,14 @@ public class InitiativeServiceImpl implements InitiativeService {
     private InitiativeRepository initiativeRepository;
 
     public List<Initiative> retrieveInitiativeSummary(String organizationId) {
-        return initiativeRepository.retrieveInitiativeSummary(organizationId);
+        List<Initiative> initiatives = initiativeRepository.retrieveInitiativeSummary(organizationId);
+        if(initiatives.isEmpty()){
+            throw new InitiativeException(
+                    InitiativeConstants.Exception.NotFound.CODE_PACKAGE,
+                    MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_LIST_BY_ORGANIZATION_MESSAGE, organizationId),
+                    HttpStatus.NOT_FOUND);
+        }
+        return initiatives;
     }
 
     @Override
