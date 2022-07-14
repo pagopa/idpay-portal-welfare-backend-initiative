@@ -81,7 +81,7 @@ public class InitiativeDTO   {
 //  @NotNull
 //  @Valid
   @JsonProperty("additionalInfo")
-  private InitiativeAdditionalDTO additionalInfo = null;
+  private InitiativeAdditionalDTO additionalInfo;
 
 //  @NotNull
 //  @Valid

@@ -1,12 +1,11 @@
 package it.gov.pagopa.initiative.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.List;
-
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
+
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * SelfCriteriaMultiDTO

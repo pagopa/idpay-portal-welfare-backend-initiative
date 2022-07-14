@@ -1,24 +1,19 @@
 package it.gov.pagopa.initiative.dto;
 
-import java.time.LocalDate;
-import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
-import io.swagger.v3.oas.annotations.media.Schema;
-import java.math.BigDecimal;
-
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 /**
  * InitiativeGeneralDTO
  */
-@Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-07-10T13:24:21.794Z[GMT]")
 
+@Validated
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

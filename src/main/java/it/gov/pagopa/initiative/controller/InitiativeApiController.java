@@ -1,15 +1,12 @@
 package it.gov.pagopa.initiative.controller;
 
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.Schema;
 import it.gov.pagopa.initiative.dto.InitiativeBeneficiaryRuleDTO;
 import it.gov.pagopa.initiative.dto.InitiativeDTO;
 import it.gov.pagopa.initiative.dto.InitiativeInfoDTO;
 import it.gov.pagopa.initiative.dto.InitiativeSummaryDTO;
+import it.gov.pagopa.initiative.mapper.InitiativeMapper;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.service.InitiativeService;
-import it.gov.pagopa.initiative.mapper.InitiativeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

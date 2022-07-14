@@ -1,8 +1,9 @@
 package it.gov.pagopa.initiative.dto;
 
-import com.fasterxml.jackson.annotation.*;
-import lombok.Data;
-import lombok.ToString;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * Gets or Sets _type

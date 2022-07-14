@@ -1,7 +1,6 @@
 package it.gov.pagopa.initiative.model;
 
 import lombok.*;
-import org.springframework.validation.annotation.Validated;
 
 @Data
 @AllArgsConstructor
