@@ -23,15 +23,19 @@ import javax.validation.constraints.*;
 @Builder
 public class InitiativeAdditionalDTO   {
 
+  @Size(min = 2, message = "At least 2 characters")
   @JsonProperty("serviceId")
   private String serviceId;
 
+  @Size(min = 2, message = "At least 2 characters")
   @JsonProperty("serviceName")
   private String serviceName;
 
+  @Size(min = 2, message = "At least 2 characters")
   @JsonProperty("argument")
   private String argument;
 
+  @Size(min = 2, message = "At least 2 characters")
   @JsonProperty("description")
   private String description;
 

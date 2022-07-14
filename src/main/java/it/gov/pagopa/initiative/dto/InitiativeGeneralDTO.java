@@ -27,9 +27,12 @@ import javax.validation.constraints.*;
 @Builder
 public class InitiativeGeneralDTO   {
 
+  /*@Size(min = 2, message = "At least 2 characters") //TODO lunghezza nome
   @JsonProperty("name")
-  private String name;
+  private String name;*/
 
+  @Min(value = 1000000, message = "budget should be at least 1000000")
+  //TODO impostare max?
   @JsonProperty("budget")
   private BigDecimal budget;
 
@@ -65,18 +68,27 @@ public class InitiativeGeneralDTO   {
   }
 
   @JsonProperty("beneficiaryType")
+  @NotNull
   private BeneficiaryTypeEnum beneficiaryType;
 
   @JsonProperty("beneficiaryKnown")
+  @NotNull
   private Boolean beneficiaryKnown;
 
   @JsonProperty("beneficiaryBudget")
+  @Min(value = 1, message = "beneficiaryBudget should be at least 1")
+  //TODO @Max(value = 1000, message = "beneficiaryBudget should not be greater than 1000")
   private BigDecimal beneficiaryBudget;
 
+
+
+
   @JsonProperty("startDate")
+  @FutureOrPresent
   private LocalDate startDate;
 
   @JsonProperty("endDate")
+  @Future
   private LocalDate endDate;
 
   @JsonProperty("rankingStartDate")

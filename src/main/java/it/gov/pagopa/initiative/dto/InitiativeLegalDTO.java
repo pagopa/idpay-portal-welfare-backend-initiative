@@ -22,16 +22,23 @@ import javax.validation.constraints.*;
 @ToString
 @Builder
 public class InitiativeLegalDTO   {
-  
+
+  //@NotNull
+  //@Pattern(regexp = "https://")
   @JsonProperty("privacyLink")
   private String privacyLink;
 
+  //@NotEmpty
+  //@Size(min = 8, message = "At least 8 characters") //'https://..' min 8 characters
   @JsonProperty("tcLink")
   private String tcLink;
 
+  //@NotBlank
+  //@Size(min = 8, message = "At least 8 characters") //'https://..' min 8 characters
   @JsonProperty("regulationLink")
   private String regulationLink;
 
+  //@Size(min = 8, message = "At least 8 characters") //'https://..' min 8 characters
   @JsonProperty("dpiaLink")
   private String dpiaLink;
 
