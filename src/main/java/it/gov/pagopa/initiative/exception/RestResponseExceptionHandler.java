@@ -1,6 +1,8 @@
 package it.gov.pagopa.initiative.exception;
 
+import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.ErrorDTO;
+import it.gov.pagopa.initiative.model.Initiative;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -33,7 +35,7 @@ public class RestResponseExceptionHandler  {
         });
         String message = String.join(" - ", errors);
         return new ResponseEntity<>(
-                new ErrorDTO(message, message), HttpStatus.BAD_REQUEST);
+                new ErrorDTO(InitiativeConstants.Exception.BadRequest.CODE_PACKAGE, message), HttpStatus.BAD_REQUEST);
     }
 
 }

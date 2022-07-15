@@ -277,10 +277,14 @@ class InitiativeServiceTest {
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
-        initiativeGeneralDTO.setEndDate(LocalDate.of(2022, 9, 8));
-        initiativeGeneralDTO.setStartDate(LocalDate.of(2022, 8, 8));
-        initiativeGeneralDTO.setRankingStartDate(LocalDate.of(2022, 9, 18));
-        initiativeGeneralDTO.setRankingEndDate(LocalDate.of(2022, 8, 18));
+        LocalDate rankingStartDate = LocalDate.now();
+        LocalDate rankingEndDate = rankingStartDate.plusDays(1);
+        LocalDate startDate = rankingEndDate.plusDays(1);
+        LocalDate endDate = startDate.plusDays(1);
+        initiativeGeneralDTO.setRankingStartDate(rankingStartDate);
+        initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
+        initiativeGeneralDTO.setStartDate(startDate);
+        initiativeGeneralDTO.setEndDate(endDate);
         return initiativeGeneralDTO;
     }
 

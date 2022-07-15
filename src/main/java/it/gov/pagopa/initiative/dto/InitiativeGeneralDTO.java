@@ -3,9 +3,7 @@ package it.gov.pagopa.initiative.dto;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
-import it.gov.pagopa.initiative.utils.constraint.BeneficiaryBudgetValue;
-import it.gov.pagopa.initiative.utils.constraint.RankingEndDateValue;
-import it.gov.pagopa.initiative.utils.constraint.RankingStartDateValue;
+import it.gov.pagopa.initiative.utils.constraint.*;
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
 
@@ -28,15 +26,17 @@ import java.time.LocalDate;
 @ToString
 @Builder
 @BeneficiaryBudgetValue(value1 = "beneficiaryBudget", value2 = "budget")
-@RankingStartDateValue(value1 = "startDate", value2 = "rankingStartDate")
-@RankingEndDateValue(value1 = "endDate", value2 = "rankingEndDate")
+//@StartDateLessThanEndDate(value1 = "startDate", value2 = "endDate")
+//@RankingEndDateLessThanStartDate(value1 = "rankingEndDate", value2 = "startDate")
+//@RankingStartDateLessThanRankingEndDate(value1 = "rankingStartDate", value2 = "rankingEndDate")
+@DisjointSetOrderedDatesFieldsFromLowestToHighest(orderedDates = {"rankingStartDate", "rankingEndDate", "startDate", "endDate"})
 public class InitiativeGeneralDTO   {
 
   /*@Size(min = 2, message = "At least 2 characters") //TODO lunghezza nome
   @JsonProperty("name")
   private String name;*/
 
-  @Min(value = 1000000, message = "budget should be at least 1000000")
+  @Min(value = 2, message = "budget should have an amount of at least 2")
   //TODO impostare max?
   @JsonProperty("budget")
   private BigDecimal budget;
@@ -80,25 +80,23 @@ public class InitiativeGeneralDTO   {
   @NotNull
   private Boolean beneficiaryKnown;
 
-
   @JsonProperty("beneficiaryBudget")
-  @Min(value = 1, message = "beneficiaryBudget should be at least 1")
+  @Min(value = 1, message = "Beneficiary budget should have an amount of at least 1")
   //TODO @Max(value = 1000, message = "beneficiaryBudget should not be greater than 1000")
   private BigDecimal beneficiaryBudget;
 
-
   @JsonProperty("startDate")
-  @FutureOrPresent
   private LocalDate startDate;
 
   @JsonProperty("endDate")
-  @Future
   private LocalDate endDate;
 
   @JsonProperty("rankingStartDate")
+  @FutureOrPresent
   private LocalDate rankingStartDate;
 
   @JsonProperty("rankingEndDate")
+  @Future
   private LocalDate rankingEndDate;
 
 }
