@@ -42,7 +42,7 @@ class InitiativeServiceTest {
 
 //    List<Initiative> retrieveInitiativeSummary(String organizationId);
     @Test
-    public void retrieveInitiativeSummary_ok() throws Exception {
+    void retrieveInitiativeSummary_ok() throws Exception {
         Initiative step2Initiative1 = createStep2Initiative();
         Initiative step2Initiative2 = createStep2Initiative();
         List<Initiative> initiativeList = Arrays.asList(step2Initiative1, step2Initiative2);
@@ -75,7 +75,7 @@ class InitiativeServiceTest {
 
 //    Initiative insertInitiative(Initiative initiative);
     @Test
-    public void insertInitiative_ok() throws Exception {
+    void insertInitiative_ok() throws Exception {
         Initiative step2Initiative1 = createStep2Initiative();
 
         //Instruct the Repo Mock to return Dummy Initiatives
@@ -93,7 +93,7 @@ class InitiativeServiceTest {
 
 //    Initiative getInitiative(String organizationId, String initiativeId);
     @Test
-    public void getInitiative_ok() throws Exception {
+    void getInitiative_ok() throws Exception {
         Initiative step2Initiative1 = createStep2Initiative();
 
         //Instruct the Repo Mock to return Dummy Initiatives
@@ -111,7 +111,7 @@ class InitiativeServiceTest {
 
 //    Initiative getInitiativeBeneficiaryView(String initiativeId);
     @Test
-    public void getInitiativeBeneficiaryView_ok() throws Exception {
+    void getInitiativeBeneficiaryView_ok() throws Exception {
         Initiative step2Initiative1 = createStep2Initiative();
 
         //Instruct the Repo Mock to return Dummy Initiatives
@@ -129,7 +129,7 @@ class InitiativeServiceTest {
 
 //    void updateInitiativeGeneralInfo(String organizationId, String initiativeId, Initiative initiativeInfoModel);
     @Test
-    public void updateInitiativeGeneralInfo_ok() throws Exception {
+    void updateInitiativeGeneralInfo_ok() throws Exception {
         Initiative step2Initiative1 = createStep2Initiative();
 
         //Instruct the Repo Mock to return Dummy Initiatives
@@ -144,7 +144,7 @@ class InitiativeServiceTest {
 
 //    void updateInitiativeBeneficiary(String organizationId, String initiativeId, Initiative toBeneficiaryRuleModel);
     @Test
-    public void updateInitiativeBeneficiary_ok() throws Exception {
+    void updateInitiativeBeneficiary_ok() throws Exception {
         Initiative step2Initiative1 = createStep2Initiative();
 
         //Instruct the Repo Mock to return Dummy Initiatives

@@ -67,7 +67,7 @@ class InitiativeApiTest {
     private static final String ROLE = "TEST_ROLE";
 
     @Test
-    public void getInitiativeSummary_ok() throws Exception {
+    void getInitiativeSummary_ok() throws Exception {
 
         //create Dummy Initiative
         Initiative step2Initiative = createStep2Initiative();
@@ -93,7 +93,7 @@ class InitiativeApiTest {
     }
 
     @Test
-    public void getInitiativeDetail_ok() throws Exception {
+    void getInitiativeDetail_ok() throws Exception {
 
         //create Dummy Initiative
         Initiative step2Initiative = createStep2Initiative();
@@ -118,7 +118,7 @@ class InitiativeApiTest {
     }
 
     @Test
-    public void saveInitiativeGeneralInfo_ok() throws Exception {
+    void saveInitiativeGeneralInfo_ok() throws Exception {
         objectMapper.registerModule(new JavaTimeModule());
 //        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
@@ -150,7 +150,7 @@ class InitiativeApiTest {
     }
 
     @Test
-    public void updateInitiativeGeneralInfo_ok() throws Exception {
+    void updateInitiativeGeneralInfo_ok() throws Exception {
         objectMapper.registerModule(new JavaTimeModule());
 
         //create Dummy Initiative
@@ -175,7 +175,7 @@ class InitiativeApiTest {
     }
 
     @Test
-    public void updateInitiativeBeneficiary_ok() throws Exception {
+    void updateInitiativeBeneficiary_ok() throws Exception {
         objectMapper.registerModule(new JavaTimeModule());
 
         //create Dummy Initiative
@@ -200,7 +200,7 @@ class InitiativeApiTest {
     }
 
     @Test
-    public void getInitiativeBeneficiaryView_ok() throws Exception {
+    void getInitiativeBeneficiaryView_ok() throws Exception {
 
         //create Dummy Initiative
         Initiative initiative = createFullInitiative();
