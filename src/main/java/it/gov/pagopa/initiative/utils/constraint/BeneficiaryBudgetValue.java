@@ -11,10 +11,8 @@ import java.lang.annotation.*;
 @Documented
 @Constraint(validatedBy = {BeneficiaryBudgetValidator.class})
 public @interface BeneficiaryBudgetValue {
-
-    String value1();
-    String value2();
-
+    String budget1();
+    String budget2();
     String message() default "beneficiaryBudget cannot be greater than budget, or equal}";
     Class<?>[] groups() default { };
     Class<? extends Payload>[] payload() default { };

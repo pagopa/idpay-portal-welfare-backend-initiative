@@ -17,7 +17,6 @@ import java.time.LocalDate;
 /**
  * InitiativeGeneralDTO
  */
-
 @Validated
 @Data
 @AllArgsConstructor
@@ -25,16 +24,12 @@ import java.time.LocalDate;
 @EqualsAndHashCode
 @ToString
 @Builder
-@BeneficiaryBudgetValue(value1 = "beneficiaryBudget", value2 = "budget")
+@BeneficiaryBudgetValue(budget1 = "beneficiaryBudget", budget2 = "budget")
 //@StartDateLessThanEndDate(value1 = "startDate", value2 = "endDate")
 //@RankingEndDateLessThanStartDate(value1 = "rankingEndDate", value2 = "startDate")
 //@RankingStartDateLessThanRankingEndDate(value1 = "rankingStartDate", value2 = "rankingEndDate")
 @DisjointSetOrderedDatesFieldsFromLowestToHighest(orderedDates = {"rankingStartDate", "rankingEndDate", "startDate", "endDate"})
 public class InitiativeGeneralDTO   {
-
-  /*@Size(min = 2, message = "At least 2 characters") //TODO lunghezza nome
-  @JsonProperty("name")
-  private String name;*/
 
   @Min(value = 2, message = "budget should have an amount of at least 2")
   //TODO impostare max?

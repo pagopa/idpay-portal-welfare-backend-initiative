@@ -7,8 +7,7 @@ import it.gov.pagopa.initiative.dto.InitiativeSummaryDTO;
 import it.gov.pagopa.initiative.mapper.InitiativeMapper;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.service.InitiativeService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,9 +20,8 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
+@Slf4j
 public class InitiativeApiController implements InitiativeApi {
-
-    private static final Logger log = LoggerFactory.getLogger(InitiativeApiController.class);
 
     @Autowired
     private InitiativeService initiativeService;

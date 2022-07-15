@@ -22,8 +22,15 @@ public class RankingEndDateLessThanStartDateValidator implements ConstraintValid
 
     @Override
     public boolean isValid(InitiativeGeneralDTO value, ConstraintValidatorContext context) {
-        LocalDate rankingEndDate = (LocalDate) PARSER.parseExpression(rankingEndDateField).getValue(value);
-        LocalDate startDate = (LocalDate) PARSER.parseExpression(startDateField).getValue(value);
-        return rankingEndDate.isBefore(startDate);
+        LocalDate rankingEndDate = null;
+        LocalDate startDate = null;
+        if (PARSER.parseExpression(rankingEndDateField).getValue(value) instanceof LocalDate)
+            rankingEndDate = (LocalDate) PARSER.parseExpression(rankingEndDateField).getValue(value);
+        if (PARSER.parseExpression(startDateField).getValue(value) instanceof LocalDate)
+            startDate = (LocalDate) PARSER.parseExpression(startDateField).getValue(value);
+        if (rankingEndDate != null && startDate != null) {
+            return rankingEndDate.isBefore(startDate);
+        }
+        return false;
     }
 }

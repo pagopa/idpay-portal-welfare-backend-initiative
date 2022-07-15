@@ -22,9 +22,15 @@ public class StartDateLessThanEndDateValidator implements ConstraintValidator<St
 
     @Override
     public boolean isValid(InitiativeGeneralDTO value, ConstraintValidatorContext context) {
-        LocalDate startDate = (LocalDate) PARSER.parseExpression(startDateField).getValue(value); //startDate
-        LocalDate endDate = (LocalDate) PARSER.parseExpression(this.endDateField).getValue(value); //rankingStartDate
-
-        return startDate.isBefore(endDate);
+        LocalDate startDate = null;
+        LocalDate endDate = null;
+        if(PARSER.parseExpression(startDateField).getValue(value) instanceof LocalDate)
+            startDate = (LocalDate) PARSER.parseExpression(startDateField).getValue(value);
+        if(PARSER.parseExpression(this.endDateField).getValue(value) instanceof LocalDate)
+            endDate = (LocalDate) PARSER.parseExpression(this.endDateField).getValue(value);
+        if (startDate != null && endDate != null) {
+            return startDate.isBefore(endDate);
+        }
+        return false;
     }
 }

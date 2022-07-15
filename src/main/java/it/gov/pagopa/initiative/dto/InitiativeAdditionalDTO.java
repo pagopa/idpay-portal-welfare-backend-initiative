@@ -10,8 +10,6 @@ import javax.validation.constraints.Size;
  * InitiativeAdditionalDTO
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-07-11T11:28:33.400Z[GMT]")
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

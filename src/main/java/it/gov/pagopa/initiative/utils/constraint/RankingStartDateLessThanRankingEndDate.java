@@ -1,6 +1,5 @@
 package it.gov.pagopa.initiative.utils.constraint;
 
-import it.gov.pagopa.initiative.utils.validator.RankingEndDateLessThanStartDateValidator;
 import it.gov.pagopa.initiative.utils.validator.RankingStartDateLessThanRankingEndDateValidator;
 
 import javax.validation.Constraint;

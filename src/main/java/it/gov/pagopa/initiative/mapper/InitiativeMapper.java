@@ -58,7 +58,7 @@ public class InitiativeMapper {
         Initiative initiative = new Initiative();
         InitiativeBeneficiaryRule beneficiaryRule = new InitiativeBeneficiaryRule();
         if (CollectionUtils.isEmpty(beneficiaryRuleDto.getAutomatedCriteria())) {
-            beneficiaryRule.setAutomatedCriteria(Collections.EMPTY_LIST);
+            beneficiaryRule.setAutomatedCriteria(Collections.emptyList());
         } else {
             //TODO definire modalità di recupero authority
             beneficiaryRule.setAutomatedCriteria(beneficiaryRuleDto.getAutomatedCriteria().stream().map(x ->
@@ -70,7 +70,7 @@ public class InitiativeMapper {
         }
 
         if (CollectionUtils.isEmpty(beneficiaryRuleDto.getSelfDeclarationCriteria())) {
-            beneficiaryRule.setSelfDeclarationCriteria(Collections.EMPTY_LIST);
+            beneficiaryRule.setSelfDeclarationCriteria(Collections.emptyList());
         } else {
             beneficiaryRule.setSelfDeclarationCriteria(beneficiaryRuleDto.getSelfDeclarationCriteria().stream()
                     .map(x -> {
@@ -132,14 +132,13 @@ public class InitiativeMapper {
                 .serviceName(additional.getServiceName()).build();
     }
 
-    public InitiativeBeneficiaryRuleDTO toBEneficiaryRuleDto(InitiativeBeneficiaryRule beneficiaryRule) {
+    public InitiativeBeneficiaryRuleDTO toBeneficiaryRuleDto(InitiativeBeneficiaryRule beneficiaryRule) {
         if (beneficiaryRule == null) {
             return null;
         }
-        Initiative initiative = new Initiative();
         InitiativeBeneficiaryRuleDTO beneficiaryRuleDto = new InitiativeBeneficiaryRuleDTO();
         if (CollectionUtils.isEmpty(beneficiaryRule.getAutomatedCriteria())) {
-            beneficiaryRuleDto.setAutomatedCriteria(Collections.EMPTY_LIST);
+            beneficiaryRuleDto.setAutomatedCriteria(Collections.emptyList());
         } else {
             //TODO definire modalità di recupero authority
             beneficiaryRuleDto.setAutomatedCriteria(beneficiaryRule.getAutomatedCriteria().stream().map(x ->
@@ -151,7 +150,7 @@ public class InitiativeMapper {
         }
 
         if (CollectionUtils.isEmpty(beneficiaryRule.getSelfDeclarationCriteria())) {
-            beneficiaryRuleDto.setSelfDeclarationCriteria(Collections.EMPTY_LIST);
+            beneficiaryRuleDto.setSelfDeclarationCriteria(Collections.emptyList());
         } else {
             beneficiaryRuleDto.setSelfDeclarationCriteria(beneficiaryRule.getSelfDeclarationCriteria().stream()
                     .map(x -> {
@@ -179,7 +178,7 @@ public class InitiativeMapper {
 
     public List<InitiativeSummaryDTO> toInitiativeSummaryDtoList(List<Initiative> initiatives) {
         if (CollectionUtils.isEmpty(initiatives)) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
         return initiatives.stream().map(x -> InitiativeSummaryDTO.builder()
                 .initiativeId(x.getInitiativeId())
@@ -201,7 +200,7 @@ public class InitiativeMapper {
         initiativeDto.setStatus(initiative.getStatus());
         initiativeDto.setGeneral(this.toGeneralDto(initiative.getGeneral()));
         initiativeDto.setAdditionalInfo(this.toInitiativeAdditionalDto(initiative.getAdditionalInfo()));
-        initiativeDto.setBeneficiaryRule(this.toBEneficiaryRuleDto(initiative.getBeneficiaryRule()));
+        initiativeDto.setBeneficiaryRule(this.toBeneficiaryRuleDto(initiative.getBeneficiaryRule()));
         return initiativeDto;
     }
 

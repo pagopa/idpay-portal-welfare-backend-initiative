@@ -1,7 +1,6 @@
 package it.gov.pagopa.initiative.utils.constraint;
 
 import it.gov.pagopa.initiative.utils.validator.DisjointSetOrderedDatesFieldsFromLowestToHighestValidator;
-import it.gov.pagopa.initiative.utils.validator.RankingStartDateLessThanRankingEndDateValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;

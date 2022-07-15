@@ -12,6 +12,6 @@ public class InitiativeException extends RuntimeException {
 
   private final String message;
 
-  private HttpStatus httpStatus;
+  private final HttpStatus httpStatus;
 
 }

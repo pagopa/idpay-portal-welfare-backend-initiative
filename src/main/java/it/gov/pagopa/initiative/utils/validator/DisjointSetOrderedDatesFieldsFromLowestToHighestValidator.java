@@ -2,14 +2,13 @@ package it.gov.pagopa.initiative.utils.validator;
 
 import it.gov.pagopa.initiative.dto.InitiativeGeneralDTO;
 import it.gov.pagopa.initiative.utils.constraint.DisjointSetOrderedDatesFieldsFromLowestToHighest;
-import org.springframework.cglib.core.Local;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Stream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DisjointSetOrderedDatesFieldsFromLowestToHighestValidator implements ConstraintValidator<DisjointSetOrderedDatesFieldsFromLowestToHighest, InitiativeGeneralDTO> {
 
