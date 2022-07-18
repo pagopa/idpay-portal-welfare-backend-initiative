@@ -18,13 +18,13 @@ public class RestResponseExceptionHandler  {
 
     // API
     @ExceptionHandler({InitiativeException.class})
-    public ResponseEntity<ErrorDTO> handleException(InitiativeException ex) {
+    public ResponseEntity<ErrorDTO> handleInitiativeException(InitiativeException ex) {
         return new ResponseEntity<>(new ErrorDTO(ex.getCode(), ex.getMessage()),
                 ex.getHttpStatus());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorDTO> handleValidationExceptions(
+    public ResponseEntity<ErrorDTO> handleMethodArgumentNotValidExceptions(
             MethodArgumentNotValidException ex) {
         List<String> errors = new ArrayList<>();
         ex.getBindingResult().getAllErrors().forEach(error -> {

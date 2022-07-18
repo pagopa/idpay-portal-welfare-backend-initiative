@@ -9,7 +9,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class InitiativeMapper {
@@ -66,7 +65,7 @@ public class InitiativeMapper {
                             .code(x.getCode())
                             .field(x.getField()).operator(x.getOperator())
                             .build()
-            ).collect(Collectors.toList()));
+            ).toList());
         }
 
         if (CollectionUtils.isEmpty(beneficiaryRuleDto.getSelfDeclarationCriteria())) {
@@ -91,7 +90,7 @@ public class InitiativeMapper {
                                 }
                                 return null;
                             }
-                    ).collect(Collectors.toList()));
+                    ).toList());
         }
         initiative.setBeneficiaryRule(beneficiaryRule);
         return initiative;
@@ -146,7 +145,7 @@ public class InitiativeMapper {
                             .code(x.getCode())
                             .field(x.getField()).operator(x.getOperator())
                             .build()
-            ).collect(Collectors.toList()));
+            ).toList());
         }
 
         if (CollectionUtils.isEmpty(beneficiaryRule.getSelfDeclarationCriteria())) {
@@ -171,7 +170,7 @@ public class InitiativeMapper {
                                 }
                                 return null;
                             }
-                    ).collect(Collectors.toList()));
+                    ).toList());
         }
         return beneficiaryRuleDto;
     }
@@ -188,7 +187,7 @@ public class InitiativeMapper {
                                 x.getAdditionalInfo().getServiceName()
                                 : StringUtils.EMPTY)
                 .status(x.getStatus())
-                .build()).collect(Collectors.toList());
+                .build()).toList();
     }
 
     public InitiativeDTO toInitiativeDto(Initiative initiative) {

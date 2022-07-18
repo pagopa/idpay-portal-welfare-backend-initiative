@@ -41,8 +41,8 @@ public class InitiativeServiceImpl implements InitiativeService {
     public Initiative getInitiative(String organizationId, String initiativeId) {
         return initiativeRepository.findByOrganizationIdAndInitiativeId(organizationId, initiativeId)
                 .orElseThrow(() -> new InitiativeException(
-                        String.format(InitiativeConstants.Exception.NOT_FOUND, initiativeId),
-                        InitiativeConstants.Exception.NOT_FOUND_MESSAGE,
+                        InitiativeConstants.Exception.NotFound.CODE_PACKAGE,
+                        MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_LIST_BY_ORGANIZATION_MESSAGE, organizationId),
                         HttpStatus.NOT_FOUND));
     }
 
@@ -50,8 +50,8 @@ public class InitiativeServiceImpl implements InitiativeService {
     public Initiative getInitiativeBeneficiaryView(String initiativeId) {
         return initiativeRepository.retrieveInitiativeBeneficiaryView(initiativeId)
                 .orElseThrow(() -> new InitiativeException(
-                        String.format(InitiativeConstants.Exception.NOT_FOUND, initiativeId),
-                        InitiativeConstants.Exception.NOT_FOUND_MESSAGE,
+                        InitiativeConstants.Exception.NotFound.CODE_PACKAGE,
+                        MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
                         HttpStatus.NOT_FOUND));
     }
 
@@ -59,8 +59,8 @@ public class InitiativeServiceImpl implements InitiativeService {
     public void updateInitiativeGeneralInfo(String organizationId, String initiativeId, Initiative initiativeInfoModel) {
         Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeId(organizationId, initiativeId)
                 .orElseThrow(() -> new InitiativeException(
-                        String.format(InitiativeConstants.Exception.NOT_FOUND, initiativeId),
-                        InitiativeConstants.Exception.NOT_FOUND_MESSAGE,
+                        InitiativeConstants.Exception.NotFound.CODE_PACKAGE,
+                        MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_ORGANIZATION_ID_MESSAGE, organizationId, initiativeId),
                         HttpStatus.NOT_FOUND));
         initiative.setGeneral(initiativeInfoModel.getGeneral());
         initiative.setAdditionalInfo(initiativeInfoModel.getAdditionalInfo());
@@ -71,8 +71,8 @@ public class InitiativeServiceImpl implements InitiativeService {
     public void updateInitiativeBeneficiary(String organizationId, String initiativeId, Initiative initiativeBeneficiaryRuleModel){
         Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeId(organizationId, initiativeId)
                 .orElseThrow(() -> new InitiativeException(
-                        String.format(InitiativeConstants.Exception.NOT_FOUND, initiativeId),
-                        InitiativeConstants.Exception.NOT_FOUND_MESSAGE,
+                        InitiativeConstants.Exception.NotFound.CODE_PACKAGE,
+                        MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_ORGANIZATION_ID_MESSAGE, organizationId, initiativeId),
                         HttpStatus.NOT_FOUND));
         initiative.setBeneficiaryRule(initiativeBeneficiaryRuleModel.getBeneficiaryRule());
         this.initiativeRepository.save(initiative);
