@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 /**
  * InitiativeDTO
  */
@@ -45,6 +48,12 @@ public class InitiativeDTO   {
 //  @Size(min = 2, message = "At least 2 characters")
   @JsonProperty("pdndToken")
   private String pdndToken;
+
+  @JsonProperty("creationDate")
+  private LocalDateTime creationDate;
+
+  @JsonProperty("updateDate")
+  private LocalDateTime updateDate;
 
 //  @NotEmpty
 //  @NotBlank
