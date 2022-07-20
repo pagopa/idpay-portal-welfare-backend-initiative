@@ -4,6 +4,9 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,6 +22,8 @@ public class Initiative {
     private String organizationId;
     private String serviceId;
     private String pdndToken;
+    private LocalDateTime creationDate;
+    private LocalDateTime updateDate;
     private String status;
     private Boolean pdndCheck;
     private Boolean autocertificationCheck;

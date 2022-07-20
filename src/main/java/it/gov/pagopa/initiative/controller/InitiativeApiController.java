@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -49,6 +51,8 @@ public class InitiativeApiController implements InitiativeApi {
     public ResponseEntity<InitiativeDTO> saveInitiativeGeneralInfo(@PathVariable("organizationId") String organizationId, @Valid @RequestBody InitiativeInfoDTO initiativeInfoDTO) {
         Initiative initiativeToSave = this.initiativeDTOsToModelMapper.toInitiative(initiativeInfoDTO);
         initiativeToSave.setOrganizationId(organizationId);
+        initiativeToSave.setCreationDate(LocalDateTime.now());
+        initiativeToSave.setUpdateDate(LocalDateTime.now());
         //TODO verificare se necessario controllo per serviceId e organization non sovrapposti prima di creare una ulteriore iniziativa
         Initiative insertedInitiative = initiativeService.insertInitiative(initiativeToSave);
         return ResponseEntity.ok(this.initiativeModelToDTOMapper.toDtoOnlyId(insertedInitiative));

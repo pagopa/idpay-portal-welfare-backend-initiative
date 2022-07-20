@@ -122,6 +122,8 @@ public class InitiativeModelToDTOMapper {
                                 x.getAdditionalInfo().getServiceName()
                                 : StringUtils.EMPTY)
                 .status(x.getStatus())
+                .creationDate(x.getCreationDate())
+                .updateDate(x.getUpdateDate())
                 .build()).toList();
     }
 

@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 /**
  * InitiativeSummaryDTO
  */
@@ -25,4 +28,9 @@ public class InitiativeSummaryDTO   {
   @JsonProperty("status")
   private String status;
 
+  @JsonProperty("creationDate")
+  private LocalDateTime creationDate;
+
+  @JsonProperty("updateDate")
+  private LocalDateTime updateDate;
 }
