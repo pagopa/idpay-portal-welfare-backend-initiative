@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import it.gov.pagopa.initiative.utils.constraint.BeneficiaryBudgetValue;
-import it.gov.pagopa.initiative.utils.constraint.DisjointSetOrderedDatesFieldsFromLowestToHighest;
+import it.gov.pagopa.initiative.utils.constraint.RankingAndSpendingDatesDoubleUseCaseValue;
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
 
@@ -26,10 +26,7 @@ import java.time.LocalDate;
 @ToString
 @Builder
 @BeneficiaryBudgetValue(budget1 = "beneficiaryBudget", budget2 = "budget")
-//@RankingEndDateLessThanStartDate(date1 = "rankingEndDate", date2 = "startDate")
-//@RankingStartDateLessThanRankingEndDate(date1 = "rankingStartDate", date2 = "rankingEndDate")
 @RankingAndSpendingDatesDoubleUseCaseValue(date1 = "rankingStartDate", date2 = "rankingEndDate", date3 = "startDate", date4 = "endDate")
-//@StartDateLessThanEndDate(date1 = "startDate", date2 = "endDate")
 public class InitiativeGeneralDTO   {
 
   @Min(value = 2, message = "budget should have an amount of at least 2")
