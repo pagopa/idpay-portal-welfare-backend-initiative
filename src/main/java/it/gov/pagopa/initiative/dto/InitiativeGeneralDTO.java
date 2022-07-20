@@ -3,7 +3,8 @@ package it.gov.pagopa.initiative.dto;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
-import it.gov.pagopa.initiative.utils.constraint.*;
+import it.gov.pagopa.initiative.utils.constraint.BeneficiaryBudgetValue;
+import it.gov.pagopa.initiative.utils.constraint.DisjointSetOrderedDatesFieldsFromLowestToHighest;
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
 

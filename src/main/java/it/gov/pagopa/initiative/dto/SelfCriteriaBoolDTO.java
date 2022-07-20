@@ -17,7 +17,7 @@ import org.springframework.validation.annotation.Validated;
 public class SelfCriteriaBoolDTO implements AnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems {
 
   @JsonProperty("_type")
-  private TypeEnum _type;
+  private TypeBoolEnum type;
 
   @JsonProperty("description")
   private String description;

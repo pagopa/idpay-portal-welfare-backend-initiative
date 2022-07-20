@@ -1,217 +1,68 @@
-package it.gov.pagopa.initiative.service;
+package it.gov.pagopa.initiative.mapper;
 
-
-import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.*;
-import it.gov.pagopa.initiative.exception.InitiativeException;
 import it.gov.pagopa.initiative.model.TypeBoolEnum;
 import it.gov.pagopa.initiative.model.TypeMultiEnum;
 import it.gov.pagopa.initiative.model.*;
-import it.gov.pagopa.initiative.repository.InitiativeRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
 
 import java.math.BigDecimal;
-import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @WebMvcTest(value = {
-        InitiativeService.class})
+        InitiativeDTOsToModelMapper.class})
 @Slf4j
-class InitiativeServiceTest {
-
+class InitiativeDTOsToModelMapperTest {
     @Autowired
-    InitiativeService initiativeService;
+    InitiativeDTOsToModelMapper initiativeDTOsToModelMapper;
 
-    @MockBean
-    InitiativeRepository initiativeRepository;
+    private Initiative initiativeOnlyInfoGeneral;
+    private Initiative initiativeNoBaseFields;
+    private InitiativeBeneficiaryRule initiativeBeneficiaryRule;
+    private InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO;
+    private InitiativeInfoDTO initiativeInfoDTOnoBaseFields;
+    private InitiativeInfoDTO initiativeInfoOnlyInfoGeneralDTO;
 
-//    List<Initiative> retrieveInitiativeSummary(String organizationId);
+    @BeforeEach
+    public void setUp() {
+        initiativeOnlyInfoGeneral = createStep1InitiativeOnlyInfoGeneral();
+        initiativeNoBaseFields = createStep1InitiativeNoBaseFields();
+        initiativeBeneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
+        initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
+        initiativeInfoOnlyInfoGeneralDTO = createStep1InitiativeInfoDTOonlyInfoGeneral();
+        initiativeInfoDTOnoBaseFields = createStep1InitiativeInfoDTOnoBaseFields();
+    }
+
     @Test
-    void retrieveInitiativeSummary_ok() throws Exception {
-        Initiative step2Initiative1 = createStep2Initiative();
-        Initiative step2Initiative2 = createStep2Initiative();
-        List<Initiative> initiativeList = Arrays.asList(step2Initiative1, step2Initiative2);
-
-        //Instruct the Repo Mock to return Dummy Initiatives
-        when(initiativeRepository.retrieveInitiativeSummary(anyString())).thenReturn(initiativeList);
-
-        //Try to call the Real Service (which is using the instructed Repo)
-        List<Initiative> initiatives = initiativeService.retrieveInitiativeSummary(anyString());
-
+    void toInitiativeOnlyInfoGeneral_ok(){
+        Initiative initiativeActual = initiativeDTOsToModelMapper.toInitiative(initiativeInfoOnlyInfoGeneralDTO);
         //Check the equality of the results
-        assertEquals(initiativeList, initiatives);
-
-        // you are expecting repo to be called once with correct param
-        verify(initiativeRepository).retrieveInitiativeSummary(anyString()); // same as: verify(initiativeRepository, times(1)).retrieveInitiativeSummary(anyString());
+        assertEquals(initiativeOnlyInfoGeneral, initiativeActual);
     }
 
     @Test
-    void retrieveInitiativeSummary_ko() {
-        //Try to call the Real Service (which is using the instructed Repo)
-        try {
-            List<Initiative> initiatives = initiativeService.retrieveInitiativeSummary(anyString());
-        } catch (InitiativeException e) {
-            log.info("InitiativeException: " + e.getCode());
-            assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
-            assertEquals(InitiativeConstants.Exception.NotFound.CODE_PACKAGE, e.getCode());
-        }
-    }
-
-    @Test
-    void insertInitiative_ok() throws Exception {
-        Initiative step2Initiative = createStep2Initiative();
-
-        //Instruct the Repo Mock to return Dummy Initiatives
-        when(initiativeRepository.insert(any(Initiative.class))).thenReturn(step2Initiative);
-
-        //Try to call the Real Service (which is using the instructed Repo)
-        Initiative initiative = initiativeService.insertInitiative(step2Initiative);
-
+    void toInitiativeNoBaseFields_ok(){
+        Initiative initiativeActual = initiativeDTOsToModelMapper.toInitiative(initiativeInfoDTOnoBaseFields);
         //Check the equality of the results
-        assertEquals(step2Initiative, initiative);
-
-        // you are expecting repo to be called once with correct param
-        verify(initiativeRepository, times(1)).insert(any(Initiative.class));
+        assertEquals(initiativeNoBaseFields, initiativeActual);
     }
 
     @Test
-    void getInitiative_ok() throws Exception {
-        Initiative step2Initiative = createStep2Initiative();
-
-        //Instruct the Repo Mock to return Dummy Initiatives
-        when(initiativeRepository.findByOrganizationIdAndInitiativeId(anyString(), anyString())).thenReturn(Optional.ofNullable(step2Initiative));
-
-        //Try to call the Real Service (which is using the instructed Repo)
-        Initiative initiative = initiativeService.getInitiative(anyString(), anyString());
-
+    void toBeneficiaryRule_ok(){
+        InitiativeBeneficiaryRule initiativeBeneficiaryRuleActual = initiativeDTOsToModelMapper.toBeneficiaryRule(initiativeBeneficiaryRuleDTO);
         //Check the equality of the results
-        assertEquals(Optional.ofNullable(step2Initiative).get(), initiative);
-
-        // you are expecting repo to be called once with correct param
-        verify(initiativeRepository).findByOrganizationIdAndInitiativeId(anyString(), anyString()); // same as: verify(initiativeRepository, times(1)).retrieveInitiativeSummary(anyString());
-    }
-
-    @Test
-    void getInitiative_ko() throws Exception {
-        //Try to call the Real Service (which is using the instructed Repo)
-        try {
-            Initiative initiative = initiativeService.getInitiative(anyString(), anyString());
-        } catch (InitiativeException e) {
-            log.info("InitiativeException: " + e.getCode());
-            assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
-            assertEquals(InitiativeConstants.Exception.NotFound.CODE_PACKAGE, e.getCode());
-        }
-    }
-
-    @Test
-    void getInitiativeBeneficiaryView_ok() throws Exception {
-        Initiative step2Initiative = createStep2Initiative();
-
-        //Instruct the Repo Mock to return Dummy Initiatives
-        when(initiativeRepository.retrieveInitiativeBeneficiaryView(anyString())).thenReturn(Optional.ofNullable(step2Initiative));
-
-        //Try to call the Real Service (which is using the instructed Repo)
-        Initiative initiative = initiativeService.getInitiativeBeneficiaryView(anyString());
-
-        //Check the equality of the results
-        assertEquals(Optional.ofNullable(step2Initiative).get(), initiative);
-
-        // you are expecting repo to be called once with correct param
-        verify(initiativeRepository).retrieveInitiativeBeneficiaryView(anyString()); // same as: verify(initiativeRepository, times(1)).retrieveInitiativeSummary(anyString());
-    }
-
-    @Test
-    void getInitiativeBeneficiaryView_ko() throws Exception {
-        //Try to call the Real Service (which is using the instructed Repo)
-        try {
-            Initiative initiative = initiativeService.getInitiativeBeneficiaryView(anyString());
-        } catch (InitiativeException e) {
-            log.info("InitiativeException: " + e.getCode());
-            assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
-            assertEquals(InitiativeConstants.Exception.NotFound.CODE_PACKAGE, e.getCode());
-        }
-    }
-
-    @Test
-    void updateInitiativeGeneralInfo_ok() throws Exception {
-        Initiative step2Initiative = createStep2Initiative();
-
-        //Instruct the Repo Mock to return Dummy Initiatives
-        when(initiativeRepository.findByOrganizationIdAndInitiativeId(anyString(), anyString())).thenReturn(Optional.ofNullable(step2Initiative));
-
-        //Try to call the Real Service (which is using the instructed Repo)
-        initiativeService.updateInitiativeGeneralInfo("Ente1", "Id1", step2Initiative);
-
-        // you are expecting repo to be called once with correct param
-        verify(initiativeRepository, times(1)).findByOrganizationIdAndInitiativeId(anyString(), anyString());
-    }
-
-    @Test
-    void updateInitiativeGeneralInfo_ko() throws Exception {
-        Initiative fullInitiative = createFullInitiative();
-        //Try to call the Real Service (which is using the instructed Repo)
-        try {
-            initiativeService.updateInitiativeGeneralInfo("Ente1", "Id1", fullInitiative);
-        } catch (InitiativeException e) {
-            log.info("InitiativeException: " + e.getCode());
-            assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
-            assertEquals(InitiativeConstants.Exception.NotFound.CODE_PACKAGE, e.getCode());
-        }
-    }
-
-    @Test
-    void updateInitiativeBeneficiary_ok() throws Exception {
-        Initiative fullInitiative = createFullInitiative();
-        InitiativeBeneficiaryRule initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
-
-        //Instruct the Repo Mock to return Dummy Initiatives
-        when(initiativeRepository.findByOrganizationIdAndInitiativeId(anyString(), anyString())).thenReturn(Optional.ofNullable(fullInitiative));
-
-        //Try to call the Real Service (which is using the instructed Repo)
-        initiativeService.updateInitiativeBeneficiary("Ente1", "Id1", initiativeBeneficiaryRule);
-
-        // you are expecting repo to be called once with correct param
-        verify(initiativeRepository, times(1)).findByOrganizationIdAndInitiativeId(anyString(), anyString());
-    }
-
-    @Test
-    void updateInitiativeBeneficiary_ko() throws Exception {
-        InitiativeBeneficiaryRule initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
-
-        //Instruct the Repo Mock to return Dummy Initiatives
-        when(initiativeRepository.findByOrganizationIdAndInitiativeId(anyString(), anyString())).thenThrow(
-                new InitiativeException(
-                        InitiativeConstants.Exception.NotFound.CODE_PACKAGE,
-                        MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_ORGANIZATION_ID_MESSAGE, "Ente1", "Id1"),
-                        HttpStatus.NOT_FOUND)
-        );
-
-        //Try to call the Real Service (which is using the instructed Repo)
-        try {
-            initiativeService.updateInitiativeBeneficiary("Ente1", "Id1", initiativeBeneficiaryRule);
-        } catch (InitiativeException e) {
-            log.info("InitiativeException: " + e.getCode());
-            assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
-            assertEquals(InitiativeConstants.Exception.NotFound.CODE_PACKAGE, e.getCode());
-            assertEquals(MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_ORGANIZATION_ID_MESSAGE, "Ente1", "Id1"), e.getMessage());
-        }
+        assertEquals(initiativeBeneficiaryRule, initiativeBeneficiaryRuleActual);
     }
 
     Initiative createFullInitiative () {
@@ -226,8 +77,7 @@ class InitiativeServiceTest {
         return initiativeDTO;
     }
 
-    Initiative createStep1Initiative () {
-        Initiative initiative = new Initiative();
+    private Initiative createInitiativeBaseFields(Initiative initiative) {
         initiative.setInitiativeId("Id1");
         initiative.setInitiativeName("initiativeName1");
         initiative.setOrganizationId("organizationId1");
@@ -237,11 +87,30 @@ class InitiativeServiceTest {
         initiative.setPdndCheck(true);
         initiative.setPdndToken("pdndToken1");
         initiative.setServiceId("serviceId");
+        return initiative;
+    }
 
+    Initiative createStep1Initiative () {
+        Initiative initiative = new Initiative();
+        initiative = createInitiativeBaseFields(initiative);
         initiative.setGeneral(createInitiativeGeneral());
         initiative.setAdditionalInfo(createInitiativeAdditional());
 //        initiative.setBeneficiaryRule(createInitiativeBeneficiaryRule());
 //        initiative.setLegal(createInitiativeLegal());
+        return initiative;
+    }
+
+    Initiative createStep1InitiativeOnlyInfoGeneral () {
+        Initiative initiative = new Initiative();
+//        initiative = createInitiativeBaseFields(initiative);
+        initiative.setGeneral(createInitiativeGeneral());
+        return initiative;
+    }
+
+    Initiative createStep1InitiativeNoBaseFields () {
+        Initiative initiative = new Initiative();
+        initiative.setGeneral(createInitiativeGeneral());
+        initiative.setAdditionalInfo(createInitiativeAdditional());
         return initiative;
     }
 
@@ -251,10 +120,14 @@ class InitiativeServiceTest {
         initiativeGeneral.setBeneficiaryKnown(true);
         initiativeGeneral.setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF);
         initiativeGeneral.setBudget(new BigDecimal(1000000000));
-        initiativeGeneral.setEndDate(LocalDate.of(2022, 9, 8));
-        initiativeGeneral.setStartDate(LocalDate.of(2022, 8, 8));
-        initiativeGeneral.setRankingStartDate(LocalDate.of(2022, 9, 18));
-        initiativeGeneral.setRankingEndDate(LocalDate.of(2022, 8, 18));
+        LocalDate rankingStartDate = LocalDate.now();
+        LocalDate rankingEndDate = rankingStartDate.plusDays(1);
+        LocalDate startDate = rankingEndDate.plusDays(1);
+        LocalDate endDate = startDate.plusDays(1);
+        initiativeGeneral.setRankingStartDate(rankingStartDate);
+        initiativeGeneral.setRankingEndDate(rankingEndDate);
+        initiativeGeneral.setStartDate(startDate);
+        initiativeGeneral.setEndDate(endDate);
         return initiativeGeneral;
     }
 
@@ -308,8 +181,7 @@ class InitiativeServiceTest {
     }
 
     InitiativeDTO createStep1InitiativeDTO () {
-        InitiativeDTO initiativeDTO = new InitiativeDTO();
-        initiativeDTO = initiativeDTO.builder()
+        return InitiativeDTO.builder()
                 .initiativeId("Id1")
                 .initiativeName("initiativeName1")
                 .organizationId("organizationId1")
@@ -319,13 +191,14 @@ class InitiativeServiceTest {
                 .pdndCheck(true)
                 .pdndToken("pdndToken1")
                 .general(createInitiativeGeneralDTO()).additionalInfo(createInitiativeAdditionalDTO()).build();
-        return initiativeDTO;
     }
 
-    InitiativeInfoDTO createStep1InitiativeInfoDTO() {
-        InitiativeInfoDTO initiativeInfoDTO = new InitiativeInfoDTO();
-        initiativeInfoDTO = initiativeInfoDTO.builder().general(createInitiativeGeneralDTO()).additionalInfo(createInitiativeAdditionalDTO()).build();
-        return initiativeInfoDTO;
+    InitiativeInfoDTO createStep1InitiativeInfoDTOnoBaseFields() {
+        return InitiativeInfoDTO.builder().general(createInitiativeGeneralDTO()).additionalInfo(createInitiativeAdditionalDTO()).build();
+    }
+
+    InitiativeInfoDTO createStep1InitiativeInfoDTOonlyInfoGeneral() {
+        return InitiativeInfoDTO.builder().general(createInitiativeGeneralDTO()).build();
     }
 
     private InitiativeGeneralDTO createInitiativeGeneralDTO() {

@@ -3,6 +3,7 @@ package it.gov.pagopa.initiative.service;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.exception.InitiativeException;
 import it.gov.pagopa.initiative.model.Initiative;
+import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,13 +69,13 @@ public class InitiativeServiceImpl implements InitiativeService {
     }
 
     @Override
-    public void updateInitiativeBeneficiary(String organizationId, String initiativeId, Initiative initiativeBeneficiaryRuleModel){
+    public void updateInitiativeBeneficiary(String organizationId, String initiativeId, InitiativeBeneficiaryRule initiativeBeneficiaryRuleModel){
         Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeId(organizationId, initiativeId)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE_PACKAGE,
                         MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_ORGANIZATION_ID_MESSAGE, organizationId, initiativeId),
                         HttpStatus.NOT_FOUND));
-        initiative.setBeneficiaryRule(initiativeBeneficiaryRuleModel.getBeneficiaryRule());
+        initiative.setBeneficiaryRule(initiativeBeneficiaryRuleModel);
         this.initiativeRepository.save(initiative);
     }
 

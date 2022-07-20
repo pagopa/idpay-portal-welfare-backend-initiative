@@ -4,7 +4,8 @@ import it.gov.pagopa.initiative.dto.InitiativeBeneficiaryRuleDTO;
 import it.gov.pagopa.initiative.dto.InitiativeDTO;
 import it.gov.pagopa.initiative.dto.InitiativeInfoDTO;
 import it.gov.pagopa.initiative.dto.InitiativeSummaryDTO;
-import it.gov.pagopa.initiative.mapper.InitiativeMapper;
+import it.gov.pagopa.initiative.mapper.InitiativeDTOsToModelMapper;
+import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.service.InitiativeService;
 import lombok.extern.slf4j.Slf4j;
@@ -27,44 +28,47 @@ public class InitiativeApiController implements InitiativeApi {
     private InitiativeService initiativeService;
 
     @Autowired
-    private InitiativeMapper mapper;
+    private InitiativeModelToDTOMapper initiativeModelToDTOMapper;
+
+    @Autowired
+    private InitiativeDTOsToModelMapper initiativeDTOsToModelMapper;
 
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<InitiativeSummaryDTO>> getInitativeSummary(@PathVariable("organizationId") String organizationId) {
-        return ResponseEntity.ok(this.mapper.toInitiativeSummaryDtoList(
+        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeSummaryDTOList(
                 this.initiativeService.retrieveInitiativeSummary(organizationId)
         ));
     }
 
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<InitiativeDTO> getInitiativeDetail(@PathVariable("organizationId") String organizationId, @PathVariable("initiativeId") String initiativeId) {
-        return ResponseEntity.ok(this.mapper.toInitiativeDto(this.initiativeService.getInitiative(organizationId, initiativeId)));
+        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDTO(this.initiativeService.getInitiative(organizationId, initiativeId)));
     }
 
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<InitiativeDTO> saveInitiativeGeneralInfo(@PathVariable("organizationId") String organizationId, @Valid @RequestBody InitiativeInfoDTO initiativeInfoDTO) {
-        Initiative initiativeToSave = this.mapper.toInitiativeInfoModel(initiativeInfoDTO);
+        Initiative initiativeToSave = this.initiativeDTOsToModelMapper.toInitiative(initiativeInfoDTO);
         initiativeToSave.setOrganizationId(organizationId);
         //TODO verificare se necessario controllo per serviceId e organization non sovrapposti prima di creare una ulteriore iniziativa
         Initiative insertedInitiative = initiativeService.insertInitiative(initiativeToSave);
-        return ResponseEntity.ok(this.mapper.toDtoOnlyId(insertedInitiative));
+        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toDtoOnlyId(insertedInitiative));
     }
 
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Void> updateInitiativeBeneficiary(@PathVariable("organizationId") String organizationId,  @PathVariable("initiativeId") String initiativeId, @Valid @RequestBody InitiativeBeneficiaryRuleDTO beneficiaryRuleDto) {
-        this.initiativeService.updateInitiativeBeneficiary(organizationId, initiativeId, this.mapper.toBeneficiaryRuleModel(beneficiaryRuleDto));
+        this.initiativeService.updateInitiativeBeneficiary(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toBeneficiaryRule(beneficiaryRuleDto));
         return ResponseEntity.ok().build();
     }
 
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Void> updateInitiativeGeneralInfo(@PathVariable("organizationId") String organizationId,  @PathVariable("initiativeId") String initiativeId, @Valid @RequestBody InitiativeInfoDTO initiativeInfoDto) {
-        this.initiativeService.updateInitiativeGeneralInfo(organizationId, initiativeId, this.mapper.toInitiativeInfoModel(initiativeInfoDto));
+        this.initiativeService.updateInitiativeGeneralInfo(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toInitiative(initiativeInfoDto));
         return ResponseEntity.ok().build();
     }
 
     @Override
     public ResponseEntity<InitiativeDTO> getInitiativeBeneficiaryView(String initiativeId) {
-        return ResponseEntity.ok(this.mapper.toInitiativeDto(this.initiativeService.getInitiativeBeneficiaryView(initiativeId)));
+        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDTO(this.initiativeService.getInitiativeBeneficiaryView(initiativeId)));
     }
 
 }

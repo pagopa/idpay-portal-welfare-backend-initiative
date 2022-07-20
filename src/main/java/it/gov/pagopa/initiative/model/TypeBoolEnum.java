@@ -6,15 +6,13 @@ import com.fasterxml.jackson.annotation.JsonValue;
 /**
  * Gets or Sets _type
  */
-public enum TypeEnum {
+public enum TypeBoolEnum {
 
-    BOOLEAN("boolean"),
-
-    MULTI("multi");
+    BOOLEAN("boolean");
 
     private String value;
 
-    TypeEnum(String value) {
+    TypeBoolEnum(String value) {
         this.value = value;
     }
 
@@ -25,8 +23,8 @@ public enum TypeEnum {
     }
 
     @JsonCreator
-    public static TypeEnum fromValue(String text) {
-        for (TypeEnum b : TypeEnum.values()) {
+    public static TypeBoolEnum fromValue(String text) {
+        for (TypeBoolEnum b : TypeBoolEnum.values()) {
             if (String.valueOf(b.value).equals(text)) {
                 return b;
             }

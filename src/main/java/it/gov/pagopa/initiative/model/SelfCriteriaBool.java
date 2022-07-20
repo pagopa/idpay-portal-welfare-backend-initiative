@@ -11,7 +11,7 @@ import lombok.*;
 @Builder
 public class SelfCriteriaBool implements ISelfDeclarationCriteria {
 
-  private TypeEnum _type;
+  private TypeBoolEnum _type;
   private String description;
   private Boolean value;
   private String code;
