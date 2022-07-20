@@ -1,6 +1,7 @@
 package it.gov.pagopa.initiative.service;
 
 import it.gov.pagopa.initiative.model.Initiative;
+import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,5 +19,5 @@ public interface InitiativeService {
 
     void updateInitiativeGeneralInfo(String organizationId, String initiativeId, Initiative initiativeInfoModel);
 
-    void updateInitiativeBeneficiary(String organizationId, String initiativeId, Initiative toBeneficiaryRuleModel);
+    void updateInitiativeBeneficiary(String organizationId, String initiativeId, InitiativeBeneficiaryRule toBeneficiaryRuleModel);
 }

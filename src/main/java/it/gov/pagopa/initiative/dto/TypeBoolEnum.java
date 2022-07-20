@@ -9,12 +9,10 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * Gets or Sets _type
  */
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
-public enum TypeEnum {
+public enum TypeBoolEnum {
 
     @JsonProperty("boolean")
-    BOOLEAN("boolean"),
-    @JsonProperty("multi")
-    MULTI("multi");
+    BOOLEAN("boolean");
 
     @JsonProperty("_type")
     private String type;
@@ -24,7 +22,7 @@ public enum TypeEnum {
         return String.valueOf(type);
     }
 
-    TypeEnum(String type) {
+    TypeBoolEnum(String type) {
         this.type = type;
     }
 
@@ -34,8 +32,8 @@ public enum TypeEnum {
     }
 
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
-    public static TypeEnum fromValue(String type) {
-        for (TypeEnum b : TypeEnum.values()) {
+    public static TypeBoolEnum fromValue(String type) {
+        for (TypeBoolEnum b : TypeBoolEnum.values()) {
             if (String.valueOf(b.type).equals(type)) {
                 return b;
             }

@@ -3,9 +3,11 @@ package it.gov.pagopa.initiative.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import it.gov.pagopa.initiative.dto.*;
-import it.gov.pagopa.initiative.mapper.InitiativeMapper;
+import it.gov.pagopa.initiative.mapper.InitiativeDTOsToModelMapper;
+import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
+import it.gov.pagopa.initiative.model.TypeBoolEnum;
+import it.gov.pagopa.initiative.model.TypeMultiEnum;
 import it.gov.pagopa.initiative.model.*;
-import it.gov.pagopa.initiative.model.TypeEnum;
 import it.gov.pagopa.initiative.service.InitiativeService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -24,12 +26,13 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -45,7 +48,10 @@ class InitiativeApiTest {
     InitiativeService initiativeService;
 
     @MockBean
-    InitiativeMapper initiativeMapper;
+    InitiativeModelToDTOMapper initiativeModelToDTOMapper;
+
+    @MockBean
+    InitiativeDTOsToModelMapper initiativeDTOsToModelMapper;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -132,7 +138,7 @@ class InitiativeApiTest {
 //        doNothing().when(initiativeService).insertInitiative(step1Initiative); //doNothing only for Void method
         when(initiativeService.insertInitiative(step1Initiative)).thenReturn(step1Initiative);
 
-        when(initiativeMapper.toInitiativeInfoModel(initiativeInfoDTO)).thenReturn(step1Initiative);
+        when(initiativeDTOsToModelMapper.toInitiative(initiativeInfoDTO)).thenReturn(step1Initiative);
 
 //        Map<String, Object> body = new HashMap<>();
 //        body.put("general", initiativeGeneralDTO);
@@ -158,11 +164,11 @@ class InitiativeApiTest {
         //create Dummy BodyRequest InitiativeInfoDTO
         InitiativeInfoDTO initiativeInfoDTO = createStep1InitiativeInfoDTO();
 
-        // Instruct the Service to insert a Dummy Initiative
-        when(initiativeMapper.toInitiativeInfoModel(initiativeInfoDTO)).thenReturn(step1Initiative);
+        // Instruct the Service to update a Dummy Initiative
+        when(initiativeDTOsToModelMapper.toInitiative(initiativeInfoDTO)).thenReturn(step1Initiative);
 
         //doNothing only for Void method
-        Initiative toInitiativeInfoModel = initiativeMapper.toInitiativeInfoModel(initiativeInfoDTO);
+        Initiative toInitiativeInfoModel = initiativeDTOsToModelMapper.toInitiative(initiativeInfoDTO);
         doNothing().when(initiativeService).updateInitiativeGeneralInfo("Ente1", "Id1", toInitiativeInfoModel);
 
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.patch(BASE_URL + MessageFormat.format(PATCH_INITIATIVE_GENERAL_INFO_URL, "Ente1", "Id1"))
@@ -178,17 +184,18 @@ class InitiativeApiTest {
     void updateInitiativeBeneficiary_ok() throws Exception {
         objectMapper.registerModule(new JavaTimeModule());
 
+        InitiativeBeneficiaryRule initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
         //create Dummy Initiative
         Initiative step2Initiative = createStep2Initiative();
         //create Dummy BodyRequest InitiativeInfoDTO
         InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
 
         // Instruct the Service to insert a Dummy Initiative
-        when(initiativeMapper.toBeneficiaryRuleModel(initiativeBeneficiaryRuleDTO)).thenReturn(step2Initiative);
+        when(initiativeDTOsToModelMapper.toBeneficiaryRule(initiativeBeneficiaryRuleDTO)).thenReturn(initiativeBeneficiaryRule);
 
         //doNothing only for Void method
-        Initiative toInitiativeInfoModel = initiativeMapper.toBeneficiaryRuleModel(initiativeBeneficiaryRuleDTO);
-        doNothing().when(initiativeService).updateInitiativeGeneralInfo("Ente1", "Id1", toInitiativeInfoModel);
+        InitiativeBeneficiaryRule initiativeBeneficiaryRule2 = initiativeDTOsToModelMapper.toBeneficiaryRule(initiativeBeneficiaryRuleDTO);
+        doNothing().when(initiativeService).updateInitiativeBeneficiary("Ente1", "Id1", initiativeBeneficiaryRule2);
 
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.patch(BASE_URL + MessageFormat.format(PATCH_INITIATIVE_BENEFICIARY_RULES_URL, "Ente1", "Id1"))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -207,7 +214,7 @@ class InitiativeApiTest {
         InitiativeDTO initiativeDTO = createFullInitiativeDTO();
 
         // Instruct the Service to insert a Dummy Initiative
-        when(initiativeMapper.toInitiativeDto(initiative)).thenReturn(initiativeDTO);
+        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative)).thenReturn(initiativeDTO);
         // When
         // With this instruction, I instruct the service (via Mockito's when) to always return the DummyInitiative to me anytime I call the same service's function
         when(initiativeService.getInitiativeBeneficiaryView(anyString())).thenReturn(initiative);
@@ -281,12 +288,12 @@ class InitiativeApiTest {
     private InitiativeBeneficiaryRule createInitiativeBeneficiaryRule() {
         InitiativeBeneficiaryRule initiativeBeneficiaryRule = new InitiativeBeneficiaryRule();
         SelfCriteriaBool selfCriteriaBool = new SelfCriteriaBool();
-        selfCriteriaBool.set_type(TypeEnum.BOOLEAN);
+        selfCriteriaBool.set_type(TypeBoolEnum.BOOLEAN);
         selfCriteriaBool.setCode("B001");
         selfCriteriaBool.setDescription("Desc_bool");
         selfCriteriaBool.setValue(true);
         SelfCriteriaMulti selfCriteriaMulti = new SelfCriteriaMulti();
-        selfCriteriaMulti.set_type(TypeEnum.MULTI);
+        selfCriteriaMulti.set_type(TypeMultiEnum.MULTI);
         selfCriteriaMulti.setCode("B001");
         selfCriteriaMulti.setDescription("Desc_Multi");
         List<String> values = new ArrayList<>();
@@ -320,7 +327,7 @@ class InitiativeApiTest {
 
     InitiativeDTO createStep1InitiativeDTO () {
         InitiativeDTO initiativeDTO = new InitiativeDTO();
-        initiativeDTO.builder()
+        initiativeDTO = initiativeDTO.builder()
                 .initiativeId("Id1")
                 .initiativeName("initiativeName1")
                 .organizationId("organizationId1")
@@ -382,12 +389,12 @@ class InitiativeApiTest {
     private InitiativeBeneficiaryRuleDTO createInitiativeBeneficiaryRuleDTO() {
         InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = new InitiativeBeneficiaryRuleDTO();
         SelfCriteriaBoolDTO selfCriteriaBoolDTO = new SelfCriteriaBoolDTO();
-        selfCriteriaBoolDTO.set_type(it.gov.pagopa.initiative.dto.TypeEnum.BOOLEAN);
+        selfCriteriaBoolDTO.setType(it.gov.pagopa.initiative.dto.TypeBoolEnum.BOOLEAN);
         selfCriteriaBoolDTO.setCode("B001");
         selfCriteriaBoolDTO.setDescription("Desc_bool");
         selfCriteriaBoolDTO.setValue(true);
         SelfCriteriaMultiDTO selfCriteriaMultiDTO = new SelfCriteriaMultiDTO();
-        selfCriteriaMultiDTO.set_type(it.gov.pagopa.initiative.dto.TypeEnum.MULTI);
+        selfCriteriaMultiDTO.setType(it.gov.pagopa.initiative.dto.TypeMultiEnum.MULTI);
         selfCriteriaMultiDTO.setCode("B001");
         selfCriteriaMultiDTO.setDescription("Desc_Multi");
         List<String> values = new ArrayList<>();

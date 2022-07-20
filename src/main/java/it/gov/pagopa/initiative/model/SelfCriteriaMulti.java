@@ -13,7 +13,7 @@ import java.util.List;
 @Builder
 public class SelfCriteriaMulti implements ISelfDeclarationCriteria {
 
-  private TypeEnum _type;
+  private TypeMultiEnum _type;
   private String description;
   private List<String> value;
   private String code;

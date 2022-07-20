@@ -1,6 +1,7 @@
 package it.gov.pagopa.initiative.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
 
@@ -27,6 +28,9 @@ public class InitiativeBeneficiaryRuleDTO   {
   //@NotEmpty
   @JsonProperty("selfDeclarationCriteria")
   @Valid
+  @Schema(
+          description = "List of possible self criteria",
+          anyOf = {SelfCriteriaBoolDTO.class, SelfCriteriaMultiDTO.class})
   private List<AnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems> selfDeclarationCriteria;
 
   //@NotEmpty

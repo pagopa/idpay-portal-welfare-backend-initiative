@@ -20,7 +20,7 @@ import java.util.List;
 public class SelfCriteriaMultiDTO implements AnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems {
 
   @JsonProperty("_type")
-  private TypeEnum _type;
+  private TypeMultiEnum type;
 
   @JsonProperty("description")
   private String description;
