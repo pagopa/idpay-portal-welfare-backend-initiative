@@ -1,0 +1,11 @@
+spring:
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
+      database: ${MONGODB_DBNAME}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
