@@ -162,6 +162,15 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
         //or
         assertThat(violations.size()).isEqualTo(0);
     }
+
+    @Test
+    void when_BeneficiaryBudgetAndBudgetAreValid_thenValidationArePassed(){
+        InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralBudgetValid_ok();
+        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO);
+
+        assertTrue(violations.isEmpty());
+        assertThat(violations.size()).isEqualTo(0);
+    }
     private InitiativeGeneralDTO createInitiativeGeneralDTO_ok() {
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
@@ -366,6 +375,23 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
         LocalDate rankingStartDate = startDate.plusDays(1);
         LocalDate rankingEndDate = rankingStartDate.plusDays(1);
         LocalDate endDate = rankingEndDate.plusDays(5);
+        initiativeGeneralDTO.setRankingStartDate(rankingStartDate);
+        initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
+        initiativeGeneralDTO.setStartDate(startDate);
+        initiativeGeneralDTO.setEndDate(endDate);
+        return initiativeGeneralDTO;
+    }
+
+    private InitiativeGeneralDTO createInitiativeGeneralBudgetValid_ok(){
+        InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
+        initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
+        initiativeGeneralDTO.setBeneficiaryKnown(true);
+        initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
+        initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
+        LocalDate rankingStartDate = LocalDate.now();
+        LocalDate rankingEndDate = rankingStartDate.plusDays(1);
+        LocalDate startDate = rankingEndDate.plusDays(1);
+        LocalDate endDate = startDate.plusDays(5);
         initiativeGeneralDTO.setRankingStartDate(rankingStartDate);
         initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
         initiativeGeneralDTO.setStartDate(startDate);

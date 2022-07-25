@@ -66,6 +66,12 @@ class InitiativeModelToDTOMapperTest {
     }
 
     @Test
+    void toInitiativeDTONull_ok(){
+        InitiativeDTO initiativeDTO = null;
+        assertEquals(null, initiativeModelToDTOMapper.toInitiativeDTO(null));
+    }
+
+    @Test
     void toDtoOnlyId_ok(){
         InitiativeDTO initiativeDTOonlyId = new InitiativeDTO();
         initiativeDTOonlyId.setInitiativeId("Id1");
@@ -73,11 +79,22 @@ class InitiativeModelToDTOMapperTest {
         //Check the equality of the results
         assertEquals(initiativeDTOonlyId, initiativeDTOtoBeVerified);
     }
+
+    @Test
+    void toDtoOnlyNull_ok(){
+        assertEquals(null, initiativeModelToDTOMapper.toDtoOnlyId(null));
+    }
+
     @Test
     void toInitiativeBeneficiaryRuleDTO_ok(){
         InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTOtoBeVerified = initiativeModelToDTOMapper.toInitiativeBeneficiaryRuleDTO(initiativeBeneficiaryRule);
         //Check the equality of the results
         assertEquals(initiativeBeneficiaryRuleDTO, initiativeBeneficiaryRuleDTOtoBeVerified);
+    }
+
+    @Test
+    void toInitiativeBeneficiaryRuleDTONull_ok(){
+        assertEquals(null, initiativeModelToDTOMapper.toInitiativeBeneficiaryRuleDTO(null));
     }
     @Test
     void toInitiativeSummaryDTOList_ok(){
