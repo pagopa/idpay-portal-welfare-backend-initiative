@@ -95,7 +95,7 @@ public interface InitiativeApi {
             @ApiResponse(responseCode = "429", description = "Too many Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
 
             @ApiResponse(responseCode = "500", description = "Server ERROR", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))})
-    @PatchMapping(value = "/idpay/organization/{organizationId}/initiative/{initiativeId}/beneficiary",
+    @PutMapping(value = "/idpay/organization/{organizationId}/initiative/{initiativeId}/beneficiary",
             produces = {"application/json"},
             consumes = {"application/json"})
     ResponseEntity<Void> updateInitiativeBeneficiary(@PathVariable("organizationId") String organizationId, @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId, @Parameter(in = ParameterIn.DEFAULT, description = "Unique identifier of the subscribed initiative, instrument HPAN", schema = @Schema()) @Valid @RequestBody InitiativeBeneficiaryRuleDTO body);
@@ -117,7 +117,7 @@ public interface InitiativeApi {
             @ApiResponse(responseCode = "429", description = "Too many Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
 
             @ApiResponse(responseCode = "500", description = "Server ERROR", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))})
-    @PatchMapping(value = "/idpay/organization/{organizationId}/initiative/{initiativeId}/general",
+    @PutMapping(value = "/idpay/organization/{organizationId}/initiative/{initiativeId}/general",
             produces = {"application/json"},
             consumes = {"application/json"})
     ResponseEntity<Void> updateInitiativeGeneralInfo(@PathVariable("organizationId") String organizationId, @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId, @Parameter(in = ParameterIn.DEFAULT, description = "Unique identifier of the subscribed initiative, IBAN of the citizen", schema = @Schema()) @Valid @RequestBody InitiativeInfoDTO body);

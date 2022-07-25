@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 /**
@@ -18,19 +19,19 @@ import javax.validation.constraints.Size;
 @Builder
 public class InitiativeAdditionalDTO   {
 
-  @Size(min = 2, message = "At least 2 characters")
+  @NotBlank
   @JsonProperty("serviceId")
   private String serviceId;
 
-  @Size(min = 2, message = "At least 2 characters")
+  @NotBlank
   @JsonProperty("serviceName")
   private String serviceName;
 
-  @Size(min = 2, message = "At least 2 characters")
+  @NotBlank
   @JsonProperty("argument")
   private String argument;
 
-  @Size(min = 2, message = "At least 2 characters")
+  @NotBlank
   @JsonProperty("description")
   private String description;
 

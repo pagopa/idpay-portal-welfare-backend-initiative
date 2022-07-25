@@ -49,12 +49,6 @@ public class InitiativeDTO   {
   @JsonProperty("pdndToken")
   private String pdndToken;
 
-  @JsonProperty("creationDate")
-  private LocalDateTime creationDate;
-
-  @JsonProperty("updateDate")
-  private LocalDateTime updateDate;
-
 //  @NotEmpty
 //  @NotBlank
 //  @NotNull
@@ -62,6 +56,11 @@ public class InitiativeDTO   {
   @JsonProperty("status")
   private String status;
 
+  @JsonProperty("creationDate")
+  private LocalDateTime creationDate;
+
+  @JsonProperty("updateDate")
+  private LocalDateTime updateDate;
 
   @JsonProperty("pdndCheck")
   //@NotNull

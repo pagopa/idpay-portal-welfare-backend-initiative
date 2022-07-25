@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -65,6 +66,7 @@ public class InitiativeServiceImpl implements InitiativeService {
                         HttpStatus.NOT_FOUND));
         initiative.setGeneral(initiativeInfoModel.getGeneral());
         initiative.setAdditionalInfo(initiativeInfoModel.getAdditionalInfo());
+        initiative.setUpdateDate(LocalDateTime.now());
         this.initiativeRepository.save(initiative);
     }
 
@@ -76,6 +78,7 @@ public class InitiativeServiceImpl implements InitiativeService {
                         MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_ORGANIZATION_ID_MESSAGE, organizationId, initiativeId),
                         HttpStatus.NOT_FOUND));
         initiative.setBeneficiaryRule(initiativeBeneficiaryRuleModel);
+        initiative.setUpdateDate(LocalDateTime.now());
         this.initiativeRepository.save(initiative);
     }
 
