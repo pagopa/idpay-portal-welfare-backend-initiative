@@ -27,7 +27,7 @@ public class InitiativeInfoDTO {
 
   @JsonProperty("additionalInfo")
   @Valid
-  @NotNull
+//  @NotNull
   private InitiativeAdditionalDTO additionalInfo;
 
 }
