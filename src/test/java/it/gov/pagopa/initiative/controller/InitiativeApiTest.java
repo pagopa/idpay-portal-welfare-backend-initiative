@@ -68,8 +68,8 @@ class InitiativeApiTest {
     private static final String GET_INITIATIVE_ACTIVE_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_1_ID_PLACEHOLDER;
     private static final String GET_INITIATIVE_BENEFICIARY_VIEW_URL = "/initiative/" + INITIATIVE_0_ID_PLACEHOLDER + "/beneficiary/view";
     private static final String POST_INITIATIVE_GENERAL_INFO_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/general";
-    private static final String PATCH_INITIATIVE_GENERAL_INFO_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_1_ID_PLACEHOLDER + "/general";
-    private static final String PATCH_INITIATIVE_BENEFICIARY_RULES_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_1_ID_PLACEHOLDER + "/beneficiary";
+    private static final String PUT_INITIATIVE_GENERAL_INFO_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_1_ID_PLACEHOLDER + "/general";
+    private static final String PUT_INITIATIVE_BENEFICIARY_RULES_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_1_ID_PLACEHOLDER + "/beneficiary";
     private static final String ROLE = "TEST_ROLE";
 
     @Test
@@ -171,7 +171,7 @@ class InitiativeApiTest {
         Initiative toInitiativeInfoModel = initiativeDTOsToModelMapper.toInitiative(initiativeInfoDTO);
         doNothing().when(initiativeService).updateInitiativeGeneralInfo("Ente1", "Id1", toInitiativeInfoModel);
 
-        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.patch(BASE_URL + MessageFormat.format(PATCH_INITIATIVE_GENERAL_INFO_URL, "Ente1", "Id1"))
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + MessageFormat.format(PUT_INITIATIVE_GENERAL_INFO_URL, "Ente1", "Id1"))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(initiativeInfoDTO))
                 .accept(MediaType.APPLICATION_JSON))
@@ -197,7 +197,7 @@ class InitiativeApiTest {
         InitiativeBeneficiaryRule initiativeBeneficiaryRule2 = initiativeDTOsToModelMapper.toBeneficiaryRule(initiativeBeneficiaryRuleDTO);
         doNothing().when(initiativeService).updateInitiativeBeneficiary("Ente1", "Id1", initiativeBeneficiaryRule2);
 
-        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.patch(BASE_URL + MessageFormat.format(PATCH_INITIATIVE_BENEFICIARY_RULES_URL, "Ente1", "Id1"))
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + MessageFormat.format(PUT_INITIATIVE_BENEFICIARY_RULES_URL, "Ente1", "Id1"))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(initiativeBeneficiaryRuleDTO))
                 .accept(MediaType.APPLICATION_JSON))
