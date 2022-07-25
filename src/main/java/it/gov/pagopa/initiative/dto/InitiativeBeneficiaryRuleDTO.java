@@ -20,12 +20,6 @@ import java.util.List;
 @Builder
 public class InitiativeBeneficiaryRuleDTO   {
 
-
-  // InitiativeBeneficiaryRuleDTO non deve essere null ma uno tra selfDeclarationCriteria e automatedCriteria dovrebbe esserlo??
-
-  //! Come comportarsi con la scelta di criteri automated o self?
-
-  //@NotEmpty
   @JsonProperty("selfDeclarationCriteria")
   @Valid
   @Schema(
@@ -33,7 +27,6 @@ public class InitiativeBeneficiaryRuleDTO   {
           anyOf = {SelfCriteriaBoolDTO.class, SelfCriteriaMultiDTO.class})
   private List<AnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems> selfDeclarationCriteria;
 
-  //@NotEmpty
   @JsonProperty("automatedCriteria")
   @Valid
   private List<AutomatedCriteriaDTO> automatedCriteria;

@@ -5,6 +5,8 @@ import lombok.*;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * InitiativePatchDTO
@@ -20,13 +22,12 @@ public class InitiativeInfoDTO {
 
   @JsonProperty("general")
   @Valid
-  //TODO aggiungere validatore custom che prosegue solo per status DRAFT
+  @NotNull
   private InitiativeGeneralDTO general;
 
-
-  @Valid
-  //TODO aggiungere validatore custom che prosegue solo per status DRAFT
   @JsonProperty("additionalInfo")
+  @Valid
+  @NotNull
   private InitiativeAdditionalDTO additionalInfo;
 
 }

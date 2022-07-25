@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.NotBlank;
+
 /**
  * InitiativeLegalDTO
  */
@@ -16,22 +18,20 @@ import org.springframework.validation.annotation.Validated;
 @Builder
 public class InitiativeLegalDTO   {
 
-  //@NotNull
+  @NotBlank
   //@Pattern(regexp = "https://")
   @JsonProperty("privacyLink")
   private String privacyLink;
 
-  //@NotEmpty
-  //@Size(min = 8, message = "At least 8 characters") //'https://..' min 8 characters
+  @NotBlank
   @JsonProperty("tcLink")
   private String tcLink;
 
-  //@NotBlank
-  //@Size(min = 8, message = "At least 8 characters") //'https://..' min 8 characters
+  @NotBlank
   @JsonProperty("regulationLink")
   private String regulationLink;
 
-  //@Size(min = 8, message = "At least 8 characters") //'https://..' min 8 characters
+  @NotBlank
   @JsonProperty("dpiaLink")
   private String dpiaLink;
 

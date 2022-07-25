@@ -12,7 +12,7 @@ public class AutomatedCriteria {
 
   private String authority;
   private String code ;
-  private Boolean field;
+  private String field;
   private String operator;
   private String value;
 

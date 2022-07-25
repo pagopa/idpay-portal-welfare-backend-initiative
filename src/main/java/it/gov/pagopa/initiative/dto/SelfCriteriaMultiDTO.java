@@ -5,6 +5,7 @@ import lombok.*;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 /**
@@ -23,6 +24,7 @@ public class SelfCriteriaMultiDTO implements AnyOfInitiativeBeneficiaryRuleDTOSe
   private TypeMultiEnum type;
 
   @JsonProperty("description")
+  @NotBlank
   private String description;
 
   @JsonProperty("value")

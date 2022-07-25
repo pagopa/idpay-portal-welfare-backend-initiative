@@ -29,9 +29,9 @@ import java.time.LocalDate;
 @RankingAndSpendingDatesDoubleUseCaseValue(date1 = "rankingStartDate", date2 = "rankingEndDate", date3 = "startDate", date4 = "endDate")
 public class InitiativeGeneralDTO   {
 
-  @Min(value = 2, message = "budget should have an amount of at least 2")
-  //TODO impostare max?
   @JsonProperty("budget")
+  @Min(value = 0, message = "budget should have an amount of at least 1")
+  @NotNull
   private BigDecimal budget;
 
   /**
@@ -74,10 +74,11 @@ public class InitiativeGeneralDTO   {
   private Boolean beneficiaryKnown;
 
   @JsonProperty("beneficiaryBudget")
-  @Min(value = 1, message = "Beneficiary budget should have an amount of at least 1")
-  //TODO @Max(value = 1000, message = "beneficiaryBudget should not be greater than 1000")
+  @Min(value = 0, message = "Beneficiary budget should have an amount of at least 1")
+  @NotNull
   private BigDecimal beneficiaryBudget;
 
+  //La validazione di startDate e endDate viene effettuata da RankingAndSpendingDatesDoubleUseCaseValue, dovranno essere successive alle date di ranking.
   @JsonProperty("startDate")
   private LocalDate startDate;
 
