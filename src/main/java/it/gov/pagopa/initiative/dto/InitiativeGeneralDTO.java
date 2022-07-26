@@ -30,7 +30,7 @@ import java.time.LocalDate;
 public class InitiativeGeneralDTO   {
 
   @JsonProperty("budget")
-  @Min(value = 0, message = "budget should have an amount of at least 1")
+  @Min(value = 0, message = "budget should have an amount of at least 0")
   @NotNull
   private BigDecimal budget;
 
@@ -39,7 +39,6 @@ public class InitiativeGeneralDTO   {
    */
   public enum BeneficiaryTypeEnum {
     PF("PF"),
-    
     PG("PG");
 
     private String value;
@@ -74,11 +73,10 @@ public class InitiativeGeneralDTO   {
   private Boolean beneficiaryKnown;
 
   @JsonProperty("beneficiaryBudget")
-  @Min(value = 0, message = "Beneficiary budget should have an amount of at least 1")
+  @Min(value = 0, message = "Beneficiary budget should have an amount of at least 0")
   @NotNull
   private BigDecimal beneficiaryBudget;
 
-  //La validazione di startDate e endDate viene effettuata da RankingAndSpendingDatesDoubleUseCaseValue, dovranno essere successive alle date di ranking.
   @JsonProperty("startDate")
   private LocalDate startDate;
 
