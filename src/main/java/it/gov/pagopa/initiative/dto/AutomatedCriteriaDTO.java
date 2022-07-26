@@ -1,5 +1,6 @@
 package it.gov.pagopa.initiative.dto;
 
+import it.gov.pagopa.initiative.utils.validator.ValidationOff;
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
 
@@ -18,15 +19,15 @@ public class AutomatedCriteriaDTO   {
 
   private String authority;
 
-  @NotBlank
+  @NotBlank(groups = ValidationOff.class)
   private String code;
 
-  @NotBlank
+  @NotBlank(groups = ValidationOff.class)
   private String field;
 
-  @NotBlank
+  @NotBlank(groups = ValidationOff.class)
   private String operator;
 
-  @NotBlank
+  @NotBlank(groups = ValidationOff.class)
   private String value;
 }

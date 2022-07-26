@@ -1,6 +1,7 @@
 package it.gov.pagopa.initiative.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import it.gov.pagopa.initiative.utils.validator.ValidationOff;
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
 
@@ -24,7 +25,7 @@ public class SelfCriteriaMultiDTO implements AnyOfInitiativeBeneficiaryRuleDTOSe
   private TypeMultiEnum type;
 
   @JsonProperty("description")
-  @NotBlank
+  @NotBlank(groups = ValidationOff.class)
   private String description;
 
   @JsonProperty("value")

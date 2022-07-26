@@ -1,6 +1,7 @@
 package it.gov.pagopa.initiative.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import it.gov.pagopa.initiative.utils.validator.ValidationOff;
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
 
@@ -22,7 +23,7 @@ public class InitiativeInfoDTO {
 
   @JsonProperty("general")
   @Valid
-  @NotNull
+  @NotNull(groups = ValidationOff.class)
   private InitiativeGeneralDTO general;
 
   @JsonProperty("additionalInfo")

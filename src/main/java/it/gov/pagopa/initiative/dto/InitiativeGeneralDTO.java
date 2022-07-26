@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import it.gov.pagopa.initiative.utils.constraint.BeneficiaryBudgetValue;
 import it.gov.pagopa.initiative.utils.constraint.RankingAndSpendingDatesDoubleUseCaseValue;
+import it.gov.pagopa.initiative.utils.validator.ValidationOff;
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
 
@@ -25,13 +26,13 @@ import java.time.LocalDate;
 @EqualsAndHashCode
 @ToString
 @Builder
-@BeneficiaryBudgetValue(budget1 = "beneficiaryBudget", budget2 = "budget")
-@RankingAndSpendingDatesDoubleUseCaseValue(date1 = "rankingStartDate", date2 = "rankingEndDate", date3 = "startDate", date4 = "endDate")
+@BeneficiaryBudgetValue(budget1 = "beneficiaryBudget", budget2 = "budget", groups = ValidationOff.class)
+@RankingAndSpendingDatesDoubleUseCaseValue(date1 = "rankingStartDate", date2 = "rankingEndDate", date3 = "startDate", date4 = "endDate", groups = ValidationOff.class)
 public class InitiativeGeneralDTO   {
 
   @JsonProperty("budget")
-  @Min(value = 0, message = "budget should have an amount of at least 1")
-  @NotNull
+  @Min(value = 0, message = "budget should have an amount of at least 1", groups = ValidationOff.class)
+  @NotNull(groups = ValidationOff.class)
   private BigDecimal budget;
 
   /**
@@ -66,16 +67,16 @@ public class InitiativeGeneralDTO   {
   }
 
   @JsonProperty("beneficiaryType")
-  @NotNull
+  @NotNull(groups = ValidationOff.class)
   private BeneficiaryTypeEnum beneficiaryType;
 
   @JsonProperty("beneficiaryKnown")
-  @NotNull
+  @NotNull(groups = ValidationOff.class)
   private Boolean beneficiaryKnown;
 
   @JsonProperty("beneficiaryBudget")
-  @Min(value = 0, message = "Beneficiary budget should have an amount of at least 1")
-  @NotNull
+  @Min(value = 0, message = "Beneficiary budget should have an amount of at least 1", groups = ValidationOff.class)
+  @NotNull(groups = ValidationOff.class)
   private BigDecimal beneficiaryBudget;
 
   //La validazione di startDate e endDate viene effettuata da RankingAndSpendingDatesDoubleUseCaseValue, dovranno essere successive alle date di ranking.
@@ -86,11 +87,11 @@ public class InitiativeGeneralDTO   {
   private LocalDate endDate;
 
   @JsonProperty("rankingStartDate")
-  @FutureOrPresent
+  @FutureOrPresent(groups = ValidationOff.class)
   private LocalDate rankingStartDate;
 
   @JsonProperty("rankingEndDate")
-  @Future
+  @Future(groups = ValidationOff.class)
   private LocalDate rankingEndDate;
 
 }

@@ -1,17 +1,16 @@
 package it.gov.pagopa.initiative.controller;
 
-import it.gov.pagopa.initiative.dto.InitiativeBeneficiaryRuleDTO;
-import it.gov.pagopa.initiative.dto.InitiativeDTO;
-import it.gov.pagopa.initiative.dto.InitiativeInfoDTO;
-import it.gov.pagopa.initiative.dto.InitiativeSummaryDTO;
+import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.mapper.InitiativeDTOsToModelMapper;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.service.InitiativeService;
+import it.gov.pagopa.initiative.utils.validator.ValidationOff;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -48,7 +47,7 @@ public class InitiativeApiController implements InitiativeApi {
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<InitiativeDTO> saveInitiativeGeneralInfo(@PathVariable("organizationId") String organizationId, @Valid @RequestBody InitiativeInfoDTO initiativeInfoDTO) {
+    public ResponseEntity<InitiativeDTO> saveInitiativeGeneralInfo(@PathVariable("organizationId") String organizationId, /*@Valid*/@Validated(ValidationOff.class) @RequestBody InitiativeInfoDTO initiativeInfoDTO) {
         Initiative initiativeToSave = this.initiativeDTOsToModelMapper.toInitiative(initiativeInfoDTO);
         initiativeToSave.setOrganizationId(organizationId);
         initiativeToSave.setCreationDate(LocalDateTime.now());
@@ -59,13 +58,25 @@ public class InitiativeApiController implements InitiativeApi {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Void> updateInitiativeBeneficiary(@PathVariable("organizationId") String organizationId,  @PathVariable("initiativeId") String initiativeId, @Valid @RequestBody InitiativeBeneficiaryRuleDTO beneficiaryRuleDto) {
+    public ResponseEntity<Void> updateInitiativeBeneficiary(@PathVariable("organizationId") String organizationId,  @PathVariable("initiativeId") String initiativeId, /*@Valid*/@Validated(ValidationOff.class) @RequestBody InitiativeBeneficiaryRuleDTO beneficiaryRuleDto) {
         this.initiativeService.updateInitiativeBeneficiary(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toBeneficiaryRule(beneficiaryRuleDto));
         return ResponseEntity.ok().build();
     }
 
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Void> updateInitiativeGeneralInfo(@PathVariable("organizationId") String organizationId,  @PathVariable("initiativeId") String initiativeId, @Valid @RequestBody InitiativeInfoDTO initiativeInfoDto) {
+    public ResponseEntity<Void> updateInitiativeGeneralInfo(@PathVariable("organizationId") String organizationId,  @PathVariable("initiativeId") String initiativeId, /*@Valid*/@Validated(ValidationOff.class) @RequestBody InitiativeInfoDTO initiativeInfoDto) {
+        this.initiativeService.updateInitiativeGeneralInfo(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toInitiative(initiativeInfoDto));
+        return ResponseEntity.ok().build();
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Void> updateInitiativeBeneficiaryDraft(@PathVariable("organizationId") String organizationId,  @PathVariable("initiativeId") String initiativeId, /*@Validated(ValidationOff.class)*/ @RequestBody InitiativeBeneficiaryRuleDTO beneficiaryRuleDto) {
+        this.initiativeService.updateInitiativeBeneficiary(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toBeneficiaryRule(beneficiaryRuleDto));
+        return ResponseEntity.ok().build();
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Void> updateInitiativeGeneralInfoDraft(@PathVariable("organizationId") String organizationId,  @PathVariable("initiativeId") String initiativeId, /*@Validated(ValidationOff.class)*/ @RequestBody InitiativeInfoDTO initiativeInfoDto) {
         this.initiativeService.updateInitiativeGeneralInfo(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toInitiative(initiativeInfoDto));
         return ResponseEntity.ok().build();
     }
