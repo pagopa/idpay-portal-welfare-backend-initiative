@@ -19,19 +19,19 @@ import javax.validation.constraints.Size;
 @Builder
 public class InitiativeAdditionalDTO   {
 
-  @NotBlank
+//  @NotBlank
   @JsonProperty("serviceId")
   private String serviceId;
 
-  @NotBlank
+//  @NotBlank
   @JsonProperty("serviceName")
   private String serviceName;
 
-  @NotBlank
+//  @NotBlank
   @JsonProperty("argument")
   private String argument;
 
-  @NotBlank
+//  @NotBlank
   @JsonProperty("description")
   private String description;
 
