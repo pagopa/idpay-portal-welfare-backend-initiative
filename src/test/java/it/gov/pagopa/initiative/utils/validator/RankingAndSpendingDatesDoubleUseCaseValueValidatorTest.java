@@ -14,8 +14,7 @@ import java.time.LocalDate;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
@@ -166,10 +165,36 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
     @Test
     void when_BeneficiaryBudgetAndBudgetAreValid_thenValidationArePassed(){
         InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralBudgetValid_ok();
+        initiativeGeneralDTO.setBudget(BigDecimal.valueOf(1000000));
+        initiativeGeneralDTO.setBeneficiaryBudget(BigDecimal.valueOf(100));
         Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO);
-
         assertTrue(violations.isEmpty());
         assertThat(violations.size()).isEqualTo(0);
+    }
+
+    @Test
+    void when_beneficiaryBudgetIsNull_thenValidationFailed(){
+        InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralBudgetNotValid_ko();
+        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO);
+        assertFalse(violations.isEmpty());
+    }
+
+    @Test
+    void when_budgetIsNull_thenValidationFailed(){
+        InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralBudgetNotValid_ko();
+        initiativeGeneralDTO.setBeneficiaryBudget(null);
+        initiativeGeneralDTO.setBudget(null);
+        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO);
+        assertFalse(violations.isEmpty());
+    }
+
+    @Test
+    void when_beneficiaryBudgetAndBudgetAreNull_thenValidationFailed(){
+        InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralBudgetNotValid_ko();
+        initiativeGeneralDTO.setBeneficiaryBudget(BigDecimal.valueOf(100000));
+        initiativeGeneralDTO.setBudget(null);
+        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO);
+        assertFalse(violations.isEmpty());
     }
     private InitiativeGeneralDTO createInitiativeGeneralDTO_ok() {
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
@@ -385,6 +410,22 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
     private InitiativeGeneralDTO createInitiativeGeneralBudgetValid_ok(){
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
+        initiativeGeneralDTO.setBeneficiaryKnown(true);
+        initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
+        initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
+        LocalDate rankingStartDate = LocalDate.now();
+        LocalDate rankingEndDate = rankingStartDate.plusDays(1);
+        LocalDate startDate = rankingEndDate.plusDays(1);
+        LocalDate endDate = startDate.plusDays(5);
+        initiativeGeneralDTO.setRankingStartDate(rankingStartDate);
+        initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
+        initiativeGeneralDTO.setStartDate(startDate);
+        initiativeGeneralDTO.setEndDate(endDate);
+        return initiativeGeneralDTO;
+    }
+    private InitiativeGeneralDTO createInitiativeGeneralBudgetNotValid_ko(){
+        InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
+        initiativeGeneralDTO.setBeneficiaryBudget(null);
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
