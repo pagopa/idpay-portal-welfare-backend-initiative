@@ -101,7 +101,7 @@ public interface InitiativeApi {
     ResponseEntity<Void> updateInitiativeBeneficiary(@PathVariable("organizationId") String organizationId, @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId, @Parameter(in = ParameterIn.DEFAULT, description = "Unique identifier of the subscribed initiative, instrument HPAN", schema = @Schema()) @Valid @RequestBody InitiativeBeneficiaryRuleDTO body);
 
 
-    @Operation(summary = "Save initiative and first subset of data 'general info'", description = "", security = {
+    @Operation(summary = "Update initiative and first subset of data 'general info'", description = "", security = {
             @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "No Content"),
@@ -123,7 +123,7 @@ public interface InitiativeApi {
     ResponseEntity<Void> updateInitiativeGeneralInfo(@PathVariable("organizationId") String organizationId, @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId, @Parameter(in = ParameterIn.DEFAULT, description = "Unique identifier of the subscribed initiative, IBAN of the citizen", schema = @Schema()) @Valid @RequestBody InitiativeInfoDTO body);
 
 
-    @Operation(summary = "Association of beneficiary rules to an initiative", description = "", security = {
+    @Operation(summary = "Association of beneficiary rules to a draft initiative without validation", description = "", security = {
             @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "No Content"),
