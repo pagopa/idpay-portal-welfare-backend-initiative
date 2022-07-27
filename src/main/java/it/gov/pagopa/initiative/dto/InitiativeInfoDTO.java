@@ -1,11 +1,11 @@
 package it.gov.pagopa.initiative.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -22,7 +22,7 @@ public class InitiativeInfoDTO {
 
   @JsonProperty("general")
   @Valid
-  @NotNull
+  @NotNull(groups = ValidationOnGroup.class)
   private InitiativeGeneralDTO general;
 
   @JsonProperty("additionalInfo")

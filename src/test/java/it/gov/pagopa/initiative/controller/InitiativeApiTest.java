@@ -175,7 +175,7 @@ class InitiativeApiTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(initiativeInfoDTO))
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.status().isNoContent())
                 .andDo(print())
                 .andReturn();
     }
@@ -201,7 +201,33 @@ class InitiativeApiTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(initiativeBeneficiaryRuleDTO))
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    void updateInitiativeBeneficiaryDraft_ok() throws Exception {
+        objectMapper.registerModule(new JavaTimeModule());
+
+        InitiativeBeneficiaryRule initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
+        //create Dummy Initiative
+        Initiative step2Initiative = createStep2Initiative();
+        //create Dummy BodyRequest InitiativeInfoDTO
+        InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
+
+        // Instruct the Service to insert a Dummy Initiative
+        when(initiativeDTOsToModelMapper.toBeneficiaryRule(initiativeBeneficiaryRuleDTO)).thenReturn(initiativeBeneficiaryRule);
+
+        //doNothing only for Void method
+        InitiativeBeneficiaryRule initiativeBeneficiaryRule2 = initiativeDTOsToModelMapper.toBeneficiaryRule(initiativeBeneficiaryRuleDTO);
+        doNothing().when(initiativeService).updateInitiativeBeneficiary("Ente1", "Id1", initiativeBeneficiaryRule2);
+
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + MessageFormat.format(PUT_INITIATIVE_BENEFICIARY_RULES_URL + "/draft", "Ente1", "Id1"))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(initiativeBeneficiaryRuleDTO))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isNoContent())
                 .andDo(print())
                 .andReturn();
     }
