@@ -11,13 +11,11 @@ import java.util.List;
 /**
  * InitiativeBeneficiaryRuleDTO
  */
-@Validated
+//@Validated
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
-@ToString
-@Builder
+//@Builder
 public class InitiativeBeneficiaryRuleDTO   {
 
 

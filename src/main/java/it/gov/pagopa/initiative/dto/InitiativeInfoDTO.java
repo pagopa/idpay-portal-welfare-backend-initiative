@@ -14,7 +14,6 @@ import javax.validation.Valid;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
-@ToString
 @Builder
 public class InitiativeInfoDTO {
 

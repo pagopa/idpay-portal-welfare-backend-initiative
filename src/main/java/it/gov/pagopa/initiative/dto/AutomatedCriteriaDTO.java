@@ -9,7 +9,6 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 @Data @AllArgsConstructor @NoArgsConstructor
 @EqualsAndHashCode
-@ToString
 @Builder
 public class AutomatedCriteriaDTO   {
 

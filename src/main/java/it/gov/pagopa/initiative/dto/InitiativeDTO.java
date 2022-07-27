@@ -16,7 +16,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
-@ToString
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class InitiativeDTO   {

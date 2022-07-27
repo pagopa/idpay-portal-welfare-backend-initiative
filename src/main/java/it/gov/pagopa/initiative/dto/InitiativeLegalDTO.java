@@ -9,11 +9,10 @@ import org.springframework.validation.annotation.Validated;
  */
 @Validated
 @Data
-@AllArgsConstructor
+//@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
-@ToString
-@Builder
+//@Builder
 public class InitiativeLegalDTO   {
 
   //@NotNull

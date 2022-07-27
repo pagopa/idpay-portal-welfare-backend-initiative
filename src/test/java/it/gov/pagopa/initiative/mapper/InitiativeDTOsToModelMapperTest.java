@@ -34,6 +34,8 @@ class InitiativeDTOsToModelMapperTest {
     private InitiativeInfoDTO initiativeInfoDTOnoBaseFields;
     private InitiativeInfoDTO initiativeInfoOnlyInfoGeneralDTO;
 
+    private InitiativeLegalDTO initiativeLegalDTOFull;
+
     @BeforeEach
     public void setUp() {
         initiativeOnlyInfoGeneral = createStep1InitiativeOnlyInfoGeneral();
@@ -42,6 +44,16 @@ class InitiativeDTOsToModelMapperTest {
         initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
         initiativeInfoOnlyInfoGeneralDTO = createStep1InitiativeInfoDTOonlyInfoGeneral();
         initiativeInfoDTOnoBaseFields = createStep1InitiativeInfoDTOnoBaseFields();
+        initiativeLegalDTOFull = createInitiativeLegalDTOfull();
+    }
+
+    @Test
+    void toInitiativeLegalFull_ok(){
+        assertEquals("https://", initiativeLegalDTOFull.getDpiaLink().toString().substring(0,8));
+        assertEquals("https://", initiativeLegalDTOFull.getPrivacyLink().toString().substring(0,8));
+        assertEquals("https://", initiativeLegalDTOFull.getRegulationLink().toString().substring(0,8));
+        assertEquals("https://", initiativeLegalDTOFull.getTcLink().toString().substring(0,8));
+
     }
 
     @Test
@@ -184,6 +196,16 @@ class InitiativeDTOsToModelMapperTest {
         initiativeLegal.setRegulationLink("https://www.google.it");
         initiativeLegal.setTcLink("https://www.google.it");
         return initiativeLegal;
+    }
+
+    private InitiativeLegalDTO createInitiativeLegalDTOfull(){
+        InitiativeLegalDTO initiativeLegalDTO = new InitiativeLegalDTO();
+        initiativeLegalDTO.setDpiaLink("\"https://www.google.it\"");
+        initiativeLegalDTO.setDpiaLink("https://www.google.it");
+        initiativeLegalDTO.setPrivacyLink("https://www.google.it");
+        initiativeLegalDTO.setRegulationLink("https://www.google.it");
+        initiativeLegalDTO.setTcLink("https://www.google.it");
+        return initiativeLegalDTO;
     }
 
     InitiativeDTO createStep1InitiativeDTO () {
