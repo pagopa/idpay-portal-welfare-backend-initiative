@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import it.gov.pagopa.initiative.utils.constraint.BeneficiaryBudgetValue;
 import it.gov.pagopa.initiative.utils.constraint.RankingAndSpendingDatesDoubleUseCaseValue;
-import it.gov.pagopa.initiative.utils.validator.ValidationOff;
+import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
 
@@ -26,13 +26,13 @@ import java.time.LocalDate;
 @EqualsAndHashCode
 @ToString
 @Builder
-@BeneficiaryBudgetValue(budget1 = "beneficiaryBudget", budget2 = "budget", groups = ValidationOff.class)
-@RankingAndSpendingDatesDoubleUseCaseValue(date1 = "rankingStartDate", date2 = "rankingEndDate", date3 = "startDate", date4 = "endDate", groups = ValidationOff.class)
+@BeneficiaryBudgetValue(budget1 = "beneficiaryBudget", budget2 = "budget", groups = ValidationOnGroup.class)
+@RankingAndSpendingDatesDoubleUseCaseValue(date1 = "rankingStartDate", date2 = "rankingEndDate", date3 = "startDate", date4 = "endDate", groups = ValidationOnGroup.class)
 public class InitiativeGeneralDTO   {
 
   @JsonProperty("budget")
-  @Min(value = 0, message = "budget should have an amount of at least 1", groups = ValidationOff.class)
-  @NotNull(groups = ValidationOff.class)
+  @Min(value = 0, message = "budget should have an amount of at least 1", groups = ValidationOnGroup.class)
+  @NotNull(groups = ValidationOnGroup.class)
   private BigDecimal budget;
 
   /**
@@ -67,16 +67,16 @@ public class InitiativeGeneralDTO   {
   }
 
   @JsonProperty("beneficiaryType")
-  @NotNull(groups = ValidationOff.class)
+  @NotNull(groups = ValidationOnGroup.class)
   private BeneficiaryTypeEnum beneficiaryType;
 
   @JsonProperty("beneficiaryKnown")
-  @NotNull(groups = ValidationOff.class)
+  @NotNull(groups = ValidationOnGroup.class)
   private Boolean beneficiaryKnown;
 
   @JsonProperty("beneficiaryBudget")
-  @Min(value = 0, message = "Beneficiary budget should have an amount of at least 1", groups = ValidationOff.class)
-  @NotNull(groups = ValidationOff.class)
+  @Min(value = 0, message = "Beneficiary budget should have an amount of at least 1", groups = ValidationOnGroup.class)
+  @NotNull(groups = ValidationOnGroup.class)
   private BigDecimal beneficiaryBudget;
 
   //La validazione di startDate e endDate viene effettuata da RankingAndSpendingDatesDoubleUseCaseValue, dovranno essere successive alle date di ranking.
@@ -87,11 +87,11 @@ public class InitiativeGeneralDTO   {
   private LocalDate endDate;
 
   @JsonProperty("rankingStartDate")
-  @FutureOrPresent(groups = ValidationOff.class)
+  @FutureOrPresent(groups = ValidationOnGroup.class)
   private LocalDate rankingStartDate;
 
   @JsonProperty("rankingEndDate")
-  @Future(groups = ValidationOff.class)
+  @Future(groups = ValidationOnGroup.class)
   private LocalDate rankingEndDate;
 
 }
