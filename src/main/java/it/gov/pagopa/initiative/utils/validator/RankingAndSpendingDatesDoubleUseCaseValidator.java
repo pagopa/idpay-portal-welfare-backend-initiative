@@ -19,14 +19,12 @@ import java.time.LocalDate;
 public class RankingAndSpendingDatesDoubleUseCaseValidator implements ConstraintValidator<RankingAndSpendingDatesDoubleUseCaseValue, InitiativeGeneralDTO> {
 
     private static final SpelExpressionParser PARSER = new SpelExpressionParser();
-    //private String[] orderedDatesFields;
     private String rankingStart;
     private String rankingEnd;
     private String start;
     private String end;
     @Override
     public void initialize(RankingAndSpendingDatesDoubleUseCaseValue constraintAnnotation) {
-        //orderedDatesFields = constraintAnnotation.orderedDates();
         rankingStart = constraintAnnotation.date1();
         rankingEnd = constraintAnnotation.date2();
         start = constraintAnnotation.date3();

@@ -16,7 +16,6 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
-@ToString
 @Builder
 public class InitiativeInfoDTO {
 

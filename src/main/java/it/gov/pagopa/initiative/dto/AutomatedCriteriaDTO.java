@@ -12,7 +12,6 @@ import javax.validation.constraints.NotBlank;
 @Validated
 @Data @AllArgsConstructor @NoArgsConstructor
 @EqualsAndHashCode
-@ToString
 @Builder
 public class AutomatedCriteriaDTO   {
 

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Collections;
+import java.util.List;
 
 @Component
 public class InitiativeDTOsToModelMapper {
@@ -41,10 +42,26 @@ public class InitiativeDTOsToModelMapper {
         if (additionalDTO == null) {
             return null;
         }
-        return InitiativeAdditional.builder().serviceId(additionalDTO.getServiceId())
+        return InitiativeAdditional.builder()
+                .serviceId(additionalDTO.getServiceId())
                 .argument(additionalDTO.getArgument())
                 .description(additionalDTO.getDescription())
-                .serviceName(additionalDTO.getServiceName()).build();
+                .serviceName(additionalDTO.getServiceName())
+                .channels(toInitiativeAdditionalChannels(additionalDTO.getChannels()))
+                .build();
+    }
+
+    private List<Channel> toInitiativeAdditionalChannels(List<ChannelDTO> channels) {
+        if (CollectionUtils.isEmpty(channels)) {
+            return Collections.emptyList();
+        } else {
+            return channels.stream().map(dto ->
+                    Channel.builder()
+                            .type(Channel.TypeEnum.valueOf(dto.getType().name()))
+                            .contact(dto.getContact())
+                            .build()
+            ).toList();
+        }
     }
 
     public InitiativeBeneficiaryRule toBeneficiaryRule(InitiativeBeneficiaryRuleDTO beneficiaryRuleDto) {
@@ -55,13 +72,13 @@ public class InitiativeDTOsToModelMapper {
         if (CollectionUtils.isEmpty(beneficiaryRuleDto.getAutomatedCriteria())) {
             beneficiaryRule.setAutomatedCriteria(Collections.emptyList());
         } else {
-            beneficiaryRule.setAutomatedCriteria(beneficiaryRuleDto.getAutomatedCriteria().stream().map(x ->
+            beneficiaryRule.setAutomatedCriteria(beneficiaryRuleDto.getAutomatedCriteria().stream().map(dto ->
                     AutomatedCriteria.builder()
-                            .code(x.getCode())
-                            .field(x.getField())
-                            .operator(x.getOperator())
-                            .authority(x.getAuthority())//TODO definire modalità di recupero authority
-                            .value(x.getValue())
+                            .code(dto.getCode())
+                            .field(dto.getField())
+                            .operator(dto.getOperator())
+                            .authority(dto.getAuthority())//TODO definire modalità di recupero authority
+                            .value(dto.getValue())
                             .build()
             ).toList());
         }
@@ -70,20 +87,20 @@ public class InitiativeDTOsToModelMapper {
             beneficiaryRule.setSelfDeclarationCriteria(Collections.emptyList());
         } else {
             beneficiaryRule.setSelfDeclarationCriteria(beneficiaryRuleDto.getSelfDeclarationCriteria().stream()
-                    .map(x -> {
-                                if (x instanceof SelfCriteriaBoolDTO) {
+                    .map(dto -> {
+                                if (dto instanceof SelfCriteriaBoolDTO) {
                                     return SelfCriteriaBool.builder()
-                                            ._type(it.gov.pagopa.initiative.model.TypeBoolEnum.valueOf(((SelfCriteriaBoolDTO) x).getType().name()))
-                                            .code(((SelfCriteriaBoolDTO) x).getCode())
-                                            .description(((SelfCriteriaBoolDTO) x).getDescription())
-                                            .value(((SelfCriteriaBoolDTO) x).getValue())
+                                            ._type(it.gov.pagopa.initiative.model.TypeBoolEnum.valueOf(((SelfCriteriaBoolDTO) dto).getType().name()))
+                                            .code(((SelfCriteriaBoolDTO) dto).getCode())
+                                            .description(((SelfCriteriaBoolDTO) dto).getDescription())
+                                            .value(((SelfCriteriaBoolDTO) dto).getValue())
                                             .build();
-                                } else if (x instanceof SelfCriteriaMultiDTO) {
+                                } else if (dto instanceof SelfCriteriaMultiDTO) {
                                     return SelfCriteriaMulti.builder()
-                                            ._type(TypeMultiEnum.valueOf(((SelfCriteriaMultiDTO) x).getType().name()))
-                                            .code(((SelfCriteriaMultiDTO) x).getCode())
-                                            .description(((SelfCriteriaMultiDTO) x).getDescription())
-                                            .value(((SelfCriteriaMultiDTO) x).getValue())
+                                            ._type(TypeMultiEnum.valueOf(((SelfCriteriaMultiDTO) dto).getType().name()))
+                                            .code(((SelfCriteriaMultiDTO) dto).getCode())
+                                            .description(((SelfCriteriaMultiDTO) dto).getDescription())
+                                            .value(((SelfCriteriaMultiDTO) dto).getValue())
                                             .build();
                                 }
                                 return null;

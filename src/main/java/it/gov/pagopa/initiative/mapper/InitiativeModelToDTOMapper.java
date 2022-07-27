@@ -59,10 +59,26 @@ public class InitiativeModelToDTOMapper {
         if (additional == null) {
             return null;
         }
-        return InitiativeAdditionalDTO.builder().serviceId(additional.getServiceId())
+        return InitiativeAdditionalDTO.builder()
+                .serviceId(additional.getServiceId())
                 .argument(additional.getArgument())
                 .description(additional.getDescription())
-                .serviceName(additional.getServiceName()).build();
+                .serviceName(additional.getServiceName())
+                .channels(toChannelsDTO(additional.getChannels()))
+                .build();
+    }
+
+    private List<ChannelDTO> toChannelsDTO(List<Channel> channels) {
+        if (CollectionUtils.isEmpty(channels)) {
+            return Collections.emptyList();
+        } else {
+            return channels.stream().map(channel ->
+                    ChannelDTO.builder()
+                            .type(ChannelDTO.TypeEnum.valueOf(channel.getType().name()))
+                            .contact(channel.getContact())
+                            .build()
+            ).toList();
+        }
     }
 
     public InitiativeBeneficiaryRuleDTO toInitiativeBeneficiaryRuleDTO(InitiativeBeneficiaryRule beneficiaryRule) {

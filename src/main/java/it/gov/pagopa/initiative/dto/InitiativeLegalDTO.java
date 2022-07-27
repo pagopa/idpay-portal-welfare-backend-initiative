@@ -11,11 +11,10 @@ import javax.validation.constraints.NotBlank;
  */
 @Validated
 @Data
-@AllArgsConstructor
+//@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
-@ToString
-@Builder
+//@Builder
 public class InitiativeLegalDTO   {
 
   @NotBlank
