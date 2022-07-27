@@ -82,7 +82,7 @@ public interface InitiativeApi {
     @Operation(summary = "Association of beneficiary rules to an initiative", description = "", security = {
             @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Enrollment OK"),
+            @ApiResponse(responseCode = "204", description = "No Content"),
 
             @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
 
@@ -104,7 +104,7 @@ public interface InitiativeApi {
     @Operation(summary = "Save initiative and first subset of data 'general info'", description = "", security = {
             @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Enrollment OK"),
+            @ApiResponse(responseCode = "204", description = "No Content"),
 
             @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
 
@@ -126,7 +126,7 @@ public interface InitiativeApi {
     @Operation(summary = "Association of beneficiary rules to an initiative", description = "", security = {
             @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Enrollment OK"),
+            @ApiResponse(responseCode = "204", description = "No Content"),
 
             @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
 
@@ -148,7 +148,7 @@ public interface InitiativeApi {
     @Operation(summary = "Save initiative and first subset of data 'general info'", description = "", security = {
             @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Enrollment OK"),
+            @ApiResponse(responseCode = "204", description = "No Content"),
 
             @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
 
@@ -162,7 +162,6 @@ public interface InitiativeApi {
 
             @ApiResponse(responseCode = "500", description = "Server ERROR", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))})
     @PutMapping(value = "/idpay/organization/{organizationId}/initiative/{initiativeId}/general/draft",
-            produces = {"application/json"},
             consumes = {"application/json"})
     ResponseEntity<Void> updateInitiativeGeneralInfoDraft(@PathVariable("organizationId") String organizationId, @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId, @Parameter(in = ParameterIn.DEFAULT, description = "Unique identifier of the subscribed initiative, IBAN of the citizen", schema = @Schema()) @Validated() @RequestBody InitiativeInfoDTO body);
 

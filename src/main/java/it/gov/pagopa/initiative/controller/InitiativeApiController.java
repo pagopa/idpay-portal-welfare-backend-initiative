@@ -55,28 +55,28 @@ public class InitiativeApiController implements InitiativeApi {
         return ResponseEntity.ok(this.initiativeModelToDTOMapper.toDtoOnlyId(insertedInitiative));
     }
 
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> updateInitiativeBeneficiary(@PathVariable("organizationId") String organizationId,  @PathVariable("initiativeId") String initiativeId, @Validated(ValidationOnGroup.class) @RequestBody InitiativeBeneficiaryRuleDTO beneficiaryRuleDto) {
         this.initiativeService.updateInitiativeBeneficiary(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toBeneficiaryRule(beneficiaryRuleDto));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> updateInitiativeGeneralInfo(@PathVariable("organizationId") String organizationId,  @PathVariable("initiativeId") String initiativeId, @Validated({ValidationOnGroup.class}) @RequestBody InitiativeInfoDTO initiativeInfoDto) {
         this.initiativeService.updateInitiativeGeneralInfo(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toInitiative(initiativeInfoDto));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> updateInitiativeBeneficiaryDraft(@PathVariable("organizationId") String organizationId,  @PathVariable("initiativeId") String initiativeId, @RequestBody InitiativeBeneficiaryRuleDTO beneficiaryRuleDto) {
         this.initiativeService.updateInitiativeBeneficiary(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toBeneficiaryRule(beneficiaryRuleDto));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> updateInitiativeGeneralInfoDraft(@PathVariable("organizationId") String organizationId,  @PathVariable("initiativeId") String initiativeId, @RequestBody InitiativeInfoDTO initiativeInfoDto) {
         this.initiativeService.updateInitiativeGeneralInfo(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toInitiative(initiativeInfoDto));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @Override
