@@ -22,7 +22,6 @@ public class AutomatedCriteriaDTO   {
   @NotBlank(groups = ValidationOnGroup.class)
   private String code;
 
-  @NotBlank(groups = ValidationOnGroup.class)
   private String field;
 
   @NotBlank(groups = ValidationOnGroup.class)
