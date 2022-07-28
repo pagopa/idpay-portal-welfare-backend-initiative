@@ -33,19 +33,19 @@ public class InitiativeApiController implements InitiativeApi {
     private InitiativeDTOsToModelMapper initiativeDTOsToModelMapper;
 
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<List<InitiativeSummaryDTO>> getInitativeSummary(@PathVariable("organizationId") String organizationId) {
+    public ResponseEntity<List<InitiativeSummaryDTO>> getInitativeSummary(String organizationId) {
         return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeSummaryDTOList(
                 this.initiativeService.retrieveInitiativeSummary(organizationId)
         ));
     }
 
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<InitiativeDTO> getInitiativeDetail(@PathVariable("organizationId") String organizationId, @PathVariable("initiativeId") String initiativeId) {
+    public ResponseEntity<InitiativeDTO> getInitiativeDetail(String organizationId, String initiativeId) {
         return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDTO(this.initiativeService.getInitiative(organizationId, initiativeId)));
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<InitiativeDTO> saveInitiativeGeneralInfo(@PathVariable("organizationId") String organizationId, /*@Valid*/@Validated(ValidationOnGroup.class) @RequestBody InitiativeInfoDTO initiativeInfoDTO) {
+    public ResponseEntity<InitiativeDTO> saveInitiativeGeneralInfo(String organizationId, InitiativeInfoDTO initiativeInfoDTO) {
         Initiative initiativeToSave = this.initiativeDTOsToModelMapper.toInitiative(initiativeInfoDTO);
         initiativeToSave.setOrganizationId(organizationId);
         initiativeToSave.setCreationDate(LocalDateTime.now());
@@ -56,19 +56,19 @@ public class InitiativeApiController implements InitiativeApi {
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> updateInitiativeBeneficiary(@PathVariable("organizationId") String organizationId,  @PathVariable("initiativeId") String initiativeId, @Validated(ValidationOnGroup.class) @RequestBody InitiativeBeneficiaryRuleDTO beneficiaryRuleDto) {
+    public ResponseEntity<Void> updateInitiativeBeneficiary(String organizationId, String initiativeId, InitiativeBeneficiaryRuleDTO beneficiaryRuleDto) {
         this.initiativeService.updateInitiativeBeneficiary(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toBeneficiaryRule(beneficiaryRuleDto));
         return ResponseEntity.noContent().build();
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> updateInitiativeGeneralInfo(@PathVariable("organizationId") String organizationId,  @PathVariable("initiativeId") String initiativeId, @Validated({ValidationOnGroup.class}) @RequestBody InitiativeInfoDTO initiativeInfoDto) {
+    public ResponseEntity<Void> updateInitiativeGeneralInfo(String organizationId, String initiativeId, InitiativeInfoDTO initiativeInfoDto) {
         this.initiativeService.updateInitiativeGeneralInfo(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toInitiative(initiativeInfoDto));
         return ResponseEntity.noContent().build();
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> updateInitiativeBeneficiaryDraft(@PathVariable("organizationId") String organizationId,  @PathVariable("initiativeId") String initiativeId, @RequestBody InitiativeBeneficiaryRuleDTO beneficiaryRuleDto) {
+    public ResponseEntity<Void> updateInitiativeBeneficiaryDraft(String organizationId, String initiativeId, InitiativeBeneficiaryRuleDTO beneficiaryRuleDto) {
         this.initiativeService.updateInitiativeBeneficiary(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toBeneficiaryRule(beneficiaryRuleDto));
         return ResponseEntity.noContent().build();
     }

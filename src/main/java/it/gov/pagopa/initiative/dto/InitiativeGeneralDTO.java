@@ -19,7 +19,7 @@ import java.time.LocalDate;
 /**
  * InitiativeGeneralDTO
  */
-@Validated
+//@Validated
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
