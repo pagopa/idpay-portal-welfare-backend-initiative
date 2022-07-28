@@ -5,10 +5,13 @@ import it.gov.pagopa.initiative.mapper.InitiativeDTOsToModelMapper;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.service.InitiativeService;
+import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -41,7 +44,7 @@ public class InitiativeApiController implements InitiativeApi {
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<InitiativeDTO> saveInitiativeGeneralInfo(String organizationId, InitiativeInfoDTO initiativeInfoDTO) {
+    public ResponseEntity<InitiativeDTO> saveInitiativeGeneralInfo(String organizationId, @RequestBody @Validated(ValidationOnGroup.class) InitiativeInfoDTO initiativeInfoDTO) {
         Initiative initiativeToSave = this.initiativeDTOsToModelMapper.toInitiative(initiativeInfoDTO);
         initiativeToSave.setOrganizationId(organizationId);
         initiativeToSave.setCreationDate(LocalDateTime.now());
@@ -52,13 +55,13 @@ public class InitiativeApiController implements InitiativeApi {
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> updateInitiativeBeneficiary(String organizationId, String initiativeId, InitiativeBeneficiaryRuleDTO beneficiaryRuleDto) {
+    public ResponseEntity<Void> updateInitiativeBeneficiary(String organizationId, String initiativeId, @RequestBody @Validated(ValidationOnGroup.class) InitiativeBeneficiaryRuleDTO beneficiaryRuleDto) {
         this.initiativeService.updateInitiativeBeneficiary(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toBeneficiaryRule(beneficiaryRuleDto));
         return ResponseEntity.noContent().build();
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> updateInitiativeGeneralInfo(String organizationId, String initiativeId, InitiativeInfoDTO initiativeInfoDto) {
+    public ResponseEntity<Void> updateInitiativeGeneralInfo(String organizationId, String initiativeId, @RequestBody @Validated(ValidationOnGroup.class) InitiativeInfoDTO initiativeInfoDto) {
         this.initiativeService.updateInitiativeGeneralInfo(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toInitiative(initiativeInfoDto));
         return ResponseEntity.noContent().build();
     }
