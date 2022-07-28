@@ -1,6 +1,7 @@
 package it.gov.pagopa.initiative.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.*;
@@ -15,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 @NoArgsConstructor
 @EqualsAndHashCode
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ChannelDTO   {
   @JsonProperty("type")
   private TypeEnum type = null;

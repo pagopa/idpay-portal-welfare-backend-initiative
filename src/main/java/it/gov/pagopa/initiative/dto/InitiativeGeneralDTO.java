@@ -1,6 +1,7 @@
 package it.gov.pagopa.initiative.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import it.gov.pagopa.initiative.utils.constraint.BeneficiaryBudgetValue;
@@ -27,6 +28,7 @@ import java.time.LocalDate;
 @Builder
 @BeneficiaryBudgetValue(budget1 = "beneficiaryBudget", budget2 = "budget", groups = ValidationOnGroup.class)
 @RankingAndSpendingDatesDoubleUseCaseValue(date1 = "rankingStartDate", date2 = "rankingEndDate", date3 = "startDate", date4 = "endDate", groups = ValidationOnGroup.class)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class InitiativeGeneralDTO   {
 
   @JsonProperty("budget")

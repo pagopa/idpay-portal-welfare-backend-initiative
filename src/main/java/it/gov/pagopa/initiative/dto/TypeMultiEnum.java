@@ -1,14 +1,12 @@
 package it.gov.pagopa.initiative.dto;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.annotation.*;
 
 /**
  * Gets or Sets _type
  */
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public enum TypeMultiEnum {
 
     @JsonProperty("multi")

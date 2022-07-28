@@ -1,5 +1,6 @@
 package it.gov.pagopa.initiative.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
@@ -13,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 @NoArgsConstructor
 @EqualsAndHashCode
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class SelfCriteriaBoolDTO implements AnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems {
 
   @JsonProperty("_type")
