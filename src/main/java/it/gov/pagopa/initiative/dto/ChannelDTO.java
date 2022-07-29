@@ -19,10 +19,10 @@ import org.springframework.validation.annotation.Validated;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ChannelDTO   {
   @JsonProperty("type")
-  private TypeEnum type = null;
+  private TypeEnum type;
 
   @JsonProperty("contact")
-  private String contact = null;
+  private String contact;
 
   /**
    * Gets or Sets type
