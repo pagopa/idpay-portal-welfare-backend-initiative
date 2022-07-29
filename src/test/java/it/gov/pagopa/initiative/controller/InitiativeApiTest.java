@@ -308,6 +308,12 @@ class InitiativeApiTest {
         initiativeAdditional.setServiceName("serviceName");
         initiativeAdditional.setArgument("Argument");
         initiativeAdditional.setDescription("Description");
+        Channel channel = new Channel();
+        channel.setType(Channel.TypeEnum.EMAIL);
+        channel.setContact("contact");
+        List<Channel> channels = new ArrayList<>();
+        channels.add(channel);
+        initiativeAdditional.setChannels(channels);
         return initiativeAdditional;
     }
 
@@ -395,6 +401,12 @@ class InitiativeApiTest {
         initiativeAdditionalDTO.setServiceName("serviceName");
         initiativeAdditionalDTO.setArgument("Argument");
         initiativeAdditionalDTO.setDescription("Description");
+        ChannelDTO channelDTO = new ChannelDTO();
+        channelDTO.setType(ChannelDTO.TypeEnum.EMAIL);
+        channelDTO.setContact("contact");
+        List<ChannelDTO> channelDTOS = new ArrayList<>();
+        channelDTOS.add(channelDTO);
+        initiativeAdditionalDTO.setChannels(channelDTOS);
         return initiativeAdditionalDTO;
     }
 
