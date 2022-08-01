@@ -19,6 +19,7 @@ public class InitiativeConstants {
         }
         public static final class BadRequest {
             public static final String CODE_PACKAGE = "it.gov.pagopa.initiative.bad.request";
+            public static final String INITIATIVE_PROPERTIES_NOT_VALID = "Initiative {0} properties are not valid for this request";
         }
     }
 }

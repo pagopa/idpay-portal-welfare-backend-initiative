@@ -1,6 +1,8 @@
 package it.gov.pagopa.initiative.controller;
 
+import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.*;
+import it.gov.pagopa.initiative.exception.InitiativeException;
 import it.gov.pagopa.initiative.mapper.InitiativeDTOsToModelMapper;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.Initiative;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -56,6 +59,12 @@ public class InitiativeApiController implements InitiativeApi {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> updateInitiativeBeneficiary(String organizationId, String initiativeId, @RequestBody @Validated(ValidationOnGroup.class) InitiativeBeneficiaryRuleDTO beneficiaryRuleDto) {
+        if(this.initiativeService.getInitiative(organizationId, initiativeId).getGeneral().getBeneficiaryKnown()){
+            throw new InitiativeException(
+                    InitiativeConstants.Exception.BadRequest.CODE_PACKAGE,
+                    MessageFormat.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_PROPERTIES_NOT_VALID, initiativeId),
+                    HttpStatus.BAD_REQUEST);
+        }
         this.initiativeService.updateInitiativeBeneficiary(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toBeneficiaryRule(beneficiaryRuleDto));
         return ResponseEntity.noContent().build();
     }
