@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 /**
  * InitiativeSummaryDTO
  */
-@Validated
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

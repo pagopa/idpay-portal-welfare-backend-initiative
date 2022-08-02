@@ -76,7 +76,7 @@ public interface InitiativeApi {
     @PostMapping(value = "/idpay/organization/{organizationId}/initiative/general",
             produces = {"application/json"},
             consumes = {"application/json"})
-    ResponseEntity<InitiativeDTO> saveInitiativeGeneralInfo(@PathVariable("organizationId") String organizationId, @Parameter(in = ParameterIn.DEFAULT, description = "Unique identifier of the subscribed initiative, IBAN of the citizen", schema = @Schema()) @Valid @RequestBody InitiativeInfoDTO body);
+    ResponseEntity<InitiativeDTO> saveInitiativeGeneralInfo(@PathVariable("organizationId") String organizationId, @Parameter(in = ParameterIn.DEFAULT, description = "Unique identifier of the subscribed initiative, IBAN of the citizen", schema = @Schema()) @RequestBody InitiativeInfoDTO body);
 
 
     @Operation(summary = "Association of beneficiary rules to an initiative", description = "", security = {
@@ -98,7 +98,7 @@ public interface InitiativeApi {
     @PutMapping(value = "/idpay/organization/{organizationId}/initiative/{initiativeId}/beneficiary",
             produces = {"application/json"},
             consumes = {"application/json"})
-    ResponseEntity<Void> updateInitiativeBeneficiary(@PathVariable("organizationId") String organizationId, @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId, @Parameter(in = ParameterIn.DEFAULT, description = "Unique identifier of the subscribed initiative, instrument HPAN", schema = @Schema()) @Valid @RequestBody InitiativeBeneficiaryRuleDTO body);
+    ResponseEntity<Void> updateInitiativeBeneficiary(@PathVariable("organizationId") String organizationId, @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId, @Parameter(in = ParameterIn.DEFAULT, description = "Unique identifier of the subscribed initiative, instrument HPAN", schema = @Schema()) @RequestBody InitiativeBeneficiaryRuleDTO body);
 
 
     @Operation(summary = "Update initiative and first subset of data 'general info'", description = "", security = {
@@ -120,7 +120,7 @@ public interface InitiativeApi {
     @PutMapping(value = "/idpay/organization/{organizationId}/initiative/{initiativeId}/general",
             produces = {"application/json"},
             consumes = {"application/json"})
-    ResponseEntity<Void> updateInitiativeGeneralInfo(@PathVariable("organizationId") String organizationId, @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId, @Parameter(in = ParameterIn.DEFAULT, description = "Unique identifier of the subscribed initiative, IBAN of the citizen", schema = @Schema()) @Valid @RequestBody InitiativeInfoDTO body);
+    ResponseEntity<Void> updateInitiativeGeneralInfo(@PathVariable("organizationId") String organizationId, @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId, @Parameter(in = ParameterIn.DEFAULT, description = "Unique identifier of the subscribed initiative, IBAN of the citizen", schema = @Schema()) @RequestBody InitiativeInfoDTO body);
 
 
     @Operation(summary = "Association of beneficiary rules to a draft initiative without validation", description = "", security = {

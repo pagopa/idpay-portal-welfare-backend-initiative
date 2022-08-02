@@ -8,13 +8,14 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 import java.util.List;
 
 /**
  * InitiativeAdditionalDTO
  */
-@Validated
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -38,7 +39,8 @@ public class InitiativeAdditionalDTO   {
   private String description;
 
   @JsonProperty("channels")
-  @NotNull(groups = ValidationOnGroup.class)
-  private List<@NotNull(groups = ValidationOnGroup.class) ChannelDTO> channels;
+  @Valid
+  @NotEmpty(groups = ValidationOnGroup.class)
+  private List<ChannelDTO> channels;
 
 }
