@@ -54,7 +54,7 @@ public class InitiativeApiController implements InitiativeApi {
         initiativeToSave.setUpdateDate(LocalDateTime.now());
         //TODO verificare se necessario controllo per serviceId e organization non sovrapposti prima di creare una ulteriore iniziativa
         Initiative insertedInitiative = initiativeService.insertInitiative(initiativeToSave);
-        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toDtoOnlyId(insertedInitiative));
+        return new ResponseEntity<>(this.initiativeModelToDTOMapper.toDtoOnlyId(insertedInitiative), HttpStatus.CREATED);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
