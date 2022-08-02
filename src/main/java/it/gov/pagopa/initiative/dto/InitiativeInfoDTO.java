@@ -12,7 +12,6 @@ import javax.validation.constraints.NotNull;
 /**
  * InitiativePatchDTO
  */
-@Validated
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -28,7 +27,7 @@ public class InitiativeInfoDTO {
 
   @JsonProperty("additionalInfo")
   @Valid
-//  @NotNull
+  @NotNull(groups = ValidationOnGroup.class)
   private InitiativeAdditionalDTO additionalInfo;
 
 }
