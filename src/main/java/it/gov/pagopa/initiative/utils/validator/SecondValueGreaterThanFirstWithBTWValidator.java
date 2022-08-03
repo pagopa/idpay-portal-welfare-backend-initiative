@@ -47,8 +47,7 @@ public class SecondValueGreaterThanFirstWithBTWValidator implements ConstraintVa
             value2 = (String) PARSER.parseExpression(valueField2).getValue(automatedCriteriaDTO);
         }
 
-        String operatorName = operator.name();
-        if (operatorName.equals("BTW_CLOSED") || operatorName.equals("BTW_OPEN")) {
+        if (FilterOperatorEnum.BTW_CLOSED.equals(operator) || FilterOperatorEnum.BTW_OPEN.equals(operator)) {
             number1 = decimalFormat.parse(value1, new ParsePosition(0));
             if (number1 instanceof BigDecimal)
                 value1BigDecimal = (BigDecimal) number1;
