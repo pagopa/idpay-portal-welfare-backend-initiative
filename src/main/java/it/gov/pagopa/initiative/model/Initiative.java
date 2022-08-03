@@ -4,7 +4,6 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -30,6 +29,8 @@ public class Initiative {
     private InitiativeGeneral general;
     private InitiativeAdditional additionalInfo;
     private InitiativeBeneficiaryRule beneficiaryRule;
+    private IRewardRuleTypeItems rewardRule;
+    private InitiativeTrxRule trxRule;
     private InitiativeLegal legal;
 
 }

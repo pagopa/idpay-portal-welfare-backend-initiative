@@ -81,6 +81,13 @@ public class InitiativeApiController implements InitiativeApi {
         return ResponseEntity.noContent().build();
     }
 
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public ResponseEntity<Void> updateTrxAndRewardRulesDraft(String organizationId, String initiativeId, InitiativeRewardAndTrxRulesDTO rewardAndTrxRulesDTO){
+        //this.initiativeService.updateTrxAndRewardRules(organizationId, initiativeId, this.);
+        return ResponseEntity.noContent().build();
+    }
+
+    @ResponseStatus(HttpStatus.OK)
     @Override
     public ResponseEntity<InitiativeDTO> getInitiativeBeneficiaryView(String initiativeId) {
         return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDTO(this.initiativeService.getInitiativeBeneficiaryView(initiativeId)));

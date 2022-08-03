@@ -60,6 +60,12 @@ public class InitiativeDTO   {
   @JsonProperty("beneficiaryRule")
   private InitiativeBeneficiaryRuleDTO beneficiaryRule;
 
+  @JsonProperty("rewardRule")
+  private InitiativeRewardRuleTypeItems rewardRule;
+
+  @JsonProperty("trxRule")
+  private InitiativeTrxRulesDTO trxRule;
+
   @JsonProperty("legal")
   private InitiativeLegalDTO legal;
 

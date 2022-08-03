@@ -82,5 +82,18 @@ public class InitiativeServiceImpl implements InitiativeService {
         this.initiativeRepository.save(initiative);
     }
 
+    @Override
+    public void updateTrxAndRewardRules(String organizationId, String initiativeId, Initiative rewardAndTrxRules) {
+        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeId(organizationId, initiativeId)
+                .orElseThrow(() -> new InitiativeException(
+                        InitiativeConstants.Exception.NotFound.CODE_PACKAGE,
+                        MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_ORGANIZATION_ID_MESSAGE, organizationId, initiativeId),
+                        HttpStatus.NOT_FOUND));
+        initiative.setRewardRule(rewardAndTrxRules.getRewardRule());
+        initiative.setTrxRule(rewardAndTrxRules.getTrxRule());
+        initiative.setUpdateDate(LocalDateTime.now());
+        this.initiativeRepository.save(initiative);
+    }
+
 
 }
