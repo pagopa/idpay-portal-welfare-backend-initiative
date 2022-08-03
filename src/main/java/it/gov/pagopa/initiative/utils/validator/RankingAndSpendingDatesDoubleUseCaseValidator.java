@@ -65,6 +65,6 @@ public class RankingAndSpendingDatesDoubleUseCaseValidator implements Constraint
                 return false;
             }
         }
-        return false; //se non sono presenti entrambe le date di start e end ritorno false a prescindere
+        return false; //if both (start and end dates) are not present, return false regardless
     }
 }

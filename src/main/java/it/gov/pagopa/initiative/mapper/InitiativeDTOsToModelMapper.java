@@ -76,9 +76,10 @@ public class InitiativeDTOsToModelMapper {
                     AutomatedCriteria.builder()
                             .code(dto.getCode())
                             .field(dto.getField())
-                            .operator(dto.getOperator())
+                            .operator(FilterOperatorEnumModel.valueOf(dto.getOperator().name()))
                             .authority(dto.getAuthority())//TODO definire modalità di recupero authority
                             .value(dto.getValue())
+                            .value2(dto.getValue2())
                             .build()
             ).toList());
         }

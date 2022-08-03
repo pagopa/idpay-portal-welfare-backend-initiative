@@ -31,8 +31,6 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
     void whenAllValidationAreValid_InitiativeGeneralDTO_thenValidationArePassed() {
         InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralDTO_ok();
         Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationOnGroup.class);
-//        Then in your test simply call it on the object you require validation on, with what exception you are validating:
-//        Set<TheViolation<TheClassYouAreValidating> violations = validator.validate(theInstanceOfTheClassYouAreValidating);
 
         assertTrue(violations.isEmpty());
     }
