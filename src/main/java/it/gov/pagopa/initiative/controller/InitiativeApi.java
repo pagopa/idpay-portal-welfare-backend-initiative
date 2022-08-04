@@ -11,12 +11,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import it.gov.pagopa.initiative.dto.*;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Validated
 public interface InitiativeApi {
 
     @Operation(summary = "Returns the list of initiatives names for a specific organization", description = "", security = {
@@ -100,7 +98,7 @@ public interface InitiativeApi {
     @PutMapping(value = "/idpay/organization/{organizationId}/initiative/{initiativeId}/reward",
             produces = {"application/json"},
             consumes = {"application/json"})
-    public ResponseEntity<Void> updateTrxAndRewardRules(@PathVariable("organizationId") String organizationId, @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId, @Parameter(in = ParameterIn.DEFAULT, schema = @Schema()) @Validated() @RequestBody InitiativeRewardAndTrxRulesDTO rewardAndTrxRulesDTO);
+    public ResponseEntity<Void> updateTrxAndRewardRules(@PathVariable("organizationId") String organizationId, @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId, @Parameter(in = ParameterIn.DEFAULT, schema = @Schema()) @RequestBody InitiativeRewardAndTrxRulesDTO rewardAndTrxRulesDTO);
 
     @Operation(summary = "Association of beneficiary rules to a draft initiative without validation", description = "", security = {
             @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
