@@ -1,19 +1,20 @@
 package it.gov.pagopa.initiative.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import it.gov.pagopa.initiative.utils.constraint.SecondValueGreaterThanFirstWithBTW;
 import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
 import lombok.*;
-import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * AutomatedCriteriaDTO
  */
-@Validated
 @Data @AllArgsConstructor @NoArgsConstructor
 @EqualsAndHashCode
 @Builder
+@SecondValueGreaterThanFirstWithBTW(value1 = "value", value2 = "value2", operator = "operator", groups = ValidationOnGroup.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AutomatedCriteriaDTO   {
 
@@ -24,9 +25,11 @@ public class AutomatedCriteriaDTO   {
 
   private String field;
 
-  @NotBlank(groups = ValidationOnGroup.class)
-  private String operator;
+  @NotNull(groups = ValidationOnGroup.class)
+  private FilterOperatorEnum operator;
 
   @NotBlank(groups = ValidationOnGroup.class)
   private String value;
+
+  private String value2;
 }
