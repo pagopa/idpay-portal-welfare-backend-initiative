@@ -1,4 +1,4 @@
-package it.gov.pagopa.initiative.dto;
+package it.gov.pagopa.initiative.dto.rule.reward;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -11,5 +11,5 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value = RewardGroupsDTO.class, name = "rewardGroups"),
         @JsonSubTypes.Type(value = RewardValueDTO.class, name = "rewardValue"),
 })
-public interface InitiativeRewardRuleTypeItems {
+public interface InitiativeRewardRuleDTO {
 }

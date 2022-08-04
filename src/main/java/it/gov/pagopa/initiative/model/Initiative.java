@@ -1,5 +1,7 @@
 package it.gov.pagopa.initiative.model;
 
+import it.gov.pagopa.initiative.model.rule.reward.InitiativeRewardRule;
+import it.gov.pagopa.initiative.model.rule.trx.InitiativeTrxConditions;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -29,8 +31,8 @@ public class Initiative {
     private InitiativeGeneral general;
     private InitiativeAdditional additionalInfo;
     private InitiativeBeneficiaryRule beneficiaryRule;
-    private IRewardRuleTypeItems rewardRule;
-    private InitiativeTrxRule trxRule;
+    private InitiativeRewardRule rewardRule;
+    private InitiativeTrxConditions trxRule;
     private InitiativeLegal legal;
 
 }

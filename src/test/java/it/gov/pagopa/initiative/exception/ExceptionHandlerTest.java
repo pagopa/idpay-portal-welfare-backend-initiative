@@ -17,9 +17,9 @@ class ExceptionHandlerTest {
 
     @Test
     void raisedInitiativeException(){
-        ErrorDTO errorDTO = new ErrorDTO(InitiativeConstants.Exception.NotFound.CODE_PACKAGE, MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_LIST_BY_ORGANIZATION_MESSAGE, anyString()));
+        ErrorDTO errorDTO = new ErrorDTO(InitiativeConstants.Exception.NotFound.CODE, MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_LIST_BY_ORGANIZATION_MESSAGE, anyString()));
         InitiativeException e = new InitiativeException(
-                InitiativeConstants.Exception.NotFound.CODE_PACKAGE,
+                InitiativeConstants.Exception.NotFound.CODE,
                 MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_LIST_BY_ORGANIZATION_MESSAGE, anyString()),
                 HttpStatus.NOT_FOUND);
         ResponseEntity<ErrorDTO> errorDTOResponseEntity = controllerAdvice.handleInitiativeException(e);

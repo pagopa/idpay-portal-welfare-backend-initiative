@@ -34,7 +34,7 @@ public class RestResponseExceptionHandler  {
         });
         String message = String.join(" - ", errors);
         return new ResponseEntity<>(
-                new ErrorDTO(InitiativeConstants.Exception.BadRequest.CODE_PACKAGE, message), HttpStatus.BAD_REQUEST);
+                new ErrorDTO(InitiativeConstants.Exception.BadRequest.CODE, message), HttpStatus.BAD_REQUEST);
     }
 
 }

@@ -1,103 +1,25 @@
 package it.gov.pagopa.initiative.mapper;
 
 import it.gov.pagopa.initiative.dto.*;
+import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
+import it.gov.pagopa.initiative.dto.rule.reward.RewardGroupsDTO;
+import it.gov.pagopa.initiative.dto.rule.reward.RewardValueDTO;
+import it.gov.pagopa.initiative.dto.rule.trx.*;
 import it.gov.pagopa.initiative.model.TypeMultiEnum;
 import it.gov.pagopa.initiative.model.*;
-import org.springframework.beans.BeanUtils;
+import it.gov.pagopa.initiative.model.rule.reward.InitiativeRewardRule;
+import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
+import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
+import it.gov.pagopa.initiative.model.rule.trx.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import javax.naming.InitialContext;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class InitiativeDTOsToModelMapper {
-
-    public Initiative toInitiativeTrxAndRewardRules(InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO){
-        if (initiativeRewardAndTrxRulesDTO == null){
-            return null;
-        }
-
-        Initiative initiative = new Initiative();
-        //initiative.setRewardRule();
-        initiative.setTrxRule(this.toInitiativeTrxRule(initiativeRewardAndTrxRulesDTO.getTrxRule()));
-        return initiative;
-    }
-
-    private InitiativeTrxRule toInitiativeTrxRule(InitiativeTrxRulesDTO trxRulesDTO){
-        if (trxRulesDTO == null){
-            return null;
-        }
-        InitiativeTrxRule initiativeTrxRule = new InitiativeTrxRule();
-        initiativeTrxRule.setTrxCount(this.toTrxCount(trxRulesDTO.getTrxCount()));
-        initiativeTrxRule.setMccFilter(this.toMccFilter(trxRulesDTO.getMccFilter()));
-        initiativeTrxRule.setDaysOfWeekAllowed(this.toDaysOfWeekAllowedItem(trxRulesDTO.getDaysOfWeekAllowed()));
-        initiativeTrxRule.setRewardLimit(this.toRewardLimit(trxRulesDTO.getRewardLimit()));
-        initiativeTrxRule.setThreshold(this.toThreshold(trxRulesDTO.getThreshold()));
-        return initiativeTrxRule;
-
-    }
-    private TrxCount toTrxCount(TrxCountDTO trxCountDTO){
-        if (trxCountDTO == null){
-            return null;
-        }
-        return TrxCount.builder().to(trxCountDTO.getTo())
-                .from(trxCountDTO.getFrom())
-                .fromIncluded(trxCountDTO.getFromIncluded())
-                .toIncluded(trxCountDTO.getToIncluded()).build();
-    }
-
-    private MccFilter toMccFilter(MccFilterDTO mccFilterDTO){
-        if (mccFilterDTO == null){
-            return null;
-        }
-        return MccFilter.builder().value(mccFilterDTO.getValue())
-                .filterOperator(MccFilter.FilterOperatorEnum.valueOf(mccFilterDTO.getFilterOperator().name())).build();
-    }
-    private List<DaysOfWeekAllowedItem> toDaysOfWeekAllowedItem(List<DaysOfWeekAllowedItemDTO> daysOfWeekAllowedItemDTO){
-        if (CollectionUtils.isEmpty(daysOfWeekAllowedItemDTO)) {
-            return Collections.emptyList();
-        }
-        else {
-            List<DaysOfWeekAllowedItem> daysOfWeekAllowedItems = new ArrayList<>();
-            BeanUtils.copyProperties(daysOfWeekAllowedItemDTO, daysOfWeekAllowedItems);
-            return daysOfWeekAllowedItems;
-//            return daysOfWeekAllowedItemDTO.stream().map(dto -> {
-//                BeanUtils.copyProperties();
-//                List<DaysOfWeekDTO> daysOfWeekDTOS = new ArrayList<>();
-//                return daysOfWeekDTOS.stream().map(dow -> DaysOfWeek.builder().days(dto.getDaysOfWeek().))
-//            })
-        }
-    }
-
-    private List<RewardLimit> toRewardLimit(List<RewardLimitDTO> rewardLimitDTO){
-        if (CollectionUtils.isEmpty(rewardLimitDTO)) {
-            return Collections.emptyList();
-        }
-        else {
-            List<RewardLimit> rewardLimits = new ArrayList<>();
-            BeanUtils.copyProperties(rewardLimitDTO, rewardLimits);
-            return rewardLimits;
-//            return daysOfWeekAllowedItemDTO.stream().map(dto -> {
-//                BeanUtils.copyProperties();
-//                List<DaysOfWeekDTO> daysOfWeekDTOS = new ArrayList<>();
-//                return daysOfWeekDTOS.stream().map(dow -> DaysOfWeek.builder().days(dto.getDaysOfWeek().))
-//            })
-        }
-    }
-
-    private Threshold toThreshold(ThresholdDTO thresholdDTO){
-        if (thresholdDTO == null){
-            return null;
-        }
-        return Threshold.builder().from(thresholdDTO.getFrom())
-                .to(thresholdDTO.getTo())
-                .fromIncluded(thresholdDTO.getFromIncluded())
-                .toIncluded(thresholdDTO.getToIncluded()).build();
-    }
-
 
     public Initiative toInitiative(InitiativeInfoDTO initiativeInfoDto) {
         if (initiativeInfoDto == null) {
@@ -105,7 +27,6 @@ public class InitiativeDTOsToModelMapper {
         }
 
         Initiative initiative = new Initiative();
-
         initiative.setGeneral(this.toInitiativeGeneral(initiativeInfoDto.getGeneral()));
         initiative.setAdditionalInfo(this.toInitiativeAdditional(initiativeInfoDto.getAdditionalInfo()));
         return initiative;
@@ -175,19 +96,19 @@ public class InitiativeDTOsToModelMapper {
         } else {
             beneficiaryRule.setSelfDeclarationCriteria(beneficiaryRuleDto.getSelfDeclarationCriteria().stream()
                     .map(dto -> {
-                                if (dto instanceof SelfCriteriaBoolDTO) {
+                                if (dto instanceof SelfCriteriaBoolDTO selfCriteriaBoolDTOInput) {
                                     return SelfCriteriaBool.builder()
-                                            ._type(it.gov.pagopa.initiative.model.TypeBoolEnum.valueOf(((SelfCriteriaBoolDTO) dto).getType().name()))
-                                            .code(((SelfCriteriaBoolDTO) dto).getCode())
-                                            .description(((SelfCriteriaBoolDTO) dto).getDescription())
-                                            .value(((SelfCriteriaBoolDTO) dto).getValue())
+                                            ._type(it.gov.pagopa.initiative.model.TypeBoolEnum.valueOf(selfCriteriaBoolDTOInput.getType().name()))
+                                            .code(selfCriteriaBoolDTOInput.getCode())
+                                            .description(selfCriteriaBoolDTOInput.getDescription())
+                                            .value(selfCriteriaBoolDTOInput.getValue())
                                             .build();
-                                } else if (dto instanceof SelfCriteriaMultiDTO) {
+                                } else if (dto instanceof SelfCriteriaMultiDTO selfCriteriaMultiDTO) {
                                     return SelfCriteriaMulti.builder()
-                                            ._type(TypeMultiEnum.valueOf(((SelfCriteriaMultiDTO) dto).getType().name()))
-                                            .code(((SelfCriteriaMultiDTO) dto).getCode())
-                                            .description(((SelfCriteriaMultiDTO) dto).getDescription())
-                                            .value(((SelfCriteriaMultiDTO) dto).getValue())
+                                            ._type(TypeMultiEnum.valueOf(selfCriteriaMultiDTO.getType().name()))
+                                            .code(selfCriteriaMultiDTO.getCode())
+                                            .description(selfCriteriaMultiDTO.getDescription())
+                                            .value(selfCriteriaMultiDTO.getValue())
                                             .build();
                                 }
                                 return null;
@@ -197,4 +118,99 @@ public class InitiativeDTOsToModelMapper {
         return beneficiaryRule;
     }
 
+    public Initiative toInitiative(InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDto) {
+        if (initiativeRewardAndTrxRulesDto == null) {
+            return null;
+        }
+        Initiative initiative = new Initiative();
+        initiative.setTrxRule(this.toInitiativeTrxRule(initiativeRewardAndTrxRulesDto.getTrxRule()));
+        initiative.setRewardRule(this.toInitiativeRewardRule(initiativeRewardAndTrxRulesDto.getRewardRule()));
+        return initiative;
+    }
+
+    private InitiativeRewardRule toInitiativeRewardRule(InitiativeRewardRuleDTO rewardRuleDTO) {
+        if (rewardRuleDTO == null) {
+            return null;
+        }
+        InitiativeRewardRule ret;
+        if(rewardRuleDTO instanceof RewardValueDTO rewardValueInput){
+            ret = RewardValue.builder().rewardValue(rewardValueInput.getRewardValue()).build();
+        } else if (rewardRuleDTO instanceof RewardGroupsDTO rewardGroupsInput) {
+            ret = RewardGroups.builder().rewardGroups(rewardGroupsInput.getRewardGroups().stream().map(
+                    x -> RewardGroups.RewardGroup.builder().from(x.getFrom()).to(x.getTo()).rewardValue(x.getRewardValue()).build()
+            ).collect(Collectors.toList())).build();
+        } else {
+            throw new IllegalArgumentException("Initiative Reward Rule not handled: %s".formatted(rewardRuleDTO.getClass().getName()));
+        }
+        return ret;
+    }
+
+    private InitiativeTrxConditions toInitiativeTrxRule(InitiativeTrxConditionsDTO trxRulesDTO) {
+        if (trxRulesDTO == null) {
+            return null;
+        }
+        return InitiativeTrxConditions.builder()
+                .daysOfWeek(this.toDaysOfWeek(trxRulesDTO.getDaysOfWeek()))
+                .mccFilter(this.toMccFilter(trxRulesDTO.getMccFilter()))
+                .rewardLimits(this.toRewardLimits(trxRulesDTO.getRewardLimits()))
+                .trxCount(this.toTrxCount(trxRulesDTO.getTrxCount()))
+                .threshold(this.toThreshold(trxRulesDTO.getThreshold()))
+                .build();
+    }
+
+    private TrxCount toTrxCount(TrxCountDTO trxCountDTO) {
+        if (trxCountDTO == null) {
+            return null;
+        }
+        return TrxCount.builder().to(trxCountDTO.getTo())
+                .from(trxCountDTO.getFrom())
+                .fromIncluded(trxCountDTO.isFromIncluded())
+                .toIncluded(trxCountDTO.isToIncluded()).build();
+    }
+
+    private MccFilter toMccFilter(MccFilterDTO mccFilterDTO) {
+        if (mccFilterDTO == null) {
+            return null;
+        }
+        return MccFilter.builder()
+                .allowedList(mccFilterDTO.isAllowedList())
+                .values(mccFilterDTO.getValues())
+                .build();
+    }
+
+    private DayOfWeek toDaysOfWeek(DayOfWeekDTO dayOfWeekDTO) {
+        if (dayOfWeekDTO == null) {
+            return null;
+        }
+        return new DayOfWeek(dayOfWeekDTO.stream().map(x -> DayOfWeek.DayConfig.builder()
+                        .daysOfWeek(x.getDaysOfWeek())
+                        .intervals(x.getIntervals().stream().map(i -> DayOfWeek.Interval.builder()
+                                        .startTime(i.getStartTime())
+                                        .endTime(i.getEndTime())
+                                        .build())
+                                .collect(Collectors.toList()))
+                        .build())
+                .collect(Collectors.toList()));
+    }
+
+    private List<RewardLimits> toRewardLimits(List<RewardLimitsDTO> rewardLimitDTO) {
+        if (CollectionUtils.isEmpty(rewardLimitDTO)) {
+            return Collections.emptyList();
+        }
+        return rewardLimitDTO.stream().map(x -> RewardLimits.builder()
+                        .frequency(RewardLimits.RewardLimitFrequency.valueOf(x.getFrequency().name()))
+                        .rewardLimit(x.getRewardLimit())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    private Threshold toThreshold(ThresholdDTO thresholdDTO) {
+        if (thresholdDTO == null) {
+            return null;
+        }
+        return Threshold.builder().from(thresholdDTO.getFrom())
+                .to(thresholdDTO.getTo())
+                .fromIncluded(thresholdDTO.isFromIncluded())
+                .toIncluded(thresholdDTO.isToIncluded()).build();
+    }
 }

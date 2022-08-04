@@ -2,10 +2,11 @@ package it.gov.pagopa.initiative.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
+import it.gov.pagopa.initiative.dto.rule.trx.InitiativeTrxConditionsDTO;
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -50,7 +51,6 @@ public class InitiativeDTO   {
   @JsonProperty("beneficiaryRanking")
   private Boolean beneficiaryRanking;
 
-
   @JsonProperty("general")
   private InitiativeGeneralDTO general;
 
@@ -61,10 +61,10 @@ public class InitiativeDTO   {
   private InitiativeBeneficiaryRuleDTO beneficiaryRule;
 
   @JsonProperty("rewardRule")
-  private InitiativeRewardRuleTypeItems rewardRule;
+  private InitiativeRewardRuleDTO rewardRule;
 
   @JsonProperty("trxRule")
-  private InitiativeTrxRulesDTO trxRule;
+  private InitiativeTrxConditionsDTO trxRule;
 
   @JsonProperty("legal")
   private InitiativeLegalDTO legal;

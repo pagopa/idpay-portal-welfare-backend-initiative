@@ -2,18 +2,23 @@ package it.gov.pagopa.initiative.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
+import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
+import it.gov.pagopa.initiative.dto.rule.trx.InitiativeTrxConditionsDTO;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 
+@Validated
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
-@Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class InitiativeRewardAndTrxRulesDTO {
+
     @JsonProperty("rewardRule")
-    private InitiativeRewardRuleTypeItems rewardRule;
+    private InitiativeRewardRuleDTO rewardRule;
 
     @JsonProperty("trxRule")
-    private InitiativeTrxRulesDTO trxRule;
+    private InitiativeTrxConditionsDTO trxRule;
 }

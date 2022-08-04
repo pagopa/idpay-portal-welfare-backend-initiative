@@ -1,13 +1,22 @@
 package it.gov.pagopa.initiative.mapper;
 
 import it.gov.pagopa.initiative.dto.*;
+import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
+import it.gov.pagopa.initiative.dto.rule.reward.RewardGroupsDTO;
+import it.gov.pagopa.initiative.dto.rule.reward.RewardValueDTO;
+import it.gov.pagopa.initiative.dto.rule.trx.*;
 import it.gov.pagopa.initiative.model.*;
+import it.gov.pagopa.initiative.model.rule.reward.InitiativeRewardRule;
+import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
+import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
+import it.gov.pagopa.initiative.model.rule.trx.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class InitiativeModelToDTOMapper {
@@ -29,8 +38,11 @@ public class InitiativeModelToDTOMapper {
         initiativeDto.setGeneral(this.toInitiativeGeneralDTO(initiative.getGeneral()));
         initiativeDto.setAdditionalInfo(this.toInitiativeAdditionalDTO(initiative.getAdditionalInfo()));
         initiativeDto.setBeneficiaryRule(this.toInitiativeBeneficiaryRuleDTO(initiative.getBeneficiaryRule()));
+        initiativeDto.setRewardRule(this.toRewardRuleDTO(initiative.getRewardRule()));
+        initiativeDto.setTrxRule(this.toTrxRuleDTO(initiative.getTrxRule()));
         return initiativeDto;
     }
+
 
     public InitiativeDTO toDtoOnlyId(Initiative initiative) {
         if (initiative == null) {
@@ -106,19 +118,19 @@ public class InitiativeModelToDTOMapper {
         } else {
             beneficiaryRuleDto.setSelfDeclarationCriteria(beneficiaryRule.getSelfDeclarationCriteria().stream()
                     .map(x -> {
-                                if (x instanceof SelfCriteriaBool) {
+                                if (x instanceof SelfCriteriaBool selfCriteriaBool) {
                                     return SelfCriteriaBoolDTO.builder()
-                                            .type(it.gov.pagopa.initiative.dto.TypeBoolEnum.valueOf(((SelfCriteriaBool) x).get_type().name()))
-                                            .code(((SelfCriteriaBool) x).getCode())
-                                            .description(((SelfCriteriaBool) x).getDescription())
-                                            .value(((SelfCriteriaBool) x).getValue())
+                                            .type(it.gov.pagopa.initiative.dto.TypeBoolEnum.valueOf(selfCriteriaBool.get_type().name()))
+                                            .code(selfCriteriaBool.getCode())
+                                            .description(selfCriteriaBool.getDescription())
+                                            .value(selfCriteriaBool.getValue())
                                             .build();
-                                } else if (x instanceof SelfCriteriaMulti) {
+                                } else if (x instanceof SelfCriteriaMulti selfCriteriaMulti) {
                                     return SelfCriteriaMultiDTO.builder()
-                                            .type(it.gov.pagopa.initiative.dto.TypeMultiEnum.valueOf(((SelfCriteriaMulti) x).get_type().name()))
-                                            .code(((SelfCriteriaMulti) x).getCode())
-                                            .description(((SelfCriteriaMulti) x).getDescription())
-                                            .value(((SelfCriteriaMulti) x).getValue())
+                                            .type(it.gov.pagopa.initiative.dto.TypeMultiEnum.valueOf(selfCriteriaMulti.get_type().name()))
+                                            .code(selfCriteriaMulti.getCode())
+                                            .description(selfCriteriaMulti.getDescription())
+                                            .value(selfCriteriaMulti.getValue())
                                             .build();
                                 }
                                 return null;
@@ -145,5 +157,88 @@ public class InitiativeModelToDTOMapper {
                 .build()).toList();
     }
 
+    private InitiativeRewardRuleDTO toRewardRuleDTO(InitiativeRewardRule rewardRule) {
+        if (rewardRule == null) {
+            return null;
+        }
+        InitiativeRewardRuleDTO dto = null;
+        if (rewardRule instanceof RewardValue rewardValueInput) {
+            dto = RewardValueDTO.builder().rewardValue(rewardValueInput.getRewardValue()).build();
+        } else if (rewardRule instanceof RewardGroups rewardGroupsInput) {
+            dto = RewardGroupsDTO.builder().rewardGroups(rewardGroupsInput.getRewardGroups().stream().map(
+                    x -> RewardGroupsDTO.RewardGroupDTO.builder().from(x.getFrom()).to(x.getTo()).rewardValue(x.getRewardValue()).build()
+            ).collect(Collectors.toList())).build();
+        }
+        return dto;
+    }
+
+    private InitiativeTrxConditionsDTO toTrxRuleDTO(InitiativeTrxConditions trxRules) {
+        if (trxRules == null) {
+            return null;
+        }
+        return InitiativeTrxConditionsDTO.builder()
+                .daysOfWeek(this.toDaysOfWeekDTO(trxRules.getDaysOfWeek()))
+                .mccFilter(this.toMccFilterDTO(trxRules.getMccFilter()))
+                .rewardLimits(this.toRewardLimitsDTO(trxRules.getRewardLimits()))
+                .trxCount(this.toTrxCountDTO(trxRules.getTrxCount()))
+                .threshold(this.toThresholdDTO(trxRules.getThreshold()))
+                .build();
+    }
+
+    private TrxCountDTO toTrxCountDTO(TrxCount trxCount) {
+        if (trxCount == null) {
+            return null;
+        }
+        return TrxCountDTO.builder().to(trxCount.getTo())
+                .from(trxCount.getFrom())
+                .fromIncluded(trxCount.isFromIncluded())
+                .toIncluded(trxCount.isToIncluded()).build();
+    }
+
+    private MccFilterDTO toMccFilterDTO(MccFilter mccFilter) {
+        if (mccFilter == null) {
+            return null;
+        }
+        return MccFilterDTO.builder()
+                .allowedList(mccFilter.isAllowedList())
+                .values(mccFilter.getValues())
+                .build();
+    }
+
+    private DayOfWeekDTO toDaysOfWeekDTO(DayOfWeek dayOfWeek) {
+        if (dayOfWeek == null) {
+            return null;
+        }
+        return new DayOfWeekDTO(dayOfWeek.stream().map(x -> DayOfWeekDTO.DayConfig.builder()
+                        .daysOfWeek(x.getDaysOfWeek())
+                        .intervals(x.getIntervals().stream().map(i -> DayOfWeekDTO.Interval.builder()
+                                        .startTime(i.getStartTime())
+                                        .endTime(i.getEndTime())
+                                        .build())
+                                .collect(Collectors.toList()))
+                        .build())
+                .collect(Collectors.toList()));
+    }
+
+    private List<RewardLimitsDTO> toRewardLimitsDTO(List<RewardLimits> rewardLimit) {
+        if (CollectionUtils.isEmpty(rewardLimit)) {
+            return Collections.emptyList();
+        }
+        return rewardLimit.stream().map(x -> RewardLimitsDTO.builder()
+                        .frequency(RewardLimitsDTO.RewardLimitFrequency.valueOf(x.getFrequency().name()))
+                        .rewardLimit(x.getRewardLimit())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    private ThresholdDTO toThresholdDTO(Threshold threshold) {
+        if (threshold == null) {
+            return null;
+        }
+        return ThresholdDTO.builder().from(threshold.getFrom())
+                .to(threshold.getTo())
+                .fromIncluded(threshold.isFromIncluded())
+                .toIncluded(threshold.isToIncluded()).build();
+    }
 
 }
