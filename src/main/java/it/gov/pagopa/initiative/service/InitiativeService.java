@@ -20,4 +20,6 @@ public interface InitiativeService {
     void updateInitiativeGeneralInfo(String organizationId, String initiativeId, Initiative initiativeInfoModel);
 
     void updateInitiativeBeneficiary(String organizationId, String initiativeId, InitiativeBeneficiaryRule toBeneficiaryRuleModel);
+
+    void updateTrxAndRewardRules(String organizationId, String initiativeId, Initiative rewardAndTrxRules);
 }
