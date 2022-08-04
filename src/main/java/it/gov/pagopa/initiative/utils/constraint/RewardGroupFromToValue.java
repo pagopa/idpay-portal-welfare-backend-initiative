@@ -1,6 +1,5 @@
 package it.gov.pagopa.initiative.utils.constraint;
 
-import it.gov.pagopa.initiative.utils.validator.BigDecimalLengthValidator;
 import it.gov.pagopa.initiative.utils.validator.RewardGroupFromToValidator;
 
 import javax.validation.Constraint;
