@@ -12,7 +12,8 @@ public class AutomatedCriteria {
   private String authority;
   private String code ;
   private String field;
-  private String operator;
+  private FilterOperatorEnumModel operator;
   private String value;
+  private String value2;
 
 }

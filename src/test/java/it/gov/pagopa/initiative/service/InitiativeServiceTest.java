@@ -296,7 +296,7 @@ class InitiativeServiceTest {
         automatedCriteria.setAuthority("Authority_ISEE");
         automatedCriteria.setCode("Code_ISEE");
         automatedCriteria.setField("true");
-        automatedCriteria.setOperator("Operator");
+        automatedCriteria.setOperator(FilterOperatorEnumModel.EQ);
         automatedCriteria.setValue("value");
         List<AutomatedCriteria> automatedCriteriaList = new ArrayList<>();
         automatedCriteriaList.add(automatedCriteria);
@@ -403,7 +403,7 @@ class InitiativeServiceTest {
         automatedCriteriaDTO.setAuthority("Authority_ISEE");
         automatedCriteriaDTO.setCode("Code_ISEE");
         automatedCriteriaDTO.setField("true");
-        automatedCriteriaDTO.setOperator("Operator");
+        automatedCriteriaDTO.setOperator(FilterOperatorEnum.EQ);
         automatedCriteriaDTO.setValue("value");
         List<AutomatedCriteriaDTO> automatedCriteriaList = new ArrayList<>();
         automatedCriteriaList.add(automatedCriteriaDTO);

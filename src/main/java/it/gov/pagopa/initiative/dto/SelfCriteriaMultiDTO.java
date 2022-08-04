@@ -4,16 +4,15 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
 import lombok.*;
-import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
  * SelfCriteriaMultiDTO
  */
-@Validated
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -23,6 +22,7 @@ import java.util.List;
 public class SelfCriteriaMultiDTO implements AnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems {
 
   @JsonProperty("_type")
+  @NotNull(groups = ValidationOnGroup.class)
   private TypeMultiEnum type;
 
   @JsonProperty("description")
@@ -30,10 +30,11 @@ public class SelfCriteriaMultiDTO implements AnyOfInitiativeBeneficiaryRuleDTOSe
   private String description;
 
   @JsonProperty("value")
-  @Valid
+  @NotEmpty(groups = ValidationOnGroup.class)
   private List<String> value;
 
   @JsonProperty("code")
+  @NotNull(groups = ValidationOnGroup.class)
   private String code;
 
 }
