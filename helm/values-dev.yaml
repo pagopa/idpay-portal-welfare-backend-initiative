@@ -79,8 +79,17 @@ microservice-chart:
 #          metricAggregationType: Count
 #          targetValue: "30"
 
+
   envConfig:
     MONGODB_DBNAME: idpay
+    APPLICATIONINSIGHTS_ROLE_NAME: "idpayportalwelfarebackendinitiative"
+    APPLICATIONINSIGHTS_INSTRUMENTATION_LOGGING_LEVEL: "OFF"
+    APPLICATIONINSIGHTS_INSTRUMENTATION_MICROMETER_ENABLED: "false"
+
+  envConfigMapExternals:
+    idpay-common:
+      TZ: TZ
+      JAVA_TOOL_OPTIONS: JAVA_TOOL_OPTIONS
 
   envSecret:
     aks-api-url: cstar-d-weu-dev01-aks-apiserver-url
