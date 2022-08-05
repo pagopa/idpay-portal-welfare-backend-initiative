@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.DayOfWeek;
@@ -31,6 +32,7 @@ public class DayOfWeekDTO extends ArrayList<DayOfWeekDTO.DayConfig> {
         @NotEmpty(groups = ValidationOnGroup.class)
         private Set<DayOfWeek> daysOfWeek;
 
+        @Valid
         @NotNull(groups = ValidationOnGroup.class)
         @NotEmpty(groups = ValidationOnGroup.class)
         private List<Interval> intervals;

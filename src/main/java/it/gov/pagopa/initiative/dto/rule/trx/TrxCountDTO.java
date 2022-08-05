@@ -3,6 +3,8 @@ package it.gov.pagopa.initiative.dto.rule.trx;
 import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
 import lombok.*;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 @Data
@@ -16,11 +18,11 @@ public class TrxCountDTO {
     private Long from;
 
     @NotNull(groups = ValidationOnGroup.class)
-    private boolean fromIncluded;
+    private Boolean fromIncluded;
 
     @NotNull(groups = ValidationOnGroup.class)
     private Long to;
 
     @NotNull(groups = ValidationOnGroup.class)
-    private boolean toIncluded;
+    private Boolean toIncluded;
 }

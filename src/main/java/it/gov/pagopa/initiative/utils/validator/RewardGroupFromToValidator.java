@@ -27,9 +27,11 @@ public class RewardGroupFromToValidator implements ConstraintValidator<RewardGro
         if (listTmp.isEmpty()){
             return false;
         }
-        for (int i = 0; i < listTmp.size()-1; i++){
-            if (listTmp.get(i).getFrom().compareTo(listTmp.get(i).getTo()) == 1 || (listTmp.get(i).getFrom().equals(listTmp.get(i+1).getFrom()) && listTmp.get(i).getTo().equals(listTmp.get(i+1).getTo()))){
-                return false;
+        for (int j = 0; j < listTmp.size()-1; j++){
+            for (int i = j+1; i < listTmp.size()-1; i++){
+                if (listTmp.get(j).getFrom().compareTo(listTmp.get(j).getTo()) == 1 || (listTmp.get(j).getFrom().equals(listTmp.get(i).getFrom()) && listTmp.get(j).getTo().equals(listTmp.get(i).getTo()))){
+                    return false;
+                }
             }
         }
         return true;
