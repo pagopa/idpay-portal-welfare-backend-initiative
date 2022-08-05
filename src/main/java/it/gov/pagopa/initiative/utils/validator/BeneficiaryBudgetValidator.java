@@ -24,10 +24,10 @@ public class BeneficiaryBudgetValidator implements ConstraintValidator<Beneficia
     public boolean isValid(InitiativeGeneralDTO value, ConstraintValidatorContext context) {
         BigDecimal budget1 = null;
         BigDecimal budget2 = null;
-        if (PARSER.parseExpression(budgetField1).getValue(value) instanceof BigDecimal)
-            budget1 = (BigDecimal) PARSER.parseExpression(budgetField1).getValue(value);
-        if (PARSER.parseExpression(budgetField2).getValue(value) instanceof BigDecimal){
-            budget2 = (BigDecimal) PARSER.parseExpression(budgetField2).getValue(value);
+        if (PARSER.parseExpression(budgetField1).getValue(value) instanceof BigDecimal bigDecimalInput)
+            budget1 = bigDecimalInput;
+        if (PARSER.parseExpression(budgetField2).getValue(value) instanceof BigDecimal bigDecimalInput){
+            budget2 = bigDecimalInput;
         }
         if(budget1 != null && budget2 != null)
             return budget1.compareTo(budget2) < 0;

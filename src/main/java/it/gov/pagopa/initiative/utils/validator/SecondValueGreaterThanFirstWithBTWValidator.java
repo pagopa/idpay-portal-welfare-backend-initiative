@@ -37,23 +37,23 @@ public class SecondValueGreaterThanFirstWithBTWValidator implements ConstraintVa
         DecimalFormat decimalFormat = new DecimalFormat();
         decimalFormat.setParseBigDecimal(true);
 
-        if (PARSER.parseExpression(operatorField3).getValue(automatedCriteriaDTO) instanceof FilterOperatorEnum){
-            operator = (FilterOperatorEnum) PARSER.parseExpression(operatorField3).getValue(automatedCriteriaDTO);
+        if (PARSER.parseExpression(operatorField3).getValue(automatedCriteriaDTO) instanceof FilterOperatorEnum filterOperatorEnumInput){
+            operator = filterOperatorEnumInput;
         }
-        if (PARSER.parseExpression(valueField1).getValue(automatedCriteriaDTO) instanceof String) {
-            value1 = (String) PARSER.parseExpression(valueField1).getValue(automatedCriteriaDTO);
+        if (PARSER.parseExpression(valueField1).getValue(automatedCriteriaDTO) instanceof String stringInput) {
+            value1 = stringInput;
         }
-        if (PARSER.parseExpression(valueField2).getValue(automatedCriteriaDTO) instanceof String) {
-            value2 = (String) PARSER.parseExpression(valueField2).getValue(automatedCriteriaDTO);
+        if (PARSER.parseExpression(valueField2).getValue(automatedCriteriaDTO) instanceof String stringInput) {
+            value2 = stringInput;
         }
 
         if (FilterOperatorEnum.BTW_CLOSED.equals(operator) || FilterOperatorEnum.BTW_OPEN.equals(operator)) {
             number1 = decimalFormat.parse(value1, new ParsePosition(0));
-            if (number1 instanceof BigDecimal)
-                value1BigDecimal = (BigDecimal) number1;
+            if (number1 instanceof BigDecimal bigDecimalInput)
+                value1BigDecimal = bigDecimalInput;
             number2 = decimalFormat.parse(value2, new ParsePosition(0));
-            if (number2 instanceof BigDecimal)
-                value2BigDecimal = (BigDecimal) number2;
+            if (number2 instanceof BigDecimal bigDecimalInput)
+                value2BigDecimal = bigDecimalInput;
 
             if (number1 != null && number2 != null) {
                 if (value1BigDecimal != null && value2BigDecimal != null){

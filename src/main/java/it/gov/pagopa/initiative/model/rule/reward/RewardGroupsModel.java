@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RewardGroups implements InitiativeRewardRule {
+public class RewardGroupsModel implements InitiativeRewardRule {
     private List<RewardGroup> rewardGroups;
 
     @Data

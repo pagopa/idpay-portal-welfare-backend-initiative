@@ -80,9 +80,11 @@ public class InitiativeGeneralDTO   {
   private BigDecimal beneficiaryBudget;
 
   @JsonProperty("startDate")
+  @NotNull(groups = ValidationOnGroup.class)
   private LocalDate startDate;
 
   @JsonProperty("endDate")
+  @NotNull(groups = ValidationOnGroup.class)
   private LocalDate endDate;
 
   @JsonProperty("rankingStartDate")

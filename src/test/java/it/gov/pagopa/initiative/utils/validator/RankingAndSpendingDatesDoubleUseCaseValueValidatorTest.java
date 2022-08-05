@@ -72,7 +72,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
 
         assertFalse(violations.isEmpty());
         //or
-        assertThat(violations.size()).isEqualTo(1);
+        assertThat(violations.size()).isEqualTo(2);
     }
     @Test
     void whenOnlyEndDateIsNull_InitiativeGeneralDTO_thenValidationAreFailed(){
@@ -81,7 +81,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
 
         assertFalse(violations.isEmpty());
         //or
-        assertThat(violations.size()).isEqualTo(1);
+        assertThat(violations.size()).isEqualTo(2);
     }
 
     @Test
@@ -91,7 +91,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
 
         assertFalse(violations.isEmpty());
         //or
-        assertThat(violations.size()).isEqualTo(1);
+        assertThat(violations.size()).isEqualTo(3);
     }
 
     @Test
@@ -110,7 +110,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
 
         assertTrue(violations.isEmpty());
         //or
-        assertThat(violations.size()).isEqualTo(0);
+        assertThat(violations.size()).isZero();
     }
 
     @Test
@@ -157,7 +157,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
 
         assertTrue(violations.isEmpty());
         //or
-        assertThat(violations.size()).isEqualTo(0);
+        assertThat(violations.size()).isZero();
     }
 
     @Test
@@ -167,7 +167,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
         initiativeGeneralDTO.setBeneficiaryBudget(BigDecimal.valueOf(100));
         Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationOnGroup.class);
         assertTrue(violations.isEmpty());
-        assertThat(violations.size()).isEqualTo(0);
+        assertThat(violations.size()).isZero();
     }
 
     @Test

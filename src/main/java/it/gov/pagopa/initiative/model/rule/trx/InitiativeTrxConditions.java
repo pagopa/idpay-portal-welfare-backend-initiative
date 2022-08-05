@@ -1,7 +1,5 @@
 package it.gov.pagopa.initiative.model.rule.trx;
 
-import it.gov.pagopa.initiative.dto.rule.trx.DayOfWeekDTO;
-
 import lombok.*;
 
 import java.util.List;

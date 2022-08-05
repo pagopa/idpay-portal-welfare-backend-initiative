@@ -37,34 +37,33 @@ public class RankingAndSpendingDatesDoubleUseCaseValidator implements Constraint
         LocalDate rankingEndDate = null;
         LocalDate startDate = null;
         LocalDate endDate = null;
-        if (PARSER.parseExpression(rankingStart).getValue(value) instanceof LocalDate){
-            rankingStartDate = (LocalDate) PARSER.parseExpression(rankingStart).getValue(value);
+        if (PARSER.parseExpression(rankingStart).getValue(value) instanceof LocalDate localeDateInput){
+            rankingStartDate = localeDateInput;
         }
-        if (PARSER.parseExpression(rankingEnd).getValue(value) instanceof LocalDate){
-            rankingEndDate = (LocalDate) PARSER.parseExpression(rankingEnd).getValue(value);
+        if (PARSER.parseExpression(rankingEnd).getValue(value) instanceof LocalDate localeDateInput){
+            rankingEndDate = localeDateInput;
         }
-        if (PARSER.parseExpression(start).getValue(value) instanceof LocalDate){
-            startDate = (LocalDate) PARSER.parseExpression(start).getValue(value);
+        if (PARSER.parseExpression(start).getValue(value) instanceof LocalDate localeDateInput){
+            startDate = localeDateInput;
         }
-        if (PARSER.parseExpression(end).getValue(value) instanceof LocalDate){
-            endDate = (LocalDate) PARSER.parseExpression(end).getValue(value);
+        if (PARSER.parseExpression(end).getValue(value) instanceof LocalDate localeDateInput){
+            endDate = localeDateInput;
         }
 
 
         if (startDate != null && endDate != null){//if both start and end buy dates are not present, false.
             log.debug("start and end date not null");
-            if (rankingStartDate != null && rankingEndDate != null){//if dates are all present, they are checked.
-                if (rankingStartDate.isBefore(rankingEndDate) && rankingEndDate.isBefore(startDate) && startDate.isBefore(endDate)){
-                    return true;
+            if (rankingStartDate != null){//if dates are all present, they are checked.
+                if (rankingEndDate != null){
+                    return rankingStartDate.isBefore(rankingEndDate) && rankingEndDate.isBefore(startDate) && startDate.isBefore(endDate);
                 }
-            } else if (rankingStartDate == null && rankingEndDate == null) { //if we have only start and end buy dates, those are checked.
-                if (startDate.isBefore(endDate)){
-                    return true;
+            } else { //if we have only start and end buy dates, those are checked.
+                if (rankingEndDate == null){
+                    return startDate.isBefore(endDate);
                 }
-            }else{ //if we're not in the case in which all dates are present or the missing ones are (both and only) the ranking dates, false.
-                return false;
             }
         }
-        return false; //if both (start and end dates) are not present, return false regardless
+        return false;
+
     }
 }

@@ -1,7 +1,7 @@
 package it.gov.pagopa.initiative.service;
 
-import it.gov.pagopa.initiative.model.ConfigMcc;
-import it.gov.pagopa.initiative.model.ConfigTrxRule;
+import it.gov.pagopa.initiative.model.config.ConfigMcc;
+import it.gov.pagopa.initiative.model.config.ConfigTrxRule;
 import it.gov.pagopa.initiative.repository.ConfigMccRepository;
 import it.gov.pagopa.initiative.repository.ConfigTrxRulesRepository;
 import org.springframework.beans.factory.annotation.Autowired;

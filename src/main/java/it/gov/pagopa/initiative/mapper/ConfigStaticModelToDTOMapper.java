@@ -2,13 +2,11 @@ package it.gov.pagopa.initiative.mapper;
 
 import it.gov.pagopa.initiative.dto.config.ConfigMccDTO;
 import it.gov.pagopa.initiative.dto.config.ConfigTrxRuleDTO;
-import it.gov.pagopa.initiative.model.ConfigMcc;
-import it.gov.pagopa.initiative.model.ConfigTrxRule;
-import org.springframework.beans.BeanUtils;
+import it.gov.pagopa.initiative.model.config.ConfigMcc;
+import it.gov.pagopa.initiative.model.config.ConfigTrxRule;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 

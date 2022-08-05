@@ -67,7 +67,7 @@ class SecondValueGreaterThanFirstWithBTWValidatorTest {
 
         assertTrue(violations.isEmpty());
         //or
-        assertThat(violations.size()).isEqualTo(0);
+        assertThat(violations.size()).isZero();
     }
 
     private AutomatedCriteriaDTO createAutomatedCriteriaDTO(FilterOperatorEnum operator, String value, String value2) {

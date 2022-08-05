@@ -8,8 +8,8 @@ import it.gov.pagopa.initiative.dto.rule.trx.*;
 import it.gov.pagopa.initiative.model.TypeMultiEnum;
 import it.gov.pagopa.initiative.model.*;
 import it.gov.pagopa.initiative.model.rule.reward.InitiativeRewardRule;
-import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
-import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
+import it.gov.pagopa.initiative.model.rule.reward.RewardGroupsModel;
+import it.gov.pagopa.initiative.model.rule.reward.RewardValueModel;
 import it.gov.pagopa.initiative.model.rule.trx.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -135,10 +135,10 @@ public class InitiativeDTOsToModelMapper {
         }
         InitiativeRewardRule ret;
         if(rewardRuleDTO instanceof RewardValueDTO rewardValueInput){
-            ret = RewardValue.builder().rewardValue(rewardValueInput.getRewardValue()).build();
+            ret = RewardValueModel.builder().rewardValue(rewardValueInput.getRewardValue()).build();
         } else if (rewardRuleDTO instanceof RewardGroupsDTO rewardGroupsInput) {
-            ret = RewardGroups.builder().rewardGroups(rewardGroupsInput.getRewardGroups().stream().map(
-                    x -> RewardGroups.RewardGroup.builder().from(x.getFrom()).to(x.getTo()).rewardValue(x.getRewardValue()).build()
+            ret = RewardGroupsModel.builder().rewardGroups(rewardGroupsInput.getRewardGroups().stream().map(
+                    x -> RewardGroupsModel.RewardGroup.builder().from(x.getFrom()).to(x.getTo()).rewardValue(x.getRewardValue()).build()
             ).collect(Collectors.toList())).build();
         } else {
             throw new IllegalArgumentException("Initiative Reward Rule not handled: %s".formatted(rewardRuleDTO.getClass().getName()));
@@ -189,9 +189,9 @@ public class InitiativeDTOsToModelMapper {
                                         .startTime(i.getStartTime())
                                         .endTime(i.getEndTime())
                                         .build())
-                                .collect(Collectors.toList()))
+                                .toList())
                         .build())
-                .collect(Collectors.toList()));
+                .toList());
     }
 
     private List<RewardLimits> toRewardLimits(List<RewardLimitsDTO> rewardLimitDTO) {
@@ -202,7 +202,7 @@ public class InitiativeDTOsToModelMapper {
                         .frequency(RewardLimits.RewardLimitFrequency.valueOf(x.getFrequency().name()))
                         .rewardLimit(x.getRewardLimit())
                         .build())
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private Threshold toThreshold(ThresholdDTO thresholdDTO) {
