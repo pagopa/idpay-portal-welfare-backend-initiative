@@ -110,46 +110,6 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
-<!--            <plugin>-->
-<!--                <groupId>org.openapitools</groupId>-->
-<!--                <artifactId>openapi-generator-maven-plugin</artifactId>-->
-<!--                &lt;!&ndash; RELEASE_VERSION &ndash;&gt;-->
-<!--                <version>6.0.1</version>-->
-<!--                &lt;!&ndash; /RELEASE_VERSION &ndash;&gt;-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <id>openapi-generator</id>-->
-<!--                        <phase>generate-sources</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>generate</goal>-->
-<!--                        </goals>-->
-<!--                        <configuration>-->
-<!--                            <inputSpec>IdPay-WelfarePortalUserPermissions.openapi.yaml</inputSpec>-->
-<!--&lt;!&ndash;                            <generatorName>openapi</generatorName>&ndash;&gt;-->
-<!--&lt;!&ndash;                            <generatorName>spring</generatorName>&ndash;&gt;-->
-<!--                            <generatorName>java</generatorName>-->
-<!--                            <configOptions>-->
-<!--&lt;!&ndash;                                <outputFileName>openapi.json</outputFileName>&ndash;&gt;-->
-<!--&lt;!&ndash;                                <serializableModel>true</serializableModel>&ndash;&gt;-->
-<!--                                <groupId>${project.groupId}</groupId>-->
-<!--                                <artifactId>${project.artifactId}</artifactId>-->
-<!--                                <version>${project.version}</version>-->
-<!--                                <sourceFolder>src/main/java</sourceFolder>-->
-<!--                                <dateLibrary>java17</dateLibrary>-->
-<!--&lt;!&ndash;                                <basePackage>it.gov.pagopa</basePackage>&ndash;&gt;-->
-<!--                                <invokerPakage>it.gov.pagopa</invokerPakage>-->
-<!--                                <configPackage>it.gov.pagopa.config</configPackage>-->
-<!--                                <modelPackage>it.gov.pagopa.dto</modelPackage>-->
-<!--                                <apiPackage>it.gov.pagopa.controller</apiPackage>-->
-<!--                                <library>resttemplate</library>-->
-<!--                                <openApiNullable>false</openApiNullable>-->
-<!--                            </configOptions>-->
-<!--&lt;!&ndash;                            <output>${project.build.directory}/generated-sources/openapi</output>&ndash;&gt;-->
-<!--                            <output>${project.basedir}</output>-->
-<!--                        </configuration>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
         </plugins>
     </build>
 
