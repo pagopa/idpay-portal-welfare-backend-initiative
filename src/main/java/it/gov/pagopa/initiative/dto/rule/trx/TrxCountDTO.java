@@ -16,7 +16,7 @@ import javax.validation.constraints.NotNull;
 public class TrxCountDTO {
 
     @NotNull(groups = ValidationOnGroup.class)
-    @Min(value = 0, message = "from must be at least 0", groups = ValidationOnGroup.class)
+    @Min(value = 1, message = "from must be at least 1", groups = ValidationOnGroup.class)
     private Long from;
 
     @NotNull(groups = ValidationOnGroup.class)
