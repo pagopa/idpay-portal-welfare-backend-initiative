@@ -27,7 +27,11 @@ public class RewardGroupsDTO implements InitiativeRewardRuleDTO {
     @NoArgsConstructor
     @Builder
     public static class RewardGroupDTO {
+
+        @Min(value = 0, message = "from must be at least 0", groups = ValidationOnGroup.class)
         private BigDecimal from;
+
+        @Min(value = 1, message = "to must be at least 1", groups = ValidationOnGroup.class)
         private BigDecimal to;
 
         @Min(value = 0, message = "Reward value must be at least 0%", groups = ValidationOnGroup.class)

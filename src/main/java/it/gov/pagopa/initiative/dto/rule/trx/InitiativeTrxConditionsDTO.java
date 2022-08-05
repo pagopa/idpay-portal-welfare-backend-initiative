@@ -29,5 +29,5 @@ public class InitiativeTrxConditionsDTO {
 
     @Valid
     @Size(min = 1, groups = ValidationOnGroup.class, message = "Reward limit must contain at least 1 element.")
-    private List<RewardLimitsDTO> rewardLimits;
+    private List<RewardLimitsDTO> rewardLimits; //TODO Validatore custom per verificare che non ci siano elementi uguali??
 }
