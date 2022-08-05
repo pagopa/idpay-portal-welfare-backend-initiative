@@ -1,10 +1,14 @@
 package it.gov.pagopa.initiative.dto.rule.reward;
 
+import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import java.math.BigDecimal;
 
 @Data
@@ -12,5 +16,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Builder
 public class RewardValueDTO implements InitiativeRewardRuleDTO {
+    @Min(value = 0, message = "Reward value must be at least 0%", groups = ValidationOnGroup.class)
+    @Max(value = 100, message = "Reward value must be at most 100%", groups = ValidationOnGroup.class)
     private BigDecimal rewardValue;
 }

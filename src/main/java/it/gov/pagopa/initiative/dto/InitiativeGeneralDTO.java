@@ -32,7 +32,7 @@ import java.time.LocalDate;
 public class InitiativeGeneralDTO   {
 
   @JsonProperty("budget")
-  @Min(value = 0, message = "budget should have an amount of at least 1", groups = ValidationOnGroup.class)
+  @Min(value = 1, message = "budget should have an amount of at least 1", groups = ValidationOnGroup.class)
   @NotNull(groups = ValidationOnGroup.class)
   private BigDecimal budget;
 
@@ -75,7 +75,7 @@ public class InitiativeGeneralDTO   {
   private Boolean beneficiaryKnown;
 
   @JsonProperty("beneficiaryBudget")
-  @Min(value = 0, message = "Beneficiary budget should have an amount of at least 0", groups = ValidationOnGroup.class)
+  @Min(value = 1, message = "Beneficiary budget should have an amount of at least 1", groups = ValidationOnGroup.class)
   @NotNull(groups = ValidationOnGroup.class)
   private BigDecimal beneficiaryBudget;
 

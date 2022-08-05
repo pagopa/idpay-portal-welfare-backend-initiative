@@ -38,6 +38,8 @@ class InitiativeModelToDTOMapperTest {
     private InitiativeSummaryDTO initiativeSummaryDTO2;
     private List<InitiativeSummaryDTO> initiativeSummaryDTOList;
 
+    private InitiativeLegal initiativeLegal;
+
     @BeforeEach
     public void setUp() {
         fullInitiative = createFullInitiative();
@@ -54,6 +56,7 @@ class InitiativeModelToDTOMapperTest {
         initiativeSummaryDTO2 = createInitiativeSummaryDTO();
         initiativeSummaryDTOList = new ArrayList<>();
         initiativeSummaryDTOList.addAll(Arrays.asList(initiativeSummaryDTO, initiativeSummaryDTO2));
+        initiativeLegal = createInitiativeLegal();
     }
 
     @Test
@@ -64,6 +67,13 @@ class InitiativeModelToDTOMapperTest {
         assertEquals(fullInitiativeDTO, initiativeDTOtoBeVerified);
     }
 
+    @Test
+    void toInitiativeLegal_ok() {
+        assertEquals("https://", initiativeLegal.getDpiaLink().toString().substring(0, 8));
+        assertEquals("https://", initiativeLegal.getPrivacyLink().toString().substring(0, 8));
+        assertEquals("https://", initiativeLegal.getTcLink().toString().substring(0, 8));
+        assertEquals("https://", initiativeLegal.getRegulationLink().toString().substring(0, 8));
+    }
     @Test
     void toInitiativeDTONull_ok(){
         InitiativeDTO initiativeDTO = null;

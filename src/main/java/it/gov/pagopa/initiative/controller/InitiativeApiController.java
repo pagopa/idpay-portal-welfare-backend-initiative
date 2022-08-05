@@ -70,7 +70,7 @@ public class InitiativeApiController implements InitiativeApi {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Override
     public ResponseEntity<Void> updateInitiativeBeneficiary(String organizationId, String initiativeId, @RequestBody @Validated(ValidationOnGroup.class) InitiativeBeneficiaryRuleDTO beneficiaryRuleDto) {
-        if(this.initiativeService.getInitiative(organizationId, initiativeId).getGeneral().getBeneficiaryKnown()){
+        if(Boolean.TRUE.equals(this.initiativeService.getInitiative(organizationId, initiativeId).getGeneral().getBeneficiaryKnown())){
             throw new InitiativeException(
                     InitiativeConstants.Exception.BadRequest.CODE,
                     MessageFormat.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_PROPERTIES_NOT_VALID, initiativeId),

@@ -165,8 +165,8 @@ public class InitiativeDTOsToModelMapper {
         }
         return TrxCount.builder().to(trxCountDTO.getTo())
                 .from(trxCountDTO.getFrom())
-                .fromIncluded(trxCountDTO.isFromIncluded())
-                .toIncluded(trxCountDTO.isToIncluded()).build();
+                .fromIncluded(trxCountDTO.getFromIncluded())
+                .toIncluded(trxCountDTO.getToIncluded()).build();
     }
 
     private MccFilter toMccFilter(MccFilterDTO mccFilterDTO) {
@@ -211,7 +211,7 @@ public class InitiativeDTOsToModelMapper {
         }
         return Threshold.builder().from(thresholdDTO.getFrom())
                 .to(thresholdDTO.getTo())
-                .fromIncluded(thresholdDTO.isFromIncluded())
-                .toIncluded(thresholdDTO.isToIncluded()).build();
+                .fromIncluded(thresholdDTO.getFromIncluded())
+                .toIncluded(thresholdDTO.getToIncluded()).build();
     }
 }

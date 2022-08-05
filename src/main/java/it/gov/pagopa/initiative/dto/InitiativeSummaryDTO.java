@@ -3,9 +3,7 @@ package it.gov.pagopa.initiative.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
-import org.springframework.validation.annotation.Validated;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
