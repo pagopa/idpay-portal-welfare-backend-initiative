@@ -70,7 +70,7 @@ class InitiativeServiceTest {
         } catch (InitiativeException e) {
             log.info("InitiativeException: " + e.getCode());
             assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
-            assertEquals(InitiativeConstants.Exception.NotFound.CODE_PACKAGE, e.getCode());
+            assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
         }
     }
 
@@ -116,7 +116,7 @@ class InitiativeServiceTest {
         } catch (InitiativeException e) {
             log.info("InitiativeException: " + e.getCode());
             assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
-            assertEquals(InitiativeConstants.Exception.NotFound.CODE_PACKAGE, e.getCode());
+            assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
         }
     }
 
@@ -145,7 +145,7 @@ class InitiativeServiceTest {
         } catch (InitiativeException e) {
             log.info("InitiativeException: " + e.getCode());
             assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
-            assertEquals(InitiativeConstants.Exception.NotFound.CODE_PACKAGE, e.getCode());
+            assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
         }
     }
 
@@ -172,7 +172,7 @@ class InitiativeServiceTest {
         } catch (InitiativeException e) {
             log.info("InitiativeException: " + e.getCode());
             assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
-            assertEquals(InitiativeConstants.Exception.NotFound.CODE_PACKAGE, e.getCode());
+            assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
         }
     }
 
@@ -198,7 +198,7 @@ class InitiativeServiceTest {
         //Instruct the Repo Mock to return Dummy Initiatives
         when(initiativeRepository.findByOrganizationIdAndInitiativeId(anyString(), anyString())).thenThrow(
                 new InitiativeException(
-                        InitiativeConstants.Exception.NotFound.CODE_PACKAGE,
+                        InitiativeConstants.Exception.NotFound.CODE,
                         MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_ORGANIZATION_ID_MESSAGE, "Ente1", "Id1"),
                         HttpStatus.NOT_FOUND)
         );
@@ -209,7 +209,7 @@ class InitiativeServiceTest {
         } catch (InitiativeException e) {
             log.info("InitiativeException: " + e.getCode());
             assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
-            assertEquals(InitiativeConstants.Exception.NotFound.CODE_PACKAGE, e.getCode());
+            assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
             assertEquals(MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_ORGANIZATION_ID_MESSAGE, "Ente1", "Id1"), e.getMessage());
         }
     }

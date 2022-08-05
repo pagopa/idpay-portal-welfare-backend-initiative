@@ -24,7 +24,7 @@ public class InitiativeServiceImpl implements InitiativeService {
         List<Initiative> initiatives = initiativeRepository.retrieveInitiativeSummary(organizationId);
         if(initiatives.isEmpty()){
             throw new InitiativeException(
-                    InitiativeConstants.Exception.NotFound.CODE_PACKAGE,
+                    InitiativeConstants.Exception.NotFound.CODE,
                     MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_LIST_BY_ORGANIZATION_MESSAGE, organizationId),
                     HttpStatus.NOT_FOUND);
         }
@@ -43,7 +43,7 @@ public class InitiativeServiceImpl implements InitiativeService {
     public Initiative getInitiative(String organizationId, String initiativeId) {
         return initiativeRepository.findByOrganizationIdAndInitiativeId(organizationId, initiativeId)
                 .orElseThrow(() -> new InitiativeException(
-                        InitiativeConstants.Exception.NotFound.CODE_PACKAGE,
+                        InitiativeConstants.Exception.NotFound.CODE,
                         MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_LIST_BY_ORGANIZATION_MESSAGE, organizationId),
                         HttpStatus.NOT_FOUND));
     }
@@ -52,7 +52,7 @@ public class InitiativeServiceImpl implements InitiativeService {
     public Initiative getInitiativeBeneficiaryView(String initiativeId) {
         return initiativeRepository.retrieveInitiativeBeneficiaryView(initiativeId)
                 .orElseThrow(() -> new InitiativeException(
-                        InitiativeConstants.Exception.NotFound.CODE_PACKAGE,
+                        InitiativeConstants.Exception.NotFound.CODE,
                         MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
                         HttpStatus.NOT_FOUND));
     }
@@ -61,7 +61,7 @@ public class InitiativeServiceImpl implements InitiativeService {
     public void updateInitiativeGeneralInfo(String organizationId, String initiativeId, Initiative initiativeInfoModel) {
         Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeId(organizationId, initiativeId)
                 .orElseThrow(() -> new InitiativeException(
-                        InitiativeConstants.Exception.NotFound.CODE_PACKAGE,
+                        InitiativeConstants.Exception.NotFound.CODE,
                         MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_ORGANIZATION_ID_MESSAGE, organizationId, initiativeId),
                         HttpStatus.NOT_FOUND));
         initiative.setGeneral(initiativeInfoModel.getGeneral());
@@ -74,10 +74,23 @@ public class InitiativeServiceImpl implements InitiativeService {
     public void updateInitiativeBeneficiary(String organizationId, String initiativeId, InitiativeBeneficiaryRule initiativeBeneficiaryRuleModel){
         Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeId(organizationId, initiativeId)
                 .orElseThrow(() -> new InitiativeException(
-                        InitiativeConstants.Exception.NotFound.CODE_PACKAGE,
+                        InitiativeConstants.Exception.NotFound.CODE,
                         MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_ORGANIZATION_ID_MESSAGE, organizationId, initiativeId),
                         HttpStatus.NOT_FOUND));
         initiative.setBeneficiaryRule(initiativeBeneficiaryRuleModel);
+        initiative.setUpdateDate(LocalDateTime.now());
+        this.initiativeRepository.save(initiative);
+    }
+
+    @Override
+    public void updateTrxAndRewardRules(String organizationId, String initiativeId, Initiative rewardAndTrxRules) {
+        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeId(organizationId, initiativeId)
+                .orElseThrow(() -> new InitiativeException(
+                        InitiativeConstants.Exception.NotFound.CODE,
+                        MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_ORGANIZATION_ID_MESSAGE, organizationId, initiativeId),
+                        HttpStatus.NOT_FOUND));
+        initiative.setRewardRule(rewardAndTrxRules.getRewardRule());
+        initiative.setTrxRule(rewardAndTrxRules.getTrxRule());
         initiative.setUpdateDate(LocalDateTime.now());
         this.initiativeRepository.save(initiative);
     }

@@ -35,14 +35,14 @@ public class RestResponseExceptionHandler {
         });
         String message = String.join(" - ", errors);
         return new ResponseEntity<>(
-                new ErrorDTO(InitiativeConstants.Exception.BadRequest.CODE_PACKAGE, message), HttpStatus.BAD_REQUEST);
+                new ErrorDTO(InitiativeConstants.Exception.BadRequest.CODE, message), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler({HttpMessageNotReadableException.class})
     public ResponseEntity<ErrorDTO> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
         String localizedMessage = StringUtils.split(ex.getMostSpecificCause().getLocalizedMessage(), System.lineSeparator())[0];
         return new ResponseEntity<>(
-                new ErrorDTO(InitiativeConstants.Exception.BadRequest.CODE_PACKAGE, localizedMessage), HttpStatus.BAD_REQUEST);
+                new ErrorDTO(InitiativeConstants.Exception.BadRequest.CODE, localizedMessage), HttpStatus.BAD_REQUEST);
     }
 
 }
