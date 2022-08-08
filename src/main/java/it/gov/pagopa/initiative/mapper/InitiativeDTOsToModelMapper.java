@@ -29,6 +29,9 @@ public class InitiativeDTOsToModelMapper {
         Initiative initiative = new Initiative();
         initiative.setGeneral(this.toInitiativeGeneral(initiativeInfoDto.getGeneral()));
         initiative.setAdditionalInfo(this.toInitiativeAdditional(initiativeInfoDto.getAdditionalInfo()));
+        if(null != initiative.getAdditionalInfo() && null != initiative.getAdditionalInfo().getServiceName())
+            //TODO servizi IO ancora da definire. Ad ora si inserisce il nome dell'iniziativa se viene compilato il nome del servizio in modo tale che coincidano.
+            initiative.setInitiativeName(initiative.getAdditionalInfo().getServiceName());
         return initiative;
     }
 

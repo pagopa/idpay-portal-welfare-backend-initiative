@@ -11,7 +11,6 @@ public enum FilterOperatorEnumModel {
     GT("GT"),
     GE("GE"),
     INSTANCE_OF("INSTANCE_OF"),
-    IN("IN"),
     BTW_CLOSED("BTW_CLOSED"),
     BTW_OPEN("BTW_OPEN");
 

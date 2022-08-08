@@ -97,7 +97,6 @@ class InitiativeDTOsToModelMapperTest {
         initiative.setBeneficiaryRanking(true);
         initiative.setPdndCheck(true);
         initiative.setPdndToken("pdndToken1");
-        initiative.setServiceId("serviceId");
         return initiative;
     }
 
@@ -122,6 +121,8 @@ class InitiativeDTOsToModelMapperTest {
         Initiative initiative = new Initiative();
         initiative.setGeneral(createInitiativeGeneral());
         initiative.setAdditionalInfo(createInitiativeAdditional());
+        if(initiative.getAdditionalInfo() != null && initiative.getAdditionalInfo().getServiceName() != null)
+            initiative.setInitiativeName(initiative.getAdditionalInfo().getServiceName());
         return initiative;
     }
 
@@ -144,7 +145,6 @@ class InitiativeDTOsToModelMapperTest {
 
     private InitiativeAdditional createInitiativeAdditional() {
         InitiativeAdditional initiativeAdditional = new InitiativeAdditional();
-        initiativeAdditional.setServiceId("serviceId");
         initiativeAdditional.setServiceName("serviceName");
         initiativeAdditional.setArgument("Argument");
         initiativeAdditional.setDescription("Description");
@@ -247,7 +247,6 @@ class InitiativeDTOsToModelMapperTest {
 
     private InitiativeAdditionalDTO createInitiativeAdditionalDTO() {
         InitiativeAdditionalDTO initiativeAdditionalDTO = new InitiativeAdditionalDTO();
-        initiativeAdditionalDTO.setServiceId("serviceId");
         initiativeAdditionalDTO.setServiceName("serviceName");
         initiativeAdditionalDTO.setArgument("Argument");
         initiativeAdditionalDTO.setDescription("Description");

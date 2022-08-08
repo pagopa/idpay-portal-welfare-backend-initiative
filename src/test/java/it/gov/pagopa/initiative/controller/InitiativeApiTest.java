@@ -314,7 +314,6 @@ class InitiativeApiTest {
         initiative.setBeneficiaryRanking(true);
         initiative.setPdndCheck(true);
         initiative.setPdndToken("pdndToken1");
-        initiative.setServiceId("serviceId");
         initiative.setGeneral(createInitiativeGeneral(beneficiaryKnown));
         initiative.setAdditionalInfo(createInitiativeAdditional());
 //        initiative.setBeneficiaryRule(createInitiativeBeneficiaryRule());
@@ -340,7 +339,6 @@ class InitiativeApiTest {
 
     private InitiativeAdditional createInitiativeAdditional() {
         InitiativeAdditional initiativeAdditional = new InitiativeAdditional();
-        initiativeAdditional.setServiceId("serviceId");
         initiativeAdditional.setServiceName("serviceName");
         initiativeAdditional.setArgument("Argument");
         initiativeAdditional.setDescription("Description");
@@ -433,7 +431,6 @@ class InitiativeApiTest {
 
     private InitiativeAdditionalDTO createInitiativeAdditionalDTO() {
         InitiativeAdditionalDTO initiativeAdditionalDTO = new InitiativeAdditionalDTO();
-        initiativeAdditionalDTO.setServiceId("serviceId");
         initiativeAdditionalDTO.setServiceName("serviceName");
         initiativeAdditionalDTO.setArgument("Argument");
         initiativeAdditionalDTO.setDescription("Description");

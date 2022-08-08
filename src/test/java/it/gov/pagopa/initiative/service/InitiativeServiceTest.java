@@ -3,7 +3,9 @@ package it.gov.pagopa.initiative.service;
 
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.*;
+import it.gov.pagopa.initiative.event.InitiativeProducer;
 import it.gov.pagopa.initiative.exception.InitiativeException;
+import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.TypeBoolEnum;
 import it.gov.pagopa.initiative.model.TypeMultiEnum;
 import it.gov.pagopa.initiative.model.*;
@@ -40,6 +42,12 @@ class InitiativeServiceTest {
 
     @MockBean
     InitiativeRepository initiativeRepository;
+
+    @MockBean
+    InitiativeProducer initiativeProducer;
+
+    @MockBean
+    InitiativeModelToDTOMapper initiativeModelToDTOMapper;
 
 //    List<Initiative> retrieveInitiativeSummary(String organizationId);
     @Test
@@ -235,7 +243,6 @@ class InitiativeServiceTest {
         initiative.setBeneficiaryRanking(true);
         initiative.setPdndCheck(true);
         initiative.setPdndToken("pdndToken1");
-        initiative.setServiceId("serviceId");
 
         initiative.setGeneral(createInitiativeGeneral());
         initiative.setAdditionalInfo(createInitiativeAdditional());
@@ -259,7 +266,6 @@ class InitiativeServiceTest {
 
     private InitiativeAdditional createInitiativeAdditional() {
         InitiativeAdditional initiativeAdditional = new InitiativeAdditional();
-        initiativeAdditional.setServiceId("serviceId");
         initiativeAdditional.setServiceName("serviceName");
         initiativeAdditional.setArgument("Argument");
         initiativeAdditional.setDescription("Description");
@@ -352,7 +358,6 @@ class InitiativeServiceTest {
 
     private InitiativeAdditionalDTO createInitiativeAdditionalDTO() {
         InitiativeAdditionalDTO initiativeAdditionalDTO = new InitiativeAdditionalDTO();
-        initiativeAdditionalDTO.setServiceId("serviceId");
         initiativeAdditionalDTO.setServiceName("serviceName");
         initiativeAdditionalDTO.setArgument("Argument");
         initiativeAdditionalDTO.setDescription("Description");
