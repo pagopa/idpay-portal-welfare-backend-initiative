@@ -15,7 +15,6 @@ import java.time.LocalDate;
 @Builder
 public class InitiativeGeneral   {
 
-  private String name;
   private BigDecimal budget;
   private BeneficiaryTypeEnum beneficiaryType;
   private Boolean beneficiaryKnown;

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -82,7 +83,8 @@ public class InitiativeApiController implements InitiativeApi {
 
     @Override
     public ResponseEntity<Void> updateTrxAndRewardRules(String organizationId, String initiativeId, @RequestBody @Validated(ValidationOnGroup.class) InitiativeRewardAndTrxRulesDTO rewardAndTrxRulesDTO) {
-        this.initiativeService.updateTrxAndRewardRules(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toInitiative(rewardAndTrxRulesDTO));
+        Initiative initiative = this.initiativeDTOsToModelMapper.toInitiative(rewardAndTrxRulesDTO);
+        this.initiativeService.updateTrxAndRewardRules(organizationId, initiativeId, initiative);
         return ResponseEntity.noContent().build();
     }
 
@@ -96,7 +98,8 @@ public class InitiativeApiController implements InitiativeApi {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Override
     public ResponseEntity<Void> updateTrxAndRewardRulesDraft(String organizationId, String initiativeId, InitiativeRewardAndTrxRulesDTO rewardAndTrxRulesDTO){
-        this.initiativeService.updateTrxAndRewardRules(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toInitiative(rewardAndTrxRulesDTO));
+        Initiative initiative = this.initiativeDTOsToModelMapper.toInitiative(rewardAndTrxRulesDTO);
+        this.initiativeService.updateTrxAndRewardRules(organizationId, initiativeId, initiative);
         return ResponseEntity.noContent().build();
     }
 

@@ -36,6 +36,7 @@ public class SecondValueGreaterThanFirstWithBTWValidator implements ConstraintVa
         FilterOperatorEnum operator = null;
         DecimalFormat decimalFormat = new DecimalFormat();
         decimalFormat.setParseBigDecimal(true);
+        decimalFormat.setMinimumFractionDigits(2);
 
         if (PARSER.parseExpression(operatorField3).getValue(automatedCriteriaDTO) instanceof FilterOperatorEnum){
             operator = (FilterOperatorEnum) PARSER.parseExpression(operatorField3).getValue(automatedCriteriaDTO);
@@ -47,13 +48,13 @@ public class SecondValueGreaterThanFirstWithBTWValidator implements ConstraintVa
             value2 = (String) PARSER.parseExpression(valueField2).getValue(automatedCriteriaDTO);
         }
 
-        if (FilterOperatorEnum.BTW_CLOSED.equals(operator) || FilterOperatorEnum.BTW_OPEN.equals(operator)) {
+        if ((FilterOperatorEnum.BTW_CLOSED.equals(operator) || FilterOperatorEnum.BTW_OPEN.equals(operator)) && null != value1 && null != value2) {
             number1 = decimalFormat.parse(value1, new ParsePosition(0));
             if (number1 instanceof BigDecimal)
-                value1BigDecimal = (BigDecimal) number1;
+                value1BigDecimal = new BigDecimal(value1).setScale(2);
             number2 = decimalFormat.parse(value2, new ParsePosition(0));
             if (number2 instanceof BigDecimal)
-                value2BigDecimal = (BigDecimal) number2;
+                value2BigDecimal = new BigDecimal(value2).setScale(2);
 
             if (number1 != null && number2 != null) {
                 if (value1BigDecimal != null && value2BigDecimal != null){
