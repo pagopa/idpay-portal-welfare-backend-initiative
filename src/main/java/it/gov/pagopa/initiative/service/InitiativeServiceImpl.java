@@ -1,7 +1,10 @@
 package it.gov.pagopa.initiative.service;
 
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
+import it.gov.pagopa.initiative.dto.InitiativeDTO;
+import it.gov.pagopa.initiative.event.InitiativeProducer;
 import it.gov.pagopa.initiative.exception.InitiativeException;
+import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
@@ -19,6 +22,12 @@ public class InitiativeServiceImpl implements InitiativeService {
 
     @Autowired
     private InitiativeRepository initiativeRepository;
+
+    @Autowired
+    private InitiativeModelToDTOMapper initiativeModelToDTOMapper;
+
+    @Autowired
+    private InitiativeProducer initiativeProducer;
 
     public List<Initiative> retrieveInitiativeSummary(String organizationId) {
         List<Initiative> initiatives = initiativeRepository.retrieveInitiativeSummary(organizationId);
@@ -93,6 +102,13 @@ public class InitiativeServiceImpl implements InitiativeService {
         initiative.setTrxRule(rewardAndTrxRules.getTrxRule());
         initiative.setUpdateDate(LocalDateTime.now());
         this.initiativeRepository.save(initiative);
+        //FIXME Test d'integrazione con RuleEngine. Invio Iniziativa da spostare all'ultimo step del Wizard come pubblicazione
+        sendInitiativeInfoToRuleEngine(initiativeModelToDTOMapper.toInitiativeDTO(initiative));
+    }
+
+    @Override
+    public void sendInitiativeInfoToRuleEngine(InitiativeDTO initiativeDTO) {
+        initiativeProducer.sendPublishInitiative(initiativeDTO);
     }
 
 
