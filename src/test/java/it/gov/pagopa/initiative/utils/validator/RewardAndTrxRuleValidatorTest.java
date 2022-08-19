@@ -126,9 +126,13 @@ public class RewardAndTrxRuleValidatorTest {
         RewardGroupsDTO rewardGroupsDTO = new RewardGroupsDTO();
         RewardGroupsDTO.RewardGroupDTO rewardGroupDTO1 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(-10), BigDecimal.valueOf(20), BigDecimal.valueOf(30));
         RewardGroupsDTO.RewardGroupDTO rewardGroupDTO2 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(40), BigDecimal.valueOf(20), BigDecimal.valueOf(40));
+        RewardGroupsDTO.RewardGroupDTO rewardGroupDTO3 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(30), BigDecimal.valueOf(20), BigDecimal.valueOf(40));
+        RewardGroupsDTO.RewardGroupDTO rewardGroupDTO4 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(40), BigDecimal.valueOf(20), BigDecimal.valueOf(40));
         List<RewardGroupsDTO.RewardGroupDTO> rewardGroupDTOList = new ArrayList<>();
         rewardGroupDTOList.add(rewardGroupDTO1);
         rewardGroupDTOList.add(rewardGroupDTO2);
+        rewardGroupDTOList.add(rewardGroupDTO3);
+        rewardGroupDTOList.add(rewardGroupDTO4);
         rewardGroupsDTO.setRewardGroups(rewardGroupDTOList);
         return rewardGroupsDTO;
     }

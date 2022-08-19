@@ -7,8 +7,8 @@ import it.gov.pagopa.initiative.dto.rule.reward.RewardValueDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.*;
 import it.gov.pagopa.initiative.model.*;
 import it.gov.pagopa.initiative.model.rule.reward.InitiativeRewardRule;
-import it.gov.pagopa.initiative.model.rule.reward.RewardGroupsModel;
-import it.gov.pagopa.initiative.model.rule.reward.RewardValueModel;
+import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
+import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
 import it.gov.pagopa.initiative.model.rule.trx.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -162,10 +162,10 @@ public class InitiativeModelToDTOMapper {
             return null;
         }
         InitiativeRewardRuleDTO dto = null;
-        if (rewardRule instanceof RewardValueModel rewardValueModelInput) {
-            dto = RewardValueDTO.builder().rewardValue(rewardValueModelInput.getRewardValue()).build();
-        } else if (rewardRule instanceof RewardGroupsModel rewardGroupsModelInput) {
-            dto = RewardGroupsDTO.builder().rewardGroups(rewardGroupsModelInput.getRewardGroups().stream().map(
+        if (rewardRule instanceof RewardValue rewardValueInput) {
+            dto = RewardValueDTO.builder().rewardValue(rewardValueInput.getRewardValue()).build();
+        } else if (rewardRule instanceof RewardGroups rewardGroupsInput) {
+            dto = RewardGroupsDTO.builder().rewardGroups(rewardGroupsInput.getRewardGroups().stream().map(
                     x -> RewardGroupsDTO.RewardGroupDTO.builder().from(x.getFrom()).to(x.getTo()).rewardValue(x.getRewardValue()).build()
             ).toList()).build();
         }
