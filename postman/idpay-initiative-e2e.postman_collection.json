@@ -531,7 +531,7 @@
 							"script": {
 								"exec": [
 									"//pm.collectionVariables.set('sDC_code_B', getRandomInt(10));\r",
-									"const conditionOneValue = [\"EQ\",\"NOT_EQ\",\"LT\",\"LE\",\"GT\",\"GE\",\"INSTANCE_OF\",\"IN\"];\r",
+									"const conditionOneValue = [\"EQ\",\"NOT_EQ\",\"LT\",\"LE\",\"GT\",\"GE\",\"INSTANCE_OF\"];\r",
 									"random = _.random(0, conditionOneValue.length-1);\r",
 									"\r",
 									"const conditionTwoValue = [\"BTW_CLOSED\",\"BTW_OPEN\"];\r",
@@ -556,8 +556,6 @@
 									"pm.collectionVariables.set('aC0_operator', conditionTwoValue[random2]);\r",
 									"pm.collectionVariables.set('aC0_value', aC1_value);\r",
 									"pm.collectionVariables.set('aC0_value2', aC1_value2);\r",
-									"pm.collectionVariables.set('aC0_value', 6.62);\r",
-									"pm.collectionVariables.set('aC0_value2', 54.8);\r",
 									"\r",
 									"pm.collectionVariables.set('aC1_authority', 'AUTH2');\r",
 									"pm.collectionVariables.set('aC1_code', 'RESIDENCE');\r",
