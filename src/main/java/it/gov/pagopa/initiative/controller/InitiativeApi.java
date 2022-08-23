@@ -70,36 +70,6 @@ public interface InitiativeApi {
             consumes = {"application/json"})
     ResponseEntity<Void> updateInitiativeGeneralInfo(@PathVariable("organizationId") String organizationId, @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId, @Parameter(in = ParameterIn.DEFAULT, description = "Unique identifier of the subscribed initiative, IBAN of the citizen", schema = @Schema()) @RequestBody InitiativeInfoDTO body);
 
-    @Operation(summary = "Association of beneficiary rules to an initiative", description = "", security = {
-            @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "No Content"),
-            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
-            @ApiResponse(responseCode = "401", description = "Authentication failed", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
-            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
-            @ApiResponse(responseCode = "404", description = "The requested ID was not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
-            @ApiResponse(responseCode = "429", description = "Too many Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
-            @ApiResponse(responseCode = "500", description = "Server ERROR", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))})
-    @PutMapping(value = "/idpay/organization/{organizationId}/initiative/{initiativeId}/beneficiary",
-            produces = {"application/json"},
-            consumes = {"application/json"})
-    ResponseEntity<Void> updateInitiativeBeneficiary(@PathVariable("organizationId") String organizationId, @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId, @Parameter(in = ParameterIn.DEFAULT, description = "Unique identifier of the subscribed initiative, instrument HPAN", schema = @Schema()) @RequestBody InitiativeBeneficiaryRuleDTO body);
-
-    @Operation(summary = "Association of transaction and reward rules to an initiative", description = "", security = {
-            @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "No Content"),
-            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
-            @ApiResponse(responseCode = "401", description = "Authentication failed", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
-            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
-            @ApiResponse(responseCode = "404", description = "The requested ID was not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
-            @ApiResponse(responseCode = "429", description = "Too many Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
-            @ApiResponse(responseCode = "500", description = "Server ERROR", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))})
-    @PutMapping(value = "/idpay/organization/{organizationId}/initiative/{initiativeId}/reward",
-            produces = {"application/json"},
-            consumes = {"application/json"})
-    public ResponseEntity<Void> updateTrxAndRewardRules(@PathVariable("organizationId") String organizationId, @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId, @Parameter(in = ParameterIn.DEFAULT, schema = @Schema()) @RequestBody InitiativeRewardAndTrxRulesDTO rewardAndTrxRulesDTO);
-
     @Operation(summary = "Association of beneficiary rules to a draft initiative without validation", description = "", security = {
             @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
     @ApiResponses(value = {
@@ -115,6 +85,21 @@ public interface InitiativeApi {
             consumes = {"application/json"})
     ResponseEntity<Void> updateInitiativeBeneficiaryDraft(@PathVariable("organizationId") String organizationId, @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId, @Parameter(in = ParameterIn.DEFAULT, description = "Unique identifier of the subscribed initiative, instrument HPAN", schema = @Schema()) @RequestBody InitiativeBeneficiaryRuleDTO body);
 
+    @Operation(summary = "Association of beneficiary rules to an initiative", description = "", security = {
+            @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "No Content"),
+            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "401", description = "Authentication failed", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "404", description = "The requested ID was not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "429", description = "Too many Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "500", description = "Server ERROR", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))})
+    @PutMapping(value = "/idpay/organization/{organizationId}/initiative/{initiativeId}/beneficiary",
+            produces = {"application/json"},
+            consumes = {"application/json"})
+    ResponseEntity<Void> updateInitiativeBeneficiary(@PathVariable("organizationId") String organizationId, @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId, @Parameter(in = ParameterIn.DEFAULT, description = "Unique identifier of the subscribed initiative, instrument HPAN", schema = @Schema()) @RequestBody InitiativeBeneficiaryRuleDTO body);
+
     @Operation(summary = "Association of transaction and reward rules to a draft initiative without validation", description = "", security = {
             @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
     @ApiResponses(value = {
@@ -129,6 +114,21 @@ public interface InitiativeApi {
             produces = {"application/json"},
             consumes = {"application/json"})
     public ResponseEntity<Void> updateTrxAndRewardRulesDraft(@PathVariable("organizationId") String organizationId, @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId, @Parameter(in = ParameterIn.DEFAULT, schema = @Schema()) @RequestBody InitiativeRewardAndTrxRulesDTO rewardAndTrxRulesDTO);
+
+    @Operation(summary = "Association of transaction and reward rules to an initiative", description = "", security = {
+            @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "No Content"),
+            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "401", description = "Authentication failed", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "404", description = "The requested ID was not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "429", description = "Too many Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "500", description = "Server ERROR", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))})
+    @PutMapping(value = "/idpay/organization/{organizationId}/initiative/{initiativeId}/reward",
+            produces = {"application/json"},
+            consumes = {"application/json"})
+    public ResponseEntity<Void> updateTrxAndRewardRules(@PathVariable("organizationId") String organizationId, @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId, @Parameter(in = ParameterIn.DEFAULT, schema = @Schema()) @RequestBody InitiativeRewardAndTrxRulesDTO rewardAndTrxRulesDTO);
 
         @Operation(summary = "Returns the detail of an active initiative", description = "", security = {
             @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})

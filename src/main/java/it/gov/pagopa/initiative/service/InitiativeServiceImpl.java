@@ -73,6 +73,7 @@ public class InitiativeServiceImpl implements InitiativeService {
                         InitiativeConstants.Exception.NotFound.CODE,
                         MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_ORGANIZATION_ID_MESSAGE, organizationId, initiativeId),
                         HttpStatus.NOT_FOUND));
+        initiative.setInitiativeName(initiativeInfoModel.getInitiativeName());
         initiative.setGeneral(initiativeInfoModel.getGeneral());
         initiative.setAdditionalInfo(initiativeInfoModel.getAdditionalInfo());
         initiative.setUpdateDate(LocalDateTime.now());
