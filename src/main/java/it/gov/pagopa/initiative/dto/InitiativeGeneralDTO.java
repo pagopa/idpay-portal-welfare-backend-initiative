@@ -8,7 +8,6 @@ import it.gov.pagopa.initiative.utils.constraint.BeneficiaryBudgetValue;
 import it.gov.pagopa.initiative.utils.constraint.RankingAndSpendingDatesDoubleUseCaseValue;
 import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
 import lombok.*;
-import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.Future;
 import javax.validation.constraints.FutureOrPresent;

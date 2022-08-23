@@ -2,7 +2,6 @@ package it.gov.pagopa.initiative.utils.validator;
 
 import it.gov.pagopa.initiative.dto.AutomatedCriteriaDTO;
 import it.gov.pagopa.initiative.dto.FilterOperatorEnum;
-import it.gov.pagopa.initiative.dto.InitiativeGeneralDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,14 +10,11 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
 
 @Slf4j
 class SecondValueGreaterThanFirstWithBTWValidatorTest {
@@ -56,7 +52,7 @@ class SecondValueGreaterThanFirstWithBTWValidatorTest {
 
         assertFalse(violations.isEmpty());
         //or
-        assertThat(violations.size()).isEqualTo(1);
+        assertThat(violations).hasSize(1);
 //        assertThat(first(violations).getMessage()).isEqualTo("...");
     }
 
@@ -66,8 +62,6 @@ class SecondValueGreaterThanFirstWithBTWValidatorTest {
         Set<ConstraintViolation<AutomatedCriteriaDTO>> violations = validator.validate(automatedCriteriaDTO, ValidationOnGroup.class);
 
         assertTrue(violations.isEmpty());
-        //or
-        assertThat(violations.size()).isZero();
     }
 
     private AutomatedCriteriaDTO createAutomatedCriteriaDTO(FilterOperatorEnum operator, String value, String value2) {

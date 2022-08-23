@@ -103,7 +103,7 @@ public class InitiativeServiceImpl implements InitiativeService {
         initiative.setUpdateDate(LocalDateTime.now());
         this.initiativeRepository.save(initiative);
         //FIXME Test d'integrazione con RuleEngine. Invio Iniziativa da spostare all'ultimo step del Wizard come pubblicazione
-        sendInitiativeInfoToRuleEngine(initiativeModelToDTOMapper.toInitiativeDTO(initiative));
+//        sendInitiativeInfoToRuleEngine(initiativeModelToDTOMapper.toInitiativeDTO(initiative));
     }
 
     @Override

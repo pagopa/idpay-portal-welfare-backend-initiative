@@ -11,9 +11,7 @@ import java.lang.annotation.*;
 @Documented
 @Constraint(validatedBy = {TrxCountFromToValidator.class})
 public @interface TrxCountFromToValue {
-    String from();
-    String to();
-    String message() default "from must be before to";
+    String message() default "'from' must be before 'to'";
     Class<?>[] groups() default { };
     Class<? extends Payload>[] payload() default { };
 }

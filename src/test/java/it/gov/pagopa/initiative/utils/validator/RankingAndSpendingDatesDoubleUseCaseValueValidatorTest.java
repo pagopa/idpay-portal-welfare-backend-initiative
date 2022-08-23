@@ -14,7 +14,8 @@ import java.time.LocalDate;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
 class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
@@ -42,7 +43,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
 
         assertFalse(violations.isEmpty());
         //or
-        assertThat(violations.size()).isEqualTo(2);
+        assertThat(violations).hasSize(2);
     }
 
     @Test
@@ -52,7 +53,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
 
         assertFalse(violations.isEmpty());
         //or
-        assertThat(violations.size()).isEqualTo(2);
+        assertThat(violations).hasSize(2);
     }
 
     @Test
@@ -62,7 +63,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
 
         assertFalse(violations.isEmpty());
         //or
-        assertThat(violations.size()).isEqualTo(1);
+        assertThat(violations).hasSize(1);
     }
 
     @Test
@@ -72,7 +73,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
 
         assertFalse(violations.isEmpty());
         //or
-        assertThat(violations.size()).isEqualTo(2);
+        assertThat(violations).hasSize(2);
     }
     @Test
     void whenOnlyEndDateIsNull_InitiativeGeneralDTO_thenValidationAreFailed(){
@@ -81,7 +82,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
 
         assertFalse(violations.isEmpty());
         //or
-        assertThat(violations.size()).isEqualTo(2);
+        assertThat(violations).hasSize(2);
     }
 
     @Test
@@ -91,7 +92,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
 
         assertFalse(violations.isEmpty());
         //or
-        assertThat(violations.size()).isEqualTo(3);
+        assertThat(violations).hasSize(3);
     }
 
     @Test
@@ -101,7 +102,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
 
         assertFalse(violations.isEmpty());
         //or
-        assertThat(violations.size()).isEqualTo(1);
+        assertThat(violations).hasSize(1);
     }
     @Test
     void whenTheRankingDatesAreNullButStartAndEndAreValid_InitiativeGeneralDTO_thenValidationArePassed(){
@@ -120,7 +121,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
 
         assertFalse(violations.isEmpty());
         //or
-        assertThat(violations.size()).isEqualTo(1);
+        assertThat(violations).hasSize(1);
     }
     @Test
     void whenRankingStartIsAfterRankingEnd_InitiativeGeneralDTO_thenValidationAreFailed(){
@@ -129,7 +130,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
 
         assertFalse(violations.isEmpty());
         //or
-        assertThat(violations.size()).isEqualTo(2);
+        assertThat(violations).hasSize(2);
     }
     @Test
     void whenRankingEndIsAfterStartDate_InitiativeGeneralDTO_thenValidationAreFailed(){
@@ -138,7 +139,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
 
         assertFalse(violations.isEmpty());
         //or
-        assertThat(violations.size()).isEqualTo(1);
+        assertThat(violations).hasSize(1);
     }
     @Test
     void whenStartDateBeforeRankingDates_InitiativeGeneralDTO_thenValidationAreFailed(){
@@ -147,7 +148,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
 
         assertFalse(violations.isEmpty());
         //or
-        assertThat(violations.size()).isEqualTo(1);
+        assertThat(violations).hasSize(1);
     }
 
     @Test

@@ -1,6 +1,7 @@
 package it.gov.pagopa.initiative.dto;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum FilterOperatorEnum {
     EQ("EQ"),

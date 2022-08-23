@@ -1,8 +1,6 @@
 package it.gov.pagopa.initiative.utils.validator;
 
-import it.gov.pagopa.initiative.dto.InitiativeGeneralDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardGroupsDTO;
-import it.gov.pagopa.initiative.utils.constraint.BeneficiaryBudgetValue;
 import it.gov.pagopa.initiative.utils.constraint.RewardGroupFromToValue;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 

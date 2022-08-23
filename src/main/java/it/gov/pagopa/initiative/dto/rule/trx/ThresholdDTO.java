@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @EqualsAndHashCode
 @Builder
-@ThresholdFromToValue(from = "from", to = "to", groups = ValidationOnGroup.class)
+@ThresholdFromToValue(groups = ValidationOnGroup.class)
 public class ThresholdDTO {
     @NotNull(groups = ValidationOnGroup.class)
     @Min(value = 0, message = "from must be at least 0", groups = ValidationOnGroup.class)

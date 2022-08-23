@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @EqualsAndHashCode
 @Builder
-@TrxCountFromToValue(from = "from", to = "to", groups = ValidationOnGroup.class)
+@TrxCountFromToValue(groups = ValidationOnGroup.class)
 public class TrxCountDTO {
 
     @NotNull(groups = ValidationOnGroup.class)

@@ -10,21 +10,14 @@ import java.math.BigDecimal;
 
 public class ThresholdFromToValidator implements ConstraintValidator<ThresholdFromToValue, ThresholdDTO> {
 
-    private static final SpelExpressionParser PARSER = new SpelExpressionParser();
-
-    private String _from;
-    private String _to;
-
     @Override
     public void initialize(ThresholdFromToValue constraintAnnotation) {
-        _from = constraintAnnotation.from();
-        _to = constraintAnnotation.to();
     }
 
     @Override
     public boolean isValid(ThresholdDTO value, ConstraintValidatorContext context) {
-        BigDecimal fromTmp = (BigDecimal)  PARSER.parseExpression(_from).getValue(value);
-        BigDecimal toTmp = (BigDecimal)  PARSER.parseExpression(_to).getValue(value);
-        return fromTmp.compareTo(toTmp) == -1;
+        BigDecimal fromTmp = value.getFrom();
+        BigDecimal toTmp = value.getTo();
+        return fromTmp.compareTo(toTmp) < 0;
     }
 }

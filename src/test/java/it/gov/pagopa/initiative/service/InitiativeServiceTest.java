@@ -3,17 +3,21 @@ package it.gov.pagopa.initiative.service;
 
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.*;
+import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
+import it.gov.pagopa.initiative.dto.rule.reward.RewardGroupsDTO;
+import it.gov.pagopa.initiative.dto.rule.trx.*;
 import it.gov.pagopa.initiative.event.InitiativeProducer;
 import it.gov.pagopa.initiative.exception.InitiativeException;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.TypeBoolEnum;
 import it.gov.pagopa.initiative.model.TypeMultiEnum;
 import it.gov.pagopa.initiative.model.*;
+import it.gov.pagopa.initiative.model.rule.reward.InitiativeRewardRule;
+import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
+import it.gov.pagopa.initiative.model.rule.trx.*;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -22,10 +26,8 @@ import org.springframework.http.HttpStatus;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalTime;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -172,7 +174,7 @@ class InitiativeServiceTest {
 
     @Test
     void updateInitiativeGeneralInfo_ko() throws Exception {
-        Initiative fullInitiative = createFullInitiative();
+        Initiative fullInitiative = createStep2Initiative();
         //Try to call the Real Service (which is using the instructed Repo)
         try {
             initiativeService.updateInitiativeGeneralInfo("Ente1", "Id1", fullInitiative);
@@ -185,11 +187,11 @@ class InitiativeServiceTest {
 
     @Test
     void updateInitiativeBeneficiary_ok() throws Exception {
-        Initiative fullInitiative = createFullInitiative();
+        Initiative step2Initiative = createStep2Initiative();
         InitiativeBeneficiaryRule initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
 
         //Instruct the Repo Mock to return Dummy Initiatives
-        when(initiativeRepository.findByOrganizationIdAndInitiativeId(anyString(), anyString())).thenReturn(Optional.ofNullable(fullInitiative));
+        when(initiativeRepository.findByOrganizationIdAndInitiativeId(anyString(), anyString())).thenReturn(Optional.ofNullable(step2Initiative));
 
         //Try to call the Real Service (which is using the instructed Repo)
         initiativeService.updateInitiativeBeneficiary("Ente1", "Id1", initiativeBeneficiaryRule);
@@ -221,6 +223,49 @@ class InitiativeServiceTest {
         }
     }
 
+    @Test
+    void updateInitiativeRewardAndTrxRules_ok() throws Exception {
+        Initiative step3Initiative = createStep3Initiative();
+
+        InitiativeRewardRule rewardRule = createRewardRule(false);
+        InitiativeTrxConditions trxRuleCondition = createTrxRuleCondition();
+        Initiative initiative = Initiative.builder().rewardRule(rewardRule).trxRule(trxRuleCondition).build();
+
+        //Instruct the Repo Mock to return Dummy Initiatives
+        when(initiativeRepository.findByOrganizationIdAndInitiativeId(anyString(), anyString())).thenReturn(Optional.ofNullable(step3Initiative));
+
+        //Try to call the Real Service (which is using the instructed Repo)
+        initiativeService.updateTrxAndRewardRules("Ente1", "Id1", initiative);
+
+        // you are expecting repo to be called once with correct param
+        verify(initiativeRepository, times(1)).findByOrganizationIdAndInitiativeId(anyString(), anyString());
+    }
+
+    @Test
+    void updateInitiativeRewardAndTrxRules_ko() throws Exception {
+        InitiativeRewardRule rewardRule = createRewardRule(false);
+        InitiativeTrxConditions trxRuleCondition = createTrxRuleCondition();
+        Initiative initiative = Initiative.builder().rewardRule(rewardRule).trxRule(trxRuleCondition).build();
+
+        //Instruct the Repo Mock to return Dummy Initiatives
+        when(initiativeRepository.findByOrganizationIdAndInitiativeId(anyString(), anyString())).thenThrow(
+                new InitiativeException(
+                        InitiativeConstants.Exception.NotFound.CODE,
+                        MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_ORGANIZATION_ID_MESSAGE, "Ente1", "Id1"),
+                        HttpStatus.NOT_FOUND)
+        );
+
+        //Try to call the Real Service (which is using the instructed Repo)
+        try {
+            initiativeService.updateTrxAndRewardRules("Ente1", "Id1", initiative);
+        } catch (InitiativeException e) {
+            log.info("InitiativeException: " + e.getCode());
+            assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
+            assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
+            assertEquals(MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_ORGANIZATION_ID_MESSAGE, "Ente1", "Id1"), e.getMessage());
+        }
+    }
+
     Initiative createFullInitiative () {
         //TODO Test onGoing for different steps. Must use Step6 at the end
         Initiative initiative = createStep2Initiative();
@@ -232,6 +277,10 @@ class InitiativeServiceTest {
         InitiativeDTO initiativeDTO = createStep2InitiativeDTO();
         return initiativeDTO;
     }
+
+    /*
+     * Step 1
+     */
 
     Initiative createStep1Initiative () {
         Initiative initiative = new Initiative();
@@ -276,46 +325,6 @@ class InitiativeServiceTest {
         channels.add(channel);
         initiativeAdditional.setChannels(channels);
         return initiativeAdditional;
-    }
-
-    private InitiativeBeneficiaryRule createInitiativeBeneficiaryRule() {
-        InitiativeBeneficiaryRule initiativeBeneficiaryRule = new InitiativeBeneficiaryRule();
-        SelfCriteriaBool selfCriteriaBool = new SelfCriteriaBool();
-        selfCriteriaBool.set_type(TypeBoolEnum.BOOLEAN);
-        selfCriteriaBool.setCode("B001");
-        selfCriteriaBool.setDescription("Desc_bool");
-        selfCriteriaBool.setValue(true);
-        SelfCriteriaMulti selfCriteriaMulti = new SelfCriteriaMulti();
-        selfCriteriaMulti.set_type(TypeMultiEnum.MULTI);
-        selfCriteriaMulti.setCode("B001");
-        selfCriteriaMulti.setDescription("Desc_Multi");
-        List<String> values = new ArrayList<>();
-        values.add("valore1");
-        values.add("valore2");
-        selfCriteriaMulti.setValue(values);
-        List<ISelfDeclarationCriteria> iSelfDeclarationCriteriaList = new ArrayList<>();
-        iSelfDeclarationCriteriaList.add(selfCriteriaBool);
-        iSelfDeclarationCriteriaList.add(selfCriteriaMulti);
-        initiativeBeneficiaryRule.setSelfDeclarationCriteria(iSelfDeclarationCriteriaList);
-        AutomatedCriteria automatedCriteria = new AutomatedCriteria();
-        automatedCriteria.setAuthority("Authority_ISEE");
-        automatedCriteria.setCode("Code_ISEE");
-        automatedCriteria.setField("true");
-        automatedCriteria.setOperator(FilterOperatorEnumModel.EQ);
-        automatedCriteria.setValue("value");
-        List<AutomatedCriteria> automatedCriteriaList = new ArrayList<>();
-        automatedCriteriaList.add(automatedCriteria);
-        initiativeBeneficiaryRule.setAutomatedCriteria(automatedCriteriaList);
-        return initiativeBeneficiaryRule;
-    }
-
-    private InitiativeLegal createInitiativeLegal() {
-        InitiativeLegal initiativeLegal = new InitiativeLegal();
-        initiativeLegal.setDpiaLink("https://www.google.it");
-        initiativeLegal.setPrivacyLink("https://www.google.it");
-        initiativeLegal.setRegulationLink("https://www.google.it");
-        initiativeLegal.setTcLink("https://www.google.it");
-        return initiativeLegal;
     }
 
     InitiativeDTO createStep1InitiativeDTO () {
@@ -370,11 +379,46 @@ class InitiativeServiceTest {
         return initiativeAdditionalDTO;
     }
 
+    /*
+     * Step 2
+     */
+
     Initiative createStep2Initiative () {
         Initiative initiative = createStep1Initiative();
         InitiativeBeneficiaryRule initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
         initiative.setBeneficiaryRule(initiativeBeneficiaryRule);
         return initiative;
+    }
+
+    private InitiativeBeneficiaryRule createInitiativeBeneficiaryRule() {
+        InitiativeBeneficiaryRule initiativeBeneficiaryRule = new InitiativeBeneficiaryRule();
+        SelfCriteriaBool selfCriteriaBool = new SelfCriteriaBool();
+        selfCriteriaBool.set_type(TypeBoolEnum.BOOLEAN);
+        selfCriteriaBool.setCode("B001");
+        selfCriteriaBool.setDescription("Desc_bool");
+        selfCriteriaBool.setValue(true);
+        SelfCriteriaMulti selfCriteriaMulti = new SelfCriteriaMulti();
+        selfCriteriaMulti.set_type(TypeMultiEnum.MULTI);
+        selfCriteriaMulti.setCode("B001");
+        selfCriteriaMulti.setDescription("Desc_Multi");
+        List<String> values = new ArrayList<>();
+        values.add("valore1");
+        values.add("valore2");
+        selfCriteriaMulti.setValue(values);
+        List<ISelfDeclarationCriteria> iSelfDeclarationCriteriaList = new ArrayList<>();
+        iSelfDeclarationCriteriaList.add(selfCriteriaBool);
+        iSelfDeclarationCriteriaList.add(selfCriteriaMulti);
+        initiativeBeneficiaryRule.setSelfDeclarationCriteria(iSelfDeclarationCriteriaList);
+        AutomatedCriteria automatedCriteria = new AutomatedCriteria();
+        automatedCriteria.setAuthority("Authority_ISEE");
+        automatedCriteria.setCode("Code_ISEE");
+        automatedCriteria.setField("true");
+        automatedCriteria.setOperator(FilterOperatorEnumModel.EQ);
+        automatedCriteria.setValue("value");
+        List<AutomatedCriteria> automatedCriteriaList = new ArrayList<>();
+        automatedCriteriaList.add(automatedCriteria);
+        initiativeBeneficiaryRule.setAutomatedCriteria(automatedCriteriaList);
+        return initiativeBeneficiaryRule;
     }
 
     InitiativeDTO createStep2InitiativeDTO () {
@@ -415,14 +459,174 @@ class InitiativeServiceTest {
         return initiativeBeneficiaryRuleDTO;
     }
 
+    /*
+    * Step 3
+     */
+
     Initiative createStep3Initiative () {
-        Initiative initiative = new Initiative();
+        Initiative initiative = createStep2Initiative();
+        //TODO ora settato con l'utilizzo dei RewardGroups. Associare un faker booleano per i casi OK, altrimenti separare i 2 casi
+        initiative.setRewardRule(createRewardRule(false));
+        initiative.setTrxRule(createTrxRuleCondition());
         return initiative;
+    }
+
+    private InitiativeRewardRule createRewardRule(boolean isRewardFixedValue) {
+        if(isRewardFixedValue){
+            //TODO Aggiungere RewardValue
+            return null;
+        }
+        else {
+            RewardGroups rewardGroups = new RewardGroups();
+            RewardGroups.RewardGroup rewardGroup1 = new RewardGroups.RewardGroup(BigDecimal.valueOf(10), BigDecimal.valueOf(20), BigDecimal.valueOf(30));
+            RewardGroups.RewardGroup rewardGroup2 = new RewardGroups.RewardGroup(BigDecimal.valueOf(10), BigDecimal.valueOf(30), BigDecimal.valueOf(40));
+            List<RewardGroups.RewardGroup> rewardGroupList = new ArrayList<>();
+            rewardGroupList.add(rewardGroup1);
+            rewardGroupList.add(rewardGroup2);
+            rewardGroups.setRewardGroups(rewardGroupList);
+            return rewardGroups;
+        }
+    }
+
+    private InitiativeTrxConditions createTrxRuleCondition() {
+        InitiativeTrxConditions initiativeTrxConditions = new InitiativeTrxConditions();
+
+        List<DayOfWeek.DayConfig> dayConfigs = new ArrayList<>();
+        DayOfWeek.DayConfig dayConfig1 = new DayOfWeek.DayConfig();
+        Set<java.time.DayOfWeek> dayOfWeeks = new HashSet<>();
+        dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
+        dayOfWeeks.add(java.time.DayOfWeek.THURSDAY);
+        dayConfig1.setDaysOfWeek(dayOfWeeks);
+        List<DayOfWeek.Interval> intervals = new ArrayList<>();
+        DayOfWeek.Interval interval1 = new DayOfWeek.Interval();
+        LocalTime t1 = LocalTime.of(6, 0, 0);
+        LocalTime t2 = LocalTime.of(12, 0, 0);
+        interval1.setStartTime(t1);
+        interval1.setEndTime(t2);
+        intervals.add(interval1);
+        dayConfig1.setIntervals(intervals);
+        dayConfigs.add(dayConfig1);
+        DayOfWeek dayOfWeek = new DayOfWeek(dayConfigs);
+
+        Threshold threshold = new Threshold();
+        threshold.setFrom(BigDecimal.valueOf(10));
+        threshold.setFromIncluded(true);
+        threshold.setTo(BigDecimal.valueOf(30));
+        threshold.setToIncluded(true);
+
+        TrxCount trxCount = new TrxCount();
+        trxCount.setFrom(10L);
+        trxCount.setFromIncluded(true);
+        trxCount.setTo(30L);
+        trxCount.setToIncluded(true);
+
+        MccFilter mccFilter = new MccFilter();
+        mccFilter.setAllowedList(true);
+        Set<String> values = new HashSet<>();
+        values.add("123");
+        values.add("456");
+        mccFilter.setValues(values);
+
+        List<RewardLimits> rewardLimitsList = new ArrayList<>();
+        RewardLimits rewardLimits1 = new RewardLimits();
+        rewardLimits1.setFrequency(RewardLimits.RewardLimitFrequency.DAILY);
+        rewardLimits1.setRewardLimit(BigDecimal.valueOf(100));
+        RewardLimits rewardLimits2 = new RewardLimits();
+        rewardLimits2.setFrequency(RewardLimits.RewardLimitFrequency.MONTHLY);
+        rewardLimits2.setRewardLimit(BigDecimal.valueOf(3000));
+        rewardLimitsList.add(rewardLimits1);
+        rewardLimitsList.add(rewardLimits2);
+
+        initiativeTrxConditions.setDaysOfWeek(dayOfWeek);
+        initiativeTrxConditions.setThreshold(threshold);
+        initiativeTrxConditions.setTrxCount(trxCount);
+        initiativeTrxConditions.setMccFilter(mccFilter);
+        initiativeTrxConditions.setRewardLimits(rewardLimitsList);
+
+        return initiativeTrxConditions;
     }
 
     InitiativeDTO createStep3InitiativeDTO () {
         InitiativeDTO initiativeDTO = new InitiativeDTO();
+        //TODO ora settato con l'utilizzo dei RewardGroups. Associare un faker booleano per i casi OK, altrimenti separare i 2 casi
+        initiativeDTO.setRewardRule(createRewardRuleDTO(false));
+        initiativeDTO.setTrxRule(createTrxRuleConditionDTO());
         return initiativeDTO;
+    }
+
+    private InitiativeRewardRuleDTO createRewardRuleDTO(boolean isRewardFixedValue) {
+        if(isRewardFixedValue){
+            //TODO Aggiungere RewardValue
+            return null;
+        }
+        else {
+            RewardGroupsDTO rewardGroupsDTO = new RewardGroupsDTO();
+            RewardGroupsDTO.RewardGroupDTO rewardGroupDTO1 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(10), BigDecimal.valueOf(20), BigDecimal.valueOf(30));
+            RewardGroupsDTO.RewardGroupDTO rewardGroupDTO2 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(10), BigDecimal.valueOf(30), BigDecimal.valueOf(40));
+            List<RewardGroupsDTO.RewardGroupDTO> rewardGroupDTOList = new ArrayList<>();
+            rewardGroupDTOList.add(rewardGroupDTO1);
+            rewardGroupDTOList.add(rewardGroupDTO2);
+            rewardGroupsDTO.setRewardGroups(rewardGroupDTOList);
+            return rewardGroupsDTO;
+        }
+    }
+
+    private InitiativeTrxConditionsDTO createTrxRuleConditionDTO() {
+        InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = new InitiativeTrxConditionsDTO();
+
+        List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<>();
+        DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
+        Set<java.time.DayOfWeek> dayOfWeeks = new HashSet<>();
+        dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
+        dayOfWeeks.add(java.time.DayOfWeek.THURSDAY);
+        dayConfig1.setDaysOfWeek(dayOfWeeks);
+        List<DayOfWeekDTO.Interval> intervals = new ArrayList<>();
+        DayOfWeekDTO.Interval interval1 = new DayOfWeekDTO.Interval();
+        LocalTime t1 = LocalTime.of(6, 0, 0);
+        LocalTime t2 = LocalTime.of(12, 0, 0);
+        interval1.setStartTime(t1);
+        interval1.setEndTime(t2);
+        intervals.add(interval1);
+        dayConfig1.setIntervals(intervals);
+        dayConfigs.add(dayConfig1);
+        DayOfWeekDTO dayOfWeekDTO = new DayOfWeekDTO(dayConfigs);
+
+        ThresholdDTO thresholdDTO = new ThresholdDTO();
+        thresholdDTO.setFrom(BigDecimal.valueOf(10));
+        thresholdDTO.setFromIncluded(true);
+        thresholdDTO.setTo(BigDecimal.valueOf(30));
+        thresholdDTO.setToIncluded(true);
+
+        TrxCountDTO trxCountDTO = new TrxCountDTO();
+        trxCountDTO.setFrom(10L);
+        trxCountDTO.setFromIncluded(true);
+        trxCountDTO.setTo(30L);
+        trxCountDTO.setToIncluded(true);
+
+        MccFilterDTO mccFilterDTO = new MccFilterDTO();
+        mccFilterDTO.setAllowedList(true);
+        Set<String> values = new HashSet<>();
+        values.add("123");
+        values.add("456");
+        mccFilterDTO.setValues(values);
+
+        List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<>();
+        RewardLimitsDTO rewardLimitsDTO1 = new RewardLimitsDTO();
+        rewardLimitsDTO1.setFrequency(RewardLimitsDTO.RewardLimitFrequency.DAILY);
+        rewardLimitsDTO1.setRewardLimit(BigDecimal.valueOf(100));
+        RewardLimitsDTO rewardLimitsDTO2 = new RewardLimitsDTO();
+        rewardLimitsDTO2.setFrequency(RewardLimitsDTO.RewardLimitFrequency.MONTHLY);
+        rewardLimitsDTO2.setRewardLimit(BigDecimal.valueOf(3000));
+        rewardLimitsDTOList.add(rewardLimitsDTO1);
+        rewardLimitsDTOList.add(rewardLimitsDTO2);
+
+        initiativeTrxConditionsDTO.setDaysOfWeek(dayOfWeekDTO);
+        initiativeTrxConditionsDTO.setThreshold(thresholdDTO);
+        initiativeTrxConditionsDTO.setTrxCount(trxCountDTO);
+        initiativeTrxConditionsDTO.setMccFilter(mccFilterDTO);
+        initiativeTrxConditionsDTO.setRewardLimits(rewardLimitsDTOList);
+
+        return initiativeTrxConditionsDTO;
     }
 
     Initiative createStep4Initiative () {
@@ -440,17 +644,16 @@ class InitiativeServiceTest {
         return initiative;
     }
 
+    private InitiativeLegal createInitiativeLegal() {
+        InitiativeLegal initiativeLegal = new InitiativeLegal();
+        initiativeLegal.setDpiaLink("https://www.google.it");
+        initiativeLegal.setPrivacyLink("https://www.google.it");
+        initiativeLegal.setRegulationLink("https://www.google.it");
+        initiativeLegal.setTcLink("https://www.google.it");
+        return initiativeLegal;
+    }
+
     InitiativeDTO createStep5InitiativeDTO () {
-        InitiativeDTO initiativeDTO = new InitiativeDTO();
-        return initiativeDTO;
-    }
-
-    Initiative createStep6Initiative () {
-        Initiative initiative = new Initiative();
-        return initiative;
-    }
-
-    InitiativeDTO createStep6InitiativeDTO () {
         InitiativeDTO initiativeDTO = new InitiativeDTO();
         return initiativeDTO;
     }
