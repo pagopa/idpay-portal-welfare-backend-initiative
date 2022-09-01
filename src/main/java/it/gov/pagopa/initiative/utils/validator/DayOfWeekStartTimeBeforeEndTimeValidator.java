@@ -22,8 +22,10 @@ public class DayOfWeekStartTimeBeforeEndTimeValidator implements ConstraintValid
 
     @Override
     public boolean isValid(DayOfWeekDTO.Interval value, ConstraintValidatorContext context) {
-        LocalTime time1Tmp = (LocalTime)  PARSER.parseExpression(time_1).getValue(value);
-        LocalTime time2Tmp = (LocalTime)  PARSER.parseExpression(time_2).getValue(value);
-        return time1Tmp.isBefore(time2Tmp);
+        LocalTime time1Tmp = value.getStartTime();
+        LocalTime time2Tmp = value.getEndTime();
+        if(null != time1Tmp && null != time2Tmp)
+            return time1Tmp.isBefore(time2Tmp);
+        return true;
     }
 }

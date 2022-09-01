@@ -15,7 +15,6 @@ import java.util.List;
 @Builder
 public class InitiativeTrxConditionsDTO {
     @Valid
-    @NotEmpty(groups = ValidationOnGroup.class)
     private DayOfWeekDTO daysOfWeek;
 
     @Valid
