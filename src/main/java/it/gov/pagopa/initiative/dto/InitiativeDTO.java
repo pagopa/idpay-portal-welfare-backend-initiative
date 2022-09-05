@@ -2,6 +2,7 @@ package it.gov.pagopa.initiative.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.InitiativeTrxConditionsDTO;
 import lombok.*;
@@ -65,6 +66,9 @@ public class InitiativeDTO   {
 
   @JsonProperty("trxRule")
   private InitiativeTrxConditionsDTO trxRule;
+
+  @JsonProperty("refundRule")
+  private InitiativeRefundRuleDTO refundRule;
 
   @JsonProperty("legal")
   private InitiativeLegalDTO legal;
