@@ -4,12 +4,12 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
+import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotNull;
 
-@Validated
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,15 +18,15 @@ import javax.validation.constraints.NotNull;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TimeParameterDTO {
     public enum TimeTypeEnum {
-        FINISHEDINITIATIVE("FinishedInitiative"),
+        CLOSED("CLOSED"),
 
-        DAILY("Daily"),
+        DAILY("DAILY"),
 
-        WEEKLY("Weekly"),
+        WEEKLY("WEEKLY"),
 
-        MONTHLY("Monthly"),
+        MONTHLY("MONTHLY"),
 
-        EVERYTHREEMONTH("EveryThreeMonth");
+        QUARTERLY("QUARTERLY");
 
         private String value;
 
@@ -51,7 +51,7 @@ public class TimeParameterDTO {
         }
     }
 
-    @NotNull
+    @NotNull(groups = ValidationOnGroup.class)
     @JsonProperty("timeType")
     private TimeTypeEnum timeType;
 }

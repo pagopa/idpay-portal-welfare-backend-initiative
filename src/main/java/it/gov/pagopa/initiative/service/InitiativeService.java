@@ -3,6 +3,7 @@ package it.gov.pagopa.initiative.service;
 import it.gov.pagopa.initiative.dto.InitiativeDTO;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
+import it.gov.pagopa.initiative.model.rule.refund.InitiativeRefundRule;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +24,8 @@ public interface InitiativeService {
     void updateInitiativeBeneficiary(String organizationId, String initiativeId, InitiativeBeneficiaryRule toBeneficiaryRuleModel);
 
     void updateTrxAndRewardRules(String organizationId, String initiativeId, Initiative rewardAndTrxRules);
+
+    void updateInitiativeRefundRules(String organizationId, String initiativeId, Initiative refundRule);
 
     void sendInitiativeInfoToRuleEngine(InitiativeDTO initiativeDTO);
 }

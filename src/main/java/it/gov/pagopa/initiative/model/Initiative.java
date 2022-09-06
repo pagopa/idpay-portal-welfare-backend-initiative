@@ -1,5 +1,6 @@
 package it.gov.pagopa.initiative.model;
 
+import it.gov.pagopa.initiative.model.rule.refund.InitiativeRefundRule;
 import it.gov.pagopa.initiative.model.rule.reward.InitiativeRewardRule;
 import it.gov.pagopa.initiative.model.rule.trx.InitiativeTrxConditions;
 import lombok.*;
@@ -33,6 +34,7 @@ public class Initiative {
     private InitiativeBeneficiaryRule beneficiaryRule;
     private InitiativeRewardRule rewardRule;
     private InitiativeTrxConditions trxRule;
+    private InitiativeRefundRule refundRule;
     private InitiativeLegal legal;
 
 }

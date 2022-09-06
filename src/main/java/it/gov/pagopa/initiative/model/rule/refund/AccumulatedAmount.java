@@ -1,12 +1,9 @@
 package it.gov.pagopa.initiative.model.rule.refund;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
-import it.gov.pagopa.initiative.dto.rule.refund.AccomulatedAmountDTO;
 import lombok.*;
 
-import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 @Data
@@ -14,15 +11,15 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @EqualsAndHashCode
 @Builder
-public class AccomulatedAmount {
-    public enum AccomulatedTypeEnum {
-        PAYMENTOUT("PaymentOut"),
+public class AccumulatedAmount {
+    public enum AccumulatedTypeEnum {
+        BUDGET_EXHAUSTED("BUDGET_EXHAUSTED"),
 
-        REACHINGTHRESHOLD("ReachingThreshold");
+        THRESHOLD_REACHED("THRESHOLD_REACHED");
 
         private String value;
 
-        AccomulatedTypeEnum(String value) {
+        AccumulatedTypeEnum(String value) {
             this.value = value;
         }
 
@@ -33,8 +30,8 @@ public class AccomulatedAmount {
         }
 
         @JsonCreator
-        public static AccomulatedTypeEnum fromValue(String text) {
-            for (AccomulatedTypeEnum b : AccomulatedTypeEnum.values()) {
+        public static AccumulatedTypeEnum fromValue(String text) {
+            for (AccumulatedTypeEnum b : AccumulatedTypeEnum.values()) {
                 if (String.valueOf(b.value).equals(text)) {
                     return b;
                 }
@@ -43,7 +40,7 @@ public class AccomulatedAmount {
         }
     }
 
-    private AccomulatedTypeEnum accomulatedType;
+    private AccumulatedTypeEnum accomulatedType;
 
     private BigDecimal refundThreshold;
 }
