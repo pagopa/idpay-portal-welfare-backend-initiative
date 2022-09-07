@@ -29,9 +29,16 @@ public class RestResponseExceptionHandler {
     public ResponseEntity<ErrorDTO> handleMethodArgumentNotValidExceptions(MethodArgumentNotValidException ex) {
         List<String> errors = new ArrayList<>();
         ex.getBindingResult().getAllErrors().forEach(error -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.add(String.format("[%s]: %s", fieldName, errorMessage));
+            if(error instanceof FieldError fieldErrorInput) {
+                String fieldName = fieldErrorInput.getField();
+                String errorMessage = error.getDefaultMessage();
+                errors.add(String.format("[%s]: %s", fieldName, errorMessage));
+            }
+            else {
+                String objectName = error.getObjectName();
+                String errorMessage = error.getDefaultMessage();
+                errors.add(String.format("[%s]: %s", objectName, errorMessage));
+            }
         });
         String message = String.join(" - ", errors);
         return new ResponseEntity<>(

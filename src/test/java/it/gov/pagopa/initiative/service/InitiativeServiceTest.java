@@ -12,6 +12,10 @@ import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.TypeBoolEnum;
 import it.gov.pagopa.initiative.model.TypeMultiEnum;
 import it.gov.pagopa.initiative.model.*;
+import it.gov.pagopa.initiative.model.rule.refund.AccumulatedAmount;
+import it.gov.pagopa.initiative.model.rule.refund.AdditionalInfo;
+import it.gov.pagopa.initiative.model.rule.refund.InitiativeRefundRule;
+import it.gov.pagopa.initiative.model.rule.refund.TimeParameter;
 import it.gov.pagopa.initiative.model.rule.reward.InitiativeRewardRule;
 import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
 import it.gov.pagopa.initiative.model.rule.trx.*;
@@ -263,6 +267,34 @@ class InitiativeServiceTest {
             assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
             assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
             assertEquals(MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_ORGANIZATION_ID_MESSAGE, "Ente1", "Id1"), e.getMessage());
+        }
+    }
+
+    @Test
+    void updateRefunRules_ok(){
+        Initiative initiative = createInitiativeOnlyRefundRule();
+        when(initiativeRepository.findByOrganizationIdAndInitiativeId(anyString(), anyString())).thenReturn(Optional.ofNullable(initiative));
+        initiativeService.updateInitiativeRefundRules("O1", "A1", initiative);
+        verify(initiativeRepository, times(1)).findByOrganizationIdAndInitiativeId(anyString(), anyString());
+    }
+
+    @Test
+    void updateRefunRules_ko(){
+        Initiative initiative = createInitiativeOnlyRefundRule();
+        when(initiativeRepository.findByOrganizationIdAndInitiativeId(anyString(), anyString())).thenThrow(
+                new InitiativeException(
+                        InitiativeConstants.Exception.NotFound.CODE,
+                        MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_ORGANIZATION_ID_MESSAGE, "O1", "A1"),
+                        HttpStatus.NOT_FOUND)
+        );
+
+        try{
+            initiativeService.updateInitiativeRefundRules("O1", "A1", initiative);
+        }catch (InitiativeException e){
+            log.info("InitiativeException: " + e.getCode());
+            assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
+            assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
+            assertEquals(MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_ORGANIZATION_ID_MESSAGE, "O1", "A1"), e.getMessage());
         }
     }
 
@@ -658,5 +690,43 @@ class InitiativeServiceTest {
         return initiativeDTO;
     }
 
+    AccumulatedAmount createAccumulatedAmountValid(){
+        AccumulatedAmount amount = new AccumulatedAmount();
+        amount.setAccomulatedType(AccumulatedAmount.AccumulatedTypeEnum.THRESHOLD_REACHED);
+        amount.setRefundThreshold(BigDecimal.valueOf(100000));
+        return amount;
+    }
 
+    TimeParameter createTimeParameterValid(){
+        TimeParameter timeParameter = new TimeParameter();
+        timeParameter.setTimeType(TimeParameter.TimeTypeEnum.CLOSED);
+        return timeParameter;
+    }
+
+    AdditionalInfo createAdditionalInfoValid(){
+        AdditionalInfo additionalInfo = new AdditionalInfo();
+        additionalInfo.setIdentificationCode("B002");
+        return additionalInfo;
+    }
+
+    InitiativeRefundRule createRefundRuleValidWithAccumulatedAmount(){
+        InitiativeRefundRule refundRule = new InitiativeRefundRule();
+        refundRule.setAccumulatedAmount(createAccumulatedAmountValid());
+        refundRule.setTimeParameter(null);
+        refundRule.setAdditionalInfo(createAdditionalInfoValid());
+        return refundRule;
+    }
+    InitiativeRefundRule createRefundRuleValidWithTimeParameter(){
+        InitiativeRefundRule refundRule = new InitiativeRefundRule();
+        refundRule.setAccumulatedAmount(null);
+        refundRule.setTimeParameter(createTimeParameterValid());
+        refundRule.setAdditionalInfo(createAdditionalInfoValid());
+        return refundRule;
+    }
+
+    Initiative createInitiativeOnlyRefundRule(){
+        Initiative initiative = new Initiative();
+        initiative.setRefundRule(createRefundRuleValidWithAccumulatedAmount());
+        return initiative;
+    }
 }
