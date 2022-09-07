@@ -1,12 +1,8 @@
 package it.gov.pagopa.initiative.model.rule.refund;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
-import it.gov.pagopa.initiative.dto.rule.refund.TimeParameterDTO;
 import lombok.*;
-
-import javax.validation.constraints.NotNull;
 
 @Data
 @AllArgsConstructor
@@ -15,15 +11,15 @@ import javax.validation.constraints.NotNull;
 @Builder
 public class TimeParameter {
     public enum TimeTypeEnum {
-        FINISHEDINITIATIVE("FinishedInitiative"),
+        CLOSED("CLOSED"),
 
-        DAILY("Daily"),
+        DAILY("DAILY"),
 
-        WEEKLY("Weekly"),
+        WEEKLY("WEEKLY"),
 
-        MONTHLY("Monthly"),
+        MONTHLY("MONTHLY"),
 
-        EVERYTHREEMONTH("EveryThreeMonth");
+        QUARTERLY("QUARTERLY");
 
         private String value;
 

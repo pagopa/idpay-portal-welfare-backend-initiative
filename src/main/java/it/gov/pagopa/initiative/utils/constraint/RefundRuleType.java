@@ -11,8 +11,6 @@ import java.lang.annotation.*;
 @Documented
 @Constraint(validatedBy = {RefundRuleTypeValidator.class})
 public @interface RefundRuleType {
-//    String value1();
-//    String value2();
     String message() default "Something wrong with the refund type";
     Class<?>[] groups() default { };
     Class<? extends Payload>[] payload() default { };

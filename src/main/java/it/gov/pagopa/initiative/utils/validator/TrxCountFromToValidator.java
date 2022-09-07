@@ -2,7 +2,6 @@ package it.gov.pagopa.initiative.utils.validator;
 
 import it.gov.pagopa.initiative.dto.rule.trx.TrxCountDTO;
 import it.gov.pagopa.initiative.utils.constraint.TrxCountFromToValue;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;

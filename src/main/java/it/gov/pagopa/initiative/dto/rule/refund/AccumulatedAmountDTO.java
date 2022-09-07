@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import it.gov.pagopa.initiative.utils.constraint.AccumulatedAmountType;
 import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
 import lombok.*;
-import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -23,11 +22,8 @@ import java.math.BigDecimal;
 public class AccumulatedAmountDTO {
     public enum AccumulatedTypeEnum {
         BUDGET_EXHAUSTED("BUDGET_EXHAUSTED"),
-
         THRESHOLD_REACHED("THRESHOLD_REACHED");
-
         private String value;
-
         AccumulatedTypeEnum(String value) {
             this.value = value;
         }

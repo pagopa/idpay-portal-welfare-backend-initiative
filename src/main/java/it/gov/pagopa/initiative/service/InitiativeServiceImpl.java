@@ -7,7 +7,6 @@ import it.gov.pagopa.initiative.exception.InitiativeException;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
-import it.gov.pagopa.initiative.model.rule.refund.InitiativeRefundRule;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

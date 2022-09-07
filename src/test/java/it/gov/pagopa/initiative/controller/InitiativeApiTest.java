@@ -3,11 +3,19 @@ package it.gov.pagopa.initiative.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import it.gov.pagopa.initiative.dto.*;
+import it.gov.pagopa.initiative.dto.rule.refund.AccumulatedAmountDTO;
+import it.gov.pagopa.initiative.dto.rule.refund.AdditionalInfoDTO;
+import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
+import it.gov.pagopa.initiative.dto.rule.refund.TimeParameterDTO;
 import it.gov.pagopa.initiative.mapper.InitiativeDTOsToModelMapper;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.TypeBoolEnum;
 import it.gov.pagopa.initiative.model.TypeMultiEnum;
 import it.gov.pagopa.initiative.model.*;
+import it.gov.pagopa.initiative.model.rule.refund.AccumulatedAmount;
+import it.gov.pagopa.initiative.model.rule.refund.AdditionalInfo;
+import it.gov.pagopa.initiative.model.rule.refund.InitiativeRefundRule;
+import it.gov.pagopa.initiative.model.rule.refund.TimeParameter;
 import it.gov.pagopa.initiative.service.InitiativeService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -66,6 +74,8 @@ class InitiativeApiTest {
     private static final String GET_INITIATIVE_BENEFICIARY_VIEW_URL = "/initiative/" + INITIATIVE_0_ID_PLACEHOLDER + "/beneficiary/view";
     private static final String POST_INITIATIVE_GENERAL_INFO_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/general";
     private static final String PUT_INITIATIVE_GENERAL_INFO_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_1_ID_PLACEHOLDER + "/general";
+
+    private static final String PUT_INITIATIVE_REFUND_RULES_INFO_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_1_ID_PLACEHOLDER + "/refund";
     private static final String PUT_INITIATIVE_BENEFICIARY_RULES_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_1_ID_PLACEHOLDER + "/beneficiary";
     private static final String ROLE = "TEST_ROLE";
 
@@ -236,6 +246,52 @@ class InitiativeApiTest {
                 .content(objectMapper.writeValueAsString(initiativeBeneficiaryRuleDTO))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    void updateInitiativeRefundRule_ok() throws Exception{
+        objectMapper.registerModule(new JavaTimeModule());
+
+        InitiativeRefundRuleDTO refundRuleDTO = createRefundRuleDTOValidWithAccumulatedAmount();
+
+        Initiative initiative = createInitiativeOnlyRefundRule();
+
+        when(initiativeDTOsToModelMapper.toInitiative(refundRuleDTO)).thenReturn(initiative);
+
+        when(initiativeService.getInitiative("O1", "A1")).thenReturn(initiative);
+
+        doNothing().when(initiativeService).updateInitiativeRefundRules("O1", "A1", initiative);
+
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + MessageFormat.format(PUT_INITIATIVE_REFUND_RULES_INFO_URL, "O1", "A1"))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(refundRuleDTO))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    void updateInitiativeRefundRuleDraft_ok() throws Exception{
+        objectMapper.registerModule(new JavaTimeModule());
+
+        InitiativeRefundRuleDTO refundRuleDTO = createRefundRuleDTOValidWithAccumulatedAmount();
+
+        Initiative initiative = createInitiativeOnlyRefundRule();
+
+        when(initiativeDTOsToModelMapper.toInitiative(refundRuleDTO)).thenReturn(initiative);
+
+        when(initiativeService.getInitiative("O1", "A1")).thenReturn(initiative);
+
+        doNothing().when(initiativeService).updateInitiativeRefundRules("O1", "A1", initiative);
+
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + MessageFormat.format(PUT_INITIATIVE_REFUND_RULES_INFO_URL + "/draft", "O1", "A1"))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(refundRuleDTO))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isNoContent())
                 .andDo(print())
                 .andReturn();
     }
@@ -524,6 +580,85 @@ class InitiativeApiTest {
     InitiativeDTO createStep6InitiativeDTO () {
         InitiativeDTO initiativeDTO = new InitiativeDTO();
         return initiativeDTO;
+    }
+
+
+    AccumulatedAmountDTO createAccumulatedAmountDTOValid(){
+        AccumulatedAmountDTO amountDTO = new AccumulatedAmountDTO();
+        amountDTO.setAccumulatedType(AccumulatedAmountDTO.AccumulatedTypeEnum.THRESHOLD_REACHED);
+        amountDTO.setRefundThreshold(BigDecimal.valueOf(100000));
+        return amountDTO;
+    }
+
+    TimeParameterDTO createTimeParameterDTOValid(){
+        TimeParameterDTO timeParameterDTO = new TimeParameterDTO();
+        timeParameterDTO.setTimeType(TimeParameterDTO.TimeTypeEnum.CLOSED);
+        return timeParameterDTO;
+    }
+
+    AdditionalInfoDTO createAdditionalInfoDTOValid(){
+        AdditionalInfoDTO additionalInfoDTO = new AdditionalInfoDTO();
+        additionalInfoDTO.setIdentificationCode("B002");
+        return additionalInfoDTO;
+    }
+
+    InitiativeRefundRuleDTO createRefundRuleDTOValidWithTimeParameter(){
+        InitiativeRefundRuleDTO refundRuleDTO = new InitiativeRefundRuleDTO();
+        refundRuleDTO.setAccumulatedAmount(null);
+        refundRuleDTO.setTimeParameter(createTimeParameterDTOValid());
+        refundRuleDTO.setAdditionalInfo(createAdditionalInfoDTOValid());
+        return refundRuleDTO;
+    }
+
+    InitiativeRefundRuleDTO createRefundRuleDTOValidWithAccumulatedAmount(){
+        InitiativeRefundRuleDTO refundRuleDTO = new InitiativeRefundRuleDTO();
+        refundRuleDTO.setAccumulatedAmount(createAccumulatedAmountDTOValid());
+        refundRuleDTO.setTimeParameter(null);
+        refundRuleDTO.setAdditionalInfo(createAdditionalInfoDTOValid());
+        return refundRuleDTO;
+    }
+
+    AccumulatedAmount createAccumulatedAmountValid(){
+        AccumulatedAmount amount = new AccumulatedAmount();
+        amount.setAccomulatedType(AccumulatedAmount.AccumulatedTypeEnum.THRESHOLD_REACHED);
+        amount.setRefundThreshold(BigDecimal.valueOf(100000));
+        return amount;
+    }
+
+    TimeParameter createTimeParameterValid(){
+        TimeParameter timeParameter = new TimeParameter();
+        timeParameter.setTimeType(TimeParameter.TimeTypeEnum.CLOSED);
+        return timeParameter;
+    }
+
+    AdditionalInfo createAdditionalInfoValid(){
+        AdditionalInfo additionalInfo = new AdditionalInfo();
+        additionalInfo.setIdentificationCode("B002");
+        return additionalInfo;
+    }
+
+
+    InitiativeRefundRule createRefundRuleValidWithAccumulatedAmount(){
+        InitiativeRefundRule refundRule = new InitiativeRefundRule();
+        refundRule.setAccumulatedAmount(createAccumulatedAmountValid());
+        refundRule.setTimeParameter(null);
+        refundRule.setAdditionalInfo(createAdditionalInfoValid());
+        return refundRule;
+    }
+    InitiativeRefundRule createRefundRuleValidWithTimeParameter(){
+        InitiativeRefundRule refundRule = new InitiativeRefundRule();
+        refundRule.setAccumulatedAmount(null);
+        refundRule.setTimeParameter(createTimeParameterValid());
+        refundRule.setAdditionalInfo(createAdditionalInfoValid());
+        return refundRule;
+    }
+
+    Initiative createInitiativeOnlyRefundRule(){
+        Initiative initiative = new Initiative();
+        initiative.setInitiativeId("A1");
+        initiative.setOrganizationId("O1");
+        initiative.setRefundRule(createRefundRuleValidWithAccumulatedAmount());
+        return initiative;
     }
 
 }
