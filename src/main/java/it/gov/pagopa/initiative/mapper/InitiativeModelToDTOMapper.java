@@ -1,11 +1,19 @@
 package it.gov.pagopa.initiative.mapper;
 
 import it.gov.pagopa.initiative.dto.*;
+import it.gov.pagopa.initiative.dto.rule.refund.AccumulatedAmountDTO;
+import it.gov.pagopa.initiative.dto.rule.refund.AdditionalInfoDTO;
+import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
+import it.gov.pagopa.initiative.dto.rule.refund.TimeParameterDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardGroupsDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardValueDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.*;
 import it.gov.pagopa.initiative.model.*;
+import it.gov.pagopa.initiative.model.rule.refund.AccumulatedAmount;
+import it.gov.pagopa.initiative.model.rule.refund.AdditionalInfo;
+import it.gov.pagopa.initiative.model.rule.refund.InitiativeRefundRule;
+import it.gov.pagopa.initiative.model.rule.refund.TimeParameter;
 import it.gov.pagopa.initiative.model.rule.reward.InitiativeRewardRule;
 import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
 import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
@@ -39,6 +47,7 @@ public class InitiativeModelToDTOMapper {
         initiativeDto.setBeneficiaryRule(this.toInitiativeBeneficiaryRuleDTO(initiative.getBeneficiaryRule()));
         initiativeDto.setRewardRule(this.toRewardRuleDTO(initiative.getRewardRule()));
         initiativeDto.setTrxRule(this.toTrxRuleDTO(initiative.getTrxRule()));
+        initiativeDto.setRefundRule(this.toInitiativeRefundRuleDTO(initiative.getRefundRule()));
         return initiativeDto;
     }
 
@@ -239,6 +248,39 @@ public class InitiativeModelToDTOMapper {
                 .to(threshold.getTo())
                 .fromIncluded(threshold.isFromIncluded())
                 .toIncluded(threshold.isToIncluded()).build();
+    }
+
+    public InitiativeRefundRuleDTO toInitiativeRefundRuleDTO(InitiativeRefundRule refundRule){
+        if (refundRule == null){
+            return null;
+        }
+        InitiativeRefundRuleDTO initiativeRefundRuleDTO = new InitiativeRefundRuleDTO();
+        initiativeRefundRuleDTO.setAccumulatedAmount(toAccomulatedAmountDTO(refundRule.getAccumulatedAmount()));
+        initiativeRefundRuleDTO.setTimeParameter(toTimeParameterDTO(refundRule.getTimeParameter()));
+        initiativeRefundRuleDTO.setAdditionalInfo(toAdditionalInfoDTO(refundRule.getAdditionalInfo()));
+        return initiativeRefundRuleDTO;
+    }
+
+    private AccumulatedAmountDTO toAccomulatedAmountDTO(AccumulatedAmount accomulatedAmount){
+        if(accomulatedAmount == null){
+            return null;
+        }
+        return AccumulatedAmountDTO.builder().accumulatedType(AccumulatedAmountDTO.AccumulatedTypeEnum.valueOf(accomulatedAmount.getAccomulatedType().name()))
+                .refundThreshold(accomulatedAmount.getRefundThreshold()).build();
+    }
+
+    private TimeParameterDTO toTimeParameterDTO(TimeParameter timeParameter){
+        if (timeParameter == null){
+            return null;
+        }
+        return TimeParameterDTO.builder().timeType(TimeParameterDTO.TimeTypeEnum.valueOf(timeParameter.getTimeType().name())).build();
+    }
+
+    private AdditionalInfoDTO toAdditionalInfoDTO(AdditionalInfo additionalInfo){
+        if (additionalInfo == null){
+            return null;
+        }
+        return AdditionalInfoDTO.builder().identificationCode(additionalInfo.getIdentificationCode()).build();
     }
 
 }
