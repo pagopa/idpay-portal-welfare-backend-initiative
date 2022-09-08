@@ -1,9 +1,17 @@
 package it.gov.pagopa.initiative.mapper;
 
 import it.gov.pagopa.initiative.dto.*;
+import it.gov.pagopa.initiative.dto.rule.refund.AccumulatedAmountDTO;
+import it.gov.pagopa.initiative.dto.rule.refund.AdditionalInfoDTO;
+import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
+import it.gov.pagopa.initiative.dto.rule.refund.TimeParameterDTO;
 import it.gov.pagopa.initiative.model.TypeBoolEnum;
 import it.gov.pagopa.initiative.model.TypeMultiEnum;
 import it.gov.pagopa.initiative.model.*;
+import it.gov.pagopa.initiative.model.rule.refund.AccumulatedAmount;
+import it.gov.pagopa.initiative.model.rule.refund.AdditionalInfo;
+import it.gov.pagopa.initiative.model.rule.refund.InitiativeRefundRule;
+import it.gov.pagopa.initiative.model.rule.refund.TimeParameter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,6 +44,18 @@ class InitiativeModelToDTOMapperTest {
     private InitiativeSummaryDTO initiativeSummaryDTO2;
     private List<InitiativeSummaryDTO> initiativeSummaryDTOList;
 
+    private InitiativeRefundRuleDTO refundRuleDTO1;
+
+    private InitiativeRefundRule refundRule1;
+
+    private InitiativeRefundRuleDTO refundRuleDTO2;
+
+    private InitiativeRefundRule refundRule2;
+
+    private InitiativeRefundRuleDTO refundRuleDTO3;
+
+    private InitiativeRefundRule refundRule3;
+
     private InitiativeLegal initiativeLegal;
 
     @BeforeEach
@@ -55,6 +75,30 @@ class InitiativeModelToDTOMapperTest {
         initiativeSummaryDTOList = new ArrayList<>();
         initiativeSummaryDTOList.addAll(Arrays.asList(initiativeSummaryDTO, initiativeSummaryDTO2));
         initiativeLegal = createInitiativeLegal();
+        refundRuleDTO1 = createRefundRuleDTOValidWithTimeParameter();
+        refundRule1 = createRefundRuleValidWithTimeParameter();
+        refundRuleDTO2 = createRefundRuleDTOValidWithAccumulatedAmount();
+        refundRule2 = createRefundRuleValidWithAccumulatedAmount();
+        refundRuleDTO3 = createRefundRuleDTOValidWithTimeParameterAndAdditionalNull();
+        refundRule3 = createRefundRuleValidWithTimeParameterAndAdditionalNull();
+    }
+
+    @Test
+    void toRefundRuleDTOValidTimeParameter_ok(){
+        InitiativeRefundRuleDTO initiativeRefundRuleDTO = initiativeModelToDTOMapper.toInitiativeRefundRuleDTO(refundRule1);
+        assertEquals(initiativeRefundRuleDTO, refundRuleDTO1);
+    }
+
+    @Test
+    void toRefundRuleDTOValidAccumulatedAmount_ok(){
+        InitiativeRefundRuleDTO initiativeRefundRuleDTO = initiativeModelToDTOMapper.toInitiativeRefundRuleDTO(refundRule2);
+        assertEquals(initiativeRefundRuleDTO, refundRuleDTO2);
+    }
+
+    @Test
+    void toRefundRuleDTOValidTimeParameterAndAdditionalNull_ok(){
+        InitiativeRefundRuleDTO initiativeRefundRuleDTO = initiativeModelToDTOMapper.toInitiativeRefundRuleDTO(refundRule3);
+        assertEquals(initiativeRefundRuleDTO, refundRuleDTO3);
     }
 
     @Test
@@ -348,6 +392,98 @@ class InitiativeModelToDTOMapperTest {
     InitiativeDTO createStep6InitiativeDTO () {
         InitiativeDTO initiativeDTO = new InitiativeDTO();
         return initiativeDTO;
+    }
+
+
+
+    AccumulatedAmountDTO createAccumulatedAmountDTOValid(){
+        AccumulatedAmountDTO amountDTO = new AccumulatedAmountDTO();
+        amountDTO.setAccumulatedType(AccumulatedAmountDTO.AccumulatedTypeEnum.THRESHOLD_REACHED);
+        amountDTO.setRefundThreshold(BigDecimal.valueOf(100000));
+        return amountDTO;
+    }
+
+    TimeParameterDTO createTimeParameterDTOValid(){
+        TimeParameterDTO timeParameterDTO = new TimeParameterDTO();
+        timeParameterDTO.setTimeType(TimeParameterDTO.TimeTypeEnum.CLOSED);
+        return timeParameterDTO;
+    }
+
+    AdditionalInfoDTO createAdditionalInfoDTOValid(){
+        AdditionalInfoDTO additionalInfoDTO = new AdditionalInfoDTO();
+        additionalInfoDTO.setIdentificationCode("B002");
+        return additionalInfoDTO;
+    }
+
+    InitiativeRefundRuleDTO createRefundRuleDTOValidWithTimeParameter(){
+        InitiativeRefundRuleDTO refundRuleDTO = new InitiativeRefundRuleDTO();
+        refundRuleDTO.setAccumulatedAmount(null);
+        refundRuleDTO.setTimeParameter(createTimeParameterDTOValid());
+        refundRuleDTO.setAdditionalInfo(createAdditionalInfoDTOValid());
+        return refundRuleDTO;
+    }
+
+    InitiativeRefundRuleDTO createRefundRuleDTOValidWithTimeParameterAndAdditionalNull(){
+        InitiativeRefundRuleDTO refundRuleDTO = new InitiativeRefundRuleDTO();
+        refundRuleDTO.setAccumulatedAmount(null);
+        refundRuleDTO.setTimeParameter(createTimeParameterDTOValid());
+        refundRuleDTO.setAdditionalInfo(null);
+        return refundRuleDTO;
+    }
+
+    InitiativeRefundRuleDTO createRefundRuleDTOValidWithAccumulatedAmount(){
+        InitiativeRefundRuleDTO refundRuleDTO = new InitiativeRefundRuleDTO();
+        refundRuleDTO.setAccumulatedAmount(createAccumulatedAmountDTOValid());
+        refundRuleDTO.setTimeParameter(null);
+        refundRuleDTO.setAdditionalInfo(createAdditionalInfoDTOValid());
+        return refundRuleDTO;
+    }
+
+
+
+    AccumulatedAmount createAccumulatedAmountValid(){
+        AccumulatedAmount amount = new AccumulatedAmount();
+        amount.setAccomulatedType(AccumulatedAmount.AccumulatedTypeEnum.THRESHOLD_REACHED);
+        amount.setRefundThreshold(BigDecimal.valueOf(100000));
+        return amount;
+    }
+
+    TimeParameter createTimeParameterValid(){
+        TimeParameter timeParameter = new TimeParameter();
+        timeParameter.setTimeType(TimeParameter.TimeTypeEnum.CLOSED);
+        return timeParameter;
+    }
+
+    AdditionalInfo createAdditionalInfoValid(){
+        AdditionalInfo additionalInfo = new AdditionalInfo();
+        additionalInfo.setIdentificationCode("B002");
+        return additionalInfo;
+    }
+
+
+
+    InitiativeRefundRule createRefundRuleValidWithTimeParameter(){
+        InitiativeRefundRule refundRule = new InitiativeRefundRule();
+        refundRule.setAccumulatedAmount(null);
+        refundRule.setTimeParameter(createTimeParameterValid());
+        refundRule.setAdditionalInfo(createAdditionalInfoValid());
+        return refundRule;
+    }
+
+    InitiativeRefundRule createRefundRuleValidWithTimeParameterAndAdditionalNull(){
+        InitiativeRefundRule refundRule = new InitiativeRefundRule();
+        refundRule.setAccumulatedAmount(null);
+        refundRule.setTimeParameter(createTimeParameterValid());
+        refundRule.setAdditionalInfo(null);
+        return refundRule;
+    }
+
+    InitiativeRefundRule createRefundRuleValidWithAccumulatedAmount(){
+        InitiativeRefundRule refundRule = new InitiativeRefundRule();
+        refundRule.setAccumulatedAmount(createAccumulatedAmountValid());
+        refundRule.setTimeParameter(null);
+        refundRule.setAdditionalInfo(createAdditionalInfoValid());
+        return refundRule;
     }
 
 
