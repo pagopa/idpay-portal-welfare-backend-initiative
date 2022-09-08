@@ -116,6 +116,7 @@ public class InitiativeServiceImpl implements InitiativeService {
                         HttpStatus.NOT_FOUND));
         initiative.setRefundRule(refundRule.getRefundRule());
         initiative.setUpdateDate(LocalDateTime.now());
+        initiative.setStatus("TO_CHECK");
         this.initiativeRepository.save(initiative);
     }
 
