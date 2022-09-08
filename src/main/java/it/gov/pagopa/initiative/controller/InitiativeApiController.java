@@ -96,6 +96,7 @@ public class InitiativeApiController implements InitiativeApi {
         return ResponseEntity.noContent().build();
     }
 
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @Override
     public ResponseEntity<Void> updateTrxAndRewardRules(String organizationId, String initiativeId, @RequestBody @Validated(ValidationOnGroup.class) InitiativeRewardAndTrxRulesDTO rewardAndTrxRulesDTO) {
         Initiative initiative = this.initiativeDTOsToModelMapper.toInitiative(rewardAndTrxRulesDTO);
@@ -103,6 +104,7 @@ public class InitiativeApiController implements InitiativeApi {
         return ResponseEntity.noContent().build();
     }
 
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @Override
     public ResponseEntity<Void> updateInitiativeRefundRule(String organizationId, String initiativeId, @RequestBody @Validated(ValidationOnGroup.class) InitiativeRefundRuleDTO initiativeRefundRuleDTO){
         Initiative initiative = this.initiativeDTOsToModelMapper.toInitiative(initiativeRefundRuleDTO);
@@ -110,6 +112,7 @@ public class InitiativeApiController implements InitiativeApi {
         return ResponseEntity.noContent().build();
     }
 
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @Override
     public ResponseEntity<Void> updateInitiativeRefundRuleDraft(String organizationId, String initiativeId, @RequestBody InitiativeRefundRuleDTO initiativeRefundRuleDTO){
         Initiative initiative = this.initiativeDTOsToModelMapper.toInitiative(initiativeRefundRuleDTO);
