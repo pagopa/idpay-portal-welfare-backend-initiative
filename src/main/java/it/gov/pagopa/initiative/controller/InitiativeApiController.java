@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -81,7 +80,7 @@ public class InitiativeApiController implements InitiativeApi {
         if(Boolean.TRUE.equals(this.initiativeService.getInitiative(organizationId, initiativeId).getGeneral().getBeneficiaryKnown())){
             throw new InitiativeException(
                     InitiativeConstants.Exception.BadRequest.CODE,
-                    MessageFormat.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_PROPERTIES_NOT_VALID, initiativeId),
+                    String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_PROPERTIES_NOT_VALID, initiativeId),
                     HttpStatus.BAD_REQUEST);
         }
         this.initiativeService.updateInitiativeBeneficiary(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toBeneficiaryRule(beneficiaryRuleDto));

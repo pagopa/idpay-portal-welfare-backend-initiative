@@ -13,8 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.text.MessageFormat;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -34,7 +34,7 @@ public class InitiativeServiceImpl implements InitiativeService {
         if(initiatives.isEmpty()){
             throw new InitiativeException(
                     InitiativeConstants.Exception.NotFound.CODE,
-                    MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_LIST_BY_ORGANIZATION_MESSAGE, organizationId),
+                    String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_LIST_BY_ORGANIZATION_MESSAGE, organizationId),
                     HttpStatus.NOT_FOUND);
         }
         return initiatives;
@@ -53,7 +53,7 @@ public class InitiativeServiceImpl implements InitiativeService {
         return initiativeRepository.findByOrganizationIdAndInitiativeId(organizationId, initiativeId)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
-                        MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_LIST_BY_ORGANIZATION_MESSAGE, organizationId),
+                        String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
                         HttpStatus.NOT_FOUND));
     }
 
@@ -62,7 +62,7 @@ public class InitiativeServiceImpl implements InitiativeService {
         return initiativeRepository.retrieveInitiativeBeneficiaryView(initiativeId)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
-                        MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
+                        String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
                         HttpStatus.NOT_FOUND));
     }
 
@@ -71,8 +71,10 @@ public class InitiativeServiceImpl implements InitiativeService {
         Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeId(organizationId, initiativeId)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
-                        MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_ORGANIZATION_ID_MESSAGE, organizationId, initiativeId),
+                        String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
                         HttpStatus.NOT_FOUND));
+        //Check Initiative Status
+        isInitiativeAllowedThenThrows(initiative);
         initiative.setInitiativeName(initiativeInfoModel.getInitiativeName());
         initiative.setGeneral(initiativeInfoModel.getGeneral());
         initiative.setAdditionalInfo(initiativeInfoModel.getAdditionalInfo());
@@ -85,8 +87,10 @@ public class InitiativeServiceImpl implements InitiativeService {
         Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeId(organizationId, initiativeId)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
-                        MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_ORGANIZATION_ID_MESSAGE, organizationId, initiativeId),
+                        String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
                         HttpStatus.NOT_FOUND));
+        //Check Initiative Status
+        isInitiativeAllowedThenThrows(initiative);
         initiative.setBeneficiaryRule(initiativeBeneficiaryRuleModel);
         initiative.setUpdateDate(LocalDateTime.now());
         this.initiativeRepository.save(initiative);
@@ -97,14 +101,14 @@ public class InitiativeServiceImpl implements InitiativeService {
         Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeId(organizationId, initiativeId)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
-                        MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_ORGANIZATION_ID_MESSAGE, organizationId, initiativeId),
+                        String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
                         HttpStatus.NOT_FOUND));
+        //Check Initiative Status
+        isInitiativeAllowedThenThrows(initiative);
         initiative.setRewardRule(rewardAndTrxRules.getRewardRule());
         initiative.setTrxRule(rewardAndTrxRules.getTrxRule());
         initiative.setUpdateDate(LocalDateTime.now());
         this.initiativeRepository.save(initiative);
-        //FIXME Test d'integrazione con RuleEngine. Invio Iniziativa da spostare all'ultimo step del Wizard come pubblicazione
-//        sendInitiativeInfoToRuleEngine(initiativeModelToDTOMapper.toInitiativeDTO(initiative));
     }
 
     @Override
@@ -112,12 +116,16 @@ public class InitiativeServiceImpl implements InitiativeService {
         Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeId(organizationId, initiativeId)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
-                        MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_ORGANIZATION_ID_MESSAGE, organizationId, initiativeId),
+                        String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
                         HttpStatus.NOT_FOUND));
+        //Check Initiative Status
+        isInitiativeAllowedThenThrows(initiative);
         initiative.setRefundRule(refundRule.getRefundRule());
         initiative.setUpdateDate(LocalDateTime.now());
-        initiative.setStatus("TO_CHECK");
+        initiative.setStatus(InitiativeConstants.Status.TO_CHECK);
         this.initiativeRepository.save(initiative);
+        //FIXME Test d'integrazione con RuleEngine. Invio Iniziativa da spostare all'ultimo step del Wizard come pubblicazione
+//        sendInitiativeInfoToRuleEngine(initiativeModelToDTOMapper.toInitiativeDTO(initiative));
     }
 
     @Override
@@ -125,5 +133,14 @@ public class InitiativeServiceImpl implements InitiativeService {
         initiativeProducer.sendPublishInitiative(initiativeDTO);
     }
 
+    private void isInitiativeAllowedThenThrows(Initiative initiative){
+        if(Arrays.asList(InitiativeConstants.Status.Validation.ALLOWED_STATES_OF_EDITABLE_INITIATIVES_ARRAY).contains(initiative.getStatus())){
+            return;
+        }
+        throw new InitiativeException(
+                InitiativeConstants.Exception.BadRequest.CODE,
+                String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_STATUS_NOT_VALID, initiative.getInitiativeId()),
+                HttpStatus.BAD_REQUEST);
+    }
 
 }

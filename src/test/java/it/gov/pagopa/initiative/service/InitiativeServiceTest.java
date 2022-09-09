@@ -28,7 +28,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 
 import java.math.BigDecimal;
-import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
@@ -43,6 +42,10 @@ import static org.mockito.Mockito.*;
 @Slf4j
 class InitiativeServiceTest {
 
+    public static final String INITIATIVE_NAME = "initiativeName1";
+    public static final String ORGANIZATION_ID = "organizationId1";
+    public static final String INITIATIVE_ID = "Id1";
+
     @Autowired
     InitiativeService initiativeService;
 
@@ -55,7 +58,6 @@ class InitiativeServiceTest {
     @MockBean
     InitiativeModelToDTOMapper initiativeModelToDTOMapper;
 
-//    List<Initiative> retrieveInitiativeSummary(String organizationId);
     @Test
     void retrieveInitiativeSummary_ok() throws Exception {
         Initiative step2Initiative1 = createStep2Initiative();
@@ -170,7 +172,7 @@ class InitiativeServiceTest {
         when(initiativeRepository.findByOrganizationIdAndInitiativeId(anyString(), anyString())).thenReturn(Optional.ofNullable(step2Initiative));
 
         //Try to call the Real Service (which is using the instructed Repo)
-        initiativeService.updateInitiativeGeneralInfo("Ente1", "Id1", step2Initiative);
+        initiativeService.updateInitiativeGeneralInfo("Ente1", INITIATIVE_ID, step2Initiative);
 
         // you are expecting repo to be called once with correct param
         verify(initiativeRepository, times(1)).findByOrganizationIdAndInitiativeId(anyString(), anyString());
@@ -181,7 +183,7 @@ class InitiativeServiceTest {
         Initiative fullInitiative = createStep2Initiative();
         //Try to call the Real Service (which is using the instructed Repo)
         try {
-            initiativeService.updateInitiativeGeneralInfo("Ente1", "Id1", fullInitiative);
+            initiativeService.updateInitiativeGeneralInfo("Ente1", INITIATIVE_ID, fullInitiative);
         } catch (InitiativeException e) {
             log.info("InitiativeException: " + e.getCode());
             assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
@@ -198,7 +200,7 @@ class InitiativeServiceTest {
         when(initiativeRepository.findByOrganizationIdAndInitiativeId(anyString(), anyString())).thenReturn(Optional.ofNullable(step2Initiative));
 
         //Try to call the Real Service (which is using the instructed Repo)
-        initiativeService.updateInitiativeBeneficiary("Ente1", "Id1", initiativeBeneficiaryRule);
+        initiativeService.updateInitiativeBeneficiary("Ente1", INITIATIVE_ID, initiativeBeneficiaryRule);
 
         // you are expecting repo to be called once with correct param
         verify(initiativeRepository, times(1)).findByOrganizationIdAndInitiativeId(anyString(), anyString());
@@ -212,18 +214,18 @@ class InitiativeServiceTest {
         when(initiativeRepository.findByOrganizationIdAndInitiativeId(anyString(), anyString())).thenThrow(
                 new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
-                        MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_ORGANIZATION_ID_MESSAGE, "Ente1", "Id1"),
+                        String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID),
                         HttpStatus.NOT_FOUND)
         );
 
         //Try to call the Real Service (which is using the instructed Repo)
         try {
-            initiativeService.updateInitiativeBeneficiary("Ente1", "Id1", initiativeBeneficiaryRule);
+            initiativeService.updateInitiativeBeneficiary("Ente1", INITIATIVE_ID, initiativeBeneficiaryRule);
         } catch (InitiativeException e) {
             log.info("InitiativeException: " + e.getCode());
             assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
             assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
-            assertEquals(MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_ORGANIZATION_ID_MESSAGE, "Ente1", "Id1"), e.getMessage());
+            assertEquals(String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID), e.getMessage());
         }
     }
 
@@ -239,7 +241,7 @@ class InitiativeServiceTest {
         when(initiativeRepository.findByOrganizationIdAndInitiativeId(anyString(), anyString())).thenReturn(Optional.ofNullable(step3Initiative));
 
         //Try to call the Real Service (which is using the instructed Repo)
-        initiativeService.updateTrxAndRewardRules("Ente1", "Id1", initiative);
+        initiativeService.updateTrxAndRewardRules("Ente1", INITIATIVE_ID, initiative);
 
         // you are expecting repo to be called once with correct param
         verify(initiativeRepository, times(1)).findByOrganizationIdAndInitiativeId(anyString(), anyString());
@@ -255,18 +257,18 @@ class InitiativeServiceTest {
         when(initiativeRepository.findByOrganizationIdAndInitiativeId(anyString(), anyString())).thenThrow(
                 new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
-                        MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_ORGANIZATION_ID_MESSAGE, "Ente1", "Id1"),
+                        String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID),
                         HttpStatus.NOT_FOUND)
         );
 
         //Try to call the Real Service (which is using the instructed Repo)
         try {
-            initiativeService.updateTrxAndRewardRules("Ente1", "Id1", initiative);
+            initiativeService.updateTrxAndRewardRules("Ente1", INITIATIVE_ID, initiative);
         } catch (InitiativeException e) {
             log.info("InitiativeException: " + e.getCode());
             assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
             assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
-            assertEquals(MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_ORGANIZATION_ID_MESSAGE, "Ente1", "Id1"), e.getMessage());
+            assertEquals(String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID), e.getMessage());
         }
     }
 
@@ -274,7 +276,7 @@ class InitiativeServiceTest {
     void updateRefunRules_ok(){
         Initiative initiative = createInitiativeOnlyRefundRule();
         when(initiativeRepository.findByOrganizationIdAndInitiativeId(anyString(), anyString())).thenReturn(Optional.ofNullable(initiative));
-        initiativeService.updateInitiativeRefundRules("O1", "A1", initiative);
+        initiativeService.updateInitiativeRefundRules(ORGANIZATION_ID, INITIATIVE_ID, initiative);
         verify(initiativeRepository, times(1)).findByOrganizationIdAndInitiativeId(anyString(), anyString());
     }
 
@@ -284,17 +286,17 @@ class InitiativeServiceTest {
         when(initiativeRepository.findByOrganizationIdAndInitiativeId(anyString(), anyString())).thenThrow(
                 new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
-                        MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_ORGANIZATION_ID_MESSAGE, "O1", "A1"),
+                        String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID),
                         HttpStatus.NOT_FOUND)
         );
 
         try{
-            initiativeService.updateInitiativeRefundRules("O1", "A1", initiative);
+            initiativeService.updateInitiativeRefundRules(ORGANIZATION_ID, INITIATIVE_ID, initiative);
         }catch (InitiativeException e){
             log.info("InitiativeException: " + e.getCode());
             assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
             assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
-            assertEquals(MessageFormat.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_ORGANIZATION_ID_MESSAGE, "O1", "A1"), e.getMessage());
+            assertEquals(String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID), e.getMessage());
         }
     }
 
@@ -316,9 +318,9 @@ class InitiativeServiceTest {
 
     Initiative createStep1Initiative () {
         Initiative initiative = new Initiative();
-        initiative.setInitiativeId("Id1");
-        initiative.setInitiativeName("initiativeName1");
-        initiative.setOrganizationId("organizationId1");
+        initiative.setInitiativeId(INITIATIVE_ID);
+        initiative.setInitiativeName(INITIATIVE_NAME);
+        initiative.setOrganizationId(ORGANIZATION_ID);
         initiative.setStatus("DRAFT");
         initiative.setAutocertificationCheck(true);
         initiative.setBeneficiaryRanking(true);
@@ -362,9 +364,9 @@ class InitiativeServiceTest {
     InitiativeDTO createStep1InitiativeDTO () {
         InitiativeDTO initiativeDTO = new InitiativeDTO();
         initiativeDTO = initiativeDTO.builder()
-                .initiativeId("Id1")
-                .initiativeName("initiativeName1")
-                .organizationId("organizationId1")
+                .initiativeId(INITIATIVE_ID)
+                .initiativeName(INITIATIVE_NAME)
+                .organizationId(ORGANIZATION_ID)
                 .status("DRAFT")
                 .autocertificationCheck(true)
                 .beneficiaryRanking(true)
@@ -662,17 +664,17 @@ class InitiativeServiceTest {
     }
 
     Initiative createStep4Initiative () {
-        Initiative initiative = new Initiative();
+        Initiative initiative = createStep3Initiative();
         return initiative;
     }
 
     InitiativeDTO createStep4InitiativeDTO () {
-        InitiativeDTO initiativeDTO = new InitiativeDTO();
+        InitiativeDTO initiativeDTO = createStep3InitiativeDTO();
         return initiativeDTO;
     }
 
     Initiative createStep5Initiative () {
-        Initiative initiative = new Initiative();
+        Initiative initiative = createStep4Initiative();
         return initiative;
     }
 
@@ -725,7 +727,7 @@ class InitiativeServiceTest {
     }
 
     Initiative createInitiativeOnlyRefundRule(){
-        Initiative initiative = new Initiative();
+        Initiative initiative = createStep1Initiative();
         initiative.setRefundRule(createRefundRuleValidWithAccumulatedAmount());
         return initiative;
     }
