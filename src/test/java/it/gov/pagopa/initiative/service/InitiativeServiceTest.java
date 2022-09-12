@@ -33,6 +33,7 @@ import java.time.LocalTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -276,7 +277,7 @@ class InitiativeServiceTest {
     void updateRefunRules_ok(){
         Initiative initiative = createInitiativeOnlyRefundRule();
         when(initiativeRepository.findByOrganizationIdAndInitiativeId(anyString(), anyString())).thenReturn(Optional.ofNullable(initiative));
-        initiativeService.updateInitiativeRefundRules(ORGANIZATION_ID, INITIATIVE_ID, initiative);
+        initiativeService.updateInitiativeRefundRules(ORGANIZATION_ID, INITIATIVE_ID, initiative, false);
         verify(initiativeRepository, times(1)).findByOrganizationIdAndInitiativeId(anyString(), anyString());
     }
 
@@ -291,13 +292,27 @@ class InitiativeServiceTest {
         );
 
         try{
-            initiativeService.updateInitiativeRefundRules(ORGANIZATION_ID, INITIATIVE_ID, initiative);
+            initiativeService.updateInitiativeRefundRules(ORGANIZATION_ID, INITIATIVE_ID, initiative, false);
         }catch (InitiativeException e){
             log.info("InitiativeException: " + e.getCode());
             assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
             assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
             assertEquals(String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID), e.getMessage());
         }
+    }
+
+    @Test
+    void updateRefundRule_whenInitiativeUnprocessableForStatusNotValid_then400isRaisedForInitiativeException(){
+        Initiative initiative = Initiative.builder().initiativeId(INITIATIVE_ID).status(InitiativeConstants.Status.APPROVED).build();
+        Initiative initiativeNotProcessable = Initiative.builder().initiativeId(INITIATIVE_ID).status(InitiativeConstants.Status.APPROVED).build();
+
+        when(initiativeRepository.findByOrganizationIdAndInitiativeId(anyString(), anyString())).thenReturn(Optional.ofNullable(initiativeNotProcessable));
+
+        InitiativeException exception = assertThrows(InitiativeException.class, () -> initiativeService.updateInitiativeRefundRules(ORGANIZATION_ID, INITIATIVE_ID, initiative, true));
+
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getHttpStatus());
+        assertEquals(InitiativeConstants.Exception.BadRequest.CODE, exception.getCode());
+        assertEquals(String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_STATUS_NOT_VALID, INITIATIVE_ID), exception.getMessage());
     }
 
     Initiative createFullInitiative () {
@@ -662,6 +677,7 @@ class InitiativeServiceTest {
 
         return initiativeTrxConditionsDTO;
     }
+
 
     Initiative createStep4Initiative () {
         Initiative initiative = createStep3Initiative();

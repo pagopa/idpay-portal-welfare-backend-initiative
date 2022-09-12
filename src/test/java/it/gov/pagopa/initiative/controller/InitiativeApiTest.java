@@ -107,7 +107,7 @@ class InitiativeApiTest {
         assertThat("Reason of result", retrieveInitiativeSummary, is(sameInstance(initiatives)));
 
         mvc.perform(
-            MockMvcRequestBuilders.get(BASE_URL + String.format(GET_INITIATIVES_SUMMARY_URL, "Ente1"))
+            MockMvcRequestBuilders.get(BASE_URL + String.format(GET_INITIATIVES_SUMMARY_URL, ORGANIZATION_ID))
                 .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(print())
@@ -133,7 +133,7 @@ class InitiativeApiTest {
 
         //The MVC perform should perform the API by returning the response based on the Service previously mocked.
         mvc.perform(
-                MockMvcRequestBuilders.get(BASE_URL + String.format(GET_INITIATIVE_ACTIVE_URL, "Ente1", INITIATIVE_ID))
+                MockMvcRequestBuilders.get(BASE_URL + String.format(GET_INITIATIVE_ACTIVE_URL, ORGANIZATION_ID, INITIATIVE_ID))
                         .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(print())
@@ -162,7 +162,7 @@ class InitiativeApiTest {
 //        body.put("general", initiativeGeneralDTO);
 //        body.put("additionalInfo", initiativeAdditionalDTO);
 
-        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post(BASE_URL + String.format(POST_INITIATIVE_GENERAL_INFO_URL, "Ente1"))
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post(BASE_URL + String.format(POST_INITIATIVE_GENERAL_INFO_URL, ORGANIZATION_ID))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
 //                .content(objectMapper.writeValueAsString(body))
                 .content(objectMapper.writeValueAsString(initiativeInfoDTO))
@@ -186,10 +186,9 @@ class InitiativeApiTest {
         when(initiativeDTOsToModelMapper.toInitiative(initiativeInfoDTO)).thenReturn(step1Initiative);
 
         //doNothing only for Void method
-        Initiative toInitiativeInfoModel = initiativeDTOsToModelMapper.toInitiative(initiativeInfoDTO);
-        doNothing().when(initiativeService).updateInitiativeGeneralInfo("Ente1", INITIATIVE_ID, toInitiativeInfoModel);
+        doNothing().when(initiativeService).updateInitiativeGeneralInfo(ORGANIZATION_ID, INITIATIVE_ID, step1Initiative);
 
-        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_GENERAL_INFO_URL, "Ente1", INITIATIVE_ID))
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_GENERAL_INFO_URL, ORGANIZATION_ID, INITIATIVE_ID))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(initiativeInfoDTO))
                 .accept(MediaType.APPLICATION_JSON))
@@ -213,13 +212,12 @@ class InitiativeApiTest {
         when(initiativeDTOsToModelMapper.toBeneficiaryRule(initiativeBeneficiaryRuleDTO)).thenReturn(initiativeBeneficiaryRule);
 
         // Instruct the Service to get a Dummy Initiative
-        when(initiativeService.getInitiative("Ente1", INITIATIVE_ID)).thenReturn(step2Initiative);
+        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID)).thenReturn(step2Initiative);
 
         //doNothing only for Void method
-        InitiativeBeneficiaryRule initiativeBeneficiaryRule2 = initiativeDTOsToModelMapper.toBeneficiaryRule(initiativeBeneficiaryRuleDTO);
-        doNothing().when(initiativeService).updateInitiativeBeneficiary("Ente1", INITIATIVE_ID, initiativeBeneficiaryRule2);
+        doNothing().when(initiativeService).updateInitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule);
 
-        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_BENEFICIARY_RULES_URL, "Ente1", INITIATIVE_ID))
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_BENEFICIARY_RULES_URL, ORGANIZATION_ID, INITIATIVE_ID))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(initiativeBeneficiaryRuleDTO))
                 .accept(MediaType.APPLICATION_JSON))
@@ -243,13 +241,12 @@ class InitiativeApiTest {
         when(initiativeDTOsToModelMapper.toBeneficiaryRule(initiativeBeneficiaryRuleDTO)).thenReturn(initiativeBeneficiaryRule);
 
         // Instruct the Service to get a Dummy Initiative
-        when(initiativeService.getInitiative("Ente1", INITIATIVE_ID)).thenReturn(step2Initiative);
+        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID)).thenReturn(step2Initiative);
 
         //doNothing only for Void method
-        InitiativeBeneficiaryRule initiativeBeneficiaryRule2 = initiativeDTOsToModelMapper.toBeneficiaryRule(initiativeBeneficiaryRuleDTO);
-        doNothing().when(initiativeService).updateInitiativeBeneficiary("Ente1", INITIATIVE_ID, initiativeBeneficiaryRule2);
+        doNothing().when(initiativeService).updateInitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule);
 
-        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_BENEFICIARY_RULES_URL, "Ente1", INITIATIVE_ID))
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_BENEFICIARY_RULES_URL, ORGANIZATION_ID, INITIATIVE_ID))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(initiativeBeneficiaryRuleDTO))
                 .accept(MediaType.APPLICATION_JSON))
@@ -268,9 +265,7 @@ class InitiativeApiTest {
 
         when(initiativeDTOsToModelMapper.toInitiative(refundRuleDTO)).thenReturn(initiative);
 
-        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID)).thenReturn(initiative);
-
-        doNothing().when(initiativeService).updateInitiativeRefundRules(ORGANIZATION_ID, INITIATIVE_ID, initiative);
+        doNothing().when(initiativeService).updateInitiativeRefundRules(ORGANIZATION_ID, INITIATIVE_ID, initiative, true);
 
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_REFUND_RULES_INFO_URL, ORGANIZATION_ID, INITIATIVE_ID))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -297,7 +292,7 @@ class InitiativeApiTest {
                 CODE,
                 String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_STATUS_NOT_VALID, initiative.getInitiativeId()),
                 HttpStatus.BAD_REQUEST))
-                .when(initiativeService).updateInitiativeRefundRules(ORGANIZATION_ID, INITIATIVE_ID, initiative);
+                .when(initiativeService).updateInitiativeRefundRules(ORGANIZATION_ID, INITIATIVE_ID, initiative, true);
 
         mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_REFUND_RULES_INFO_URL, ORGANIZATION_ID, INITIATIVE_ID))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -318,9 +313,7 @@ class InitiativeApiTest {
 
         when(initiativeDTOsToModelMapper.toInitiative(refundRuleDTO)).thenReturn(initiative);
 
-        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID)).thenReturn(initiative);
-
-        doNothing().when(initiativeService).updateInitiativeRefundRules(ORGANIZATION_ID, INITIATIVE_ID, initiative);
+        doNothing().when(initiativeService).updateInitiativeRefundRules(ORGANIZATION_ID, INITIATIVE_ID, initiative, false);
 
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_REFUND_RULES_INFO_URL + "/draft", ORGANIZATION_ID, INITIATIVE_ID))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -347,9 +340,9 @@ class InitiativeApiTest {
 
         //doNothing only for Void method
         InitiativeBeneficiaryRule initiativeBeneficiaryRule2 = initiativeDTOsToModelMapper.toBeneficiaryRule(initiativeBeneficiaryRuleDTO);
-        doNothing().when(initiativeService).updateInitiativeBeneficiary("Ente1", INITIATIVE_ID, initiativeBeneficiaryRule2);
+        doNothing().when(initiativeService).updateInitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule2);
 
-        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_BENEFICIARY_RULES_URL + "/draft", "Ente1", INITIATIVE_ID))
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_BENEFICIARY_RULES_URL + "/draft", ORGANIZATION_ID, INITIATIVE_ID))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(initiativeBeneficiaryRuleDTO))
                         .accept(MediaType.APPLICATION_JSON))
@@ -435,7 +428,7 @@ class InitiativeApiTest {
         Initiative initiative = new Initiative();
         initiative.setInitiativeId(INITIATIVE_ID);
         initiative.setInitiativeName("initiativeName1");
-        initiative.setOrganizationId("organizationId1");
+        initiative.setOrganizationId(ORGANIZATION_ID);
         initiative.setStatus("DRAFT");
         initiative.setAutocertificationCheck(true);
         initiative.setBeneficiaryRanking(true);
@@ -523,7 +516,7 @@ class InitiativeApiTest {
         initiativeDTO = initiativeDTO.builder()
                 .initiativeId(INITIATIVE_ID)
                 .initiativeName("initiativeName1")
-                .organizationId("organizationId1")
+                .organizationId(ORGANIZATION_ID)
                 .status("DRAFT")
                 .autocertificationCheck(true)
                 .beneficiaryRanking(true)

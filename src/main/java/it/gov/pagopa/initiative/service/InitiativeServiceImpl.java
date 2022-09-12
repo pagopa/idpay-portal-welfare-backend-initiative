@@ -112,7 +112,7 @@ public class InitiativeServiceImpl implements InitiativeService {
     }
 
     @Override
-    public void updateInitiativeRefundRules(String organizationId, String initiativeId, Initiative refundRule){
+    public void updateInitiativeRefundRules(String organizationId, String initiativeId, Initiative refundRule, boolean changeInitiativeStatus){
         Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeId(organizationId, initiativeId)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
@@ -122,7 +122,9 @@ public class InitiativeServiceImpl implements InitiativeService {
         isInitiativeAllowedThenThrows(initiative);
         initiative.setRefundRule(refundRule.getRefundRule());
         initiative.setUpdateDate(LocalDateTime.now());
-        initiative.setStatus(InitiativeConstants.Status.TO_CHECK);
+        if (changeInitiativeStatus) {
+            initiative.setStatus(InitiativeConstants.Status.TO_CHECK);
+        }
         this.initiativeRepository.save(initiative);
         //FIXME Test d'integrazione con RuleEngine. Invio Iniziativa da spostare all'ultimo step del Wizard come pubblicazione
 //        sendInitiativeInfoToRuleEngine(initiativeModelToDTOMapper.toInitiativeDTO(initiative));
