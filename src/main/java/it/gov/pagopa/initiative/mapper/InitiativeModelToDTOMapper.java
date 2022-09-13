@@ -2,7 +2,7 @@ package it.gov.pagopa.initiative.mapper;
 
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.rule.refund.AccumulatedAmountDTO;
-import it.gov.pagopa.initiative.dto.rule.refund.AdditionalInfoDTO;
+import it.gov.pagopa.initiative.dto.rule.refund.RefundAdditionalInfoDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.TimeParameterDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
@@ -80,10 +80,13 @@ public class InitiativeModelToDTOMapper {
             return null;
         }
         return InitiativeAdditionalDTO.builder()
+                .serviceIO(true)
                 .serviceId(additional.getServiceId())
-                .argument(additional.getArgument())
                 .description(additional.getDescription())
                 .serviceName(additional.getServiceName())
+                .serviceScope(InitiativeAdditionalDTO.ServiceScope.valueOf(additional.getServiceScope().name()))
+                .privacyLink(additional.getPrivacyLink())
+                .tcLink(additional.getTcLink())
                 .channels(toChannelsDTO(additional.getChannels()))
                 .build();
     }
@@ -276,11 +279,11 @@ public class InitiativeModelToDTOMapper {
         return TimeParameterDTO.builder().timeType(TimeParameterDTO.TimeTypeEnum.valueOf(timeParameter.getTimeType().name())).build();
     }
 
-    private AdditionalInfoDTO toAdditionalInfoDTO(AdditionalInfo additionalInfo){
+    private RefundAdditionalInfoDTO toAdditionalInfoDTO(AdditionalInfo additionalInfo){
         if (additionalInfo == null){
             return null;
         }
-        return AdditionalInfoDTO.builder().identificationCode(additionalInfo.getIdentificationCode()).build();
+        return RefundAdditionalInfoDTO.builder().identificationCode(additionalInfo.getIdentificationCode()).build();
     }
 
 }

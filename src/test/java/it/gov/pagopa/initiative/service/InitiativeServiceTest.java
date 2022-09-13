@@ -364,9 +364,13 @@ class InitiativeServiceTest {
 
     private InitiativeAdditional createInitiativeAdditional() {
         InitiativeAdditional initiativeAdditional = new InitiativeAdditional();
+        initiativeAdditional.setServiceIO(true);
+        initiativeAdditional.setServiceId("serviceId");
         initiativeAdditional.setServiceName("serviceName");
-        initiativeAdditional.setArgument("Argument");
+        initiativeAdditional.setServiceScope(InitiativeAdditional.ServiceScope.LOCAL);
         initiativeAdditional.setDescription("Description");
+        initiativeAdditional.setPrivacyLink("privacyLink");
+        initiativeAdditional.setTcLink("tcLink");
         Channel channel = new Channel();
         channel.setType(Channel.TypeEnum.EMAIL);
         channel.setContact("contact");
@@ -391,12 +395,6 @@ class InitiativeServiceTest {
         return initiativeDTO;
     }
 
-    InitiativeInfoDTO createStep1InitiativeInfoDTO() {
-        InitiativeInfoDTO initiativeInfoDTO = new InitiativeInfoDTO();
-        initiativeInfoDTO = initiativeInfoDTO.builder().general(createInitiativeGeneralDTO()).additionalInfo(createInitiativeAdditionalDTO()).build();
-        return initiativeInfoDTO;
-    }
-
     private InitiativeGeneralDTO createInitiativeGeneralDTO() {
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
@@ -416,9 +414,12 @@ class InitiativeServiceTest {
 
     private InitiativeAdditionalDTO createInitiativeAdditionalDTO() {
         InitiativeAdditionalDTO initiativeAdditionalDTO = new InitiativeAdditionalDTO();
+        initiativeAdditionalDTO.setServiceIO(true);
         initiativeAdditionalDTO.setServiceName("serviceName");
-        initiativeAdditionalDTO.setArgument("Argument");
+        initiativeAdditionalDTO.setServiceScope(InitiativeAdditionalDTO.ServiceScope.LOCAL);
         initiativeAdditionalDTO.setDescription("Description");
+        initiativeAdditionalDTO.setPrivacyLink("privacyLink");
+        initiativeAdditionalDTO.setTcLink("tcLink");
         ChannelDTO channelDTO = new ChannelDTO();
         channelDTO.setType(ChannelDTO.TypeEnum.EMAIL);
         channelDTO.setContact("contact");

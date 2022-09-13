@@ -50,8 +50,8 @@ public class InitiativeApiController implements InitiativeApi {
 
     @ResponseStatus(HttpStatus.CREATED)
     @Override
-    public ResponseEntity<InitiativeDTO> saveInitiativeGeneralInfo(String organizationId, @RequestBody @Validated(ValidationOnGroup.class) InitiativeInfoDTO initiativeInfoDTO) {
-        Initiative initiativeToSave = this.initiativeDTOsToModelMapper.toInitiative(initiativeInfoDTO);
+    public ResponseEntity<InitiativeDTO> saveInitiativeServiceInfo(String organizationId, @RequestBody @Validated(ValidationOnGroup.class) InitiativeAdditionalDTO initiativeAdditionalDTO) {
+        Initiative initiativeToSave = this.initiativeDTOsToModelMapper.toInitiative(initiativeAdditionalDTO);
         initiativeToSave.setOrganizationId(organizationId);
         initiativeToSave.setCreationDate(LocalDateTime.now());
         initiativeToSave.setUpdateDate(LocalDateTime.now());
@@ -62,17 +62,32 @@ public class InitiativeApiController implements InitiativeApi {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Override
-    public ResponseEntity<Void> updateInitiativeGeneralInfo(String organizationId, String initiativeId, @RequestBody @Validated(ValidationOnGroup.class) InitiativeInfoDTO initiativeInfoDto) {
-        this.initiativeService.updateInitiativeGeneralInfo(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toInitiative(initiativeInfoDto));
+    public ResponseEntity<Void> updateInitiativeGeneralInfo(String organizationId, String initiativeId, @RequestBody @Validated(ValidationOnGroup.class) InitiativeGeneralDTO initiativeGeneralDTO) {
+        this.initiativeService.updateInitiativeGeneralInfo(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toInitiative(initiativeGeneralDTO));
         return ResponseEntity.noContent().build();
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Override
-    public ResponseEntity<Void> updateInitiativeBeneficiaryDraft(String organizationId, String initiativeId, InitiativeBeneficiaryRuleDTO beneficiaryRuleDto) {
-        this.initiativeService.updateInitiativeBeneficiary(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toBeneficiaryRule(beneficiaryRuleDto));
+    public ResponseEntity<Void> updateInitiativeAdditionalInfo(String organizationId, String initiativeId, @RequestBody @Validated(ValidationOnGroup.class) InitiativeAdditionalDTO initiativeAdditionalDTO) {
+        this.initiativeService.updateInitiativeAdditionalInfo(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toInitiative(initiativeAdditionalDTO));
         return ResponseEntity.noContent().build();
     }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Override
+    public ResponseEntity<Void> updateInitiativeAdditionalInfoDraft(String organizationId, String initiativeId, @RequestBody InitiativeAdditionalDTO initiativeAdditionalDTO) {
+        this.initiativeService.updateInitiativeAdditionalInfo(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toInitiative(initiativeAdditionalDTO));
+        return ResponseEntity.noContent().build();
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Override
+    public ResponseEntity<Void> updateInitiativeGeneralInfoDraft(String organizationId, String initiativeId, @RequestBody InitiativeGeneralDTO initiativeGeneralDTO) {
+        this.initiativeService.updateInitiativeGeneralInfo(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toInitiative(initiativeGeneralDTO));
+        return ResponseEntity.noContent().build();
+    }
+
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Override
@@ -89,7 +104,15 @@ public class InitiativeApiController implements InitiativeApi {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Override
-    public ResponseEntity<Void> updateTrxAndRewardRulesDraft(String organizationId, String initiativeId, InitiativeRewardAndTrxRulesDTO rewardAndTrxRulesDTO){
+    public ResponseEntity<Void> updateInitiativeBeneficiaryDraft(String organizationId, String initiativeId, InitiativeBeneficiaryRuleDTO beneficiaryRuleDto) {
+        this.initiativeService.updateInitiativeBeneficiary(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toBeneficiaryRule(beneficiaryRuleDto));
+        return ResponseEntity.noContent().build();
+    }
+
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Override
+    public ResponseEntity<Void> updateTrxAndRewardRules(String organizationId, String initiativeId, @RequestBody @Validated(ValidationOnGroup.class) InitiativeRewardAndTrxRulesDTO rewardAndTrxRulesDTO) {
         Initiative initiative = this.initiativeDTOsToModelMapper.toInitiative(rewardAndTrxRulesDTO);
         this.initiativeService.updateTrxAndRewardRules(organizationId, initiativeId, initiative);
         return ResponseEntity.noContent().build();
@@ -97,7 +120,7 @@ public class InitiativeApiController implements InitiativeApi {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Override
-    public ResponseEntity<Void> updateTrxAndRewardRules(String organizationId, String initiativeId, @RequestBody @Validated(ValidationOnGroup.class) InitiativeRewardAndTrxRulesDTO rewardAndTrxRulesDTO) {
+    public ResponseEntity<Void> updateTrxAndRewardRulesDraft(String organizationId, String initiativeId, InitiativeRewardAndTrxRulesDTO rewardAndTrxRulesDTO){
         Initiative initiative = this.initiativeDTOsToModelMapper.toInitiative(rewardAndTrxRulesDTO);
         this.initiativeService.updateTrxAndRewardRules(organizationId, initiativeId, initiative);
         return ResponseEntity.noContent().build();

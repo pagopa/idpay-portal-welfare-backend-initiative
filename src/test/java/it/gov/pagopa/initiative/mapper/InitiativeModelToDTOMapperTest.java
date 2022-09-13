@@ -2,7 +2,7 @@ package it.gov.pagopa.initiative.mapper;
 
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.rule.refund.AccumulatedAmountDTO;
-import it.gov.pagopa.initiative.dto.rule.refund.AdditionalInfoDTO;
+import it.gov.pagopa.initiative.dto.rule.refund.RefundAdditionalInfoDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.TimeParameterDTO;
 import it.gov.pagopa.initiative.model.TypeBoolEnum;
@@ -56,7 +56,6 @@ class InitiativeModelToDTOMapperTest {
 
     private InitiativeRefundRule refundRule3;
 
-    private InitiativeLegal initiativeLegal;
 
     @BeforeEach
     public void setUp() {
@@ -74,7 +73,6 @@ class InitiativeModelToDTOMapperTest {
         initiativeSummaryDTO2 = createInitiativeSummaryDTO();
         initiativeSummaryDTOList = new ArrayList<>();
         initiativeSummaryDTOList.addAll(Arrays.asList(initiativeSummaryDTO, initiativeSummaryDTO2));
-        initiativeLegal = createInitiativeLegal();
         refundRuleDTO1 = createRefundRuleDTOValidWithTimeParameter();
         refundRule1 = createRefundRuleValidWithTimeParameter();
         refundRuleDTO2 = createRefundRuleDTOValidWithAccumulatedAmount();
@@ -107,14 +105,6 @@ class InitiativeModelToDTOMapperTest {
 
         //Check the equality of the results
         assertEquals(fullInitiativeDTO, initiativeDTOtoBeVerified);
-    }
-
-    @Test
-    void toInitiativeLegal_ok() {
-        assertEquals("https://", initiativeLegal.getDpiaLink().toString().substring(0, 8));
-        assertEquals("https://", initiativeLegal.getPrivacyLink().toString().substring(0, 8));
-        assertEquals("https://", initiativeLegal.getTcLink().toString().substring(0, 8));
-        assertEquals("https://", initiativeLegal.getRegulationLink().toString().substring(0, 8));
     }
     @Test
     void toInitiativeDTONull_ok(){
@@ -201,9 +191,12 @@ class InitiativeModelToDTOMapperTest {
 
     private InitiativeAdditional createInitiativeAdditional() {
         InitiativeAdditional initiativeAdditional = new InitiativeAdditional();
+        initiativeAdditional.setServiceIO(true);
         initiativeAdditional.setServiceName("serviceName");
-        initiativeAdditional.setArgument("Argument");
         initiativeAdditional.setDescription("Description");
+        initiativeAdditional.setPrivacyLink("privacyLink");
+        initiativeAdditional.setTcLink("tcLink");
+        initiativeAdditional.setServiceScope(InitiativeAdditional.ServiceScope.LOCAL);
         Channel channel = new Channel();
         channel.setType(Channel.TypeEnum.EMAIL);
         channel.setContact("contact");
@@ -244,15 +237,6 @@ class InitiativeModelToDTOMapperTest {
         return initiativeBeneficiaryRule;
     }
 
-    private InitiativeLegal createInitiativeLegal() {
-        InitiativeLegal initiativeLegal = new InitiativeLegal();
-        initiativeLegal.setDpiaLink("https://www.google.it");
-        initiativeLegal.setPrivacyLink("https://www.google.it");
-        initiativeLegal.setRegulationLink("https://www.google.it");
-        initiativeLegal.setTcLink("https://www.google.it");
-        return initiativeLegal;
-    }
-
     InitiativeDTO createStep1InitiativeDTO () {
         return InitiativeDTO.builder()
                 .initiativeId("Id1")
@@ -264,10 +248,6 @@ class InitiativeModelToDTOMapperTest {
                 .pdndCheck(true)
                 .pdndToken("pdndToken1")
                 .general(createInitiativeGeneralDTO()).additionalInfo(createInitiativeAdditionalDTO()).build();
-    }
-
-    InitiativeInfoDTO createStep1InitiativeInfoDTO() {
-        return InitiativeInfoDTO.builder().general(createInitiativeGeneralDTO()).additionalInfo(createInitiativeAdditionalDTO()).build();
     }
 
     private InitiativeGeneralDTO createInitiativeGeneralDTO() {
@@ -289,9 +269,12 @@ class InitiativeModelToDTOMapperTest {
 
     private InitiativeAdditionalDTO createInitiativeAdditionalDTO() {
         InitiativeAdditionalDTO initiativeAdditionalDTO = new InitiativeAdditionalDTO();
+        initiativeAdditionalDTO.setServiceIO(true);
         initiativeAdditionalDTO.setServiceName("serviceName");
-        initiativeAdditionalDTO.setArgument("Argument");
+        initiativeAdditionalDTO.setServiceScope(InitiativeAdditionalDTO.ServiceScope.LOCAL);
         initiativeAdditionalDTO.setDescription("Description");
+        initiativeAdditionalDTO.setPrivacyLink("privacyLink");
+        initiativeAdditionalDTO.setTcLink("tcLink");
         ChannelDTO channelDTO = new ChannelDTO();
         channelDTO.setType(ChannelDTO.TypeEnum.EMAIL);
         channelDTO.setContact("contact");
@@ -409,10 +392,10 @@ class InitiativeModelToDTOMapperTest {
         return timeParameterDTO;
     }
 
-    AdditionalInfoDTO createAdditionalInfoDTOValid(){
-        AdditionalInfoDTO additionalInfoDTO = new AdditionalInfoDTO();
-        additionalInfoDTO.setIdentificationCode("B002");
-        return additionalInfoDTO;
+    RefundAdditionalInfoDTO createAdditionalInfoDTOValid(){
+        RefundAdditionalInfoDTO refundAdditionalInfoDTO = new RefundAdditionalInfoDTO();
+        refundAdditionalInfoDTO.setIdentificationCode("B002");
+        return refundAdditionalInfoDTO;
     }
 
     InitiativeRefundRuleDTO createRefundRuleDTOValidWithTimeParameter(){

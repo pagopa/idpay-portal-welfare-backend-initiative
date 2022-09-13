@@ -5,7 +5,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.rule.refund.AccumulatedAmountDTO;
-import it.gov.pagopa.initiative.dto.rule.refund.AdditionalInfoDTO;
+import it.gov.pagopa.initiative.dto.rule.refund.RefundAdditionalInfoDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.TimeParameterDTO;
 import it.gov.pagopa.initiative.exception.InitiativeException;
@@ -65,7 +65,7 @@ class InitiativeApiTest {
     private static final String GET_INITIATIVES_SUMMARY_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/summary";
     private static final String GET_INITIATIVE_ACTIVE_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER;
     private static final String GET_INITIATIVE_BENEFICIARY_VIEW_URL = "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/beneficiary/view";
-    private static final String POST_INITIATIVE_GENERAL_INFO_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/general";
+    private static final String POST_INITIATIVE_GENERAL_INFO_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/info";
     private static final String PUT_INITIATIVE_GENERAL_INFO_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/general";
 
     private static final String PUT_INITIATIVE_REFUND_RULES_INFO_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/refund";
@@ -149,14 +149,13 @@ class InitiativeApiTest {
         //create Dummy Initiative
         Initiative step1Initiative = createStep1Initiative(beneficiaryKnown);
 
-        //create Dummy BodyRequest InitiativeInfoDTO
-        InitiativeInfoDTO initiativeInfoDTO = createStep1InitiativeInfoDTO();
+        InitiativeAdditionalDTO initiativeAdditionalDTO = createStep1InitiativeAdditionalDTO();
 
         // Instruct the Service to insert a Dummy Initiative
 //        doNothing().when(initiativeService).insertInitiative(step1Initiative); //doNothing only for Void method
         when(initiativeService.insertInitiative(step1Initiative)).thenReturn(step1Initiative);
 
-        when(initiativeDTOsToModelMapper.toInitiative(initiativeInfoDTO)).thenReturn(step1Initiative);
+        when(initiativeDTOsToModelMapper.toInitiative(initiativeAdditionalDTO)).thenReturn(step1Initiative);
 
 //        Map<String, Object> body = new HashMap<>();
 //        body.put("general", initiativeGeneralDTO);
@@ -165,7 +164,7 @@ class InitiativeApiTest {
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post(BASE_URL + String.format(POST_INITIATIVE_GENERAL_INFO_URL, ORGANIZATION_ID))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
 //                .content(objectMapper.writeValueAsString(body))
-                .content(objectMapper.writeValueAsString(initiativeInfoDTO))
+                .content(objectMapper.writeValueAsString(initiativeAdditionalDTO))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andDo(print())
@@ -179,18 +178,17 @@ class InitiativeApiTest {
         Boolean beneficiaryKnown = false;
         //create Dummy Initiative
         Initiative step1Initiative = createStep1Initiative(beneficiaryKnown);
-        //create Dummy BodyRequest InitiativeInfoDTO
-        InitiativeInfoDTO initiativeInfoDTO = createStep1InitiativeInfoDTO();
+        InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralDTO();
 
         // Instruct the Service to update a Dummy Initiative
-        when(initiativeDTOsToModelMapper.toInitiative(initiativeInfoDTO)).thenReturn(step1Initiative);
+        when(initiativeDTOsToModelMapper.toInitiative(initiativeGeneralDTO)).thenReturn(step1Initiative);
 
         //doNothing only for Void method
         doNothing().when(initiativeService).updateInitiativeGeneralInfo(ORGANIZATION_ID, INITIATIVE_ID, step1Initiative);
 
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_GENERAL_INFO_URL, ORGANIZATION_ID, INITIATIVE_ID))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(objectMapper.writeValueAsString(initiativeInfoDTO))
+                .content(objectMapper.writeValueAsString(initiativeGeneralDTO))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
                 .andDo(print())
@@ -205,7 +203,6 @@ class InitiativeApiTest {
         Boolean beneficiaryKnown = false;
         //create Dummy Initiative
         Initiative step2Initiative = createStep2Initiative(beneficiaryKnown);
-        //create Dummy BodyRequest InitiativeInfoDTO
         InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
 
         // Instruct the Service to insert a Dummy Initiative
@@ -234,7 +231,6 @@ class InitiativeApiTest {
         Boolean beneficiaryKnown = true;
         //create Dummy Initiative
         Initiative step2Initiative = createStep2Initiative(beneficiaryKnown);
-        //create Dummy BodyRequest InitiativeInfoDTO
         InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
 
         // Instruct the Service to insert a Dummy Initiative
@@ -332,7 +328,6 @@ class InitiativeApiTest {
         Boolean beneficiaryKnown = false;
         //create Dummy Initiative
         Initiative step2Initiative = createStep2Initiative(beneficiaryKnown);
-        //create Dummy BodyRequest InitiativeInfoDTO
         InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
 
         // Instruct the Service to insert a Dummy Initiative
@@ -459,9 +454,13 @@ class InitiativeApiTest {
 
     private InitiativeAdditional createInitiativeAdditional() {
         InitiativeAdditional initiativeAdditional = new InitiativeAdditional();
+        initiativeAdditional.setServiceIO(true);
+        initiativeAdditional.setServiceId("serviceId");
         initiativeAdditional.setServiceName("serviceName");
-        initiativeAdditional.setArgument("Argument");
+        initiativeAdditional.setServiceScope(InitiativeAdditional.ServiceScope.LOCAL);
         initiativeAdditional.setDescription("Description");
+        initiativeAdditional.setPrivacyLink("privacyLink");
+        initiativeAdditional.setTcLink("tcLink");
         Channel channel = new Channel();
         channel.setType(Channel.TypeEnum.EMAIL);
         channel.setContact("contact");
@@ -526,11 +525,11 @@ class InitiativeApiTest {
         return initiativeDTO;
     }
 
-    InitiativeInfoDTO createStep1InitiativeInfoDTO() {
-        InitiativeInfoDTO initiativeInfoDTO = new InitiativeInfoDTO();
-        initiativeInfoDTO = initiativeInfoDTO.builder().general(createInitiativeGeneralDTO()).additionalInfo(createInitiativeAdditionalDTO()).build();
-        return initiativeInfoDTO;
+    InitiativeAdditionalDTO createStep1InitiativeAdditionalDTO() {
+        InitiativeAdditionalDTO initiativeAdditionalDTO = createInitiativeAdditionalDTO();
+        return initiativeAdditionalDTO;
     }
+
 
     private InitiativeGeneralDTO createInitiativeGeneralDTO() {
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
@@ -551,9 +550,12 @@ class InitiativeApiTest {
 
     private InitiativeAdditionalDTO createInitiativeAdditionalDTO() {
         InitiativeAdditionalDTO initiativeAdditionalDTO = new InitiativeAdditionalDTO();
+        initiativeAdditionalDTO.setServiceIO(null);
         initiativeAdditionalDTO.setServiceName("serviceName");
-        initiativeAdditionalDTO.setArgument("Argument");
+        initiativeAdditionalDTO.setServiceScope(InitiativeAdditionalDTO.ServiceScope.LOCAL);
         initiativeAdditionalDTO.setDescription("Description");
+        initiativeAdditionalDTO.setPrivacyLink("privacyLink");
+        initiativeAdditionalDTO.setTcLink("tcLink");
         ChannelDTO channelDTO = new ChannelDTO();
         channelDTO.setType(ChannelDTO.TypeEnum.EMAIL);
         channelDTO.setContact("contact");
@@ -662,10 +664,10 @@ class InitiativeApiTest {
         return timeParameterDTO;
     }
 
-    AdditionalInfoDTO createAdditionalInfoDTOValid(){
-        AdditionalInfoDTO additionalInfoDTO = new AdditionalInfoDTO();
-        additionalInfoDTO.setIdentificationCode("B002");
-        return additionalInfoDTO;
+    RefundAdditionalInfoDTO createAdditionalInfoDTOValid(){
+        RefundAdditionalInfoDTO refundAdditionalInfoDTO = new RefundAdditionalInfoDTO();
+        refundAdditionalInfoDTO.setIdentificationCode("B002");
+        return refundAdditionalInfoDTO;
     }
 
     InitiativeRefundRuleDTO createRefundRuleDTOValidWithTimeParameter(){

@@ -15,11 +15,17 @@ import java.util.List;
 @EqualsAndHashCode
 @Builder
 public class InitiativeAdditional {
-
+  public enum ServiceScope{
+    LOCAL,
+    NATIONAL
+  }
+  private Boolean serviceIO;
   private String serviceId;
   private String serviceName;
-  private String argument;
+  private ServiceScope serviceScope;
   private String description;
+  private String privacyLink;
+  private String tcLink;
   private List<Channel> channels;
 
 }

@@ -69,8 +69,4 @@ public class InitiativeDTO   {
 
   @JsonProperty("refundRule")
   private InitiativeRefundRuleDTO refundRule;
-
-  @JsonProperty("legal")
-  private InitiativeLegalDTO legal;
-
 }

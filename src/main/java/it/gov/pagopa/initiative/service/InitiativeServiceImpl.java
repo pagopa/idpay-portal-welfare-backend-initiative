@@ -83,6 +83,19 @@ public class InitiativeServiceImpl implements InitiativeService {
     }
 
     @Override
+    public void updateInitiativeAdditionalInfo(String organizationId, String initiativeId, Initiative initiativeAdditionalInfo){
+        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeId(organizationId, initiativeId)
+                .orElseThrow(() -> new InitiativeException(
+                        InitiativeConstants.Exception.NotFound.CODE,
+                        String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
+                        HttpStatus.NOT_FOUND));
+        isInitiativeAllowedThenThrows(initiative);
+        initiative.setAdditionalInfo(initiativeAdditionalInfo.getAdditionalInfo());
+        initiative.setUpdateDate(LocalDateTime.now());
+        this.initiativeRepository.save(initiative);
+    }
+
+    @Override
     public void updateInitiativeBeneficiary(String organizationId, String initiativeId, InitiativeBeneficiaryRule initiativeBeneficiaryRuleModel){
         Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeId(organizationId, initiativeId)
                 .orElseThrow(() -> new InitiativeException(

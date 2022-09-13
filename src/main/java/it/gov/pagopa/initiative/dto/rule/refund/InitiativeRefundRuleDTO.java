@@ -26,5 +26,5 @@ public class InitiativeRefundRuleDTO {
 
     @Valid
     @JsonProperty("additionalInfo")
-    private AdditionalInfoDTO additionalInfo;
+    private RefundAdditionalInfoDTO additionalInfo;
 }

@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
 @EqualsAndHashCode
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AdditionalInfoDTO {
+public class RefundAdditionalInfoDTO {
     @NotNull(groups = ValidationOnGroup.class)
     @JsonProperty("identificationCode")
     private String identificationCode;

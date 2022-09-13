@@ -4,10 +4,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
 import lombok.*;
+import org.hibernate.validator.constraints.URL;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -21,19 +23,38 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class InitiativeAdditionalDTO   {
 
+  private static final String VALID_LINK = "^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
+  public enum ServiceScope{
+    LOCAL,
+    NATIONAL
+  }
+
+  @JsonProperty("serviceIO")
+  @NotNull(groups = ValidationOnGroup.class)
+  private Boolean serviceIO;
+
   @JsonProperty("serviceId")
   private String serviceId;
 
   @JsonProperty("serviceName")
+  @NotBlank(groups = ValidationOnGroup.class)
   private String serviceName;
 
-  @JsonProperty("argument")
-  @NotBlank(groups = ValidationOnGroup.class)
-  private String argument;
+  @JsonProperty("serviceScope")
+  @NotNull(groups = ValidationOnGroup.class)
+  private ServiceScope serviceScope;
 
   @JsonProperty("description")
   @NotBlank(groups = ValidationOnGroup.class)
   private String description;
+
+  @JsonProperty("privacyLink")
+  @URL(protocol = "https", regexp = VALID_LINK, groups = ValidationOnGroup.class)
+  private String privacyLink;
+
+  @JsonProperty("tcLink")
+  @URL(protocol = "https", regexp = VALID_LINK, groups = ValidationOnGroup.class)
+  private String tcLink;
 
   @JsonProperty("channels")
   @Valid
