@@ -2,7 +2,7 @@ package it.gov.pagopa.initiative.mapper;
 
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.rule.refund.AccumulatedAmountDTO;
-import it.gov.pagopa.initiative.dto.rule.refund.AdditionalInfoDTO;
+import it.gov.pagopa.initiative.dto.rule.refund.RefundAdditionalInfoDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.TimeParameterDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
@@ -29,17 +29,23 @@ import java.util.stream.Collectors;
 @Component
 public class InitiativeDTOsToModelMapper {
 
-    public Initiative toInitiative(InitiativeInfoDTO initiativeInfoDto) {
-        if (initiativeInfoDto == null) {
+    public Initiative toInitiative(InitiativeAdditionalDTO initiativeAdditionalDTO) {
+        if (initiativeAdditionalDTO == null) {
             return null;
         }
-
         Initiative initiative = new Initiative();
-        initiative.setGeneral(this.toInitiativeGeneral(initiativeInfoDto.getGeneral()));
-        initiative.setAdditionalInfo(this.toInitiativeAdditional(initiativeInfoDto.getAdditionalInfo()));
+        initiative.setAdditionalInfo(this.toInitiativeAdditional(initiativeAdditionalDTO));
         if(null != initiative.getAdditionalInfo() && null != initiative.getAdditionalInfo().getServiceName())
-            //TODO servizi IO ancora da definire. Ad ora si inserisce il nome dell'iniziativa se viene compilato il nome del servizio in modo tale che coincidano.
             initiative.setInitiativeName(initiative.getAdditionalInfo().getServiceName());
+        return initiative;
+    }
+
+    public Initiative toInitiative(InitiativeGeneralDTO initiativeGeneralDTO) {
+        if (initiativeGeneralDTO == null) {
+            return null;
+        }
+        Initiative initiative = new Initiative();
+        initiative.setGeneral(toInitiativeGeneral(initiativeGeneralDTO));
         return initiative;
     }
 
@@ -62,10 +68,13 @@ public class InitiativeDTOsToModelMapper {
             return null;
         }
         return InitiativeAdditional.builder()
+                .serviceIO(additionalDTO.getServiceIO())
                 .serviceId(additionalDTO.getServiceId())
-                .argument(additionalDTO.getArgument())
                 .description(additionalDTO.getDescription())
                 .serviceName(additionalDTO.getServiceName())
+                .serviceScope(InitiativeAdditional.ServiceScope.valueOf(additionalDTO.getServiceScope().name()))
+                .privacyLink(additionalDTO.getPrivacyLink())
+                .tcLink(additionalDTO.getTcLink())
                 .channels(toInitiativeAdditionalChannels(additionalDTO.getChannels()))
                 .build();
     }
@@ -260,10 +269,10 @@ public class InitiativeDTOsToModelMapper {
         return TimeParameter.builder().timeType(TimeParameter.TimeTypeEnum.valueOf(timeParameterDTO.getTimeType().name())).build();
     }
 
-    private AdditionalInfo toAdditionalInfo(AdditionalInfoDTO additionalInfoDTO){
-        if (additionalInfoDTO == null){
+    private AdditionalInfo toAdditionalInfo(RefundAdditionalInfoDTO refundAdditionalInfoDTO){
+        if (refundAdditionalInfoDTO == null){
             return null;
         }
-        return AdditionalInfo.builder().identificationCode(additionalInfoDTO.getIdentificationCode()).build();
+        return AdditionalInfo.builder().identificationCode(refundAdditionalInfoDTO.getIdentificationCode()).build();
     }
 }

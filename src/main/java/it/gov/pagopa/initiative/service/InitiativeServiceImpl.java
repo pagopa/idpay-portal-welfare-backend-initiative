@@ -75,9 +75,20 @@ public class InitiativeServiceImpl implements InitiativeService {
                         HttpStatus.NOT_FOUND));
         //Check Initiative Status
         isInitiativeAllowedThenThrows(initiative);
-        initiative.setInitiativeName(initiativeInfoModel.getInitiativeName());
         initiative.setGeneral(initiativeInfoModel.getGeneral());
-        initiative.setAdditionalInfo(initiativeInfoModel.getAdditionalInfo());
+        initiative.setUpdateDate(LocalDateTime.now());
+        this.initiativeRepository.save(initiative);
+    }
+
+    @Override
+    public void updateInitiativeAdditionalInfo(String organizationId, String initiativeId, Initiative initiativeAdditionalInfo){
+        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeId(organizationId, initiativeId)
+                .orElseThrow(() -> new InitiativeException(
+                        InitiativeConstants.Exception.NotFound.CODE,
+                        String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
+                        HttpStatus.NOT_FOUND));
+        isInitiativeAllowedThenThrows(initiative);
+        initiative.setAdditionalInfo(initiativeAdditionalInfo.getAdditionalInfo());
         initiative.setUpdateDate(LocalDateTime.now());
         this.initiativeRepository.save(initiative);
     }

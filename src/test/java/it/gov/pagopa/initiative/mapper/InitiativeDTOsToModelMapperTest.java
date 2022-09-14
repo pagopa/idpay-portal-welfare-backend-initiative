@@ -2,7 +2,7 @@ package it.gov.pagopa.initiative.mapper;
 
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.rule.refund.AccumulatedAmountDTO;
-import it.gov.pagopa.initiative.dto.rule.refund.AdditionalInfoDTO;
+import it.gov.pagopa.initiative.dto.rule.refund.RefundAdditionalInfoDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.TimeParameterDTO;
 import it.gov.pagopa.initiative.model.TypeBoolEnum;
@@ -36,8 +36,8 @@ class InitiativeDTOsToModelMapperTest {
     private Initiative initiativeNoBaseFields;
     private InitiativeBeneficiaryRule initiativeBeneficiaryRule;
     private InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO;
-    private InitiativeInfoDTO initiativeInfoDTOnoBaseFields;
-    private InitiativeInfoDTO initiativeInfoOnlyInfoGeneralDTO;
+    private InitiativeAdditionalDTO initiativeInfoDTOnoBaseFields;
+    private InitiativeGeneralDTO initiativeInfoOnlyInfoGeneralDTO;
 
     private InitiativeRefundRuleDTO initiativeRefundRuleDTOAmount;
     private Initiative initiativeOnlyRefundRule;
@@ -48,7 +48,6 @@ class InitiativeDTOsToModelMapperTest {
     private InitiativeRefundRuleDTO initiativeRefundRuleDTOAdditionalNull;
 
     private Initiative initiativeOnlyRefundRule3;
-    private InitiativeLegalDTO initiativeLegalDTOFull;
 
     @BeforeEach
     public void setUp() {
@@ -58,22 +57,12 @@ class InitiativeDTOsToModelMapperTest {
         initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
         initiativeInfoOnlyInfoGeneralDTO = createStep1InitiativeInfoDTOonlyInfoGeneral();
         initiativeInfoDTOnoBaseFields = createStep1InitiativeInfoDTOnoBaseFields();
-        initiativeLegalDTOFull = createInitiativeLegalDTOfull();
         initiativeRefundRuleDTOAmount = createRefundRuleDTOValidWithAccumulatedAmount();
         initiativeOnlyRefundRule = createInitiativeOnlyRefundRule();
         initiativeRefundRuleDTOTimeParameter = createRefundRuleDTOValidWithTimeParameter();
         initiativeOnlyRefundRule2 = createInitiativeOnlyRefundRule2();
         initiativeRefundRuleDTOAdditionalNull = createRefundRuleDTOValidWithTimeParameterAndAdditionalNull();
         initiativeOnlyRefundRule3 = createInitiativeOnlyRefundRule3();
-    }
-
-    @Test
-    void toInitiativeLegalFull_ok(){
-        assertEquals("https://", initiativeLegalDTOFull.getDpiaLink().toString().substring(0,8));
-        assertEquals("https://", initiativeLegalDTOFull.getPrivacyLink().toString().substring(0,8));
-        assertEquals("https://", initiativeLegalDTOFull.getRegulationLink().toString().substring(0,8));
-        assertEquals("https://", initiativeLegalDTOFull.getTcLink().toString().substring(0,8));
-
     }
 
     @Test
@@ -115,13 +104,13 @@ class InitiativeDTOsToModelMapperTest {
         assertEquals(initiativeOnlyRefundRule3, initiative);
     }
 
-    Initiative createFullInitiative () {
+    private Initiative createFullInitiative () {
         //TODO Test onGoing for different steps. Must use Step6 at the end
         Initiative initiative = createStep2Initiative();
         return initiative;
     }
 
-    InitiativeDTO createFullInitiativeDTO () {
+    private InitiativeDTO createFullInitiativeDTO () {
         //TODO Test onGoing for different steps. Must use Step6 at the end
         InitiativeDTO initiativeDTO = createStep2InitiativeDTO();
         return initiativeDTO;
@@ -139,7 +128,7 @@ class InitiativeDTOsToModelMapperTest {
         return initiative;
     }
 
-    Initiative createStep1Initiative () {
+    private Initiative createStep1Initiative () {
         Initiative initiative = new Initiative();
         initiative = createInitiativeBaseFields(initiative);
         initiative.setGeneral(createInitiativeGeneral());
@@ -149,16 +138,15 @@ class InitiativeDTOsToModelMapperTest {
         return initiative;
     }
 
-    Initiative createStep1InitiativeOnlyInfoGeneral () {
+    private Initiative createStep1InitiativeOnlyInfoGeneral () {
         Initiative initiative = new Initiative();
 //        initiative = createInitiativeBaseFields(initiative);
         initiative.setGeneral(createInitiativeGeneral());
         return initiative;
     }
 
-    Initiative createStep1InitiativeNoBaseFields () {
+    private Initiative createStep1InitiativeNoBaseFields () {
         Initiative initiative = new Initiative();
-        initiative.setGeneral(createInitiativeGeneral());
         initiative.setAdditionalInfo(createInitiativeAdditional());
         if(initiative.getAdditionalInfo() != null && initiative.getAdditionalInfo().getServiceName() != null)
             initiative.setInitiativeName(initiative.getAdditionalInfo().getServiceName());
@@ -184,9 +172,13 @@ class InitiativeDTOsToModelMapperTest {
 
     private InitiativeAdditional createInitiativeAdditional() {
         InitiativeAdditional initiativeAdditional = new InitiativeAdditional();
+        initiativeAdditional.setServiceIO(true);
+        initiativeAdditional.setServiceId("serviceId");
         initiativeAdditional.setServiceName("serviceName");
-        initiativeAdditional.setArgument("Argument");
+        initiativeAdditional.setServiceScope(InitiativeAdditional.ServiceScope.LOCAL);
         initiativeAdditional.setDescription("Description");
+        initiativeAdditional.setPrivacyLink("privacyLink");
+        initiativeAdditional.setTcLink("tcLink");
         Channel channel = new Channel();
         channel.setType(Channel.TypeEnum.EMAIL);
         channel.setContact("contact");
@@ -227,26 +219,7 @@ class InitiativeDTOsToModelMapperTest {
         return initiativeBeneficiaryRule;
     }
 
-    private InitiativeLegal createInitiativeLegal() {
-        InitiativeLegal initiativeLegal = new InitiativeLegal();
-        initiativeLegal.setDpiaLink("https://www.google.it");
-        initiativeLegal.setPrivacyLink("https://www.google.it");
-        initiativeLegal.setRegulationLink("https://www.google.it");
-        initiativeLegal.setTcLink("https://www.google.it");
-        return initiativeLegal;
-    }
-
-    private InitiativeLegalDTO createInitiativeLegalDTOfull(){
-        InitiativeLegalDTO initiativeLegalDTO = new InitiativeLegalDTO();
-        initiativeLegalDTO.setDpiaLink("\"https://www.google.it\"");
-        initiativeLegalDTO.setDpiaLink("https://www.google.it");
-        initiativeLegalDTO.setPrivacyLink("https://www.google.it");
-        initiativeLegalDTO.setRegulationLink("https://www.google.it");
-        initiativeLegalDTO.setTcLink("https://www.google.it");
-        return initiativeLegalDTO;
-    }
-
-    InitiativeDTO createStep1InitiativeDTO () {
+    private InitiativeDTO createStep1InitiativeDTO () {
         return InitiativeDTO.builder()
                 .initiativeId("Id1")
                 .initiativeName("initiativeName1")
@@ -259,12 +232,12 @@ class InitiativeDTOsToModelMapperTest {
                 .general(createInitiativeGeneralDTO()).additionalInfo(createInitiativeAdditionalDTO()).build();
     }
 
-    InitiativeInfoDTO createStep1InitiativeInfoDTOnoBaseFields() {
-        return InitiativeInfoDTO.builder().general(createInitiativeGeneralDTO()).additionalInfo(createInitiativeAdditionalDTO()).build();
+    private InitiativeAdditionalDTO createStep1InitiativeInfoDTOnoBaseFields() {
+        return createInitiativeAdditionalDTO();
     }
 
-    InitiativeInfoDTO createStep1InitiativeInfoDTOonlyInfoGeneral() {
-        return InitiativeInfoDTO.builder().general(createInitiativeGeneralDTO()).build();
+    private InitiativeGeneralDTO createStep1InitiativeInfoDTOonlyInfoGeneral() {
+        return createInitiativeGeneralDTO();
     }
 
     private InitiativeGeneralDTO createInitiativeGeneralDTO() {
@@ -286,9 +259,13 @@ class InitiativeDTOsToModelMapperTest {
 
     private InitiativeAdditionalDTO createInitiativeAdditionalDTO() {
         InitiativeAdditionalDTO initiativeAdditionalDTO = new InitiativeAdditionalDTO();
+        initiativeAdditionalDTO.setServiceIO(true);
+        initiativeAdditionalDTO.setServiceId("serviceId");
         initiativeAdditionalDTO.setServiceName("serviceName");
-        initiativeAdditionalDTO.setArgument("Argument");
+        initiativeAdditionalDTO.setServiceScope(InitiativeAdditionalDTO.ServiceScope.LOCAL);
         initiativeAdditionalDTO.setDescription("Description");
+        initiativeAdditionalDTO.setPrivacyLink("privacyLink");
+        initiativeAdditionalDTO.setTcLink("tcLink");
         ChannelDTO channelDTO = new ChannelDTO();
         channelDTO.setType(ChannelDTO.TypeEnum.EMAIL);
         channelDTO.setContact("contact");
@@ -298,14 +275,14 @@ class InitiativeDTOsToModelMapperTest {
         return initiativeAdditionalDTO;
     }
 
-    Initiative createStep2Initiative () {
+    private Initiative createStep2Initiative () {
         Initiative initiative = createStep1Initiative();
         InitiativeBeneficiaryRule initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
         initiative.setBeneficiaryRule(initiativeBeneficiaryRule);
         return initiative;
     }
 
-    InitiativeDTO createStep2InitiativeDTO () {
+    private InitiativeDTO createStep2InitiativeDTO () {
         InitiativeDTO initiativeDTO = createStep1InitiativeDTO();
         InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
         initiativeDTO.setBeneficiaryRule(initiativeBeneficiaryRuleDTO);
@@ -343,42 +320,42 @@ class InitiativeDTOsToModelMapperTest {
         return initiativeBeneficiaryRuleDTO;
     }
 
-    Initiative createStep3Initiative () {
+    private Initiative createStep3Initiative () {
         Initiative initiative = new Initiative();
         return initiative;
     }
 
-    InitiativeDTO createStep3InitiativeDTO () {
+    private InitiativeDTO createStep3InitiativeDTO () {
         InitiativeDTO initiativeDTO = new InitiativeDTO();
         return initiativeDTO;
     }
 
-    Initiative createStep4Initiative () {
+    private Initiative createStep4Initiative () {
         Initiative initiative = new Initiative();
         return initiative;
     }
 
-    InitiativeDTO createStep4InitiativeDTO () {
+    private InitiativeDTO createStep4InitiativeDTO () {
         InitiativeDTO initiativeDTO = new InitiativeDTO();
         return initiativeDTO;
     }
 
-    Initiative createStep5Initiative () {
+    private Initiative createStep5Initiative () {
         Initiative initiative = new Initiative();
         return initiative;
     }
 
-    InitiativeDTO createStep5InitiativeDTO () {
+    private InitiativeDTO createStep5InitiativeDTO () {
         InitiativeDTO initiativeDTO = new InitiativeDTO();
         return initiativeDTO;
     }
 
-    Initiative createStep6Initiative () {
+    private Initiative createStep6Initiative () {
         Initiative initiative = new Initiative();
         return initiative;
     }
 
-    InitiativeDTO createStep6InitiativeDTO () {
+    private InitiativeDTO createStep6InitiativeDTO () {
         InitiativeDTO initiativeDTO = new InitiativeDTO();
         return initiativeDTO;
     }
@@ -387,26 +364,26 @@ class InitiativeDTOsToModelMapperTest {
 
 
 
-     AccumulatedAmountDTO createAccumulatedAmountDTOValid(){
+    private AccumulatedAmountDTO createAccumulatedAmountDTOValid(){
         AccumulatedAmountDTO amountDTO = new AccumulatedAmountDTO();
         amountDTO.setAccumulatedType(AccumulatedAmountDTO.AccumulatedTypeEnum.THRESHOLD_REACHED);
         amountDTO.setRefundThreshold(BigDecimal.valueOf(100000));
         return amountDTO;
     }
 
-     TimeParameterDTO createTimeParameterDTOValid(){
+    private TimeParameterDTO createTimeParameterDTOValid(){
         TimeParameterDTO timeParameterDTO = new TimeParameterDTO();
         timeParameterDTO.setTimeType(TimeParameterDTO.TimeTypeEnum.CLOSED);
         return timeParameterDTO;
     }
 
-     AdditionalInfoDTO createAdditionalInfoDTOValid(){
-        AdditionalInfoDTO additionalInfoDTO = new AdditionalInfoDTO();
-        additionalInfoDTO.setIdentificationCode("B002");
-        return additionalInfoDTO;
+    private RefundAdditionalInfoDTO createAdditionalInfoDTOValid(){
+        RefundAdditionalInfoDTO refundAdditionalInfoDTO = new RefundAdditionalInfoDTO();
+        refundAdditionalInfoDTO.setIdentificationCode("B002");
+        return refundAdditionalInfoDTO;
     }
 
-    InitiativeRefundRuleDTO createRefundRuleDTOValidWithTimeParameter(){
+    private InitiativeRefundRuleDTO createRefundRuleDTOValidWithTimeParameter(){
         InitiativeRefundRuleDTO refundRuleDTO = new InitiativeRefundRuleDTO();
         refundRuleDTO.setAccumulatedAmount(null);
         refundRuleDTO.setTimeParameter(createTimeParameterDTOValid());
@@ -414,7 +391,7 @@ class InitiativeDTOsToModelMapperTest {
         return refundRuleDTO;
     }
 
-    InitiativeRefundRuleDTO createRefundRuleDTOValidWithTimeParameterAndAdditionalNull(){
+    private InitiativeRefundRuleDTO createRefundRuleDTOValidWithTimeParameterAndAdditionalNull(){
         InitiativeRefundRuleDTO refundRuleDTO = new InitiativeRefundRuleDTO();
         refundRuleDTO.setAccumulatedAmount(null);
         refundRuleDTO.setTimeParameter(createTimeParameterDTOValid());
@@ -422,7 +399,7 @@ class InitiativeDTOsToModelMapperTest {
         return refundRuleDTO;
     }
 
-    InitiativeRefundRuleDTO createRefundRuleDTOValidWithAccumulatedAmount(){
+    private InitiativeRefundRuleDTO createRefundRuleDTOValidWithAccumulatedAmount(){
         InitiativeRefundRuleDTO refundRuleDTO = new InitiativeRefundRuleDTO();
         refundRuleDTO.setAccumulatedAmount(createAccumulatedAmountDTOValid());
         refundRuleDTO.setTimeParameter(null);
@@ -432,34 +409,34 @@ class InitiativeDTOsToModelMapperTest {
 
 
 
-    AccumulatedAmount createAccumulatedAmountValid(){
+    private AccumulatedAmount createAccumulatedAmountValid(){
         AccumulatedAmount amount = new AccumulatedAmount();
         amount.setAccomulatedType(AccumulatedAmount.AccumulatedTypeEnum.THRESHOLD_REACHED);
         amount.setRefundThreshold(BigDecimal.valueOf(100000));
         return amount;
     }
 
-    TimeParameter createTimeParameterValid(){
+    private TimeParameter createTimeParameterValid(){
         TimeParameter timeParameter = new TimeParameter();
         timeParameter.setTimeType(TimeParameter.TimeTypeEnum.CLOSED);
         return timeParameter;
     }
 
-    AdditionalInfo createAdditionalInfoValid(){
+    private AdditionalInfo createAdditionalInfoValid(){
         AdditionalInfo additionalInfo = new AdditionalInfo();
         additionalInfo.setIdentificationCode("B002");
         return additionalInfo;
     }
 
 
-    InitiativeRefundRule createRefundRuleValidWithAccumulatedAmount(){
+    private InitiativeRefundRule createRefundRuleValidWithAccumulatedAmount(){
         InitiativeRefundRule refundRule = new InitiativeRefundRule();
         refundRule.setAccumulatedAmount(createAccumulatedAmountValid());
         refundRule.setTimeParameter(null);
         refundRule.setAdditionalInfo(createAdditionalInfoValid());
         return refundRule;
     }
-    InitiativeRefundRule createRefundRuleValidWithTimeParameter(){
+    private InitiativeRefundRule createRefundRuleValidWithTimeParameter(){
         InitiativeRefundRule refundRule = new InitiativeRefundRule();
         refundRule.setAccumulatedAmount(null);
         refundRule.setTimeParameter(createTimeParameterValid());
@@ -467,26 +444,26 @@ class InitiativeDTOsToModelMapperTest {
         return refundRule;
     }
 
-    InitiativeRefundRule createRefundRuleValidWithTimeParameterAndAdditionalNull(){
+    private InitiativeRefundRule createRefundRuleValidWithTimeParameterAndAdditionalNull(){
         InitiativeRefundRule refundRule = new InitiativeRefundRule();
         refundRule.setAccumulatedAmount(null);
         refundRule.setTimeParameter(createTimeParameterValid());
         refundRule.setAdditionalInfo(null);
         return refundRule;
     }
-    Initiative createInitiativeOnlyRefundRule(){
+    private Initiative createInitiativeOnlyRefundRule(){
         Initiative initiative = new Initiative();
         initiative.setRefundRule(createRefundRuleValidWithAccumulatedAmount());
         return initiative;
     }
 
-    Initiative createInitiativeOnlyRefundRule2(){
+    private Initiative createInitiativeOnlyRefundRule2(){
         Initiative initiative = new Initiative();
         initiative.setRefundRule(createRefundRuleValidWithTimeParameter());
         return initiative;
     }
 
-    Initiative createInitiativeOnlyRefundRule3(){
+    private Initiative createInitiativeOnlyRefundRule3(){
         Initiative initiative = new Initiative();
         initiative.setRefundRule(createRefundRuleValidWithTimeParameterAndAdditionalNull());
         return initiative;

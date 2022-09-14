@@ -193,6 +193,33 @@ class InitiativeServiceTest {
     }
 
     @Test
+    void updateInitiativeAdditionalInfo_ok() throws Exception {
+        Initiative step2Initiative = createStep1Initiative();
+
+        //Instruct the Repo Mock to return Dummy Initiatives
+        when(initiativeRepository.findByOrganizationIdAndInitiativeId(anyString(), anyString())).thenReturn(Optional.ofNullable(step2Initiative));
+
+        //Try to call the Real Service (which is using the instructed Repo)
+        initiativeService.updateInitiativeAdditionalInfo("Ente1", INITIATIVE_ID, step2Initiative);
+
+        // you are expecting repo to be called once with correct param
+        verify(initiativeRepository, times(1)).findByOrganizationIdAndInitiativeId(anyString(), anyString());
+    }
+
+    @Test
+    void updateInitiativeAdditionalInfo_ko() throws Exception {
+        Initiative fullInitiative = createStep1Initiative();
+        //Try to call the Real Service (which is using the instructed Repo)
+        try {
+            initiativeService.updateInitiativeAdditionalInfo("Ente1", INITIATIVE_ID, fullInitiative);
+        } catch (InitiativeException e) {
+            log.info("InitiativeException: " + e.getCode());
+            assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
+            assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
+        }
+    }
+
+    @Test
     void updateInitiativeBeneficiary_ok() throws Exception {
         Initiative step2Initiative = createStep2Initiative();
         InitiativeBeneficiaryRule initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
@@ -274,7 +301,7 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void updateRefunRules_ok(){
+    void updateRefundRules_ok(){
         Initiative initiative = createInitiativeOnlyRefundRule();
         when(initiativeRepository.findByOrganizationIdAndInitiativeId(anyString(), anyString())).thenReturn(Optional.ofNullable(initiative));
         initiativeService.updateInitiativeRefundRules(ORGANIZATION_ID, INITIATIVE_ID, initiative, false);
@@ -282,7 +309,7 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void updateRefunRules_ko(){
+    void updateRefundRules_ko(){
         Initiative initiative = createInitiativeOnlyRefundRule();
         when(initiativeRepository.findByOrganizationIdAndInitiativeId(anyString(), anyString())).thenThrow(
                 new InitiativeException(
@@ -341,8 +368,6 @@ class InitiativeServiceTest {
         initiative.setBeneficiaryRanking(true);
         initiative.setPdndCheck(true);
         initiative.setPdndToken("pdndToken1");
-
-        initiative.setGeneral(createInitiativeGeneral());
         initiative.setAdditionalInfo(createInitiativeAdditional());
 //        initiative.setBeneficiaryRule(createInitiativeBeneficiaryRule());
 //        initiative.setLegal(createInitiativeLegal());
@@ -364,9 +389,13 @@ class InitiativeServiceTest {
 
     private InitiativeAdditional createInitiativeAdditional() {
         InitiativeAdditional initiativeAdditional = new InitiativeAdditional();
+        initiativeAdditional.setServiceIO(true);
+        initiativeAdditional.setServiceId("serviceId");
         initiativeAdditional.setServiceName("serviceName");
-        initiativeAdditional.setArgument("Argument");
+        initiativeAdditional.setServiceScope(InitiativeAdditional.ServiceScope.LOCAL);
         initiativeAdditional.setDescription("Description");
+        initiativeAdditional.setPrivacyLink("privacyLink");
+        initiativeAdditional.setTcLink("tcLink");
         Channel channel = new Channel();
         channel.setType(Channel.TypeEnum.EMAIL);
         channel.setContact("contact");
@@ -387,14 +416,8 @@ class InitiativeServiceTest {
                 .beneficiaryRanking(true)
                 .pdndCheck(true)
                 .pdndToken("pdndToken1")
-                .general(createInitiativeGeneralDTO()).additionalInfo(createInitiativeAdditionalDTO()).build();
+                .additionalInfo(createInitiativeAdditionalDTO()).build();
         return initiativeDTO;
-    }
-
-    InitiativeInfoDTO createStep1InitiativeInfoDTO() {
-        InitiativeInfoDTO initiativeInfoDTO = new InitiativeInfoDTO();
-        initiativeInfoDTO = initiativeInfoDTO.builder().general(createInitiativeGeneralDTO()).additionalInfo(createInitiativeAdditionalDTO()).build();
-        return initiativeInfoDTO;
     }
 
     private InitiativeGeneralDTO createInitiativeGeneralDTO() {
@@ -416,9 +439,12 @@ class InitiativeServiceTest {
 
     private InitiativeAdditionalDTO createInitiativeAdditionalDTO() {
         InitiativeAdditionalDTO initiativeAdditionalDTO = new InitiativeAdditionalDTO();
+        initiativeAdditionalDTO.setServiceIO(true);
         initiativeAdditionalDTO.setServiceName("serviceName");
-        initiativeAdditionalDTO.setArgument("Argument");
+        initiativeAdditionalDTO.setServiceScope(InitiativeAdditionalDTO.ServiceScope.LOCAL);
         initiativeAdditionalDTO.setDescription("Description");
+        initiativeAdditionalDTO.setPrivacyLink("privacyLink");
+        initiativeAdditionalDTO.setTcLink("tcLink");
         ChannelDTO channelDTO = new ChannelDTO();
         channelDTO.setType(ChannelDTO.TypeEnum.EMAIL);
         channelDTO.setContact("contact");

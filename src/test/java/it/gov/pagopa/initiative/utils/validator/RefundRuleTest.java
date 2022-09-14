@@ -1,7 +1,7 @@
 package it.gov.pagopa.initiative.utils.validator;
 
 import it.gov.pagopa.initiative.dto.rule.refund.AccumulatedAmountDTO;
-import it.gov.pagopa.initiative.dto.rule.refund.AdditionalInfoDTO;
+import it.gov.pagopa.initiative.dto.rule.refund.RefundAdditionalInfoDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.TimeParameterDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -180,10 +180,10 @@ class RefundRuleTest {
         return timeParameterDTO;
     }
 
-    private AdditionalInfoDTO createAdditionalInfoDTOValid_ok(){
-        AdditionalInfoDTO additionalInfoDTO = new AdditionalInfoDTO();
-        additionalInfoDTO.setIdentificationCode("B002");
-        return additionalInfoDTO;
+    private RefundAdditionalInfoDTO createAdditionalInfoDTOValid_ok(){
+        RefundAdditionalInfoDTO refundAdditionalInfoDTO = new RefundAdditionalInfoDTO();
+        refundAdditionalInfoDTO.setIdentificationCode("B002");
+        return refundAdditionalInfoDTO;
     }
 
     private AccumulatedAmountDTO createAccumulatedAmountNotValid_ko(){
@@ -205,9 +205,9 @@ class RefundRuleTest {
         timeParameterDTO.setTimeType(null);
         return timeParameterDTO;
     }
-    private AdditionalInfoDTO createAdditionalInfoDTONotValidNull_ko(){
-        AdditionalInfoDTO additionalInfoDTO = new AdditionalInfoDTO();
-        additionalInfoDTO.setIdentificationCode(null);
-        return additionalInfoDTO;
+    private RefundAdditionalInfoDTO createAdditionalInfoDTONotValidNull_ko(){
+        RefundAdditionalInfoDTO refundAdditionalInfoDTO = new RefundAdditionalInfoDTO();
+        refundAdditionalInfoDTO.setIdentificationCode(null);
+        return refundAdditionalInfoDTO;
     }
 }
