@@ -75,9 +75,7 @@ public class InitiativeServiceImpl implements InitiativeService {
                         HttpStatus.NOT_FOUND));
         //Check Initiative Status
         isInitiativeAllowedThenThrows(initiative);
-        initiative.setInitiativeName(initiativeInfoModel.getInitiativeName());
         initiative.setGeneral(initiativeInfoModel.getGeneral());
-        initiative.setAdditionalInfo(initiativeInfoModel.getAdditionalInfo());
         initiative.setUpdateDate(LocalDateTime.now());
         this.initiativeRepository.save(initiative);
     }

@@ -65,7 +65,9 @@ class InitiativeApiTest {
     private static final String GET_INITIATIVES_SUMMARY_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/summary";
     private static final String GET_INITIATIVE_ACTIVE_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER;
     private static final String GET_INITIATIVE_BENEFICIARY_VIEW_URL = "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/beneficiary/view";
-    private static final String POST_INITIATIVE_GENERAL_INFO_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/info";
+    private static final String POST_INITIATIVE_ADDITIONAL_INFO_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/info";
+
+    private static final String PUT_INITIATIVE_ADDITIONAL_INFO_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/info";
     private static final String PUT_INITIATIVE_GENERAL_INFO_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/general";
 
     private static final String PUT_INITIATIVE_REFUND_RULES_INFO_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/refund";
@@ -88,7 +90,7 @@ class InitiativeApiTest {
     protected MockMvc mvc;
 
     @Test
-    void getInitiativeSummary_ok() throws Exception {
+    void getInitiativeSummary_statutsOk() throws Exception {
 
         Boolean beneficiaryKnown = false;
         //create Dummy Initiative
@@ -115,7 +117,7 @@ class InitiativeApiTest {
     }
 
     @Test
-    void getInitiativeDetail_ok() throws Exception {
+    void getInitiativeDetail_statusOk() throws Exception {
 
         Boolean beneficiaryKnown = false;
         //create Dummy Initiative
@@ -141,13 +143,13 @@ class InitiativeApiTest {
     }
 
     @Test
-    void saveInitiativeGeneralInfo_ok() throws Exception {
+    void saveInitiativeServiceInfo_statusCreated() throws Exception {
         objectMapper.registerModule(new JavaTimeModule());
 //        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
         Boolean beneficiaryKnown = false;
         //create Dummy Initiative
-        Initiative step1Initiative = createStep1Initiative(beneficiaryKnown);
+        Initiative step1Initiative = createStep1Initiative();
 
         InitiativeAdditionalDTO initiativeAdditionalDTO = createStep1InitiativeAdditionalDTO();
 
@@ -161,7 +163,7 @@ class InitiativeApiTest {
 //        body.put("general", initiativeGeneralDTO);
 //        body.put("additionalInfo", initiativeAdditionalDTO);
 
-        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post(BASE_URL + String.format(POST_INITIATIVE_GENERAL_INFO_URL, ORGANIZATION_ID))
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post(BASE_URL + String.format(POST_INITIATIVE_ADDITIONAL_INFO_URL, ORGANIZATION_ID))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
 //                .content(objectMapper.writeValueAsString(body))
                 .content(objectMapper.writeValueAsString(initiativeAdditionalDTO))
@@ -172,12 +174,12 @@ class InitiativeApiTest {
     }
 
     @Test
-    void updateInitiativeGeneralInfo_ok() throws Exception {
+    void updateInitiativeGeneralInfo_statusNoContent() throws Exception {
         objectMapper.registerModule(new JavaTimeModule());
 
         Boolean beneficiaryKnown = false;
         //create Dummy Initiative
-        Initiative step1Initiative = createStep1Initiative(beneficiaryKnown);
+        Initiative step1Initiative = createStep2InitiativeGeneral(beneficiaryKnown);
         InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralDTO();
 
         // Instruct the Service to update a Dummy Initiative
@@ -196,7 +198,31 @@ class InitiativeApiTest {
     }
 
     @Test
-    void updateInitiativeBeneficiary_ok() throws Exception {
+    void updateInitiativeAdditionalInfo_statusNoContent() throws Exception{
+        objectMapper.registerModule(new JavaTimeModule());
+
+        Boolean beneficiaryKnown = false;
+        //create Dummy Initiative
+        Initiative step1Initiative = createStep1Initiative();
+        InitiativeAdditionalDTO initiativeAdditionalDTO = createInitiativeAdditionalDTO();
+
+        // Instruct the Service to update a Dummy Initiative
+        when(initiativeDTOsToModelMapper.toInitiative(initiativeAdditionalDTO)).thenReturn(step1Initiative);
+
+        //doNothing only for Void method
+        doNothing().when(initiativeService).updateInitiativeAdditionalInfo(ORGANIZATION_ID, INITIATIVE_ID, step1Initiative);
+
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_ADDITIONAL_INFO_URL, ORGANIZATION_ID, INITIATIVE_ID))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(initiativeAdditionalDTO))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    void updateInitiativeBeneficiary_statusNoContent() throws Exception {
         objectMapper.registerModule(new JavaTimeModule());
 
         InitiativeBeneficiaryRule initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
@@ -224,7 +250,7 @@ class InitiativeApiTest {
     }
 
     @Test
-    void updateInitiativeBeneficiary_ko() throws Exception {
+    void updateInitiativeBeneficiary_statusBadRequest() throws Exception {
         objectMapper.registerModule(new JavaTimeModule());
 
         InitiativeBeneficiaryRule initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
@@ -252,7 +278,7 @@ class InitiativeApiTest {
     }
 
     @Test
-    void updateInitiativeRefundRule_ok() throws Exception{
+    void updateInitiativeRefundRule_statusNoContent() throws Exception{
         objectMapper.registerModule(new JavaTimeModule());
 
         InitiativeRefundRuleDTO refundRuleDTO = createRefundRuleDTOValidWithAccumulatedAmount();
@@ -300,7 +326,7 @@ class InitiativeApiTest {
     }
 
     @Test
-    void updateInitiativeRefundRuleDraft_ok() throws Exception{
+    void updateInitiativeRefundRuleDraft_statusNoContent() throws Exception{
         objectMapper.registerModule(new JavaTimeModule());
 
         InitiativeRefundRuleDTO refundRuleDTO = createRefundRuleDTOValidWithAccumulatedAmount();
@@ -321,7 +347,7 @@ class InitiativeApiTest {
     }
 
     @Test
-    void updateInitiativeBeneficiaryDraft_ok() throws Exception {
+    void updateInitiativeBeneficiaryDraft_statusNoContent() throws Exception {
         objectMapper.registerModule(new JavaTimeModule());
 
         InitiativeBeneficiaryRule initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
@@ -347,7 +373,7 @@ class InitiativeApiTest {
     }
 
     @Test
-    void getInitiativeBeneficiaryView_ok() throws Exception {
+    void getInitiativeBeneficiaryView_statusOk() throws Exception {
 
         //create Dummy Initiative
         Initiative initiative = createFullInitiative();
@@ -419,7 +445,7 @@ class InitiativeApiTest {
         return initiativeDTO;
     }
 
-    Initiative createStep1Initiative (Boolean beneficiaryKnown) {
+    private Initiative createStep1Initiative () {
         Initiative initiative = new Initiative();
         initiative.setInitiativeId(INITIATIVE_ID);
         initiative.setInitiativeName("initiativeName1");
@@ -429,10 +455,14 @@ class InitiativeApiTest {
         initiative.setBeneficiaryRanking(true);
         initiative.setPdndCheck(true);
         initiative.setPdndToken("pdndToken1");
-        initiative.setGeneral(createInitiativeGeneral(beneficiaryKnown));
         initiative.setAdditionalInfo(createInitiativeAdditional());
 //        initiative.setBeneficiaryRule(createInitiativeBeneficiaryRule());
 //        initiative.setLegal(createInitiativeLegal());
+        return initiative;
+    }
+    private Initiative createStep2InitiativeGeneral(Boolean beneficiaryKnown){
+        Initiative initiative = createStep1Initiative();
+        initiative.setGeneral(createInitiativeGeneral(beneficiaryKnown));
         return initiative;
     }
     private InitiativeGeneral createInitiativeGeneral(Boolean beneficiaryKnown) {
@@ -459,8 +489,8 @@ class InitiativeApiTest {
         initiativeAdditional.setServiceName("serviceName");
         initiativeAdditional.setServiceScope(InitiativeAdditional.ServiceScope.LOCAL);
         initiativeAdditional.setDescription("Description");
-        initiativeAdditional.setPrivacyLink("privacyLink");
-        initiativeAdditional.setTcLink("tcLink");
+        initiativeAdditional.setPrivacyLink("https://www.google.it");
+        initiativeAdditional.setTcLink("https://www.google.it");
         Channel channel = new Channel();
         channel.setType(Channel.TypeEnum.EMAIL);
         channel.setContact("contact");
@@ -550,12 +580,13 @@ class InitiativeApiTest {
 
     private InitiativeAdditionalDTO createInitiativeAdditionalDTO() {
         InitiativeAdditionalDTO initiativeAdditionalDTO = new InitiativeAdditionalDTO();
-        initiativeAdditionalDTO.setServiceIO(null);
+        initiativeAdditionalDTO.setServiceIO(true);
+        initiativeAdditionalDTO.setServiceId("serviceId");
         initiativeAdditionalDTO.setServiceName("serviceName");
         initiativeAdditionalDTO.setServiceScope(InitiativeAdditionalDTO.ServiceScope.LOCAL);
         initiativeAdditionalDTO.setDescription("Description");
-        initiativeAdditionalDTO.setPrivacyLink("privacyLink");
-        initiativeAdditionalDTO.setTcLink("tcLink");
+        initiativeAdditionalDTO.setPrivacyLink("https://www.google.it");
+        initiativeAdditionalDTO.setTcLink("https://www.google.it");
         ChannelDTO channelDTO = new ChannelDTO();
         channelDTO.setType(ChannelDTO.TypeEnum.EMAIL);
         channelDTO.setContact("contact");
@@ -566,7 +597,8 @@ class InitiativeApiTest {
     }
 
     Initiative createStep2Initiative (Boolean beneficiaryKnown) {
-        Initiative initiative = createStep1Initiative(beneficiaryKnown);
+        Initiative initiative = createStep1Initiative();
+        initiative.setGeneral(createInitiativeGeneral(beneficiaryKnown));
         InitiativeBeneficiaryRule initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
         initiative.setBeneficiaryRule(initiativeBeneficiaryRule);
         return initiative;

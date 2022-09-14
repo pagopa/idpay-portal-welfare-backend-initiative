@@ -76,13 +76,6 @@ public class InitiativeApiController implements InitiativeApi {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Override
-    public ResponseEntity<Void> updateInitiativeAdditionalInfoDraft(String organizationId, String initiativeId, @RequestBody InitiativeAdditionalDTO initiativeAdditionalDTO) {
-        this.initiativeService.updateInitiativeAdditionalInfo(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toInitiative(initiativeAdditionalDTO));
-        return ResponseEntity.noContent().build();
-    }
-
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Override
     public ResponseEntity<Void> updateInitiativeGeneralInfoDraft(String organizationId, String initiativeId, @RequestBody InitiativeGeneralDTO initiativeGeneralDTO) {
         this.initiativeService.updateInitiativeGeneralInfo(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toInitiative(initiativeGeneralDTO));
         return ResponseEntity.noContent().build();

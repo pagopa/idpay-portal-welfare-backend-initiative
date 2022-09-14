@@ -35,6 +35,4 @@ public class Initiative {
     private InitiativeRewardRule rewardRule;
     private InitiativeTrxConditions trxRule;
     private InitiativeRefundRule refundRule;
-    private InitiativeLegal legal;
-
 }
