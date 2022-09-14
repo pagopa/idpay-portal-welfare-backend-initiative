@@ -11,9 +11,6 @@ import java.lang.annotation.*;
 @Documented
 @Constraint(validatedBy = {SecondValueGreaterThanFirstWithBTWValidator.class})
 public @interface SecondValueGreaterThanFirstWithBTW {
-    String value1();
-    String value2();
-    String operator();
     String message() default "Fail: second value should be always greater than first.";
     Class<?>[] groups() default { };
     Class<? extends Payload>[] payload() default { };

@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
 @Data @AllArgsConstructor @NoArgsConstructor
 @EqualsAndHashCode
 @Builder
-@SecondValueGreaterThanFirstWithBTW(value1 = "value", value2 = "value2", operator = "operator", groups = ValidationOnGroup.class)
+@SecondValueGreaterThanFirstWithBTW(groups = ValidationOnGroup.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AutomatedCriteriaDTO   {
 
