@@ -80,7 +80,7 @@ public class InitiativeModelToDTOMapper {
             return null;
         }
         return InitiativeAdditionalDTO.builder()
-                .serviceIO(true)
+                .serviceIO(additional.getServiceIO())
                 .serviceId(additional.getServiceId())
                 .description(additional.getDescription())
                 .serviceName(additional.getServiceName())
