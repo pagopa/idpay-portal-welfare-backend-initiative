@@ -137,8 +137,10 @@ public class InitiativeServiceImpl implements InitiativeService {
             initiative.setStatus(InitiativeConstants.Status.TO_CHECK);
         }
         this.initiativeRepository.save(initiative);
-        //FIXME Test d'integrazione con RuleEngine. Invio Iniziativa da spostare all'ultimo step del Wizard come pubblicazione
-//        sendInitiativeInfoToRuleEngine(initiativeModelToDTOMapper.toInitiativeDTO(initiative));
+        //FIXME Test d'integrazione con RuleEngine. Invio Iniziativa al RuleEngine. Da spostare nella sezione di pubblicazione
+        if (changeInitiativeStatus) {
+            sendInitiativeInfoToRuleEngine(initiativeModelToDTOMapper.toInitiativeDTO(initiative));
+        }
     }
 
     @Override

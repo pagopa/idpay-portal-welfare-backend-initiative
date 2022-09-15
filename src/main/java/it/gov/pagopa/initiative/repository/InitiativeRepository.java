@@ -14,6 +14,14 @@ public interface InitiativeRepository extends MongoRepository<Initiative, String
 
     Optional<Initiative> findByOrganizationIdAndInitiativeId(String organizationId, String initiativeId);
 
-    @Query(value="{initiativeId : ?0}", fields="{initiativeId : 1, initiativeName : 1, status : 1, 'additionalInfo.serviceName' : 1, 'general' : 1, 'beneficiaryRule' : 1, 'rewardRule' : 1, 'trxRule' : 1, 'refundRule' : 1}")
+    @Query(
+            value="{initiativeId : ?0}",
+            fields="{initiativeId : 1, " +
+                    "initiativeName : 1, " +
+                    "status : 1, " +
+                    "'additionalInfo.serviceId' : 1, " +
+                    "'additionalInfo.serviceScope' : 1, " +
+                    "'general' : 1, " +
+                    "'beneficiaryRule' : 1}")
     Optional<Initiative> retrieveInitiativeBeneficiaryView(String initiativeId);
 }
