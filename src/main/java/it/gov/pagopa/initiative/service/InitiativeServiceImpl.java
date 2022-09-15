@@ -134,7 +134,7 @@ public class InitiativeServiceImpl implements InitiativeService {
         initiative.setRefundRule(refundRule.getRefundRule());
         initiative.setUpdateDate(LocalDateTime.now());
         if (changeInitiativeStatus) {
-            initiative.setStatus(InitiativeConstants.Status.TO_CHECK);
+            initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
         }
         this.initiativeRepository.save(initiative);
         //FIXME Test d'integrazione con RuleEngine. Invio Iniziativa al RuleEngine. Da spostare nella sezione di pubblicazione
