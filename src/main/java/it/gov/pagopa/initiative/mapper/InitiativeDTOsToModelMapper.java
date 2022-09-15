@@ -30,9 +30,6 @@ import java.util.stream.Collectors;
 public class InitiativeDTOsToModelMapper {
 
     public Initiative toInitiative(InitiativeAdditionalDTO initiativeAdditionalDTO) {
-        if (initiativeAdditionalDTO == null) {
-            return null;
-        }
         Initiative initiative = new Initiative();
         initiative.setAdditionalInfo(this.toInitiativeAdditional(initiativeAdditionalDTO));
         if(null != initiative.getAdditionalInfo() && null != initiative.getAdditionalInfo().getServiceName())
@@ -41,9 +38,6 @@ public class InitiativeDTOsToModelMapper {
     }
 
     public Initiative toInitiative(InitiativeGeneralDTO initiativeGeneralDTO) {
-        if (initiativeGeneralDTO == null) {
-            return null;
-        }
         Initiative initiative = new Initiative();
         initiative.setGeneral(toInitiativeGeneral(initiativeGeneralDTO));
         return initiative;
@@ -93,9 +87,6 @@ public class InitiativeDTOsToModelMapper {
     }
 
     public InitiativeBeneficiaryRule toBeneficiaryRule(InitiativeBeneficiaryRuleDTO beneficiaryRuleDto) {
-        if (beneficiaryRuleDto == null) {
-            return null;
-        }
         InitiativeBeneficiaryRule beneficiaryRule = new InitiativeBeneficiaryRule();
         if (CollectionUtils.isEmpty(beneficiaryRuleDto.getAutomatedCriteria())) {
             beneficiaryRule.setAutomatedCriteria(Collections.emptyList());
@@ -140,9 +131,6 @@ public class InitiativeDTOsToModelMapper {
     }
 
     public Initiative toInitiative(InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDto) {
-        if (initiativeRewardAndTrxRulesDto == null) {
-            return null;
-        }
         Initiative initiative = new Initiative();
         initiative.setTrxRule(this.toInitiativeTrxRule(initiativeRewardAndTrxRulesDto.getTrxRule()));
         initiative.setRewardRule(this.toInitiativeRewardRule(initiativeRewardAndTrxRulesDto.getRewardRule()));
@@ -236,9 +224,6 @@ public class InitiativeDTOsToModelMapper {
     }
 
     public Initiative toInitiative(InitiativeRefundRuleDTO refundRuleDTO){
-        if (refundRuleDTO == null){
-            return null;
-        }
         Initiative initiative = new Initiative();
         initiative.setRefundRule(toInitiativeRefundRule(refundRuleDTO));
         return initiative;

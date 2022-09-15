@@ -108,11 +108,6 @@ class InitiativeDTOsToModelMapperTest {
         assertEquals(initiativeOnlyRewardAndTrxRules, initiative);
     }
 
-    @Test
-    void toInitiativeOnlyRewardAndTrxRulesNull_equals(){
-        Initiative initiative = initiativeDTOsToModelMapper.toInitiative((InitiativeAdditionalDTO) null);
-        assertEquals(null, initiative);
-    }
 
     @Test
     void toInitiativeOnlyRewardAndTrxRulesRewardRuleNull_equals(){
@@ -390,11 +385,11 @@ class InitiativeDTOsToModelMapperTest {
 
 
 
-    InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardValueDTO(){
+    private InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardValueDTO(){
         return new RewardValueDTO(BigDecimal.valueOf(50));
     }
 
-    InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardGroupDTO(){
+    private InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardGroupDTO(){
         RewardGroupsDTO rewardGroupsDTO = new RewardGroupsDTO();
         List<RewardGroupsDTO.RewardGroupDTO> list = new ArrayList<RewardGroupsDTO.RewardGroupDTO>();
         RewardGroupsDTO.RewardGroupDTO groupDTO1 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(10), BigDecimal.valueOf(100), BigDecimal.valueOf(50));
@@ -403,7 +398,7 @@ class InitiativeDTOsToModelMapperTest {
         return rewardGroupsDTO;
     }
 
-    InitiativeTrxConditionsDTO creatInitiativeTrxConditionsDTOValid(){
+    private InitiativeTrxConditionsDTO creatInitiativeTrxConditionsDTOValid(){
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = new InitiativeTrxConditionsDTO();
         List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<DayOfWeekDTO.DayConfig>();
         DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
@@ -463,7 +458,7 @@ class InitiativeDTOsToModelMapperTest {
         return initiativeTrxConditionsDTO;
     }
 
-    InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTO(){
+    private InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTO(){
         InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = new InitiativeRewardAndTrxRulesDTO();
         InitiativeRewardRuleDTO initiativeRewardRuleDTO = createInitiativeRewardRuleDTORewardValueDTO();
         initiativeRewardAndTrxRulesDTO.setRewardRule(initiativeRewardRuleDTO);
@@ -472,7 +467,7 @@ class InitiativeDTOsToModelMapperTest {
         return initiativeRewardAndTrxRulesDTO;
     }
 
-    InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTORewardGroup(){
+    private InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTORewardGroup(){
         InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = new InitiativeRewardAndTrxRulesDTO();
         InitiativeRewardRuleDTO initiativeRewardRuleDTO = createInitiativeRewardRuleDTORewardGroupDTO();
         initiativeRewardAndTrxRulesDTO.setRewardRule(initiativeRewardRuleDTO);
@@ -481,7 +476,7 @@ class InitiativeDTOsToModelMapperTest {
         return initiativeRewardAndTrxRulesDTO;
     }
 
-    InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTORewardRuleNull(){
+    private InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTORewardRuleNull(){
         InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = new InitiativeRewardAndTrxRulesDTO();
         initiativeRewardAndTrxRulesDTO.setRewardRule(null);
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = creatInitiativeTrxConditionsDTOValid();
@@ -496,11 +491,11 @@ class InitiativeDTOsToModelMapperTest {
         return initiativeDTO;
     }
 
-    InitiativeRewardRule createInitiativeRewardRuleRewardValue(){
+    private InitiativeRewardRule createInitiativeRewardRuleRewardValue(){
         return new RewardValue(BigDecimal.valueOf(50));
     }
 
-    InitiativeRewardRule createInitiativeRewardRuleRewardGroup(){
+    private InitiativeRewardRule createInitiativeRewardRuleRewardGroup(){
         RewardGroups rewardGroups = new RewardGroups();
         List<RewardGroups.RewardGroup> list = new ArrayList<RewardGroups.RewardGroup>();
         RewardGroups.RewardGroup group1 = new RewardGroups.RewardGroup(BigDecimal.valueOf(10), BigDecimal.valueOf(100), BigDecimal.valueOf(50));
@@ -509,7 +504,7 @@ class InitiativeDTOsToModelMapperTest {
         return rewardGroups;
     }
 
-    InitiativeTrxConditions creatInitiativeTrxConditionsValid(){
+    private InitiativeTrxConditions creatInitiativeTrxConditionsValid(){
         InitiativeTrxConditions initiativeTrxConditions = new InitiativeTrxConditions();
         List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig> dayConfigs = new ArrayList<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig dayConfig1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig();
