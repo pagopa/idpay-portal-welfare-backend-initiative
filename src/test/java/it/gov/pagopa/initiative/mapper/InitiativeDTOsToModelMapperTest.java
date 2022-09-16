@@ -77,6 +77,26 @@ class InitiativeDTOsToModelMapperTest {
 
     private Initiative initiativeOnlyRewardAndTrxRulesThresholdNull;
 
+    private InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTORewardLimitsNull;
+
+    private Initiative initiativeOnlyRewardAndTrxRulesRewardLimitsNull;
+
+    private InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTODayOfWeekNull;
+
+    private Initiative initiativeOnlyRewardAndTrxRulesDayOfWeekNull;
+
+    private InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTOMccFilterNull;
+
+    private Initiative initiativeOnlyRewardAndTrxRulesMccFilterNull;
+
+    private InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTOTrxCountNull;
+
+    private Initiative initiativeOnlyRewardAndTrxRulesTrxCountNull;
+
+    private InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRuleDTOTrxRuleNull;
+
+    private Initiative initiativeTrxRuleNull;
+
     @BeforeEach
     public void setUp() {
         initiativeOnlyInfoGeneral = createStep1InitiativeOnlyInfoGeneral();
@@ -99,6 +119,46 @@ class InitiativeDTOsToModelMapperTest {
         initiativeOnlyRewardAndTrxRulesRewardGroup = createInitiativeOnlyRewardAndTrxRulesRewardGroup();
         initiativeOnlyRewardAndTrxRulesThresholdNull = createInitiativeOnlyRewardAndTrxRulesThresholdNull();
         initiativeRewardAndTrxRulesDTOThresholdNull = createInitiativeRewardAndTrxRulesDTOThresholdNull();
+        initiativeOnlyRewardAndTrxRulesRewardLimitsNull = createInitiativeOnlyRewardAndTrxRewardLimitsEmpty();
+        initiativeRewardAndTrxRulesDTORewardLimitsNull = createInitiativeRewardAndTrxRulesDTORewardLimitsEmpty();
+        initiativeOnlyRewardAndTrxRulesDayOfWeekNull = createInitiativeOnlyRewardAndTrxDayOfWeekNull();
+        initiativeRewardAndTrxRulesDTODayOfWeekNull = createInitiativeRewardAndTrxRulesDTODayOfWeekNull();
+        initiativeRewardAndTrxRulesDTOMccFilterNull = createInitiativeRewardAndTrxRulesDTOMccFilterNull();
+        initiativeOnlyRewardAndTrxRulesMccFilterNull = createInitiativeOnlyRewardAndTrxMccFilterNull();
+        initiativeOnlyRewardAndTrxRulesTrxCountNull = createInitiativeOnlyRewardAndTrxRulesTrxCountNull();
+        initiativeRewardAndTrxRulesDTOTrxCountNull = createInitiativeRewardAndTrxRulesDTOTrxCountNull();
+        initiativeTrxRuleNull = createStep4InitiativeTrxNull();
+        initiativeRewardAndTrxRuleDTOTrxRuleNull = createInitiativeRewardAndTrxRulesDTOTrxRuleNull();
+    }
+
+    @Test
+    void toInitiativeTrxConditionsNull_equals(){
+        Initiative initiative = initiativeDTOsToModelMapper.toInitiative(initiativeRewardAndTrxRuleDTOTrxRuleNull);
+        assertEquals(initiativeTrxRuleNull, initiative);
+    }
+
+    @Test
+    void toInitiativeOnlyRewardAndTrxRulesTrxCountNull_equals(){
+        Initiative initiative = initiativeDTOsToModelMapper.toInitiative(initiativeRewardAndTrxRulesDTOTrxCountNull);
+        assertEquals(initiativeOnlyRewardAndTrxRulesTrxCountNull, initiative);
+    }
+
+    @Test
+    void toInitiativeOnlyRewardAndTrxRulesMccFilterNull_equals(){
+        Initiative initiative = initiativeDTOsToModelMapper.toInitiative(initiativeRewardAndTrxRulesDTOMccFilterNull);
+        assertEquals(initiativeOnlyRewardAndTrxRulesMccFilterNull, initiative);
+    }
+
+    @Test
+    void toInitiativeOnlyRewardAndTrxRulesDayOfWeekNull_equals(){
+        Initiative initiative = initiativeDTOsToModelMapper.toInitiative(initiativeRewardAndTrxRulesDTODayOfWeekNull);
+        assertEquals(initiativeOnlyRewardAndTrxRulesDayOfWeekNull, initiative);
+    }
+
+    @Test
+    void toInitiativeOnlyRewardAndTrxRulesRewardLimitsEmpty_equals(){
+        Initiative initiative = initiativeDTOsToModelMapper.toInitiative(initiativeRewardAndTrxRulesDTORewardLimitsNull);
+        assertEquals(initiativeOnlyRewardAndTrxRulesRewardLimitsNull, initiative);
     }
 
     @Test
@@ -523,6 +583,228 @@ class InitiativeDTOsToModelMapperTest {
         return initiativeTrxConditionsDTO;
     }
 
+    private InitiativeTrxConditionsDTO createInitiativeTrxConditionsDTORewardLimitsEmpty(){
+        InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = new InitiativeTrxConditionsDTO();
+        List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<DayOfWeekDTO.DayConfig>();
+        DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
+        Set<DayOfWeek> dayOfWeeks = new HashSet<>();
+        dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
+        dayOfWeeks.add(DayOfWeek.THURSDAY);
+        dayConfig1.setDaysOfWeek(dayOfWeeks);
+        List<DayOfWeekDTO.Interval> intervals = new ArrayList<DayOfWeekDTO.Interval>();
+        DayOfWeekDTO.Interval interval1 = new DayOfWeekDTO.Interval();
+        LocalTime t1 = LocalTime.of(6, 0, 0);
+        LocalTime t2 = LocalTime.of(12, 0, 0);
+        interval1.setStartTime(t1);
+        interval1.setEndTime(t2);
+        intervals.add(interval1);
+        dayConfig1.setIntervals(intervals);
+        dayConfigs.add(dayConfig1);
+
+        DayOfWeekDTO dayOfWeekDTO = new DayOfWeekDTO(dayConfigs);
+
+        ThresholdDTO thresholdDTO = new ThresholdDTO();
+
+        thresholdDTO.setFrom(BigDecimal.valueOf(10));
+        thresholdDTO.setFromIncluded(true);
+        thresholdDTO.setTo(BigDecimal.valueOf(30));
+        thresholdDTO.setToIncluded(true);
+
+        TrxCountDTO trxCountDTO = new TrxCountDTO();
+
+        trxCountDTO.setFrom(10L);
+        trxCountDTO.setFromIncluded(true);
+        trxCountDTO.setTo(30L);
+        trxCountDTO.setToIncluded(true);
+
+        MccFilterDTO mccFilterDTO = new MccFilterDTO();
+        mccFilterDTO.setAllowedList(true);
+        Set<String> values = new HashSet<String>();
+        values.add("123");
+        values.add("456");
+        mccFilterDTO.setValues(values);
+
+        List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<RewardLimitsDTO>();
+
+        initiativeTrxConditionsDTO.setDaysOfWeek(dayOfWeekDTO);
+        initiativeTrxConditionsDTO.setThreshold(thresholdDTO);
+        initiativeTrxConditionsDTO.setTrxCount(trxCountDTO);
+        initiativeTrxConditionsDTO.setMccFilter(mccFilterDTO);
+        initiativeTrxConditionsDTO.setRewardLimits(rewardLimitsDTOList);
+
+        return initiativeTrxConditionsDTO;
+    }
+
+    private InitiativeTrxConditionsDTO createInitiativeTrxConditionsDTODayOfWeekNull(){
+        InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = new InitiativeTrxConditionsDTO();
+        List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<DayOfWeekDTO.DayConfig>();
+        DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
+        Set<DayOfWeek> dayOfWeeks = new HashSet<>();
+        dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
+        dayOfWeeks.add(DayOfWeek.THURSDAY);
+        dayConfig1.setDaysOfWeek(dayOfWeeks);
+        List<DayOfWeekDTO.Interval> intervals = new ArrayList<DayOfWeekDTO.Interval>();
+        DayOfWeekDTO.Interval interval1 = new DayOfWeekDTO.Interval();
+        LocalTime t1 = LocalTime.of(6, 0, 0);
+        LocalTime t2 = LocalTime.of(12, 0, 0);
+        interval1.setStartTime(t1);
+        interval1.setEndTime(t2);
+        intervals.add(interval1);
+        dayConfig1.setIntervals(intervals);
+        dayConfigs.add(dayConfig1);
+
+        DayOfWeekDTO dayOfWeekDTO = null;
+
+        ThresholdDTO thresholdDTO = new ThresholdDTO();
+
+        thresholdDTO.setFrom(BigDecimal.valueOf(10));
+        thresholdDTO.setFromIncluded(true);
+        thresholdDTO.setTo(BigDecimal.valueOf(30));
+        thresholdDTO.setToIncluded(true);
+
+        TrxCountDTO trxCountDTO = new TrxCountDTO();
+
+        trxCountDTO.setFrom(10L);
+        trxCountDTO.setFromIncluded(true);
+        trxCountDTO.setTo(30L);
+        trxCountDTO.setToIncluded(true);
+
+        MccFilterDTO mccFilterDTO = new MccFilterDTO();
+        mccFilterDTO.setAllowedList(true);
+        Set<String> values = new HashSet<String>();
+        values.add("123");
+        values.add("456");
+        mccFilterDTO.setValues(values);
+
+        List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<RewardLimitsDTO>();
+        RewardLimitsDTO rewardLimitsDTO1 = new RewardLimitsDTO();
+        rewardLimitsDTO1.setFrequency(RewardLimitsDTO.RewardLimitFrequency.DAILY);
+        rewardLimitsDTO1.setRewardLimit(BigDecimal.valueOf(100));
+        RewardLimitsDTO rewardLimitsDTO2 = new RewardLimitsDTO();
+        rewardLimitsDTO2.setFrequency(RewardLimitsDTO.RewardLimitFrequency.MONTHLY);
+        rewardLimitsDTO2.setRewardLimit(BigDecimal.valueOf(3000));
+        rewardLimitsDTOList.add(rewardLimitsDTO1);
+        rewardLimitsDTOList.add(rewardLimitsDTO2);
+
+        initiativeTrxConditionsDTO.setDaysOfWeek(dayOfWeekDTO);
+        initiativeTrxConditionsDTO.setThreshold(thresholdDTO);
+        initiativeTrxConditionsDTO.setTrxCount(trxCountDTO);
+        initiativeTrxConditionsDTO.setMccFilter(mccFilterDTO);
+        initiativeTrxConditionsDTO.setRewardLimits(rewardLimitsDTOList);
+
+        return initiativeTrxConditionsDTO;
+    }
+
+    private InitiativeTrxConditionsDTO createInitiativeTrxConditionsDTOMccFilterNull(){
+        InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = new InitiativeTrxConditionsDTO();
+        List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<DayOfWeekDTO.DayConfig>();
+        DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
+        Set<DayOfWeek> dayOfWeeks = new HashSet<>();
+        dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
+        dayOfWeeks.add(DayOfWeek.THURSDAY);
+        dayConfig1.setDaysOfWeek(dayOfWeeks);
+        List<DayOfWeekDTO.Interval> intervals = new ArrayList<DayOfWeekDTO.Interval>();
+        DayOfWeekDTO.Interval interval1 = new DayOfWeekDTO.Interval();
+        LocalTime t1 = LocalTime.of(6, 0, 0);
+        LocalTime t2 = LocalTime.of(12, 0, 0);
+        interval1.setStartTime(t1);
+        interval1.setEndTime(t2);
+        intervals.add(interval1);
+        dayConfig1.setIntervals(intervals);
+        dayConfigs.add(dayConfig1);
+
+        DayOfWeekDTO dayOfWeekDTO = new DayOfWeekDTO(dayConfigs);
+
+        ThresholdDTO thresholdDTO = new ThresholdDTO();
+
+        thresholdDTO.setFrom(BigDecimal.valueOf(10));
+        thresholdDTO.setFromIncluded(true);
+        thresholdDTO.setTo(BigDecimal.valueOf(30));
+        thresholdDTO.setToIncluded(true);
+
+        TrxCountDTO trxCountDTO = new TrxCountDTO();
+
+        trxCountDTO.setFrom(10L);
+        trxCountDTO.setFromIncluded(true);
+        trxCountDTO.setTo(30L);
+        trxCountDTO.setToIncluded(true);
+
+        MccFilterDTO mccFilterDTO = null;
+
+        List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<RewardLimitsDTO>();
+        RewardLimitsDTO rewardLimitsDTO1 = new RewardLimitsDTO();
+        rewardLimitsDTO1.setFrequency(RewardLimitsDTO.RewardLimitFrequency.DAILY);
+        rewardLimitsDTO1.setRewardLimit(BigDecimal.valueOf(100));
+        RewardLimitsDTO rewardLimitsDTO2 = new RewardLimitsDTO();
+        rewardLimitsDTO2.setFrequency(RewardLimitsDTO.RewardLimitFrequency.MONTHLY);
+        rewardLimitsDTO2.setRewardLimit(BigDecimal.valueOf(3000));
+        rewardLimitsDTOList.add(rewardLimitsDTO1);
+        rewardLimitsDTOList.add(rewardLimitsDTO2);
+
+        initiativeTrxConditionsDTO.setDaysOfWeek(dayOfWeekDTO);
+        initiativeTrxConditionsDTO.setThreshold(thresholdDTO);
+        initiativeTrxConditionsDTO.setTrxCount(trxCountDTO);
+        initiativeTrxConditionsDTO.setMccFilter(mccFilterDTO);
+        initiativeTrxConditionsDTO.setRewardLimits(rewardLimitsDTOList);
+
+        return initiativeTrxConditionsDTO;
+    }
+
+    private InitiativeTrxConditionsDTO createInitiativeTrxConditionsDTOTrxCountNull(){
+        InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = new InitiativeTrxConditionsDTO();
+        List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<DayOfWeekDTO.DayConfig>();
+        DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
+        Set<DayOfWeek> dayOfWeeks = new HashSet<>();
+        dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
+        dayOfWeeks.add(DayOfWeek.THURSDAY);
+        dayConfig1.setDaysOfWeek(dayOfWeeks);
+        List<DayOfWeekDTO.Interval> intervals = new ArrayList<DayOfWeekDTO.Interval>();
+        DayOfWeekDTO.Interval interval1 = new DayOfWeekDTO.Interval();
+        LocalTime t1 = LocalTime.of(6, 0, 0);
+        LocalTime t2 = LocalTime.of(12, 0, 0);
+        interval1.setStartTime(t1);
+        interval1.setEndTime(t2);
+        intervals.add(interval1);
+        dayConfig1.setIntervals(intervals);
+        dayConfigs.add(dayConfig1);
+
+        DayOfWeekDTO dayOfWeekDTO = new DayOfWeekDTO(dayConfigs);
+
+        ThresholdDTO thresholdDTO = new ThresholdDTO();
+
+        thresholdDTO.setFrom(BigDecimal.valueOf(10));
+        thresholdDTO.setFromIncluded(true);
+        thresholdDTO.setTo(BigDecimal.valueOf(30));
+        thresholdDTO.setToIncluded(true);
+
+        TrxCountDTO trxCountDTO = null;
+
+        MccFilterDTO mccFilterDTO = new MccFilterDTO();
+        mccFilterDTO.setAllowedList(true);
+        Set<String> values = new HashSet<String>();
+        values.add("123");
+        values.add("456");
+        mccFilterDTO.setValues(values);
+
+        List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<RewardLimitsDTO>();
+        RewardLimitsDTO rewardLimitsDTO1 = new RewardLimitsDTO();
+        rewardLimitsDTO1.setFrequency(RewardLimitsDTO.RewardLimitFrequency.DAILY);
+        rewardLimitsDTO1.setRewardLimit(BigDecimal.valueOf(100));
+        RewardLimitsDTO rewardLimitsDTO2 = new RewardLimitsDTO();
+        rewardLimitsDTO2.setFrequency(RewardLimitsDTO.RewardLimitFrequency.MONTHLY);
+        rewardLimitsDTO2.setRewardLimit(BigDecimal.valueOf(3000));
+        rewardLimitsDTOList.add(rewardLimitsDTO1);
+        rewardLimitsDTOList.add(rewardLimitsDTO2);
+
+        initiativeTrxConditionsDTO.setDaysOfWeek(dayOfWeekDTO);
+        initiativeTrxConditionsDTO.setThreshold(thresholdDTO);
+        initiativeTrxConditionsDTO.setTrxCount(trxCountDTO);
+        initiativeTrxConditionsDTO.setMccFilter(mccFilterDTO);
+        initiativeTrxConditionsDTO.setRewardLimits(rewardLimitsDTOList);
+
+        return initiativeTrxConditionsDTO;
+    }
+
     private InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTO(){
         InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = new InitiativeRewardAndTrxRulesDTO();
         InitiativeRewardRuleDTO initiativeRewardRuleDTO = createInitiativeRewardRuleDTORewardValueDTO();
@@ -556,12 +838,48 @@ class InitiativeDTOsToModelMapperTest {
         return initiativeRewardAndTrxRulesDTO;
     }
 
+    private InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTORewardLimitsEmpty(){
+        InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = new InitiativeRewardAndTrxRulesDTO();
+        initiativeRewardAndTrxRulesDTO.setRewardRule(createInitiativeRewardRuleDTORewardValueDTO());
+        initiativeRewardAndTrxRulesDTO.setTrxRule(createInitiativeTrxConditionsDTORewardLimitsEmpty());
+        return initiativeRewardAndTrxRulesDTO;
+    }
+
+    private InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTOMccFilterNull(){
+        InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = new InitiativeRewardAndTrxRulesDTO();
+        initiativeRewardAndTrxRulesDTO.setRewardRule(createInitiativeRewardRuleDTORewardValueDTO());
+        initiativeRewardAndTrxRulesDTO.setTrxRule(createInitiativeTrxConditionsDTOMccFilterNull());
+        return initiativeRewardAndTrxRulesDTO;
+    }
+
+    private InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTODayOfWeekNull(){
+        InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = new InitiativeRewardAndTrxRulesDTO();
+        initiativeRewardAndTrxRulesDTO.setRewardRule(createInitiativeRewardRuleDTORewardValueDTO());
+        initiativeRewardAndTrxRulesDTO.setTrxRule(createInitiativeTrxConditionsDTODayOfWeekNull());
+        return initiativeRewardAndTrxRulesDTO;
+    }
+
+    private InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTOTrxCountNull(){
+        InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = new InitiativeRewardAndTrxRulesDTO();
+        initiativeRewardAndTrxRulesDTO.setRewardRule(createInitiativeRewardRuleDTORewardValueDTO());
+        initiativeRewardAndTrxRulesDTO.setTrxRule(createInitiativeTrxConditionsDTOTrxCountNull());
+        return initiativeRewardAndTrxRulesDTO;
+    }
+
+    private InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTOTrxRuleNull(){
+        InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = new InitiativeRewardAndTrxRulesDTO();
+        initiativeRewardAndTrxRulesDTO.setRewardRule(createInitiativeRewardRuleDTORewardValueDTO());
+        initiativeRewardAndTrxRulesDTO.setTrxRule(null);
+        return initiativeRewardAndTrxRulesDTO;
+    }
+
     private InitiativeDTO createStep4InitiativeDTO () {
         InitiativeDTO initiativeDTO = createStep3InitiativeDTO();
         initiativeDTO.setRewardRule(createInitiativeRewardRuleDTORewardValueDTO());
         initiativeDTO.setTrxRule(createInitiativeTrxConditionsDTOValid());
         return initiativeDTO;
     }
+
 
     private InitiativeRewardRule createInitiativeRewardRuleRewardValue(){
         return new RewardValue(BigDecimal.valueOf(50));
@@ -691,12 +1009,241 @@ class InitiativeDTOsToModelMapperTest {
         return initiativeTrxConditions;
     }
 
+    private InitiativeTrxConditions createInitiativeTrxConditionsRewardLimitsEmpty(){
+        InitiativeTrxConditions initiativeTrxConditions = new InitiativeTrxConditions();
+        List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig> dayConfigs = new ArrayList<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig>();
+        it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig dayConfig1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig();
+        Set<DayOfWeek> dayOfWeeks = new HashSet<>();
+        dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
+        dayOfWeeks.add(DayOfWeek.THURSDAY);
+        dayConfig1.setDaysOfWeek(dayOfWeeks);
+        List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval> intervals = new ArrayList<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval>();
+        it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval interval1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval();
+        LocalTime t1 = LocalTime.of(6, 0, 0);
+        LocalTime t2 = LocalTime.of(12, 0, 0);
+        interval1.setStartTime(t1);
+        interval1.setEndTime(t2);
+        intervals.add(interval1);
+        dayConfig1.setIntervals(intervals);
+        dayConfigs.add(dayConfig1);
+
+        it.gov.pagopa.initiative.model.rule.trx.DayOfWeek dayOfWeek = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek(dayConfigs);
+
+        Threshold threshold = new Threshold();
+
+        threshold.setFrom(BigDecimal.valueOf(10));
+        threshold.setFromIncluded(true);
+        threshold.setTo(BigDecimal.valueOf(30));
+        threshold.setToIncluded(true);
+
+        TrxCount trxCount = new TrxCount();
+
+        trxCount.setFrom(10L);
+        trxCount.setFromIncluded(true);
+        trxCount.setTo(30L);
+        trxCount.setToIncluded(true);
+
+        MccFilter mccFilter = new MccFilter();
+        mccFilter.setAllowedList(true);
+        Set<String> values = new HashSet<String>();
+        values.add("123");
+        values.add("456");
+        mccFilter.setValues(values);
+
+        List<RewardLimits> rewardLimitsList = new ArrayList<RewardLimits>();
+
+        initiativeTrxConditions.setDaysOfWeek(dayOfWeek);
+        initiativeTrxConditions.setThreshold(threshold);
+        initiativeTrxConditions.setTrxCount(trxCount);
+        initiativeTrxConditions.setMccFilter(mccFilter);
+        initiativeTrxConditions.setRewardLimits(rewardLimitsList);
+
+        return initiativeTrxConditions;
+    }
+
+    private InitiativeTrxConditions createInitiativeTrxConditionsDayOfWeekNull(){
+        InitiativeTrxConditions initiativeTrxConditions = new InitiativeTrxConditions();
+        List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig> dayConfigs = new ArrayList<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig>();
+        it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig dayConfig1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig();
+        Set<DayOfWeek> dayOfWeeks = new HashSet<>();
+        dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
+        dayOfWeeks.add(DayOfWeek.THURSDAY);
+        dayConfig1.setDaysOfWeek(dayOfWeeks);
+        List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval> intervals = new ArrayList<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval>();
+        it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval interval1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval();
+        LocalTime t1 = LocalTime.of(6, 0, 0);
+        LocalTime t2 = LocalTime.of(12, 0, 0);
+        interval1.setStartTime(t1);
+        interval1.setEndTime(t2);
+        intervals.add(interval1);
+        dayConfig1.setIntervals(intervals);
+        dayConfigs.add(dayConfig1);
+
+        it.gov.pagopa.initiative.model.rule.trx.DayOfWeek dayOfWeek = null;
+
+        Threshold threshold = new Threshold();
+
+        threshold.setFrom(BigDecimal.valueOf(10));
+        threshold.setFromIncluded(true);
+        threshold.setTo(BigDecimal.valueOf(30));
+        threshold.setToIncluded(true);
+
+        TrxCount trxCount = new TrxCount();
+
+        trxCount.setFrom(10L);
+        trxCount.setFromIncluded(true);
+        trxCount.setTo(30L);
+        trxCount.setToIncluded(true);
+
+        MccFilter mccFilter = new MccFilter();
+        mccFilter.setAllowedList(true);
+        Set<String> values = new HashSet<String>();
+        values.add("123");
+        values.add("456");
+        mccFilter.setValues(values);
+
+        List<RewardLimits> rewardLimitsList = new ArrayList<RewardLimits>();
+        RewardLimits rewardLimits1 = new RewardLimits();
+        rewardLimits1.setFrequency(RewardLimits.RewardLimitFrequency.DAILY);
+        rewardLimits1.setRewardLimit(BigDecimal.valueOf(100));
+        RewardLimits rewardLimits2 = new RewardLimits();
+        rewardLimits2.setFrequency(RewardLimits.RewardLimitFrequency.MONTHLY);
+        rewardLimits2.setRewardLimit(BigDecimal.valueOf(3000));
+        rewardLimitsList.add(rewardLimits1);
+        rewardLimitsList.add(rewardLimits2);
+
+        initiativeTrxConditions.setDaysOfWeek(dayOfWeek);
+        initiativeTrxConditions.setThreshold(threshold);
+        initiativeTrxConditions.setTrxCount(trxCount);
+        initiativeTrxConditions.setMccFilter(mccFilter);
+        initiativeTrxConditions.setRewardLimits(rewardLimitsList);
+
+        return initiativeTrxConditions;
+    }
+
+    private InitiativeTrxConditions createInitiativeTrxConditionsMccFilterNull(){
+        InitiativeTrxConditions initiativeTrxConditions = new InitiativeTrxConditions();
+        List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig> dayConfigs = new ArrayList<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig>();
+        it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig dayConfig1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig();
+        Set<DayOfWeek> dayOfWeeks = new HashSet<>();
+        dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
+        dayOfWeeks.add(DayOfWeek.THURSDAY);
+        dayConfig1.setDaysOfWeek(dayOfWeeks);
+        List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval> intervals = new ArrayList<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval>();
+        it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval interval1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval();
+        LocalTime t1 = LocalTime.of(6, 0, 0);
+        LocalTime t2 = LocalTime.of(12, 0, 0);
+        interval1.setStartTime(t1);
+        interval1.setEndTime(t2);
+        intervals.add(interval1);
+        dayConfig1.setIntervals(intervals);
+        dayConfigs.add(dayConfig1);
+
+        it.gov.pagopa.initiative.model.rule.trx.DayOfWeek dayOfWeek = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek(dayConfigs);
+
+        Threshold threshold = new Threshold();
+
+        threshold.setFrom(BigDecimal.valueOf(10));
+        threshold.setFromIncluded(true);
+        threshold.setTo(BigDecimal.valueOf(30));
+        threshold.setToIncluded(true);
+
+        TrxCount trxCount = new TrxCount();
+
+        trxCount.setFrom(10L);
+        trxCount.setFromIncluded(true);
+        trxCount.setTo(30L);
+        trxCount.setToIncluded(true);
+
+        MccFilter mccFilter = null;
+
+        List<RewardLimits> rewardLimitsList = new ArrayList<RewardLimits>();
+        RewardLimits rewardLimits1 = new RewardLimits();
+        rewardLimits1.setFrequency(RewardLimits.RewardLimitFrequency.DAILY);
+        rewardLimits1.setRewardLimit(BigDecimal.valueOf(100));
+        RewardLimits rewardLimits2 = new RewardLimits();
+        rewardLimits2.setFrequency(RewardLimits.RewardLimitFrequency.MONTHLY);
+        rewardLimits2.setRewardLimit(BigDecimal.valueOf(3000));
+        rewardLimitsList.add(rewardLimits1);
+        rewardLimitsList.add(rewardLimits2);
+
+        initiativeTrxConditions.setDaysOfWeek(dayOfWeek);
+        initiativeTrxConditions.setThreshold(threshold);
+        initiativeTrxConditions.setTrxCount(trxCount);
+        initiativeTrxConditions.setMccFilter(mccFilter);
+        initiativeTrxConditions.setRewardLimits(rewardLimitsList);
+
+        return initiativeTrxConditions;
+    }
+
+    private InitiativeTrxConditions createInitiativeTrxConditionsTrxCountNull(){
+        InitiativeTrxConditions initiativeTrxConditions = new InitiativeTrxConditions();
+        List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig> dayConfigs = new ArrayList<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig>();
+        it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig dayConfig1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig();
+        Set<DayOfWeek> dayOfWeeks = new HashSet<>();
+        dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
+        dayOfWeeks.add(DayOfWeek.THURSDAY);
+        dayConfig1.setDaysOfWeek(dayOfWeeks);
+        List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval> intervals = new ArrayList<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval>();
+        it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval interval1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval();
+        LocalTime t1 = LocalTime.of(6, 0, 0);
+        LocalTime t2 = LocalTime.of(12, 0, 0);
+        interval1.setStartTime(t1);
+        interval1.setEndTime(t2);
+        intervals.add(interval1);
+        dayConfig1.setIntervals(intervals);
+        dayConfigs.add(dayConfig1);
+
+        it.gov.pagopa.initiative.model.rule.trx.DayOfWeek dayOfWeek = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek(dayConfigs);
+
+        Threshold threshold = new Threshold();
+
+        threshold.setFrom(BigDecimal.valueOf(10));
+        threshold.setFromIncluded(true);
+        threshold.setTo(BigDecimal.valueOf(30));
+        threshold.setToIncluded(true);
+
+        TrxCount trxCount = null;
+
+        MccFilter mccFilter = new MccFilter();
+        mccFilter.setAllowedList(true);
+        Set<String> values = new HashSet<String>();
+        values.add("123");
+        values.add("456");
+        mccFilter.setValues(values);
+
+        List<RewardLimits> rewardLimitsList = new ArrayList<RewardLimits>();
+        RewardLimits rewardLimits1 = new RewardLimits();
+        rewardLimits1.setFrequency(RewardLimits.RewardLimitFrequency.DAILY);
+        rewardLimits1.setRewardLimit(BigDecimal.valueOf(100));
+        RewardLimits rewardLimits2 = new RewardLimits();
+        rewardLimits2.setFrequency(RewardLimits.RewardLimitFrequency.MONTHLY);
+        rewardLimits2.setRewardLimit(BigDecimal.valueOf(3000));
+        rewardLimitsList.add(rewardLimits1);
+        rewardLimitsList.add(rewardLimits2);
+
+        initiativeTrxConditions.setDaysOfWeek(dayOfWeek);
+        initiativeTrxConditions.setThreshold(threshold);
+        initiativeTrxConditions.setTrxCount(trxCount);
+        initiativeTrxConditions.setMccFilter(mccFilter);
+        initiativeTrxConditions.setRewardLimits(rewardLimitsList);
+
+        return initiativeTrxConditions;
+    }
+
     private Initiative createStep4Initiative () {
         Initiative initiative = createStep3Initiative();
         InitiativeRewardRule initiativeRewardRule = createInitiativeRewardRuleRewardValue();
         InitiativeTrxConditions initiativeTrxConditions = createInitiativeTrxConditionsValid();
         initiative.setRewardRule(initiativeRewardRule);
         initiative.setTrxRule(initiativeTrxConditions);
+        return initiative;
+    }
+
+    private Initiative createStep4InitiativeTrxNull () {
+        Initiative initiative = new Initiative();
+        initiative.setRewardRule(createInitiativeRewardRuleRewardValue());
+        initiative.setTrxRule(null);
         return initiative;
     }
 
@@ -714,6 +1261,27 @@ class InitiativeDTOsToModelMapperTest {
         return initiative;
     }
 
+    private Initiative createInitiativeOnlyRewardAndTrxRewardLimitsEmpty(){
+        Initiative initiative = new Initiative();
+        initiative.setRewardRule(createInitiativeRewardRuleRewardValue());
+        initiative.setTrxRule(createInitiativeTrxConditionsRewardLimitsEmpty());
+        return initiative;
+    }
+
+    private Initiative createInitiativeOnlyRewardAndTrxDayOfWeekNull(){
+        Initiative initiative = new Initiative();
+        initiative.setRewardRule(createInitiativeRewardRuleRewardValue());
+        initiative.setTrxRule(createInitiativeTrxConditionsDayOfWeekNull());
+        return initiative;
+    }
+
+    private Initiative createInitiativeOnlyRewardAndTrxMccFilterNull(){
+        Initiative initiative = new Initiative();
+        initiative.setRewardRule(createInitiativeRewardRuleRewardValue());
+        initiative.setTrxRule(createInitiativeTrxConditionsMccFilterNull());
+        return initiative;
+    }
+
     private Initiative createInitiativeOnlyRewardAndTrxRules(){
         Initiative initiative = new Initiative();
         initiative.setRewardRule(createInitiativeRewardRuleRewardValue());
@@ -721,21 +1289,16 @@ class InitiativeDTOsToModelMapperTest {
         return initiative;
     }
 
+    private Initiative createInitiativeOnlyRewardAndTrxRulesTrxCountNull(){
+        Initiative initiative = new Initiative();
+        initiative.setRewardRule(createInitiativeRewardRuleRewardValue());
+        initiative.setTrxRule(createInitiativeTrxConditionsTrxCountNull());
+        return initiative;
+    }
+
     private Initiative createInitiativeOnlyRewardAndTrxRulesRewardGroup(){
         Initiative initiative = new Initiative();
         initiative.setRewardRule(createInitiativeRewardRuleRewardGroup());
-        initiative.setTrxRule(createInitiativeTrxConditionsValid());
-        return initiative;
-    }
-
-    private Initiative createInitiativeOnlyRewardRule(){
-        Initiative initiative =new Initiative();
-        initiative.setRewardRule(createInitiativeRewardRuleRewardValue());
-        return initiative;
-    }
-
-    private Initiative createInitiativeOnlyTrxConditions(){
-        Initiative initiative = new Initiative();
         initiative.setTrxRule(createInitiativeTrxConditionsValid());
         return initiative;
     }
