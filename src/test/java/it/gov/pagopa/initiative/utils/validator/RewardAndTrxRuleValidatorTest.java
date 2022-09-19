@@ -35,6 +35,12 @@ public class RewardAndTrxRuleValidatorTest {
         validator = factory.getValidator();
     }
 
+    @Test
+    void when_IntervalStartTimeIsNullAndEndTimeIsNotNull(){
+        DayOfWeekDTO.Interval interval = createIntervalWithEndTimeNull();
+        Set<ConstraintViolation<DayOfWeekDTO.Interval>> violations = validator.validate(interval, ValidationOnGroup.class);
+        assertThat(violations).hasSize(2);
+    }
 
     @Test
     void when_RewardGroupsDTOAreValid_thenValidationIsPassed(){
@@ -585,4 +591,9 @@ public class RewardAndTrxRuleValidatorTest {
         initiativeRewardAndTrxRulesDTO.setTrxRule(initiativeTrxConditionsDTO);
         return initiativeRewardAndTrxRulesDTO;
     }
+
+    private DayOfWeekDTO.Interval createIntervalWithEndTimeNull(){
+        return new DayOfWeekDTO.Interval(LocalTime.of(10, 00, 00), null);
+    }
+
 }

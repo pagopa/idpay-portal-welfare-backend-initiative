@@ -10,10 +10,8 @@ import java.time.LocalTime;
 
 public class DayOfWeekStartTimeBeforeEndTimeValidator implements ConstraintValidator<DayOfWeekStartTimeBeforeEndTime, DayOfWeekDTO.Interval> {
     private static final SpelExpressionParser PARSER = new SpelExpressionParser();
-
     private String time_1;
     private String time_2;
-
     @Override
     public void initialize(DayOfWeekStartTimeBeforeEndTime constraintAnnotation) {
         time_1 = constraintAnnotation.time1();
@@ -26,6 +24,6 @@ public class DayOfWeekStartTimeBeforeEndTimeValidator implements ConstraintValid
         LocalTime time2Tmp = value.getEndTime();
         if(null != time1Tmp && null != time2Tmp)
             return time1Tmp.isBefore(time2Tmp);
-        return true;
+        return false;
     }
 }
