@@ -35,6 +35,19 @@ public class RewardAndTrxRuleValidatorTest {
         validator = factory.getValidator();
     }
 
+    @Test
+    void when_DayConfigHasWrongIntervals_thenValidationFailed(){
+        DayOfWeekDTO.DayConfig dayConfig = createDayConfigWithWrongIntervalsItems();
+        Set<ConstraintViolation<DayOfWeekDTO.DayConfig>> violations = validator.validate(dayConfig, ValidationOnGroup.class);
+        assertThat(violations).hasSize(1);
+    }
+
+    @Test
+    void when_IntervalStartTimeIsNullAndEndTimeIsNotNull(){
+        DayOfWeekDTO.Interval interval = createIntervalWithEndTimeNull();
+        Set<ConstraintViolation<DayOfWeekDTO.Interval>> violations = validator.validate(interval, ValidationOnGroup.class);
+        assertThat(violations).hasSize(1);
+    }
 
     @Test
     void when_RewardGroupsDTOAreValid_thenValidationIsPassed(){
@@ -585,4 +598,25 @@ public class RewardAndTrxRuleValidatorTest {
         initiativeRewardAndTrxRulesDTO.setTrxRule(initiativeTrxConditionsDTO);
         return initiativeRewardAndTrxRulesDTO;
     }
+
+    private DayOfWeekDTO.DayConfig createDayConfigWithWrongIntervalsItems(){
+        DayOfWeekDTO.DayConfig dayConfig = new DayOfWeekDTO.DayConfig();
+
+        Set<DayOfWeek> dayOfWeeks = new HashSet<DayOfWeek>();
+        dayOfWeeks.add(DayOfWeek.MONDAY);
+        dayOfWeeks.add(DayOfWeek.THURSDAY);
+
+        List<DayOfWeekDTO.Interval> intervals = new ArrayList<DayOfWeekDTO.Interval>();
+        intervals.add( new DayOfWeekDTO.Interval(null, LocalTime.of(6,0,0)));
+        intervals.add( new DayOfWeekDTO.Interval(LocalTime.of(7,0,0), LocalTime.of(22,0,0)));
+
+        dayConfig.setDaysOfWeek(dayOfWeeks);
+        dayConfig.setIntervals(intervals);
+        return dayConfig;
+    }
+
+    private DayOfWeekDTO.Interval createIntervalWithEndTimeNull(){
+        return new DayOfWeekDTO.Interval(LocalTime.of(10, 00, 00), null);
+    }
+
 }

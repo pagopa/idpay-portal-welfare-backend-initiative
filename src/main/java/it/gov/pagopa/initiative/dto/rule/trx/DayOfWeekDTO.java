@@ -1,7 +1,7 @@
 package it.gov.pagopa.initiative.dto.rule.trx;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import it.gov.pagopa.initiative.utils.constraint.DayConfigIntervalsValue;
+import it.gov.pagopa.initiative.utils.constraint.DayConfigNotRepeatedIntervalsConstraint;
 import it.gov.pagopa.initiative.utils.constraint.DayOfWeekStartTimeBeforeEndTime;
 import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
 import lombok.AllArgsConstructor;
@@ -32,7 +32,7 @@ public class DayOfWeekDTO extends ArrayList<DayOfWeekDTO.DayConfig> {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    @DayConfigIntervalsValue(intervals = "intervals", groups = ValidationOnGroup.class)
+    @DayConfigNotRepeatedIntervalsConstraint(groups = ValidationOnGroup.class)
     public static class DayConfig {
         @NotNull(groups = ValidationOnGroup.class)
         @NotEmpty(groups = ValidationOnGroup.class)
@@ -48,7 +48,7 @@ public class DayOfWeekDTO extends ArrayList<DayOfWeekDTO.DayConfig> {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    @DayOfWeekStartTimeBeforeEndTime(time1 = "startTime", time2 = "endTime", groups = ValidationOnGroup.class)
+    @DayOfWeekStartTimeBeforeEndTime(groups = ValidationOnGroup.class)
     public static class Interval {
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss[.SSS]")
         @NotNull(groups = ValidationOnGroup.class)
