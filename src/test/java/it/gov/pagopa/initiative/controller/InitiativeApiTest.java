@@ -72,6 +72,7 @@ class InitiativeApiTest {
 
     private static final String PUT_INITIATIVE_REFUND_RULES_INFO_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/refund";
     private static final String PUT_INITIATIVE_BENEFICIARY_RULES_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/beneficiary";
+    private static final String PUT_INITIATIVE_STATUS_APPROVED_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/approve";
     private static final String ROLE = "TEST_ROLE";
 
     @MockBean
@@ -366,6 +367,24 @@ class InitiativeApiTest {
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_BENEFICIARY_RULES_URL + "/draft", ORGANIZATION_ID, INITIATIVE_ID))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(initiativeBeneficiaryRuleDTO))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    void updateInitiativeStatusApproved_statusNoContent() throws Exception {
+        //create Dummy Initiative
+        Initiative step4Initiative = createStep4Initiative();
+        InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
+
+
+        //doNothing only for Void method
+        doNothing().when(initiativeService).updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID);
+
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_STATUS_APPROVED_URL, ORGANIZATION_ID, INITIATIVE_ID))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
                 .andDo(print())
