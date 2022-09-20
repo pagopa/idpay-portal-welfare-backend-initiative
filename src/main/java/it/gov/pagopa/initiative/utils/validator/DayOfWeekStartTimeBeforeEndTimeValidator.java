@@ -9,17 +9,6 @@ import javax.validation.ConstraintValidatorContext;
 import java.time.LocalTime;
 
 public class DayOfWeekStartTimeBeforeEndTimeValidator implements ConstraintValidator<DayOfWeekStartTimeBeforeEndTime, DayOfWeekDTO.Interval> {
-    private static final SpelExpressionParser PARSER = new SpelExpressionParser();
-
-    private String time_1;
-    private String time_2;
-
-    @Override
-    public void initialize(DayOfWeekStartTimeBeforeEndTime constraintAnnotation) {
-        time_1 = constraintAnnotation.time1();
-        time_2 = constraintAnnotation.time2();
-    }
-
     @Override
     public boolean isValid(DayOfWeekDTO.Interval value, ConstraintValidatorContext context) {
         LocalTime time1Tmp = value.getStartTime();
