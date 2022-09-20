@@ -144,6 +144,18 @@ public class InitiativeServiceImpl implements InitiativeService {
     }
 
     @Override
+    public void updateInitiativeApprovedStatus(String organizationId, String initiativeId){
+        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeId(organizationId, initiativeId)
+                .orElseThrow(() -> new InitiativeException(
+                        InitiativeConstants.Exception.NotFound.CODE,
+                        String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
+                        HttpStatus.NOT_FOUND));
+        initiative.setStatus(InitiativeConstants.Status.APPROVED);
+        initiative.setUpdateDate(LocalDateTime.now());
+        this.initiativeRepository.save(initiative);
+    }
+
+    @Override
     public void sendInitiativeInfoToRuleEngine(InitiativeDTO initiativeDTO) {
         initiativeProducer.sendPublishInitiative(initiativeDTO);
     }
