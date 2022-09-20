@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
 import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -193,6 +194,22 @@ public interface InitiativeApi {
             produces = {"application/json"},
             consumes = {"application/json"})
     ResponseEntity<Void> updateInitiativeRefundRuleDraft(@PathVariable("organizationId") String organizationId, @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId, @Parameter(in = ParameterIn.DEFAULT, schema = @Schema()) @RequestBody InitiativeRefundRuleDTO initiativeRefundRuleDTO);
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Save the draft refund rule of the initiative", description = "", security = {
+            @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "No Content"),
+            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "401", description = "Authentication failed", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "404", description = "The requested ID was not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "429", description = "Too many Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "500", description = "Server ERROR", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))})
+    @PutMapping(value = "/idpay/organization/{organizationId}/initiative/{initiativeId}/reject",
+            produces = {"application/json"},
+            consumes = {"application/json"})
+    ResponseEntity<Void> updateInitiativeToCheckStatus(@PathVariable("organizationId") String organizationId, @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId);
 
     @Operation(summary = "Returns the detail of an active initiative", description = "", security = {
             @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
