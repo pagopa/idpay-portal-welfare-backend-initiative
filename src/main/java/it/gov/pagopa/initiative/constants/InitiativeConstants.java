@@ -27,10 +27,12 @@ public class InitiativeConstants {
         }
         public static final class BadRequest { //400
             public static final String CODE = BASE_CODE + "bad.request";
+            public static final String INITIATIVE_CURRENT_STATUS_NOT_IN_REVISION = "Current initiative status is not IN_REVISION";
             public static final String INITIATIVE_BY_INITIATIVE_ID_PROPERTIES_NOT_VALID = "Initiative %s properties are not valid for this request";
             public static final String INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_STATUS_NOT_VALID = "Initiative %s unprocessable for status not valid";
         }
         public static final class NotFound { //404
+
             public static final String CODE = BASE_CODE + "not.found";
             public static final String INITIATIVE_LIST_BY_ORGANIZATION_MESSAGE = "List of Initiatives with organizationId %s not found.";
             public static final String INITIATIVE_BY_INITIATIVE_ID_MESSAGE = "Initiative with initiativeId %s not found.";

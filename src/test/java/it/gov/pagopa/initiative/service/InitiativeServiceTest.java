@@ -345,6 +345,7 @@ class InitiativeServiceTest {
     @Test
     void updateInitiativeStatusToCheck_thenStatusIsUpdatedWithSuccess(){
         Initiative step4Initiative = createStep4Initiative();
+        step4Initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
 
         //Instruct the Repo Mock to return Dummy Initiatives
         when(initiativeRepository.findByOrganizationIdAndInitiativeId(anyString(), anyString())).thenReturn(Optional.ofNullable(step4Initiative));
@@ -354,6 +355,23 @@ class InitiativeServiceTest {
 
         // you are expecting repo to be called once with correct param
         verify(initiativeRepository, times(1)).findByOrganizationIdAndInitiativeId(anyString(), anyString());
+    }
+    @Test
+    void updateInitiativeStatusToCheck_thenThrowInitiativeExceptionStatusIsNotInRevision(){
+        Initiative step4Initiative = createStep4Initiative();
+        step4Initiative.setStatus(InitiativeConstants.Status.TO_CHECK);
+
+        //Instruct the Repo Mock to return Dummy Initiatives
+        when(initiativeRepository.findByOrganizationIdAndInitiativeId(anyString(), anyString())).thenReturn(Optional.ofNullable(step4Initiative));
+
+        try{
+            initiativeService.updateInitiativeToCheckStatus(ORGANIZATION_ID, INITIATIVE_ID);
+        }catch (InitiativeException e){
+            log.info("InitiativeException: " + e.getCode());
+            assertEquals(HttpStatus.BAD_REQUEST, e.getHttpStatus());
+            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
+            assertEquals(String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_CURRENT_STATUS_NOT_IN_REVISION), e.getMessage());
+        }
     }
 
     @Test
