@@ -150,9 +150,18 @@ public class InitiativeServiceImpl implements InitiativeService {
                         InitiativeConstants.Exception.NotFound.CODE,
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
                         HttpStatus.NOT_FOUND));
-        initiative.setStatus(InitiativeConstants.Status.APPROVED);
-        initiative.setUpdateDate(LocalDateTime.now());
-        this.initiativeRepository.save(initiative);
+        if (initiative.getStatus().equals(InitiativeConstants.Status.IN_REVISION)){
+            initiative.setStatus(InitiativeConstants.Status.APPROVED);
+            initiative.setUpdateDate(LocalDateTime.now());
+            this.initiativeRepository.save(initiative);
+        }else {
+            throw new InitiativeException(
+                    InitiativeConstants.Exception.BadRequest.CODE,
+                    InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_IN_REVISION,
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
     }
 
     @Override
