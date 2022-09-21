@@ -32,6 +32,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -449,6 +450,32 @@ class InitiativeApiTest {
         assertEquals(HttpStatus.BAD_REQUEST.value(), res.getResponse().getStatus());
         assertEquals(CODE, error.getCode());
         assertTrue(error.getMessage().contains(SOMETHING_WRONG_WITH_THE_REFUND_TYPE));
+    }
+
+    @Test
+    void PUT_updateInitiativeApprovedStatusNotInRevision_thenThrowInitiativeException() throws Exception {
+        Initiative initiative = createStep1Initiative();
+        initiative.setStatus(InitiativeConstants.Status.DRAFT);
+
+        doThrow(
+                new InitiativeException(
+                        InitiativeConstants.Exception.BadRequest.CODE,
+                        InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_IN_REVISION,
+                        HttpStatus.BAD_REQUEST)
+        ).when(initiativeService).updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID);
+
+        MvcResult res =
+                mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_STATUS_APPROVED_URL, ORGANIZATION_ID, INITIATIVE_ID))
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .accept(MediaType.APPLICATION_JSON))
+                        .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                        .andDo(print())
+                        .andReturn();
+
+        ErrorDTO error = objectMapper.readValue(res.getResponse().getContentAsString(), ErrorDTO.class);
+        assertEquals(HttpStatus.BAD_REQUEST.value(), res.getResponse().getStatus());
+        assertEquals(CODE, error.getCode());
+        assertTrue(error.getMessage().contains(InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_IN_REVISION));
     }
 
     Initiative createFullInitiative () {

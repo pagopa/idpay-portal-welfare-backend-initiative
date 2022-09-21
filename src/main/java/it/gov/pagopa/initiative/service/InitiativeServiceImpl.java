@@ -150,17 +150,10 @@ public class InitiativeServiceImpl implements InitiativeService {
                         InitiativeConstants.Exception.NotFound.CODE,
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
                         HttpStatus.NOT_FOUND));
-        if (initiative.getStatus().equals(InitiativeConstants.Status.IN_REVISION)){
-            initiative.setStatus(InitiativeConstants.Status.APPROVED);
-            initiative.setUpdateDate(LocalDateTime.now());
-            this.initiativeRepository.save(initiative);
-        }else {
-            throw new InitiativeException(
-                    InitiativeConstants.Exception.BadRequest.CODE,
-                    InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_IN_REVISION,
-                    HttpStatus.BAD_REQUEST
-            );
-        }
+        isInitiativeStatusNotInRevisionThenThrow(initiative);
+        initiative.setStatus(InitiativeConstants.Status.APPROVED);
+        initiative.setUpdateDate(LocalDateTime.now());
+        this.initiativeRepository.save(initiative);
 
     }
 
@@ -179,4 +172,13 @@ public class InitiativeServiceImpl implements InitiativeService {
                 HttpStatus.BAD_REQUEST);
     }
 
+    private void isInitiativeStatusNotInRevisionThenThrow(Initiative initiative){
+        if (initiative.getStatus().equals(InitiativeConstants.Status.IN_REVISION)){
+            return;
+        }
+        throw new InitiativeException(
+                InitiativeConstants.Exception.BadRequest.CODE,
+                InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_IN_REVISION,
+                HttpStatus.BAD_REQUEST);
+    }
 }
