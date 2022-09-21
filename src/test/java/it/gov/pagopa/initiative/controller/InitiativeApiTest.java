@@ -427,6 +427,34 @@ class InitiativeApiTest {
     }
 
     @Test
+    void PUT_updateInitiativeStatusToCheck_whenStatusIsNotInRevision() throws Exception {
+        Initiative initiative = createStep4Initiative();
+        initiative.setOrganizationId(ORGANIZATION_ID);
+        initiative.setInitiativeId(INITIATIVE_ID);
+        initiative.setStatus(InitiativeConstants.Status.DRAFT);
+
+        doThrow(
+                new InitiativeException(
+                        InitiativeConstants.Exception.BadRequest.CODE,
+                        String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_CURRENT_STATUS_NOT_IN_REVISION),
+                        HttpStatus.BAD_REQUEST)
+        ).when(initiativeService).updateInitiativeToCheckStatus(ORGANIZATION_ID, INITIATIVE_ID);
+
+        MvcResult res =
+                mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_CHECK_STATUS_URL, initiative.getOrganizationId(), initiative.getInitiativeId()))
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .accept(MediaType.APPLICATION_JSON))
+                        .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                        .andDo(print())
+                        .andReturn();
+
+        ErrorDTO error = objectMapper.readValue(res.getResponse().getContentAsString(), ErrorDTO.class);
+        assertEquals(HttpStatus.BAD_REQUEST.value(), res.getResponse().getStatus());
+        assertEquals(CODE, error.getCode());
+        assertTrue(error.getMessage().contains(InitiativeConstants.Exception.BadRequest.INITIATIVE_CURRENT_STATUS_NOT_IN_REVISION));
+    }
+
+    @Test
     void anyUpdate_PUT_whenBodyRequestIsNotValid_then400BadRequest_MethodArgumentNotValidExceptionElseCase() throws Exception {
         InitiativeRefundRuleDTO refundRuleDTO = createRefundRuleWithAccumulatedAmountAndTimeParameter_NotValid();
 
