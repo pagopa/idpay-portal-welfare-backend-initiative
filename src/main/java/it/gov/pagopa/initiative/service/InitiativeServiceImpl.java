@@ -8,6 +8,7 @@ import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,7 +18,10 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
+
+
 @Service
+@Slf4j
 public class InitiativeServiceImpl implements InitiativeService {
 
     @Autowired
@@ -138,9 +142,23 @@ public class InitiativeServiceImpl implements InitiativeService {
         }
         this.initiativeRepository.save(initiative);
         //FIXME Test d'integrazione con RuleEngine. Invio Iniziativa al RuleEngine. Da spostare nella sezione di pubblicazione
-        if (changeInitiativeStatus) {
-            sendInitiativeInfoToRuleEngine(initiativeModelToDTOMapper.toInitiativeDTO(initiative));
-        }
+//        if (changeInitiativeStatus) {
+//            sendInitiativeInfoToRuleEngine(initiativeModelToDTOMapper.toInitiativeDTO(initiative));
+//        }
+    }
+
+    @Override
+    public void updateInitiativeApprovedStatus(String organizationId, String initiativeId){
+        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeId(organizationId, initiativeId)
+                .orElseThrow(() -> new InitiativeException(
+                        InitiativeConstants.Exception.NotFound.CODE,
+                        String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
+                        HttpStatus.NOT_FOUND));
+        isInitiativeStatusNotInRevisionThenThrow(initiative, InitiativeConstants.Status.APPROVED);
+        initiative.setStatus(InitiativeConstants.Status.APPROVED);
+        initiative.setUpdateDate(LocalDateTime.now());
+        this.initiativeRepository.save(initiative);
+        log.info("[UPDATE_TO_APPROVED_STATUS] - Initiative: {}. Status successfully changed", initiative.getInitiativeId());
     }
 
     @Override
@@ -158,4 +176,15 @@ public class InitiativeServiceImpl implements InitiativeService {
                 HttpStatus.BAD_REQUEST);
     }
 
+    private void isInitiativeStatusNotInRevisionThenThrow(Initiative initiative, String statusToBeUpdated){
+        if (initiative.getStatus().equals(InitiativeConstants.Status.IN_REVISION)){
+            log.info("[UPDATE_TO_{}_STATUS] - Initiative: {}. Current status is valid", statusToBeUpdated, initiative.getInitiativeId());
+            return;
+        }
+        log.info("[UPDATE_TO_{}_STATUS] - Initiative: {}. Current status is not IN_REVISION", statusToBeUpdated, initiative.getInitiativeId());
+        throw new InitiativeException(
+                InitiativeConstants.Exception.BadRequest.CODE,
+                InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_IN_REVISION,
+                HttpStatus.BAD_REQUEST);
+    }
 }

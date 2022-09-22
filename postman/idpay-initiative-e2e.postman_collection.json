@@ -1,10 +1,10 @@
 {
 	"info": {
-		"_postman_id": "38802170-4895-427a-a6c2-7a2b00e04e13",
+		"_postman_id": "85b6acb0-7e2b-4c17-9245-727efe3308d1",
 		"name": "idpay-initiative-e2e",
 		"description": "IDPAY Welfare Portal Initiative",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "3194665"
+		"_exporter_id": "21773098"
 	},
 	"item": [
 		{
@@ -79,7 +79,7 @@
 			]
 		},
 		{
-			"name": "UseCase1-With Ranking",
+			"name": "Wizard Initiative Creation UseCase-With Ranking",
 			"item": [
 				{
 					"name": "STEP1-Insert Initiative (Service Info) KO",
@@ -221,6 +221,62 @@
 							]
 						},
 						"description": "Save initiative and first subset of data 'general info'"
+					},
+					"response": []
+				},
+				{
+					"name": "Update initiative into APPROVED status KO",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status test 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrlInitiative}}/:initiativeId/approved",
+							"host": [
+								"{{baseUrlInitiative}}"
+							],
+							"path": [
+								":initiativeId",
+								"approved"
+							],
+							"variable": [
+								{
+									"key": "initiativeId",
+									"value": "{{initiativeId}}",
+									"description": "(Required) The initiative ID"
+								}
+							]
+						}
 					},
 					"response": []
 				},
@@ -595,10 +651,7 @@
 									"            pm.expect(item).have.property(\"operator\");\r",
 									"            pm.expect(item).have.property(\"checked\");\r",
 									"        })\r",
-									"});\r",
-									"\r",
-									"//response time is less than 1s\r",
-									"tests[\"Response time is less than 1s\"] = responseTime < 1000;"
+									"});"
 								],
 								"type": "text/javascript"
 							}
@@ -958,10 +1011,7 @@
 									"            pm.expect(item).have.property(\"enabled\");\r",
 									"            pm.expect(item).have.property(\"checked\");\r",
 									"        })\r",
-									"});\r",
-									"\r",
-									"//response time is less than 1s\r",
-									"tests[\"Response time is less than 1s\"] = responseTime < 1000;"
+									"});"
 								],
 								"type": "text/javascript"
 							}
@@ -1011,10 +1061,7 @@
 									"            pm.expect(item).have.property(\"code\");\r",
 									"            pm.expect(item).have.property(\"description\");\r",
 									"        })\r",
-									"});\r",
-									"\r",
-									"//response time is less than 1s\r",
-									"tests[\"Response time is less than 1s\"] = responseTime < 1000;"
+									"});"
 								],
 								"type": "text/javascript"
 							}
@@ -1181,10 +1228,7 @@
 								"exec": [
 									"pm.test(\"Status test 204\", function () {\r",
 									"    pm.response.to.have.status(204);\r",
-									"});\r",
-									"\r",
-									"//response time is less than 1s\r",
-									"tests[\"Response time is less than 1s\"] = responseTime < 1000;"
+									"});"
 								],
 								"type": "text/javascript"
 							}
@@ -1335,10 +1379,7 @@
 									"    pm.expect(jsonResponse.message).contain('[additionalInfo.identificationCode]');\r",
 									"    pm.expect(jsonResponse.message).contain('[initiativeRefundRuleDTO]');\r",
 									"    pm.expect(jsonResponse.message).contain('Something wrong with the refund type');\r",
-									"});\r",
-									"\r",
-									"\r",
-									"\"[accumulatedAmount]: Something wrong with the accumulated refund type selected - [additionalInfo.identificationCode]: must not be null - [initiativeRefundRuleDTO]: Something wrong with the refund type\""
+									"});"
 								],
 								"type": "text/javascript"
 							}
@@ -1712,6 +1753,67 @@
 							]
 						},
 						"description": "Returns the list of initiatives names for a specific organization"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Intiative Revision By PagoPA Operator",
+			"item": [
+				{
+					"name": "Update initiative into APPROVED status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status test 204\", function () {\r",
+									"    pm.response.to.have.status(204);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrlInitiative}}/:initiativeId/approved",
+							"host": [
+								"{{baseUrlInitiative}}"
+							],
+							"path": [
+								":initiativeId",
+								"approved"
+							],
+							"variable": [
+								{
+									"key": "initiativeId",
+									"value": "{{initiativeId}}",
+									"description": "(Required) The initiative ID"
+								}
+							]
+						}
 					},
 					"response": []
 				}

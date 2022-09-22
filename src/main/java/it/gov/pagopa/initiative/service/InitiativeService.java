@@ -28,5 +28,7 @@ public interface InitiativeService {
 
     void updateInitiativeRefundRules(String organizationId, String initiativeId, Initiative refundRule, boolean changeInitiativeStatus);
 
+    void updateInitiativeApprovedStatus(String organizationId, String initiativeId);
+
     void sendInitiativeInfoToRuleEngine(InitiativeDTO initiativeDTO);
 }
