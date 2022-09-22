@@ -217,7 +217,7 @@ public interface InitiativeApi {
             @ApiResponse(responseCode = "404", description = "The requested ID was not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
             @ApiResponse(responseCode = "429", description = "Too many Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
             @ApiResponse(responseCode = "500", description = "Server ERROR", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))})
-    @PutMapping(value = "/idpay/organization/{organizationId}/initiative/{initiativeId}/reject",
+    @PutMapping(value = "/idpay/organization/{organizationId}/initiative/{initiativeId}/rejected",
             produces = {"application/json"},
             consumes = {"application/json"})
     ResponseEntity<Void> updateInitiativeToCheckStatus(@PathVariable("organizationId") String organizationId, @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId);

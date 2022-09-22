@@ -415,7 +415,7 @@ class InitiativeServiceTest {
             log.info("InitiativeException: " + e.getCode());
             assertEquals(HttpStatus.BAD_REQUEST, e.getHttpStatus());
             assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
-            assertEquals(String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_CURRENT_STATUS_NOT_IN_REVISION), e.getMessage());
+            assertEquals(String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_IN_REVISION), e.getMessage());
         }
     }
 

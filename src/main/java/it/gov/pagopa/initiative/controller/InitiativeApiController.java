@@ -146,6 +146,7 @@ public class InitiativeApiController implements InitiativeApi {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Override
     public ResponseEntity<Void> updateInitiativeToCheckStatus(String organizationId, String initiativeId ){
+        log.info("[UPDATE_TO_CHECK_STATUS] - Initiative: {}. Start processing...", initiativeId);
         this.initiativeService.updateInitiativeToCheckStatus(organizationId, initiativeId);
         return ResponseEntity.noContent().build();
     }

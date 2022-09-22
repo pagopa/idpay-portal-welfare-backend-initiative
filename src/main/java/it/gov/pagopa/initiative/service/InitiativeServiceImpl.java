@@ -172,7 +172,7 @@ public class InitiativeServiceImpl implements InitiativeService {
         initiative.setStatus(InitiativeConstants.Status.TO_CHECK);
         initiative.setUpdateDate(LocalDateTime.now());
         this.initiativeRepository.save(initiative);
-
+        log.info("[UPDATE_TO_CHECK_STATUS] - Initiative: {}. Status successfully changed", initiative.getInitiativeId());
     }
 
     @Override
