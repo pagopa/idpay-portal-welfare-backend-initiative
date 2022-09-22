@@ -343,6 +343,51 @@ class InitiativeServiceTest {
     }
 
     @Test
+    void updateInitiativeApprovedStatus_thenStatusIsChangedWithSuccess(){
+        Initiative initiative = createStep4Initiative();
+        initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
+        when(initiativeRepository.findByOrganizationIdAndInitiativeId(anyString(), anyString())).thenReturn(Optional.ofNullable(initiative));
+        initiativeService.updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID);
+        verify(initiativeRepository, times(1)).findByOrganizationIdAndInitiativeId(anyString(), anyString());
+    }
+
+    @Test
+    void updateInitiativeApprovedStatus_thenThrowInitiativeException(){
+        Initiative initiative = createStep4Initiative();
+        initiative.setStatus(InitiativeConstants.Status.TO_CHECK);
+        when(initiativeRepository.findByOrganizationIdAndInitiativeId(anyString(), anyString())).thenReturn(Optional.of(initiative));
+
+        try{
+            initiativeService.updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID);
+        }catch (InitiativeException e){
+            log.info("InitiativeException: " + e.getCode());
+            assertEquals(HttpStatus.BAD_REQUEST, e.getHttpStatus());
+            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
+            assertEquals(String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_IN_REVISION), e.getMessage());
+        }
+    }
+
+    @Test
+    void updateInitiativeApprovedStatus_then400isRaisedForInitiativeException(){
+        Initiative initiative = createStep4Initiative();
+        when(initiativeRepository.findByOrganizationIdAndInitiativeId(anyString(), anyString())).thenThrow(
+                new InitiativeException(
+                        InitiativeConstants.Exception.NotFound.CODE,
+                        String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID),
+                        HttpStatus.NOT_FOUND)
+        );
+
+        try{
+            initiativeService.updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID);
+        }catch (InitiativeException e){
+            log.info("InitiativeException: " + e.getCode());
+            assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
+            assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
+            assertEquals(String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID), e.getMessage());
+        }
+    }
+
+    @Test
     void updateInitiativeStatusToCheck_thenStatusIsUpdatedWithSuccess(){
         Initiative step4Initiative = createStep4Initiative();
         step4Initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
