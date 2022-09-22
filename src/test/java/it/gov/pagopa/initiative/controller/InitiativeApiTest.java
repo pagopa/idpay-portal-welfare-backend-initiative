@@ -73,6 +73,7 @@ class InitiativeApiTest {
     private static final String PUT_INITIATIVE_REFUND_RULES_INFO_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/refund";
     private static final String PUT_INITIATIVE_BENEFICIARY_RULES_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/beneficiary";
     private static final String PUT_INITIATIVE_STATUS_APPROVED_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/approved";
+    private static final String PUT_INITIATIVE_TO_CHECK_STATUS_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/rejected";
     private static final String ROLE = "TEST_ROLE";
 
     @MockBean
@@ -392,6 +393,18 @@ class InitiativeApiTest {
     }
 
     @Test
+    void updateInitiativeToCheckStatus_statusNoContent() throws Exception {
+        doNothing().when(initiativeService).updateInitiativeToCheckStatus(ORGANIZATION_ID, INITIATIVE_ID);
+
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_CHECK_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
     void getInitiativeBeneficiaryView_statusOk() throws Exception {
 
         //create Dummy Initiative
@@ -430,6 +443,34 @@ class InitiativeApiTest {
         assertEquals(HttpStatus.BAD_REQUEST.value(), res.getResponse().getStatus());
         assertEquals(CODE, error.getCode());
         assertTrue(error.getMessage().contains(ACCUMULATED_AMOUNT_TYPE));
+    }
+
+    @Test
+    void PUT_updateInitiativeStatusToCheck_whenStatusIsNotInRevision() throws Exception {
+        Initiative initiative = createStep4Initiative();
+        initiative.setOrganizationId(ORGANIZATION_ID);
+        initiative.setInitiativeId(INITIATIVE_ID);
+        initiative.setStatus(InitiativeConstants.Status.DRAFT);
+
+        doThrow(
+                new InitiativeException(
+                        InitiativeConstants.Exception.BadRequest.CODE,
+                        String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_IN_REVISION),
+                        HttpStatus.BAD_REQUEST)
+        ).when(initiativeService).updateInitiativeToCheckStatus(ORGANIZATION_ID, INITIATIVE_ID);
+
+        MvcResult res =
+                mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_CHECK_STATUS_URL, initiative.getOrganizationId(), initiative.getInitiativeId()))
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .accept(MediaType.APPLICATION_JSON))
+                        .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                        .andDo(print())
+                        .andReturn();
+
+        ErrorDTO error = objectMapper.readValue(res.getResponse().getContentAsString(), ErrorDTO.class);
+        assertEquals(HttpStatus.BAD_REQUEST.value(), res.getResponse().getStatus());
+        assertEquals(CODE, error.getCode());
+        assertTrue(error.getMessage().contains(InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_IN_REVISION));
     }
 
     @Test

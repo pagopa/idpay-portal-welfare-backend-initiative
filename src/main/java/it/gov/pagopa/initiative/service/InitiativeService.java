@@ -30,5 +30,7 @@ public interface InitiativeService {
 
     void updateInitiativeApprovedStatus(String organizationId, String initiativeId);
 
+    void updateInitiativeToCheckStatus(String organizationId, String initiativeId);
+
     void sendInitiativeInfoToRuleEngine(InitiativeDTO initiativeDTO);
 }

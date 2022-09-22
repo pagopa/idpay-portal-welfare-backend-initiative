@@ -143,6 +143,14 @@ public class InitiativeApiController implements InitiativeApi {
         return ResponseEntity.noContent().build();
     }
 
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Override
+    public ResponseEntity<Void> updateInitiativeToCheckStatus(String organizationId, String initiativeId ){
+        log.info("[UPDATE_TO_CHECK_STATUS] - Initiative: {}. Start processing...", initiativeId);
+        this.initiativeService.updateInitiativeToCheckStatus(organizationId, initiativeId);
+        return ResponseEntity.noContent().build();
+    }
+
     @ResponseStatus(HttpStatus.OK)
     @Override
     public ResponseEntity<InitiativeDTO> getInitiativeBeneficiaryView(String initiativeId) {

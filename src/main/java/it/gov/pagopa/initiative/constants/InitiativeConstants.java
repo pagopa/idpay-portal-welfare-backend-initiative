@@ -27,6 +27,7 @@ public class InitiativeConstants {
         }
         public static final class BadRequest { //400
             public static final String CODE = BASE_CODE + "bad.request";
+            public static final String INITIATIVE_CURRENT_STATUS_NOT_IN_REVISION = "Current initiative status is not IN_REVISION";
 
             public static final String INITIATIVE_STATUS_NOT_IN_REVISION = "The initiative status is not IN_REVISION";
             public static final String INITIATIVE_BY_INITIATIVE_ID_PROPERTIES_NOT_VALID = "Initiative %s properties are not valid for this request";

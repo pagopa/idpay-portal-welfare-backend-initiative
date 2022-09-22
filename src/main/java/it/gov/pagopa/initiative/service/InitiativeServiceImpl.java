@@ -81,6 +81,7 @@ public class InitiativeServiceImpl implements InitiativeService {
         isInitiativeAllowedThenThrows(initiative);
         initiative.setGeneral(initiativeInfoModel.getGeneral());
         initiative.setUpdateDate(LocalDateTime.now());
+        initiative.setStatus(InitiativeConstants.Status.DRAFT);
         this.initiativeRepository.save(initiative);
     }
 
@@ -94,6 +95,7 @@ public class InitiativeServiceImpl implements InitiativeService {
         isInitiativeAllowedThenThrows(initiative);
         initiative.setAdditionalInfo(initiativeAdditionalInfo.getAdditionalInfo());
         initiative.setUpdateDate(LocalDateTime.now());
+        initiative.setStatus(InitiativeConstants.Status.DRAFT);
         this.initiativeRepository.save(initiative);
     }
 
@@ -108,6 +110,7 @@ public class InitiativeServiceImpl implements InitiativeService {
         isInitiativeAllowedThenThrows(initiative);
         initiative.setBeneficiaryRule(initiativeBeneficiaryRuleModel);
         initiative.setUpdateDate(LocalDateTime.now());
+        initiative.setStatus(InitiativeConstants.Status.DRAFT);
         this.initiativeRepository.save(initiative);
     }
 
@@ -123,6 +126,7 @@ public class InitiativeServiceImpl implements InitiativeService {
         initiative.setRewardRule(rewardAndTrxRules.getRewardRule());
         initiative.setTrxRule(rewardAndTrxRules.getTrxRule());
         initiative.setUpdateDate(LocalDateTime.now());
+        initiative.setStatus(InitiativeConstants.Status.DRAFT);
         this.initiativeRepository.save(initiative);
     }
 
@@ -137,6 +141,7 @@ public class InitiativeServiceImpl implements InitiativeService {
         isInitiativeAllowedThenThrows(initiative);
         initiative.setRefundRule(refundRule.getRefundRule());
         initiative.setUpdateDate(LocalDateTime.now());
+        initiative.setStatus(InitiativeConstants.Status.DRAFT);
         if (changeInitiativeStatus) {
             initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
         }
@@ -159,6 +164,20 @@ public class InitiativeServiceImpl implements InitiativeService {
         initiative.setUpdateDate(LocalDateTime.now());
         this.initiativeRepository.save(initiative);
         log.info("[UPDATE_TO_APPROVED_STATUS] - Initiative: {}. Status successfully changed", initiative.getInitiativeId());
+    }
+
+    @Override
+    public void updateInitiativeToCheckStatus(String organizationId, String initiativeId){
+        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeId(organizationId, initiativeId)
+                .orElseThrow(() -> new InitiativeException(
+                        InitiativeConstants.Exception.NotFound.CODE,
+                        String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
+                        HttpStatus.NOT_FOUND));
+        isInitiativeStatusNotInRevisionThenThrow(initiative, InitiativeConstants.Status.TO_CHECK);
+        initiative.setStatus(InitiativeConstants.Status.TO_CHECK);
+        initiative.setUpdateDate(LocalDateTime.now());
+        this.initiativeRepository.save(initiative);
+        log.info("[UPDATE_TO_CHECK_STATUS] - Initiative: {}. Status successfully changed", initiative.getInitiativeId());
     }
 
     @Override
