@@ -81,6 +81,7 @@ public class InitiativeServiceImpl implements InitiativeService {
         isInitiativeAllowedThenThrows(initiative);
         initiative.setGeneral(initiativeInfoModel.getGeneral());
         initiative.setUpdateDate(LocalDateTime.now());
+        initiative.setStatus(InitiativeConstants.Status.DRAFT);
         this.initiativeRepository.save(initiative);
     }
 
@@ -94,6 +95,7 @@ public class InitiativeServiceImpl implements InitiativeService {
         isInitiativeAllowedThenThrows(initiative);
         initiative.setAdditionalInfo(initiativeAdditionalInfo.getAdditionalInfo());
         initiative.setUpdateDate(LocalDateTime.now());
+        initiative.setStatus(InitiativeConstants.Status.DRAFT);
         this.initiativeRepository.save(initiative);
     }
 
@@ -108,6 +110,7 @@ public class InitiativeServiceImpl implements InitiativeService {
         isInitiativeAllowedThenThrows(initiative);
         initiative.setBeneficiaryRule(initiativeBeneficiaryRuleModel);
         initiative.setUpdateDate(LocalDateTime.now());
+        initiative.setStatus(InitiativeConstants.Status.DRAFT);
         this.initiativeRepository.save(initiative);
     }
 
@@ -123,6 +126,7 @@ public class InitiativeServiceImpl implements InitiativeService {
         initiative.setRewardRule(rewardAndTrxRules.getRewardRule());
         initiative.setTrxRule(rewardAndTrxRules.getTrxRule());
         initiative.setUpdateDate(LocalDateTime.now());
+        initiative.setStatus(InitiativeConstants.Status.DRAFT);
         this.initiativeRepository.save(initiative);
     }
 
@@ -137,6 +141,7 @@ public class InitiativeServiceImpl implements InitiativeService {
         isInitiativeAllowedThenThrows(initiative);
         initiative.setRefundRule(refundRule.getRefundRule());
         initiative.setUpdateDate(LocalDateTime.now());
+        initiative.setStatus(InitiativeConstants.Status.DRAFT);
         if (changeInitiativeStatus) {
             initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
         }
