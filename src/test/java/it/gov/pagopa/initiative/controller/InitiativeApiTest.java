@@ -32,7 +32,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;

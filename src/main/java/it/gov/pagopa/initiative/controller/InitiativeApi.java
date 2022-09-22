@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
 import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -205,7 +204,7 @@ public interface InitiativeApi {
             @ApiResponse(responseCode = "404", description = "The requested ID was not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
             @ApiResponse(responseCode = "429", description = "Too many Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
             @ApiResponse(responseCode = "500", description = "Server ERROR", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))})
-@PutMapping(value = "/idpay/organization/{organizationId}/initiative/{initiativeId}/approve")
+@PutMapping(value = "/idpay/organization/{organizationId}/initiative/{initiativeId}/approved")
     ResponseEntity<Void> updateInitiativeApprovedStatus(@PathVariable("organizationId") String organizationId, @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId);
 
     @Operation(summary = "Returns the detail of an active initiative", description = "", security = {

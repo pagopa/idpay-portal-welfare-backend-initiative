@@ -138,6 +138,7 @@ public class InitiativeApiController implements InitiativeApi {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Override
     public ResponseEntity<Void> updateInitiativeApprovedStatus(String organizationId, String initiativeId){
+        log.info("[UPDATE_TO_APPROVED_STATUS] - Initiative: {}. Start processing...", initiativeId);
         this.initiativeService.updateInitiativeApprovedStatus(organizationId, initiativeId);
         return ResponseEntity.noContent().build();
     }
