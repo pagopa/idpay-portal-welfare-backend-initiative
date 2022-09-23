@@ -157,4 +157,30 @@ public class InitiativeApiController implements InitiativeApi {
         return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDTO(this.initiativeService.getInitiativeBeneficiaryView(initiativeId)));
     }
 
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Override
+    public ResponseEntity<Void> updateInitiativePublishedStatus(String organizationId, String initiativeId, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO) {
+        //Recupero Iniziativa
+        Initiative initiative = this.initiativeService.getInitiative(organizationId, initiativeId);
+        //Verifico la validità dello stato --> creare eventualmente un Servizio di Validazione dedicato.
+        initiativeService.isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED);
+        InitiativeDTO initiativeDTO = this.initiativeModelToDTOMapper.toInitiativeDTO(initiative);
+        //Recupero stato corrente e lo salvo come TEMP
+        String statusTemp = initiativeDTO.getStatus();
+        //Salvo in PUBLISHED
+        initiativeDTO.setStatus(InitiativeConstants.Status.PUBLISHED);
+        initiative.setStatus(InitiativeConstants.Status.PUBLISHED);
+        initiativeService.updateInitiative(initiative);
+        //notifico RuleEngine dell'Iniziativa pubblicata
+        initiativeService.sendInitiativeInfoToRuleEngine(initiativeDTO);
+        //Creazione Servizio Iniziativa verso IO
+
+        //Sprint 9: In caso di beneficiaryKnown a true -> Invio al MS-Gruppi via API la richiesta di notifica della pubblicazione e, MS Gruppi la invia via coda al NotificationManager
+
+        //Nel caso una delle precedenti Integrazione si concludesse male, si fa rollback dell'Iniziativa allo stato TEMP iniziale
+
+        //Se tutto ok --> 204
+        return ResponseEntity.noContent().build();
+    }
+
 }

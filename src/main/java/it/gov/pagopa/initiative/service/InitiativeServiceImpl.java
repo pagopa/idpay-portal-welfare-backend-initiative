@@ -146,10 +146,6 @@ public class InitiativeServiceImpl implements InitiativeService {
             initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
         }
         this.initiativeRepository.save(initiative);
-        //FIXME Test d'integrazione con RuleEngine. Invio Iniziativa al RuleEngine. Da spostare nella sezione di pubblicazione
-//        if (changeInitiativeStatus) {
-//            sendInitiativeInfoToRuleEngine(initiativeModelToDTOMapper.toInitiativeDTO(initiative));
-//        }
     }
 
     @Override
@@ -183,6 +179,37 @@ public class InitiativeServiceImpl implements InitiativeService {
     @Override
     public void sendInitiativeInfoToRuleEngine(InitiativeDTO initiativeDTO) {
         initiativeProducer.sendPublishInitiative(initiativeDTO);
+    }
+
+    @Override
+    public void isInitiativeAllowedToBeNextStatusThenThrows(Initiative initiative, String statusToBeUpdated) {
+        switch (statusToBeUpdated){
+//            case InitiativeConstants.Status.DRAFT:
+//                break;
+//            case InitiativeConstants.Status.TO_CHECK:
+//                break;
+//            case InitiativeConstants.Status.IN_REVISION:
+//                break;
+//            case InitiativeConstants.Status.APPROVED:
+//                break;
+            case InitiativeConstants.Status.PUBLISHED:
+                if(!Arrays.asList(InitiativeConstants.Status.Validation.INITIATIVE_ALLOWED_STATES_TO_BECOME_PUBLISHED_ARRAY).contains(initiative.getStatus())) {
+                    throw new InitiativeException(
+                            InitiativeConstants.Exception.BadRequest.CODE,
+                            String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_STATUS_NOT_VALID, initiative.getInitiativeId()),
+                            HttpStatus.BAD_REQUEST);
+                }
+                break;
+//            case InitiativeConstants.Status.CLOSED:
+//                break;
+//            case InitiativeConstants.Status.SUSPENDED:
+//                break;
+        }
+    }
+
+    @Override
+    public void updateInitiative(Initiative initiative) {
+        initiativeRepository.save(initiative);
     }
 
     private void isInitiativeAllowedThenThrows(Initiative initiative){
