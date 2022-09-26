@@ -48,6 +48,7 @@ class InitiativeServiceTest {
     public static final String INITIATIVE_NAME = "initiativeName1";
     public static final String ORGANIZATION_ID = "organizationId1";
     public static final String INITIATIVE_ID = "initiativeId";
+    private static final String ANY_NOT_INITIATIVE_STATE = "ANY_NOT_INITIATIVE_STATE";
 
     @Autowired
     InitiativeService initiativeService;
@@ -332,8 +333,8 @@ class InitiativeServiceTest {
 
     @Test
     void updateRefundRule_whenInitiativeUnprocessableForStatusNotValid_then400isRaisedForInitiativeException(){
-        Initiative initiative = Initiative.builder().initiativeId(INITIATIVE_ID).status(InitiativeConstants.Status.APPROVED).build();
-        Initiative initiativeNotProcessable = Initiative.builder().initiativeId(INITIATIVE_ID).status(InitiativeConstants.Status.APPROVED).build();
+        Initiative initiative = Initiative.builder().initiativeId(INITIATIVE_ID).status(InitiativeConstants.Status.PUBLISHED).build();
+        Initiative initiativeNotProcessable = Initiative.builder().initiativeId(INITIATIVE_ID).status(InitiativeConstants.Status.PUBLISHED).build();
 
         when(initiativeRepository.findByOrganizationIdAndInitiativeId(anyString(), anyString())).thenReturn(Optional.ofNullable(initiativeNotProcessable));
 
@@ -468,7 +469,7 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void givenNOTInitiativeAPPROVEDandNextStatusPUBLISHED_whenInitiativeIsNOTAllowedToBeNextStatus_thenThrowInitiativeException(){
+    void givenOneOfInitiativeStatusNotAPPROVEDandNextStatusPUBLISHED_whenInitiativeIsNOTAllowedToBeNextStatus_thenThrowInitiativeException(){
         //Instruct Initiative to have a status Not Valid
         Initiative initiative = createStep5Initiative();
         initiative.setStatus(InitiativeConstants.Status.TO_CHECK);
@@ -476,6 +477,21 @@ class InitiativeServiceTest {
         //Try to call the Real Service
         //Prepare Executable with invocation of the method on your system under test
         Executable executable = () -> initiativeService.isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED);
+
+        InitiativeException exception = Assertions.assertThrows(InitiativeException.class, executable);
+        assertEquals(InitiativeConstants.Exception.BadRequest.CODE, exception.getCode());
+        assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_STATUS_NOT_VALID.formatted(initiative.getInitiativeId()), exception.getMessage());
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getHttpStatus());
+    }
+
+    @Test
+    void givenAnyInitiative_whenNextStatusIsNotSetOfInitiativeStatus_thenThrowInitiativeException(){
+        //Instruct Initiative to have a status Not Valid
+        Initiative initiative = createStep5Initiative();
+
+        //Try to call the Real Service
+        //Prepare Executable with invocation of the method on your system under test
+        Executable executable = () -> initiativeService.isInitiativeAllowedToBeNextStatusThenThrows(initiative, ANY_NOT_INITIATIVE_STATE);
 
         InitiativeException exception = Assertions.assertThrows(InitiativeException.class, executable);
         assertEquals(InitiativeConstants.Exception.BadRequest.CODE, exception.getCode());

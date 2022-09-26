@@ -211,6 +211,11 @@ public class InitiativeServiceImpl implements InitiativeService {
 //                break;
 //            case InitiativeConstants.Status.SUSPENDED:
 //                break;
+            default:
+                throw new InitiativeException(
+                        InitiativeConstants.Exception.BadRequest.CODE,
+                        String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_STATUS_NOT_VALID, initiative.getInitiativeId()),
+                        HttpStatus.BAD_REQUEST);
         }
     }
 
