@@ -106,3 +106,6 @@ Desktop.ini
 # ESLint
 ######################
 .eslintcache
+
+# Application resources
+/src/main/resources/application-local.yml
