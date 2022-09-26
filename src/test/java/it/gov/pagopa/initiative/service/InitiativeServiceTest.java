@@ -21,11 +21,15 @@ import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
 import it.gov.pagopa.initiative.model.rule.trx.*;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.client.ResourceAccessException;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -438,15 +442,84 @@ class InitiativeServiceTest {
         }
     }
 
+    @Test
+    void updateInitiativeStatusToPUBLISHED_thenInitiativeIsUpdated(){
+        Initiative initiativeExpected = createStep5Initiative();
+        initiativeExpected.setStatus(InitiativeConstants.Status.PUBLISHED);
+
+        //Instruct the Repo Mock to return Dummy Initiatives
+        when(initiativeRepository.save(any(Initiative.class))).thenReturn(initiativeExpected);
+
+        //Try to call the Real Service (which is using the instructed Repo)
+        initiativeService.updateInitiative(initiativeExpected);
+
+        //Expecting repo to be called once with correct param
+        verify(initiativeRepository, times(1)).save(any(Initiative.class));
+    }
+
+    @Test
+    void givenInitiativeAPPROVEDandNextStatusPUBLISHED_whenInitiativeIsAllowedToBeNextStatus_thenOk(){
+        //Instruct Initiative to have a status Valid (APPROVED)
+        Initiative initiative = createStep5Initiative();
+        initiative.setStatus(InitiativeConstants.Status.APPROVED);
+
+        //Try to call the Real Service
+        //Prepare Executable with invocation of the method on your system under test
+        Executable executable = () -> initiativeService.isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED);
+        Assertions.assertDoesNotThrow(executable);
+    }
+
+    @Test
+    void givenNOTInitiativeAPPROVEDandNextStatusPUBLISHED_whenInitiativeIsNOTAllowedToBeNextStatus_thenThrowInitiativeException(){
+        //Instruct Initiative to have a status Not Valid
+        Initiative initiative = createStep5Initiative();
+        initiative.setStatus(InitiativeConstants.Status.TO_CHECK);
+
+        //Try to call the Real Service
+        //Prepare Executable with invocation of the method on your system under test
+        Executable executable = () -> initiativeService.isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED);
+
+        InitiativeException exception = Assertions.assertThrows(InitiativeException.class, executable);
+        assertEquals(InitiativeConstants.Exception.BadRequest.CODE, exception.getCode());
+        assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_STATUS_NOT_VALID.formatted(initiative.getInitiativeId()), exception.getMessage());
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getHttpStatus());
+    }
+
+    @Test
+    void givenInitiativeDTO_whenRuleEngineProduceIsValid_thenOk(){
+        //Instruct Initiative to have a status Not Valid
+        InitiativeDTO initiativeDTO = createStep5InitiativeDTO();
+
+        when(initiativeProducer.sendPublishInitiative(initiativeDTO)).thenReturn(true);
+
+        //Try to call the Real Service
+        //Prepare Executable with invocation of the method on your system under test
+        Executable executable = () -> initiativeService.sendInitiativeInfoToRuleEngine(initiativeDTO);
+
+        Assertions.assertDoesNotThrow(executable);
+    }
+
+    @Test
+    void givenInitiativeDTO_whenRuleEngineProduceIsNotValid_thenThrowException(){
+        //Instruct Initiative to have a status Not Valid
+        InitiativeDTO initiativeDTO = createStep5InitiativeDTO();
+
+        when(initiativeProducer.sendPublishInitiative(initiativeDTO)).thenReturn(false);
+
+        //Try to call the Real Service
+        //Prepare Executable with invocation of the method on your system under test
+        Executable executable = () -> initiativeService.sendInitiativeInfoToRuleEngine(initiativeDTO);
+
+        IllegalStateException exception = Assertions.assertThrows(IllegalStateException.class, executable);
+    }
+
     Initiative createFullInitiative () {
-        //TODO Test onGoing for different steps. Must use Step6 at the end
-        Initiative initiative = createStep2Initiative();
+        Initiative initiative = createStep5Initiative();
         return initiative;
     }
 
     InitiativeDTO createFullInitiativeDTO () {
-        //TODO Test onGoing for different steps. Must use Step6 at the end
-        InitiativeDTO initiativeDTO = createStep2InitiativeDTO();
+        InitiativeDTO initiativeDTO = createStep5InitiativeDTO();
         return initiativeDTO;
     }
 
@@ -800,33 +873,23 @@ class InitiativeServiceTest {
         return initiativeTrxConditionsDTO;
     }
 
-
-    Initiative createStep4Initiative () {
+    private Initiative createStep4Initiative () {
         Initiative initiative = createStep3Initiative();
         return initiative;
     }
 
-    InitiativeDTO createStep4InitiativeDTO () {
+    private InitiativeDTO createStep4InitiativeDTO () {
         InitiativeDTO initiativeDTO = createStep3InitiativeDTO();
         return initiativeDTO;
     }
 
-    Initiative createStep5Initiative () {
+    private Initiative createStep5Initiative () {
         Initiative initiative = createStep4Initiative();
         return initiative;
     }
 
-    private InitiativeLegal createInitiativeLegal() {
-        InitiativeLegal initiativeLegal = new InitiativeLegal();
-        initiativeLegal.setDpiaLink("https://www.google.it");
-        initiativeLegal.setPrivacyLink("https://www.google.it");
-        initiativeLegal.setRegulationLink("https://www.google.it");
-        initiativeLegal.setTcLink("https://www.google.it");
-        return initiativeLegal;
-    }
-
-    InitiativeDTO createStep5InitiativeDTO () {
-        InitiativeDTO initiativeDTO = new InitiativeDTO();
+    private InitiativeDTO createStep5InitiativeDTO () {
+        InitiativeDTO initiativeDTO = createStep4InitiativeDTO();
         return initiativeDTO;
     }
 

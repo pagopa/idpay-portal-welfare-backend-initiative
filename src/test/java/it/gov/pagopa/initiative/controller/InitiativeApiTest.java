@@ -20,6 +20,7 @@ import it.gov.pagopa.initiative.model.rule.refund.InitiativeRefundRule;
 import it.gov.pagopa.initiative.model.rule.refund.TimeParameter;
 import it.gov.pagopa.initiative.service.InitiativeService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.common.KafkaException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
@@ -74,7 +75,12 @@ class InitiativeApiTest {
     private static final String PUT_INITIATIVE_BENEFICIARY_RULES_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/beneficiary";
     private static final String PUT_INITIATIVE_STATUS_APPROVED_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/approved";
     private static final String PUT_INITIATIVE_TO_CHECK_STATUS_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/rejected";
+    private static final String PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/published";
     private static final String ROLE = "TEST_ROLE";
+    private static final String ORGANIZATION_NAME = "organizationName";
+    private static final String ORGANIZATION_VAT = "organizationVat";
+    private static final String ORGANIZATION_USER_ID = "organizationUserId";
+    private static final String ORGANIZATION_USER_ROLE = "organizationUserRole";
 
     @MockBean
     InitiativeService initiativeService;
@@ -156,18 +162,12 @@ class InitiativeApiTest {
         InitiativeAdditionalDTO initiativeAdditionalDTO = createStep1InitiativeAdditionalDTO();
 
         // Instruct the Service to insert a Dummy Initiative
-//        doNothing().when(initiativeService).insertInitiative(step1Initiative); //doNothing only for Void method
         when(initiativeService.insertInitiative(step1Initiative)).thenReturn(step1Initiative);
 
         when(initiativeDTOsToModelMapper.toInitiative(initiativeAdditionalDTO)).thenReturn(step1Initiative);
 
-//        Map<String, Object> body = new HashMap<>();
-//        body.put("general", initiativeGeneralDTO);
-//        body.put("additionalInfo", initiativeAdditionalDTO);
-
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post(BASE_URL + String.format(POST_INITIATIVE_ADDITIONAL_INFO_URL, ORGANIZATION_ID))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-//                .content(objectMapper.writeValueAsString(body))
                 .content(objectMapper.writeValueAsString(initiativeAdditionalDTO))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
@@ -181,8 +181,8 @@ class InitiativeApiTest {
 
         Boolean beneficiaryKnown = false;
         //create Dummy Initiative
-        Initiative step1Initiative = createStep2InitiativeGeneral(beneficiaryKnown);
-        InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralDTO();
+        Initiative step1Initiative = createStep2Initiative(beneficiaryKnown);
+        InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralDTO(beneficiaryKnown);
 
         // Instruct the Service to update a Dummy Initiative
         when(initiativeDTOsToModelMapper.toInitiative(initiativeGeneralDTO)).thenReturn(step1Initiative);
@@ -376,11 +376,6 @@ class InitiativeApiTest {
 
     @Test
     void updateInitiativeStatusApproved_statusNoContent() throws Exception {
-        //create Dummy Initiative
-        Initiative step4Initiative = createStep4Initiative();
-        InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
-
-
         //doNothing only for Void method
         doNothing().when(initiativeService).updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID);
 
@@ -408,8 +403,8 @@ class InitiativeApiTest {
     void getInitiativeBeneficiaryView_statusOk() throws Exception {
 
         //create Dummy Initiative
-        Initiative initiative = createFullInitiative();
-        InitiativeDTO initiativeDTO = createFullInitiativeDTO();
+        Initiative initiative = createStep5Initiative();
+        InitiativeDTO initiativeDTO = createStep5InitiativeDTO();
 
         // Instruct the Service to insert a Dummy Initiative
         when(initiativeModelToDTOMapper.toInitiativeDTO(initiative)).thenReturn(initiativeDTO);
@@ -447,7 +442,7 @@ class InitiativeApiTest {
 
     @Test
     void PUT_updateInitiativeStatusToCheck_whenStatusIsNotInRevision() throws Exception {
-        Initiative initiative = createStep4Initiative();
+        Initiative initiative = createStep5Initiative();
         initiative.setOrganizationId(ORGANIZATION_ID);
         initiative.setInitiativeId(INITIATIVE_ID);
         initiative.setStatus(InitiativeConstants.Status.DRAFT);
@@ -493,43 +488,89 @@ class InitiativeApiTest {
     }
 
     @Test
-    void PUT_updateInitiativeApprovedStatusNotInRevision_thenThrowInitiativeException() throws Exception {
-        Initiative initiative = createStep1Initiative();
-        initiative.setStatus(InitiativeConstants.Status.DRAFT);
+    void when_PUT_updateInitiativePublishedStatus_then204() throws Exception {
+        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = InitiativeOrganizationInfoDTO.builder()
+                .organizationName(ORGANIZATION_NAME)
+                .organizationVat(ORGANIZATION_VAT)
+                .organizationUserId(ORGANIZATION_USER_ID)
+                .organizationUserRole(ORGANIZATION_USER_ROLE)
+                .build();
+
+        //create Dummy Initiative
+        Initiative step5Initiative = createStep5Initiative();
+        InitiativeDTO step5InitiativeDTO = createStep5InitiativeDTO();
+
+        // When
+        // With this instruction, I instruct the service (via Mockito's when) to always return the DummyInitiative to me anytime I call the same service's function
+        when(initiativeService.getInitiative(anyString(), anyString())).thenReturn(step5Initiative);
+        Initiative initiative = initiativeService.getInitiative(anyString(), anyString());
+        // Expecting same instance
+        assertThat("Reason of result", initiative, is(sameInstance(step5Initiative)));
+
+        doNothing().when(initiativeService).isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED);
+
+        // Instruct the Service to insert a Dummy Initiative
+        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative)).thenReturn(step5InitiativeDTO);
+
+        doNothing().when(initiativeService).updateInitiative(any(Initiative.class));
+
+        doNothing().when(initiativeService).sendInitiativeInfoToRuleEngine(any(InitiativeDTO.class));
+
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(initiativeOrganizationInfoDTO))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    void when_PUT_updateInitiativePublishedStatus_thenThrowException() throws Exception {
+        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = InitiativeOrganizationInfoDTO.builder()
+                .organizationName(ORGANIZATION_NAME)
+                .organizationVat(ORGANIZATION_VAT)
+                .organizationUserId(ORGANIZATION_USER_ID)
+                .organizationUserRole(ORGANIZATION_USER_ROLE)
+                .build();
+
+        //create Dummy Initiative
+        Initiative step5Initiative = createStep5Initiative();
+        InitiativeDTO step5InitiativeDTO = createStep5InitiativeDTO();
+
+        // When
+        // With this instruction, I instruct the service (via Mockito's when) to always return the DummyInitiative to me anytime I call the same service's function
+        when(initiativeService.getInitiative(anyString(), anyString())).thenReturn(step5Initiative);
+        Initiative initiative = initiativeService.getInitiative(anyString(), anyString());
+        // Expecting same instance
+        assertThat("Reason of result", initiative, is(sameInstance(step5Initiative)));
+
+        doNothing().when(initiativeService).isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED);
+
+        // Instruct the Service to insert a Dummy Initiative
+        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative)).thenReturn(step5InitiativeDTO);
+
+        doNothing().when(initiativeService).updateInitiative(any(Initiative.class));
 
         doThrow(
-                new InitiativeException(
-                        InitiativeConstants.Exception.BadRequest.CODE,
-                        InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_IN_REVISION,
-                        HttpStatus.BAD_REQUEST)
-        ).when(initiativeService).updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID);
+                new KafkaException()
+        ).when(initiativeService).sendInitiativeInfoToRuleEngine(any(InitiativeDTO.class));
 
         MvcResult res =
-                mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_STATUS_APPROVED_URL, ORGANIZATION_ID, INITIATIVE_ID))
+                mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID))
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .content(objectMapper.writeValueAsString(initiativeOrganizationInfoDTO))
                                 .accept(MediaType.APPLICATION_JSON))
-                        .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                        .andExpect(MockMvcResultMatchers.status().is5xxServerError())
                         .andDo(print())
                         .andReturn();
 
-        ErrorDTO error = objectMapper.readValue(res.getResponse().getContentAsString(), ErrorDTO.class);
-        assertEquals(HttpStatus.BAD_REQUEST.value(), res.getResponse().getStatus());
-        assertEquals(CODE, error.getCode());
-        assertTrue(error.getMessage().contains(InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_IN_REVISION));
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), res.getResponse().getStatus());
     }
 
-    Initiative createFullInitiative () {
-        //TODO Test onGoing for different steps. Must use Step6 at the end
-        Boolean beneficiaryKnown = false;
-        Initiative initiative = createStep2Initiative(beneficiaryKnown);
-        return initiative;
-    }
-
-    InitiativeDTO createFullInitiativeDTO () {
-        //TODO Test onGoing for different steps. Must use Step6 at the end
-        InitiativeDTO initiativeDTO = createStep2InitiativeDTO();
-        return initiativeDTO;
-    }
+    /*
+     * ############### Step 1 ###############
+     */
 
     private Initiative createStep1Initiative () {
         Initiative initiative = new Initiative();
@@ -542,30 +583,7 @@ class InitiativeApiTest {
         initiative.setPdndCheck(true);
         initiative.setPdndToken("pdndToken1");
         initiative.setAdditionalInfo(createInitiativeAdditional());
-//        initiative.setBeneficiaryRule(createInitiativeBeneficiaryRule());
-//        initiative.setLegal(createInitiativeLegal());
         return initiative;
-    }
-    private Initiative createStep2InitiativeGeneral(Boolean beneficiaryKnown){
-        Initiative initiative = createStep1Initiative();
-        initiative.setGeneral(createInitiativeGeneral(beneficiaryKnown));
-        return initiative;
-    }
-    private InitiativeGeneral createInitiativeGeneral(Boolean beneficiaryKnown) {
-        InitiativeGeneral initiativeGeneral = new InitiativeGeneral();
-        initiativeGeneral.setBeneficiaryBudget(new BigDecimal(10));
-        initiativeGeneral.setBeneficiaryKnown(beneficiaryKnown);
-        initiativeGeneral.setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF);
-        initiativeGeneral.setBudget(new BigDecimal(1000000000));
-        LocalDate rankingStartDate = LocalDate.now();
-        LocalDate rankingEndDate = rankingStartDate.plusDays(1);
-        LocalDate startDate = rankingEndDate.plusDays(1);
-        LocalDate endDate = startDate.plusDays(1);
-        initiativeGeneral.setRankingStartDate(rankingStartDate);
-        initiativeGeneral.setRankingEndDate(rankingEndDate);
-        initiativeGeneral.setStartDate(startDate);
-        initiativeGeneral.setEndDate(endDate);
-        return initiativeGeneral;
     }
 
     private InitiativeAdditional createInitiativeAdditional() {
@@ -584,6 +602,102 @@ class InitiativeApiTest {
         channels.add(channel);
         initiativeAdditional.setChannels(channels);
         return initiativeAdditional;
+    }
+
+    InitiativeDTO createStep1InitiativeDTO () {
+        return InitiativeDTO.builder()
+                .initiativeId(INITIATIVE_ID)
+                .initiativeName("initiativeName1")
+                .organizationId(ORGANIZATION_ID)
+                .status("DRAFT")
+                .autocertificationCheck(true)
+                .beneficiaryRanking(true)
+                .pdndCheck(true)
+                .pdndToken("pdndToken1")
+                .additionalInfo(createInitiativeAdditionalDTO()).build();
+    }
+
+    InitiativeAdditionalDTO createStep1InitiativeAdditionalDTO() {
+        InitiativeAdditionalDTO initiativeAdditionalDTO = createInitiativeAdditionalDTO();
+        return initiativeAdditionalDTO;
+    }
+
+    private InitiativeAdditionalDTO createInitiativeAdditionalDTO() {
+        InitiativeAdditionalDTO initiativeAdditionalDTO = new InitiativeAdditionalDTO();
+        initiativeAdditionalDTO.setServiceIO(true);
+        initiativeAdditionalDTO.setServiceId("serviceId");
+        initiativeAdditionalDTO.setServiceName("serviceName");
+        initiativeAdditionalDTO.setServiceScope(InitiativeAdditionalDTO.ServiceScope.LOCAL);
+        initiativeAdditionalDTO.setDescription("Description");
+        initiativeAdditionalDTO.setPrivacyLink("https://www.google.it");
+        initiativeAdditionalDTO.setTcLink("https://www.google.it");
+        ChannelDTO channelDTO = new ChannelDTO();
+        channelDTO.setType(ChannelDTO.TypeEnum.EMAIL);
+        channelDTO.setContact("contact");
+        List<ChannelDTO> channelDTOS = new ArrayList<>();
+        channelDTOS.add(channelDTO);
+        initiativeAdditionalDTO.setChannels(channelDTOS);
+        return initiativeAdditionalDTO;
+    }
+
+    /*
+     * ############### Step 2 ###############
+     */
+
+    private Initiative createStep2Initiative (Boolean beneficiaryKnown) {
+        Initiative initiative = createStep1Initiative();
+        initiative.setGeneral(createInitiativeGeneral(beneficiaryKnown));
+        return initiative;
+    }
+
+    private InitiativeGeneral createInitiativeGeneral(Boolean beneficiaryKnown) {
+        InitiativeGeneral initiativeGeneral = new InitiativeGeneral();
+        initiativeGeneral.setBeneficiaryBudget(new BigDecimal(10));
+        initiativeGeneral.setBeneficiaryKnown(beneficiaryKnown);
+        initiativeGeneral.setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF);
+        initiativeGeneral.setBudget(new BigDecimal(1000000000));
+        LocalDate rankingStartDate = LocalDate.now();
+        LocalDate rankingEndDate = rankingStartDate.plusDays(1);
+        LocalDate startDate = rankingEndDate.plusDays(1);
+        LocalDate endDate = startDate.plusDays(1);
+        initiativeGeneral.setRankingStartDate(rankingStartDate);
+        initiativeGeneral.setRankingEndDate(rankingEndDate);
+        initiativeGeneral.setStartDate(startDate);
+        initiativeGeneral.setEndDate(endDate);
+        return initiativeGeneral;
+    }
+
+    private InitiativeDTO createStep2InitiativeDTO (Boolean beneficiaryKnown) {
+        InitiativeDTO initiativeDTO = createStep1InitiativeDTO();
+        initiativeDTO.setGeneral(createInitiativeGeneralDTO(beneficiaryKnown));
+        return initiativeDTO;
+    }
+
+    private InitiativeGeneralDTO createInitiativeGeneralDTO(Boolean beneficiaryKnown) {
+        InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
+        initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
+        initiativeGeneralDTO.setBeneficiaryKnown(beneficiaryKnown);
+        initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
+        initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
+        LocalDate rankingStartDate = LocalDate.now();
+        LocalDate rankingEndDate = rankingStartDate.plusDays(1);
+        LocalDate startDate = rankingEndDate.plusDays(1);
+        LocalDate endDate = startDate.plusDays(1);
+        initiativeGeneralDTO.setRankingStartDate(rankingStartDate);
+        initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
+        initiativeGeneralDTO.setStartDate(startDate);
+        initiativeGeneralDTO.setEndDate(endDate);
+        return initiativeGeneralDTO;
+    }
+
+    /*
+     * ############### Step 3 ###############
+     */
+
+    private Initiative createStep3Initiative (Boolean beneficiaryKnown) {
+        Initiative initiative = createStep2Initiative(beneficiaryKnown);
+        initiative.setBeneficiaryRule(createInitiativeBeneficiaryRule());
+        return initiative;
     }
 
     private InitiativeBeneficiaryRule createInitiativeBeneficiaryRule() {
@@ -617,83 +731,9 @@ class InitiativeApiTest {
         return initiativeBeneficiaryRule;
     }
 
-    private InitiativeLegal createInitiativeLegal() {
-        InitiativeLegal initiativeLegal = new InitiativeLegal();
-        initiativeLegal.setDpiaLink("https://www.google.it");
-        initiativeLegal.setPrivacyLink("https://www.google.it");
-        initiativeLegal.setRegulationLink("https://www.google.it");
-        initiativeLegal.setTcLink("https://www.google.it");
-        return initiativeLegal;
-    }
-
-    InitiativeDTO createStep1InitiativeDTO () {
-        InitiativeDTO initiativeDTO = new InitiativeDTO();
-        initiativeDTO = initiativeDTO.builder()
-                .initiativeId(INITIATIVE_ID)
-                .initiativeName("initiativeName1")
-                .organizationId(ORGANIZATION_ID)
-                .status("DRAFT")
-                .autocertificationCheck(true)
-                .beneficiaryRanking(true)
-                .pdndCheck(true)
-                .pdndToken("pdndToken1")
-                .general(createInitiativeGeneralDTO()).additionalInfo(createInitiativeAdditionalDTO()).build();
-        return initiativeDTO;
-    }
-
-    InitiativeAdditionalDTO createStep1InitiativeAdditionalDTO() {
-        InitiativeAdditionalDTO initiativeAdditionalDTO = createInitiativeAdditionalDTO();
-        return initiativeAdditionalDTO;
-    }
-
-
-    private InitiativeGeneralDTO createInitiativeGeneralDTO() {
-        InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
-        initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
-        initiativeGeneralDTO.setBeneficiaryKnown(false);
-        initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
-        initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
-        LocalDate rankingStartDate = LocalDate.now();
-        LocalDate rankingEndDate = rankingStartDate.plusDays(1);
-        LocalDate startDate = rankingEndDate.plusDays(1);
-        LocalDate endDate = startDate.plusDays(1);
-        initiativeGeneralDTO.setRankingStartDate(rankingStartDate);
-        initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
-        initiativeGeneralDTO.setStartDate(startDate);
-        initiativeGeneralDTO.setEndDate(endDate);
-        return initiativeGeneralDTO;
-    }
-
-    private InitiativeAdditionalDTO createInitiativeAdditionalDTO() {
-        InitiativeAdditionalDTO initiativeAdditionalDTO = new InitiativeAdditionalDTO();
-        initiativeAdditionalDTO.setServiceIO(true);
-        initiativeAdditionalDTO.setServiceId("serviceId");
-        initiativeAdditionalDTO.setServiceName("serviceName");
-        initiativeAdditionalDTO.setServiceScope(InitiativeAdditionalDTO.ServiceScope.LOCAL);
-        initiativeAdditionalDTO.setDescription("Description");
-        initiativeAdditionalDTO.setPrivacyLink("https://www.google.it");
-        initiativeAdditionalDTO.setTcLink("https://www.google.it");
-        ChannelDTO channelDTO = new ChannelDTO();
-        channelDTO.setType(ChannelDTO.TypeEnum.EMAIL);
-        channelDTO.setContact("contact");
-        List<ChannelDTO> channelDTOS = new ArrayList<>();
-        channelDTOS.add(channelDTO);
-        initiativeAdditionalDTO.setChannels(channelDTOS);
-        return initiativeAdditionalDTO;
-    }
-
-    Initiative createStep2Initiative (Boolean beneficiaryKnown) {
-        Initiative initiative = createStep1Initiative();
-        initiative.setGeneral(createInitiativeGeneral(beneficiaryKnown));
-        InitiativeBeneficiaryRule initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
-        initiative.setBeneficiaryRule(initiativeBeneficiaryRule);
-        return initiative;
-    }
-
-    InitiativeDTO createStep2InitiativeDTO () {
-        InitiativeDTO initiativeDTO = createStep1InitiativeDTO();
-        InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
-        initiativeDTO.setBeneficiaryRule(initiativeBeneficiaryRuleDTO);
+    private InitiativeDTO createStep3InitiativeDTO (Boolean beneficiaryKnown) {
+        InitiativeDTO initiativeDTO = createStep2InitiativeDTO(beneficiaryKnown);
+        initiativeDTO.setBeneficiaryRule(createInitiativeBeneficiaryRuleDTO());
         return initiativeDTO;
     }
 
@@ -728,67 +768,64 @@ class InitiativeApiTest {
         return initiativeBeneficiaryRuleDTO;
     }
 
-    Initiative createStep3Initiative () {
-        Initiative initiative = new Initiative();
+    /*
+     * ############### Step 4 ###############
+     */
+
+    private Initiative createStep4Initiative (Boolean beneficiaryKnown) {
+        Initiative initiative = createStep3Initiative(beneficiaryKnown);
         return initiative;
     }
 
-    InitiativeDTO createStep3InitiativeDTO () {
-        InitiativeDTO initiativeDTO = new InitiativeDTO();
+    private InitiativeDTO createStep4InitiativeDTO (Boolean beneficiaryKnown) {
+        InitiativeDTO initiativeDTO = createStep3InitiativeDTO(beneficiaryKnown);
         return initiativeDTO;
     }
 
-    Initiative createStep4Initiative () {
-        Initiative initiative = new Initiative();
+    /*
+     * ############### Step 5 ###############
+     */
+
+    private Initiative createStep5Initiative () {
+        Initiative initiative = createStep5Initiative(false);
         return initiative;
     }
 
-    InitiativeDTO createStep4InitiativeDTO () {
-        InitiativeDTO initiativeDTO = new InitiativeDTO();
-        return initiativeDTO;
-    }
-
-    Initiative createStep5Initiative () {
-        Initiative initiative = new Initiative();
+    private Initiative createStep5Initiative (Boolean beneficiaryKnown) {
+        Initiative initiative = createStep4Initiative(beneficiaryKnown);
         return initiative;
     }
 
-    InitiativeDTO createStep5InitiativeDTO () {
-        InitiativeDTO initiativeDTO = new InitiativeDTO();
+    private InitiativeDTO createStep5InitiativeDTO () {
+        InitiativeDTO initiativeDTO = createStep5InitiativeDTO(false);
         return initiativeDTO;
     }
 
-    Initiative createStep6Initiative () {
-        Initiative initiative = new Initiative();
-        return initiative;
-    }
-
-    InitiativeDTO createStep6InitiativeDTO () {
-        InitiativeDTO initiativeDTO = new InitiativeDTO();
+    private InitiativeDTO createStep5InitiativeDTO (Boolean beneficiaryKnown) {
+        InitiativeDTO initiativeDTO = createStep4InitiativeDTO(beneficiaryKnown);
         return initiativeDTO;
     }
 
-
-    AccumulatedAmountDTO createAccumulatedAmountDTOValid(){
+    private AccumulatedAmountDTO createAccumulatedAmountDTOValid(){
         AccumulatedAmountDTO amountDTO = new AccumulatedAmountDTO();
         amountDTO.setAccumulatedType(AccumulatedAmountDTO.AccumulatedTypeEnum.THRESHOLD_REACHED);
         amountDTO.setRefundThreshold(BigDecimal.valueOf(100000));
         return amountDTO;
     }
 
-    TimeParameterDTO createTimeParameterDTO_Valid(){
+    private TimeParameterDTO createTimeParameterDTO_Valid(){
         TimeParameterDTO timeParameterDTO = new TimeParameterDTO();
         timeParameterDTO.setTimeType(TimeParameterDTO.TimeTypeEnum.CLOSED);
         return timeParameterDTO;
     }
 
-    RefundAdditionalInfoDTO createAdditionalInfoDTOValid(){
+    private RefundAdditionalInfoDTO createAdditionalInfoDTOValid(){
         RefundAdditionalInfoDTO refundAdditionalInfoDTO = new RefundAdditionalInfoDTO();
         refundAdditionalInfoDTO.setIdentificationCode("B002");
         return refundAdditionalInfoDTO;
     }
 
-    InitiativeRefundRuleDTO createRefundRuleDTOValidWithTimeParameter(){
+    private InitiativeRefundRuleDTO createRefundRuleDTOValidWithTimeParameter(){
         InitiativeRefundRuleDTO refundRuleDTO = new InitiativeRefundRuleDTO();
         refundRuleDTO.setAccumulatedAmount(null);
         refundRuleDTO.setTimeParameter(createTimeParameterDTO_Valid());
@@ -796,7 +833,7 @@ class InitiativeApiTest {
         return refundRuleDTO;
     }
 
-    InitiativeRefundRuleDTO createRefundRuleDTOValidWithAccumulatedAmount(){
+    private InitiativeRefundRuleDTO createRefundRuleDTOValidWithAccumulatedAmount(){
         InitiativeRefundRuleDTO refundRuleDTO = new InitiativeRefundRuleDTO();
         refundRuleDTO.setAccumulatedAmount(createAccumulatedAmountDTOValid());
         refundRuleDTO.setTimeParameter(null);
@@ -804,20 +841,20 @@ class InitiativeApiTest {
         return refundRuleDTO;
     }
 
-    AccumulatedAmount createAccumulatedAmount_Valid(){
+    private AccumulatedAmount createAccumulatedAmount_Valid(){
         AccumulatedAmount amount = new AccumulatedAmount();
         amount.setAccomulatedType(AccumulatedAmount.AccumulatedTypeEnum.THRESHOLD_REACHED);
         amount.setRefundThreshold(BigDecimal.valueOf(100000));
         return amount;
     }
 
-    TimeParameter createTimeParameter_Valid(){
+    private TimeParameter createTimeParameter_Valid(){
         TimeParameter timeParameter = new TimeParameter();
         timeParameter.setTimeType(TimeParameter.TimeTypeEnum.CLOSED);
         return timeParameter;
     }
 
-    AdditionalInfo createAdditionalInfo_Valid(){
+    private AdditionalInfo createAdditionalInfo_Valid(){
         AdditionalInfo additionalInfo = new AdditionalInfo();
         additionalInfo.setIdentificationCode("B002");
         return additionalInfo;
@@ -851,14 +888,14 @@ class InitiativeApiTest {
         return amountDTO;
     }
 
-    InitiativeRefundRule createRefundRuleValidWithAccumulatedAmount(){
+    private InitiativeRefundRule createRefundRuleValidWithAccumulatedAmount(){
         InitiativeRefundRule refundRule = new InitiativeRefundRule();
         refundRule.setAccumulatedAmount(createAccumulatedAmount_Valid());
         refundRule.setTimeParameter(null);
         refundRule.setAdditionalInfo(createAdditionalInfo_Valid());
         return refundRule;
     }
-    InitiativeRefundRule createRefundRuleValidWithTimeParameter(){
+    private InitiativeRefundRule createRefundRuleValidWithTimeParameter(){
         InitiativeRefundRule refundRule = new InitiativeRefundRule();
         refundRule.setAccumulatedAmount(null);
         refundRule.setTimeParameter(createTimeParameter_Valid());
@@ -866,7 +903,7 @@ class InitiativeApiTest {
         return refundRule;
     }
 
-    Initiative createInitiativeOnlyRefundRule(){
+    private Initiative createInitiativeOnlyRefundRule(){
         Initiative initiative = new Initiative();
         initiative.setInitiativeId(INITIATIVE_ID);
         initiative.setOrganizationId(ORGANIZATION_ID);
