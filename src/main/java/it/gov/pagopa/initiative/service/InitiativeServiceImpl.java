@@ -78,7 +78,7 @@ public class InitiativeServiceImpl implements InitiativeService {
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
                         HttpStatus.NOT_FOUND));
         //Check Initiative Status
-        isInitiativeAllowedThenThrows(initiative);
+        isInitiativeAllowedToBeEditableThenThrows(initiative);
         initiative.setGeneral(initiativeInfoModel.getGeneral());
         initiative.setUpdateDate(LocalDateTime.now());
         initiative.setStatus(InitiativeConstants.Status.DRAFT);
@@ -92,7 +92,7 @@ public class InitiativeServiceImpl implements InitiativeService {
                         InitiativeConstants.Exception.NotFound.CODE,
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
                         HttpStatus.NOT_FOUND));
-        isInitiativeAllowedThenThrows(initiative);
+        isInitiativeAllowedToBeEditableThenThrows(initiative);
         initiative.setAdditionalInfo(initiativeAdditionalInfo.getAdditionalInfo());
         initiative.setUpdateDate(LocalDateTime.now());
         initiative.setStatus(InitiativeConstants.Status.DRAFT);
@@ -107,7 +107,7 @@ public class InitiativeServiceImpl implements InitiativeService {
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
                         HttpStatus.NOT_FOUND));
         //Check Initiative Status
-        isInitiativeAllowedThenThrows(initiative);
+        isInitiativeAllowedToBeEditableThenThrows(initiative);
         initiative.setBeneficiaryRule(initiativeBeneficiaryRuleModel);
         initiative.setUpdateDate(LocalDateTime.now());
         initiative.setStatus(InitiativeConstants.Status.DRAFT);
@@ -122,7 +122,7 @@ public class InitiativeServiceImpl implements InitiativeService {
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
                         HttpStatus.NOT_FOUND));
         //Check Initiative Status
-        isInitiativeAllowedThenThrows(initiative);
+        isInitiativeAllowedToBeEditableThenThrows(initiative);
         initiative.setRewardRule(rewardAndTrxRules.getRewardRule());
         initiative.setTrxRule(rewardAndTrxRules.getTrxRule());
         initiative.setUpdateDate(LocalDateTime.now());
@@ -138,7 +138,7 @@ public class InitiativeServiceImpl implements InitiativeService {
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
                         HttpStatus.NOT_FOUND));
         //Check Initiative Status
-        isInitiativeAllowedThenThrows(initiative);
+        isInitiativeAllowedToBeEditableThenThrows(initiative);
         initiative.setRefundRule(refundRule.getRefundRule());
         initiative.setUpdateDate(LocalDateTime.now());
         initiative.setStatus(InitiativeConstants.Status.DRAFT);
@@ -178,22 +178,29 @@ public class InitiativeServiceImpl implements InitiativeService {
 
     @Override
     public void sendInitiativeInfoToRuleEngine(InitiativeDTO initiativeDTO) {
-        initiativeProducer.sendPublishInitiative(initiativeDTO);
+        if(!initiativeProducer.sendPublishInitiative(initiativeDTO)){
+            throw new IllegalStateException("[UPDATE_TO_PUBLISHED_STATUS] - Something gone wrong while notify Initiative to RuleEngine");
+        }
     }
 
     @Override
-    public void isInitiativeAllowedToBeNextStatusThenThrows(Initiative initiative, String statusToBeUpdated) {
-        switch (statusToBeUpdated){
+    public void isInitiativeAllowedToBeNextStatusThenThrows(Initiative initiative, String nextStatus) {
+        switch (nextStatus){
 //            case InitiativeConstants.Status.DRAFT:
+//                isInitiativeAllowedToBeEditableThenThrows(initiative);
 //                break;
 //            case InitiativeConstants.Status.TO_CHECK:
+//                isInitiativeAllowedToBeEditableThenThrows(initiative);
+//                isInitiativeStatusNotInRevisionThenThrow(initiative, nextStatus);
 //                break;
 //            case InitiativeConstants.Status.IN_REVISION:
 //                break;
 //            case InitiativeConstants.Status.APPROVED:
+//                isInitiativeStatusNotInRevisionThenThrow(initiative, nextStatus);
 //                break;
             case InitiativeConstants.Status.PUBLISHED:
                 if(!Arrays.asList(InitiativeConstants.Status.Validation.INITIATIVE_ALLOWED_STATES_TO_BECOME_PUBLISHED_ARRAY).contains(initiative.getStatus())) {
+                    log.info("[UPDATE_TO_{}_STATUS] - Initiative: {} Status: {}. Not processable status", nextStatus, initiative.getInitiativeId(), initiative.getStatus());
                     throw new InitiativeException(
                             InitiativeConstants.Exception.BadRequest.CODE,
                             String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_STATUS_NOT_VALID, initiative.getInitiativeId()),
@@ -204,6 +211,11 @@ public class InitiativeServiceImpl implements InitiativeService {
 //                break;
 //            case InitiativeConstants.Status.SUSPENDED:
 //                break;
+            default:
+                throw new InitiativeException(
+                        InitiativeConstants.Exception.BadRequest.CODE,
+                        String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_STATUS_NOT_VALID, initiative.getInitiativeId()),
+                        HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -212,8 +224,8 @@ public class InitiativeServiceImpl implements InitiativeService {
         initiativeRepository.save(initiative);
     }
 
-    private void isInitiativeAllowedThenThrows(Initiative initiative){
-        if(Arrays.asList(InitiativeConstants.Status.Validation.ALLOWED_STATES_OF_EDITABLE_INITIATIVES_ARRAY).contains(initiative.getStatus())){
+    private void isInitiativeAllowedToBeEditableThenThrows(Initiative initiative){
+        if(Arrays.asList(InitiativeConstants.Status.Validation.INITIATIVES_ALLOWED_STATES_TO_BE_EDITABLE_ARRAY).contains(initiative.getStatus())){
             return;
         }
         throw new InitiativeException(
@@ -222,12 +234,12 @@ public class InitiativeServiceImpl implements InitiativeService {
                 HttpStatus.BAD_REQUEST);
     }
 
-    private void isInitiativeStatusNotInRevisionThenThrow(Initiative initiative, String statusToBeUpdated){
+    private void isInitiativeStatusNotInRevisionThenThrow(Initiative initiative, String nextStatus){
         if (initiative.getStatus().equals(InitiativeConstants.Status.IN_REVISION)){
-            log.info("[UPDATE_TO_{}_STATUS] - Initiative: {}. Current status is valid", statusToBeUpdated, initiative.getInitiativeId());
+            log.info("[UPDATE_TO_{}_STATUS] - Initiative: {}. Current status is valid", nextStatus, initiative.getInitiativeId());
             return;
         }
-        log.info("[UPDATE_TO_{}_STATUS] - Initiative: {}. Current status is not IN_REVISION", statusToBeUpdated, initiative.getInitiativeId());
+        log.info("[UPDATE_TO_{}_STATUS] - Initiative: {}. Current status is not IN_REVISION", nextStatus, initiative.getInitiativeId());
         throw new InitiativeException(
                 InitiativeConstants.Exception.BadRequest.CODE,
                 InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_IN_REVISION,

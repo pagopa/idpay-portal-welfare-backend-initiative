@@ -122,6 +122,7 @@ public class InitiativeApiController implements InitiativeApi {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Override
     public ResponseEntity<Void> updateInitiativeRefundRule(String organizationId, String initiativeId, @RequestBody @Validated(ValidationOnGroup.class) InitiativeRefundRuleDTO initiativeRefundRuleDTO){
+        log.info("[UPDATE_TO_IN_REVISION_STATUS]-[UPDATE_REFUND_RULE] - Initiative: {}. Start processing...", initiativeId);
         Initiative initiative = this.initiativeDTOsToModelMapper.toInitiative(initiativeRefundRuleDTO);
         this.initiativeService.updateInitiativeRefundRules(organizationId, initiativeId, initiative, true);
         return ResponseEntity.noContent().build();
@@ -160,26 +161,45 @@ public class InitiativeApiController implements InitiativeApi {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Override
     public ResponseEntity<Void> updateInitiativePublishedStatus(String organizationId, String initiativeId, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO) {
-        //Recupero Iniziativa
+        //Retrieve Initiative
+        log.info("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Start processing...", initiativeId);
         Initiative initiative = this.initiativeService.getInitiative(organizationId, initiativeId);
-        //Verifico la validità dello stato --> creare eventualmente un Servizio di Validazione dedicato.
+        log.debug("Initiative retrieved");
+
+        //Validation for current Status
+        log.debug("Validating current Status");
         initiativeService.isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED);
+        log.debug("Current Status validated");
         InitiativeDTO initiativeDTO = this.initiativeModelToDTOMapper.toInitiativeDTO(initiative);
-        //Recupero stato corrente e lo salvo come TEMP
-        String statusTemp = initiativeDTO.getStatus();
-        //Salvo in PUBLISHED
+
+        log.debug("Retrieve current state and save it as TEMP");
+        String statusTemp = initiative.getStatus();
+        LocalDateTime updateDateTemp = initiative.getUpdateDate();
+
         initiativeDTO.setStatus(InitiativeConstants.Status.PUBLISHED);
+        initiativeDTO.setUpdateDate(LocalDateTime.now());
         initiative.setStatus(InitiativeConstants.Status.PUBLISHED);
+        initiative.setUpdateDate(LocalDateTime.now());
         initiativeService.updateInitiative(initiative);
-        //notifico RuleEngine dell'Iniziativa pubblicata
-        initiativeService.sendInitiativeInfoToRuleEngine(initiativeDTO);
-        //Creazione Servizio Iniziativa verso IO
+        log.debug("Initiative saved in status PUBLISHED");
+        try {
+            log.debug("Notification to Rule Engine of the published Initiative");
+            initiativeService.sendInitiativeInfoToRuleEngine(initiativeDTO);
+            //Creazione Servizio Iniziativa verso IO
 
-        //Sprint 9: In caso di beneficiaryKnown a true -> Invio al MS-Gruppi via API la richiesta di notifica della pubblicazione e, MS Gruppi la invia via coda al NotificationManager
+            //Sprint 9: In caso di beneficiaryKnown a true -> Invio al MS-Gruppi via API la richiesta di notifica della pubblicazione e, MS Gruppi la invia via coda al NotificationManager
 
-        //Nel caso una delle precedenti Integrazione si concludesse male, si fa rollback dell'Iniziativa allo stato TEMP iniziale
+            //Nel caso una delle precedenti Integrazione si concludesse male, si fa rollback dell'Iniziativa allo stato TEMP iniziale
 
-        //Se tutto ok --> 204
+            //Se tutto ok --> 204
+        } catch (Exception e) {
+            log.error("[UPDATE_TO_PUBLISHED_STATUS] - [ROLLBACK STATUS] Initiative: {}. Generic Error: {}", initiativeId, e.getMessage());
+            initiative.setStatus(statusTemp);
+            initiative.setUpdateDate(updateDateTemp);
+            initiativeService.updateInitiative(initiative);
+            log.debug("Initiative Status has been roll-backed to {}", statusTemp);
+            return ResponseEntity.internalServerError().build();
+        }
         return ResponseEntity.noContent().build();
     }
 
