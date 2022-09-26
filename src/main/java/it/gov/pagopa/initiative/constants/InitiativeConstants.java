@@ -15,7 +15,7 @@ public class InitiativeConstants {
         public static final String SUSPENDED = "SUSPENDED"; //Sospesa
 
         public static final class Validation {
-            public static final String [] ALLOWED_STATES_OF_EDITABLE_INITIATIVES_ARRAY = {Status.DRAFT, Status.TO_CHECK};
+            public static final String [] INITIATIVES_ALLOWED_STATES_TO_BE_EDITABLE_ARRAY = {Status.DRAFT, Status.TO_CHECK, Status.APPROVED};
             public static final String [] INITIATIVE_ALLOWED_STATES_TO_BECOME_PUBLISHED_ARRAY = {Status.APPROVED};
         }
     }
