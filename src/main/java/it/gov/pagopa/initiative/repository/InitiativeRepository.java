@@ -12,7 +12,7 @@ public interface InitiativeRepository extends MongoRepository<Initiative, String
     @Query(value="{organizationId : ?0, deleted: ?1}", fields="{initiativeId : 1, initiativeName : 1, status : 1, 'additionalInfo.serviceName' : 1, creationDate : 1, updateDate : 1}")
     List<Initiative> retrieveInitiativeSummary(String organizationId, Boolean deleted);
 
-    Optional<Initiative> findByOrganizationIdAndInitiativeIdAndDeletedIsFalse(String organizationId, String initiativeId, Boolean deleted);
+    Optional<Initiative> findByOrganizationIdAndInitiativeIdAndDeleted(String organizationId, String initiativeId, Boolean deleted);
 
     @Query(
             value="{initiativeId : ?0, deleted: ?1}",
