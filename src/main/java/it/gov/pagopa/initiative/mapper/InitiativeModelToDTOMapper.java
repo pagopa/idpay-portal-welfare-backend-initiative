@@ -39,6 +39,7 @@ public class InitiativeModelToDTOMapper {
         initiativeDto.setCreationDate(initiative.getCreationDate());
         initiativeDto.setUpdateDate(initiative.getUpdateDate());
         initiativeDto.setPdndToken(initiative.getPdndToken());
+        initiativeDto.setDeleted(initiative.getDeleted());
         initiativeDto.setPdndCheck(initiative.getPdndCheck());
         initiativeDto.setAutocertificationCheck(initiative.getAutocertificationCheck());
         initiativeDto.setBeneficiaryRanking(initiative.getBeneficiaryRanking());
@@ -166,6 +167,7 @@ public class InitiativeModelToDTOMapper {
                 .status(x.getStatus())
                 .creationDate(x.getCreationDate())
                 .updateDate(x.getUpdateDate())
+                .deleted(x.getDeleted())
                 .build()).toList();
     }
 
