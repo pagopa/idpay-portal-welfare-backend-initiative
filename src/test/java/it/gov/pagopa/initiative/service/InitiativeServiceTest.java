@@ -37,7 +37,6 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @WebMvcTest(value = {
@@ -299,7 +298,7 @@ class InitiativeServiceTest {
 
         //Try to call the Real Service (which is using the instructed Repo)
         try {
-            initiativeService.updateTrxAndRewardRules("Ente1", INITIATIVE_ID, initiative);
+            initiativeService.updateTrxAndRewardRules(ORGANIZATION_ID, INITIATIVE_ID, initiative);
         } catch (InitiativeException e) {
             log.info("InitiativeException: " + e.getCode());
             assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
@@ -396,6 +395,40 @@ class InitiativeServiceTest {
     }
 
     @Test
+    void logicallyDeleteInitiative_thenDeletedIsSettedToTrueWithSuccess(){
+        Initiative initiative = createStep5Initiative();
+        initiative.setDeleted(false);
+
+        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndDeletedIsFalse(ORGANIZATION_ID, INITIATIVE_ID, false)).thenReturn(Optional.ofNullable(initiative));
+        initiativeService.logicallyDeleteInitiative(ORGANIZATION_ID, INITIATIVE_ID);
+
+        verify(initiativeRepository, times(1)).findByOrganizationIdAndInitiativeIdAndDeletedIsFalse(ORGANIZATION_ID, INITIATIVE_ID, false);
+    }
+
+    @Test
+    void logicallyDeleteInitiative_thenThrowNewInitiativeException(){
+        Initiative initiative = createStep5Initiative();
+        initiative.setDeleted(false);
+
+        //Instruct the Repo Mock to return Dummy Initiatives
+        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndDeletedIsFalse(ORGANIZATION_ID, INITIATIVE_ID, false)).thenThrow(
+                new InitiativeException(
+                        InitiativeConstants.Exception.NotFound.CODE,
+                        String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID),
+                        HttpStatus.NOT_FOUND)
+                );
+
+        try{
+            initiativeService.logicallyDeleteInitiative(ORGANIZATION_ID, INITIATIVE_ID);
+        }catch (InitiativeException e){
+            log.info("InitiativeException: " + e.getCode());
+            assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
+            assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
+            assertEquals(String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID), e.getMessage());
+        }
+
+    }
+    @Test
     void updateInitiativeStatusToCheck_thenStatusIsUpdatedWithSuccess(){
         Initiative step4Initiative = createStep4Initiative();
         step4Initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
@@ -415,7 +448,13 @@ class InitiativeServiceTest {
         step4Initiative.setStatus(InitiativeConstants.Status.TO_CHECK);
 
         //Instruct the Repo Mock to return Dummy Initiatives
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndDeletedIsFalse(ORGANIZATION_ID, INITIATIVE_ID, false)).thenReturn(Optional.ofNullable(step4Initiative));
+        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndDeletedIsFalse(ORGANIZATION_ID, INITIATIVE_ID, false)).thenThrow(
+                new InitiativeException(
+                        InitiativeConstants.Exception.BadRequest.CODE,
+                        String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_IN_REVISION, INITIATIVE_ID),
+                        HttpStatus.BAD_REQUEST
+                )
+        );
 
         try{
             initiativeService.updateInitiativeToCheckStatus(ORGANIZATION_ID, INITIATIVE_ID);
@@ -423,7 +462,7 @@ class InitiativeServiceTest {
             log.info("InitiativeException: " + e.getCode());
             assertEquals(HttpStatus.BAD_REQUEST, e.getHttpStatus());
             assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
-            assertEquals(String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_IN_REVISION), e.getMessage());
+            assertEquals(String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_IN_REVISION, INITIATIVE_ID), e.getMessage());
         }
     }
 
@@ -460,6 +499,8 @@ class InitiativeServiceTest {
         //Expecting repo to be called once with correct param
         verify(initiativeRepository, times(1)).save(any(Initiative.class));
     }
+
+
 
     @Test
     void givenInitiativeAPPROVEDandNextStatusPUBLISHED_whenInitiativeIsAllowedToBeNextStatus_thenOk(){
@@ -562,7 +603,7 @@ class InitiativeServiceTest {
         return initiative;
     }
 
-    private InitiativeGeneral createInitiativeGeneral() {
+    private InitiativeGeneral createInitiativeGeneral(boolean beneficiaryKnown) {
         InitiativeGeneral initiativeGeneral = new InitiativeGeneral();
         initiativeGeneral.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneral.setBeneficiaryKnown(true);
@@ -608,10 +649,10 @@ class InitiativeServiceTest {
         return initiativeDTO;
     }
 
-    private InitiativeGeneralDTO createInitiativeGeneralDTO() {
+    private InitiativeGeneralDTO createInitiativeGeneralDTO(boolean beneficiaryKnown) {
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
-        initiativeGeneralDTO.setBeneficiaryKnown(true);
+        initiativeGeneralDTO.setBeneficiaryKnown(beneficiaryKnown);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
         LocalDate rankingStartDate = LocalDate.now();
@@ -810,7 +851,7 @@ class InitiativeServiceTest {
     }
 
     InitiativeDTO createStep3InitiativeDTO () {
-        InitiativeDTO initiativeDTO = new InitiativeDTO();
+        InitiativeDTO initiativeDTO = createStep2InitiativeDTO();
         //TODO ora settato con l'utilizzo dei RewardGroups. Associare un faker booleano per i casi OK, altrimenti separare i 2 casi
         initiativeDTO.setRewardRule(createRewardRuleDTO(false));
         initiativeDTO.setTrxRule(createTrxRuleConditionDTO());
