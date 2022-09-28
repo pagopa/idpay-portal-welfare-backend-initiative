@@ -428,6 +428,27 @@ class InitiativeServiceTest {
         }
 
     }
+
+    @Test
+    void logicallyDeleteInitiativeStatusInRevision_thenThrowNewInitiativeException(){
+        Initiative initiative = createStep5Initiative();
+        initiative.setDeleted(false);
+        initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
+
+        //Instruct the Repo Mock to return Dummy Initiatives
+        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndDeleted(ORGANIZATION_ID, INITIATIVE_ID, false)).thenReturn(Optional.of(initiative));
+
+        try{
+            initiativeService.logicallyDeleteInitiative(ORGANIZATION_ID, INITIATIVE_ID);
+        }catch (InitiativeException e){
+            log.info("InitiativeException: " + e.getCode());
+            assertEquals(HttpStatus.BAD_REQUEST, e.getHttpStatus());
+            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
+            assertEquals(String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_CANNOT_BE_DELETED, INITIATIVE_ID), e.getMessage());
+        }
+
+    }
+
     @Test
     void updateInitiativeStatusToCheck_thenStatusIsUpdatedWithSuccess(){
         Initiative step4Initiative = createStep4Initiative();

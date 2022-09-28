@@ -192,6 +192,7 @@ public class InitiativeServiceImpl implements InitiativeService {
             );
         }else{
             initiative.setDeleted(true);
+            initiative.setUpdateDate(LocalDateTime.now());
             this.initiativeRepository.save(initiative);
             log.info("[LOGICAL_INITIATIVE_ELIMINATION] - Initiative: {}. Successfully logical elimination.", initiative.getInitiativeId());
         }
