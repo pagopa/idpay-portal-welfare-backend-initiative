@@ -43,9 +43,9 @@ public class InitiativeApiController implements InitiativeApi {
 
     @ResponseStatus(HttpStatus.OK)
     @Override
-    public ResponseEntity<List<InitiativeSummaryDTO>> getInitativeSummary(String organizationId) {
+    public ResponseEntity<List<InitiativeSummaryDTO>> getInitiativeSummary(String organizationId, String role) {
         return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeSummaryDTOList(
-                this.initiativeService.retrieveInitiativeSummary(organizationId)
+                this.initiativeService.retrieveInitiativeSummary(organizationId, role)
         ));
     }
 
@@ -209,7 +209,7 @@ public class InitiativeApiController implements InitiativeApi {
                 log.info("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Notification to IO BeckEnd of the published Initiative", initiativeId);
                 initiativeDTO = initiativeService.sendInitiativeInfoToIOBackEndServiceAndSaveItOnInitiative(initiativeDTO, initiativeOrganizationInfoDTO);
                 initiative = initiativeDTOsToModelMapper.toInitiative(initiativeDTO);
-                initiativeService.updateInitiative(initiative); //TODO Needed? Also: switch out of the IF clause?
+                initiativeService.updateInitiative(initiative);
                 //Invio al MS-Gruppi via API
                 //This integration necessarily takes place in succession to having created the service with IO in order not to send "orphan" resources (not associated with any Initiative known by IO).
             }

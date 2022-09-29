@@ -44,7 +44,7 @@ public class InitiativeServiceImpl implements InitiativeService {
     @Autowired
     IOBackEndRestConnector ioBackEndRestConnector;
 
-    public List<Initiative> retrieveInitiativeSummary(String organizationId) {
+    public List<Initiative> retrieveInitiativeSummary(String organizationId, String role) {
         List<Initiative> initiatives = initiativeRepository.retrieveInitiativeSummary(organizationId, true);
         if(initiatives.isEmpty()){
             throw new InitiativeException(
@@ -52,7 +52,7 @@ public class InitiativeServiceImpl implements InitiativeService {
                     String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_LIST_BY_ORGANIZATION_MESSAGE, organizationId),
                     HttpStatus.NOT_FOUND);
         }
-        return initiatives;
+        return InitiativeConstants.Role.OPE_BASE.equals(role) ? initiatives.stream().filter(initiative -> initiative.getStatus().equals(InitiativeConstants.Status.IN_REVISION)).toList() : initiatives;
     }
 
     @Override
@@ -263,7 +263,7 @@ public class InitiativeServiceImpl implements InitiativeService {
         ServiceRequestDTO serviceRequestDTO = initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServicePayloadDTO(additionalInfo, initiativeOrganizationInfoDTO);
         ServiceResponseDTO serviceResponseDTO = ioBackEndRestConnector.createService(serviceRequestDTO);
         additionalInfo.setServiceId(serviceResponseDTO.getServiceId());
-        initiativeDTO.setUpdateDate(LocalDateTime.now()); //TODO Needed??
+        initiativeDTO.setUpdateDate(LocalDateTime.now());
         return initiativeDTO;
     }
 

@@ -40,6 +40,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 
+import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.ADMIN;
+import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.OPE_BASE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -90,7 +92,7 @@ class InitiativeServiceTest {
     IOBackEndRestConnector ioBackEndRestConnector;
 
     @Test
-    void retrieveInitiativeSummary_ok() throws Exception {
+    void givenRoleAdmin_retrieveInitiativeSummary_ok() throws Exception {
         Initiative step2Initiative1 = createStep2Initiative();
         Initiative step2Initiative2 = createStep2Initiative();
         List<Initiative> initiativeList = Arrays.asList(step2Initiative1, step2Initiative2);
@@ -99,7 +101,27 @@ class InitiativeServiceTest {
         when(initiativeRepository.retrieveInitiativeSummary(ORGANIZATION_ID, true)).thenReturn(initiativeList);
 
         //Try to call the Real Service (which is using the instructed Repo)
-        List<Initiative> initiatives = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID);
+        List<Initiative> initiatives = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, ADMIN);
+
+        //Check the equality of the results
+        assertEquals(initiativeList, initiatives);
+
+        // you are expecting repo to be called once with correct param
+        verify(initiativeRepository).retrieveInitiativeSummary(ORGANIZATION_ID, true); // same as: verify(initiativeRepository, times(1)).retrieveInitiativeSummary(anyString());
+    }
+
+    @Test
+    void givenRoleOpeBase_retrieveInitiativeSummary_ok() throws Exception {
+        Initiative step2Initiative1 = createStep2Initiative();
+        step2Initiative1.setStatus(InitiativeConstants.Status.IN_REVISION);
+        Initiative step2Initiative2 = createStep2Initiative();
+        List<Initiative> initiativeList = Arrays.asList(step2Initiative1);
+
+        //Instruct the Repo Mock to return Dummy Initiatives
+        when(initiativeRepository.retrieveInitiativeSummary(ORGANIZATION_ID, true)).thenReturn(initiativeList);
+
+        //Try to call the Real Service (which is using the instructed Repo)
+        List<Initiative> initiatives = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, OPE_BASE);
 
         //Check the equality of the results
         assertEquals(initiativeList, initiatives);
@@ -112,7 +134,7 @@ class InitiativeServiceTest {
     void retrieveInitiativeSummary_ko() {
         //Try to call the Real Service (which is using the instructed Repo)
         try {
-            List<Initiative> initiatives = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID);
+            List<Initiative> initiatives = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, ADMIN);
         } catch (InitiativeException e) {
             log.info("InitiativeException: " + e.getCode());
             assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());

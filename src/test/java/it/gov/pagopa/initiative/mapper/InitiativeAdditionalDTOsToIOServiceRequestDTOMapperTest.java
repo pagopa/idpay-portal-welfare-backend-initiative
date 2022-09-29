@@ -6,6 +6,7 @@ import it.gov.pagopa.initiative.dto.InitiativeOrganizationInfoDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceMetadataDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -75,7 +76,7 @@ class InitiativeAdditionalDTOsToIOServiceRequestDTOMapperTest {
         return ServiceRequestDTO.builder()
                 .serviceMetadata(serviceMetadataDTO)
                 .serviceName(SERVICE_NAME)
-                .departmentName(PRODUCT_DEPARTMENT_NAME)
+                .departmentName(StringUtils.isNotBlank(ORGANIZATION_NAME)? ORGANIZATION_NAME : PRODUCT_DEPARTMENT_NAME)
                 .organizationName(ORGANIZATION_NAME)
                 .organizationFiscalCode(ORGANIZATION_VAT)
                 .isVisible(IS_VISIBLE)
