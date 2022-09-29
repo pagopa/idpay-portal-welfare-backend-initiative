@@ -1,42 +1,18 @@
 package it.gov.pagopa.initiative.mapper;
 
-import it.gov.pagopa.initiative.dto.*;
+import it.gov.pagopa.initiative.dto.ChannelDTO;
+import it.gov.pagopa.initiative.dto.InitiativeAdditionalDTO;
+import it.gov.pagopa.initiative.dto.InitiativeOrganizationInfoDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceMetadataDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
-import it.gov.pagopa.initiative.dto.rule.refund.AccumulatedAmountDTO;
-import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
-import it.gov.pagopa.initiative.dto.rule.refund.RefundAdditionalInfoDTO;
-import it.gov.pagopa.initiative.dto.rule.refund.TimeParameterDTO;
-import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
-import it.gov.pagopa.initiative.dto.rule.reward.RewardGroupsDTO;
-import it.gov.pagopa.initiative.dto.rule.reward.RewardValueDTO;
-import it.gov.pagopa.initiative.dto.rule.trx.*;
-import it.gov.pagopa.initiative.model.TypeBoolEnum;
-import it.gov.pagopa.initiative.model.TypeMultiEnum;
-import it.gov.pagopa.initiative.model.*;
-import it.gov.pagopa.initiative.model.rule.refund.AccumulatedAmount;
-import it.gov.pagopa.initiative.model.rule.refund.AdditionalInfo;
-import it.gov.pagopa.initiative.model.rule.refund.InitiativeRefundRule;
-import it.gov.pagopa.initiative.model.rule.refund.TimeParameter;
-import it.gov.pagopa.initiative.model.rule.reward.InitiativeRewardRule;
-import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
-import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
-import it.gov.pagopa.initiative.model.rule.trx.*;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.TestPropertySource;
 
-import java.math.BigDecimal;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
