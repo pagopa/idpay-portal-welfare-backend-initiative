@@ -42,7 +42,7 @@ public class InitiativeGeneralDTO   {
     PF("PF"),
     PG("PG");
 
-    private String value;
+    private final String value;
 
     BeneficiaryTypeEnum(String value) {
       this.value = value;

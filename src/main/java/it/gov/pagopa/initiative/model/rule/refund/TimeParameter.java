@@ -21,7 +21,7 @@ public class TimeParameter {
 
         QUARTERLY("QUARTERLY");
 
-        private String value;
+        private final String value;
 
         TimeTypeEnum(String value) {
             this.value = value;

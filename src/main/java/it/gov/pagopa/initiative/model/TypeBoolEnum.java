@@ -10,7 +10,7 @@ public enum TypeBoolEnum {
 
     BOOLEAN("boolean");
 
-    private String value;
+    private final String value;
 
     TypeBoolEnum(String value) {
         this.value = value;

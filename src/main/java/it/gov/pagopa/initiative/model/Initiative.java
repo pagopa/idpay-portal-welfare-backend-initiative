@@ -21,14 +21,10 @@ public class Initiative {
     private String initiativeId;
     private String initiativeName;
     private String organizationId;
-    private String serviceId;
     private String pdndToken;
     private LocalDateTime creationDate;
     private LocalDateTime updateDate;
     private String status;
-    private Boolean pdndCheck;
-    private Boolean autocertificationCheck;
-    private Boolean beneficiaryRanking;
     private InitiativeGeneral general;
     private InitiativeAdditional additionalInfo;
     private InitiativeBeneficiaryRule beneficiaryRule;
