@@ -517,7 +517,7 @@ class InitiativeApiTest {
     }
 
     @Test
-    void when_PUT_updateInitiativePublishedStatus_then204() throws Exception {
+    void when_PUT_updateInitiativePublishedStatus_ToIO_then204() throws Exception {
         InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = InitiativeOrganizationInfoDTO.builder()
                 .organizationName(ORGANIZATION_NAME)
                 .organizationVat(ORGANIZATION_VAT)
@@ -549,6 +549,47 @@ class InitiativeApiTest {
         when(initiativeDTOsToModelMapper.toInitiative(step5InitiativeDTO)).thenReturn(step5Initiative);
         doNothing().when(initiativeService).updateInitiative(any(Initiative.class));
 
+
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(initiativeOrganizationInfoDTO))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    void when_PUT_updateInitiativePublishedStatus_NotToIO_then204() throws Exception {
+        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = InitiativeOrganizationInfoDTO.builder()
+                .organizationName(ORGANIZATION_NAME)
+                .organizationVat(ORGANIZATION_VAT)
+                .organizationUserId(ORGANIZATION_USER_ID)
+                .organizationUserRole(ORGANIZATION_USER_ROLE)
+                .build();
+
+        //create Dummy Initiative
+        Initiative step5Initiative = createStep5Initiative();
+        InitiativeDTO step5InitiativeDTO = createStep5InitiativeDTO();
+        InitiativeAdditionalDTO additionalInfoDTO = step5InitiativeDTO.getAdditionalInfo();
+        additionalInfoDTO.setServiceIO(false);
+        step5InitiativeDTO.setAdditionalInfo(additionalInfoDTO);
+
+        // When
+        // With this instruction, I instruct the service (via Mockito's when) to always return the DummyInitiative to me anytime I call the same service's function
+        when(initiativeService.getInitiative(anyString(), anyString())).thenReturn(step5Initiative);
+        Initiative initiative = initiativeService.getInitiative(anyString(), anyString());
+        // Expecting same instance
+        assertThat("Reason of result", initiative, is(sameInstance(step5Initiative)));
+
+        doNothing().when(initiativeService).isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED);
+
+        // Instruct the Service to insert a Dummy Initiative
+        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative)).thenReturn(step5InitiativeDTO);
+
+        doNothing().when(initiativeService).updateInitiative(any(Initiative.class));
+
+        doNothing().when(initiativeService).sendInitiativeInfoToRuleEngine(any(InitiativeDTO.class));
 
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -648,7 +689,6 @@ class InitiativeApiTest {
         assertEquals(HttpStatus.BAD_REQUEST.value(), res.getResponse().getStatus());
         assertEquals(InitiativeConstants.Exception.Publish.BadRequest.CODE, error.getCode());
         assertTrue(error.getMessage().contains(InitiativeConstants.Exception.Publish.BadRequest.INTEGRATION_FAILED));
-
     }
 
     private Response responseStub(int status, String reasonExceptionMessage) {
