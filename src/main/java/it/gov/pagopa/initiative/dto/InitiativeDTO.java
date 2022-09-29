@@ -31,6 +31,9 @@ public class InitiativeDTO   {
   @JsonProperty("organizationId")
   private String organizationId;
 
+  @JsonProperty("deleted")
+  private Boolean deleted;
+
   @JsonProperty("pdndToken")
   private String pdndToken;
 

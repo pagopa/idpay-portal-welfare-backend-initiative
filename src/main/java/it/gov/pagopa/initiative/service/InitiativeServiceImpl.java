@@ -45,7 +45,7 @@ public class InitiativeServiceImpl implements InitiativeService {
     IOBackEndRestConnector ioBackEndRestConnector;
 
     public List<Initiative> retrieveInitiativeSummary(String organizationId) {
-        List<Initiative> initiatives = initiativeRepository.retrieveInitiativeSummary(organizationId);
+        List<Initiative> initiatives = initiativeRepository.retrieveInitiativeSummary(organizationId, false);
         if(initiatives.isEmpty()){
             throw new InitiativeException(
                     InitiativeConstants.Exception.NotFound.CODE,
@@ -65,7 +65,7 @@ public class InitiativeServiceImpl implements InitiativeService {
 
     @Override
     public Initiative getInitiative(String organizationId, String initiativeId) {
-        return initiativeRepository.findByOrganizationIdAndInitiativeId(organizationId, initiativeId)
+        return initiativeRepository.findByOrganizationIdAndInitiativeIdAndDeleted(organizationId, initiativeId, false)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
@@ -74,7 +74,7 @@ public class InitiativeServiceImpl implements InitiativeService {
 
     @Override
     public Initiative getInitiativeBeneficiaryView(String initiativeId) {
-        return initiativeRepository.retrieveInitiativeBeneficiaryView(initiativeId)
+        return initiativeRepository.retrieveInitiativeBeneficiaryView(initiativeId, false)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
@@ -83,7 +83,7 @@ public class InitiativeServiceImpl implements InitiativeService {
 
     @Override
     public void updateInitiativeGeneralInfo(String organizationId, String initiativeId, Initiative initiativeInfoModel) {
-        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeId(organizationId, initiativeId)
+        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeIdAndDeleted(organizationId, initiativeId, false)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
@@ -98,7 +98,7 @@ public class InitiativeServiceImpl implements InitiativeService {
 
     @Override
     public void updateInitiativeAdditionalInfo(String organizationId, String initiativeId, Initiative initiativeAdditionalInfo){
-        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeId(organizationId, initiativeId)
+        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeIdAndDeleted(organizationId, initiativeId, false)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
@@ -112,7 +112,7 @@ public class InitiativeServiceImpl implements InitiativeService {
 
     @Override
     public void updateInitiativeBeneficiary(String organizationId, String initiativeId, InitiativeBeneficiaryRule initiativeBeneficiaryRuleModel){
-        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeId(organizationId, initiativeId)
+        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeIdAndDeleted(organizationId, initiativeId, false)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
@@ -127,7 +127,7 @@ public class InitiativeServiceImpl implements InitiativeService {
 
     @Override
     public void updateTrxAndRewardRules(String organizationId, String initiativeId, Initiative rewardAndTrxRules) {
-        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeId(organizationId, initiativeId)
+        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeIdAndDeleted(organizationId, initiativeId, false)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
@@ -143,7 +143,7 @@ public class InitiativeServiceImpl implements InitiativeService {
 
     @Override
     public void updateInitiativeRefundRules(String organizationId, String initiativeId, Initiative refundRule, boolean changeInitiativeStatus){
-        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeId(organizationId, initiativeId)
+        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeIdAndDeleted(organizationId, initiativeId, false)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
@@ -161,7 +161,7 @@ public class InitiativeServiceImpl implements InitiativeService {
 
     @Override
     public void updateInitiativeApprovedStatus(String organizationId, String initiativeId){
-        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeId(organizationId, initiativeId)
+        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeIdAndDeleted(organizationId, initiativeId, false)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
@@ -175,7 +175,7 @@ public class InitiativeServiceImpl implements InitiativeService {
 
     @Override
     public void updateInitiativeToCheckStatus(String organizationId, String initiativeId){
-        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeId(organizationId, initiativeId)
+        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeIdAndDeleted(organizationId, initiativeId, false)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
@@ -185,6 +185,28 @@ public class InitiativeServiceImpl implements InitiativeService {
         initiative.setUpdateDate(LocalDateTime.now());
         this.initiativeRepository.save(initiative);
         log.info("[UPDATE_TO_CHECK_STATUS] - Initiative: {}. Status successfully changed", initiative.getInitiativeId());
+    }
+
+    @Override
+    public void logicallyDeleteInitiative(String organizationId, String initiativeId){
+        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeIdAndDeleted(organizationId, initiativeId, false)
+                .orElseThrow(() -> new InitiativeException(
+                        InitiativeConstants.Exception.NotFound.CODE,
+                        String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
+                        HttpStatus.NOT_FOUND));
+        if (initiative.getStatus().equals(InitiativeConstants.Status.IN_REVISION)){
+            log.error("[LOGICAL_INITIATIVE_ELIMINATION] - Initiative: {}. Cannot be deleted. Current status is IN_REVISION.", initiative.getInitiativeId());
+            throw new InitiativeException(
+                    InitiativeConstants.Exception.BadRequest.CODE,
+                    String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_CANNOT_BE_DELETED, initiativeId),
+                    HttpStatus.BAD_REQUEST
+            );
+        }else{
+            initiative.setDeleted(true);
+            initiative.setUpdateDate(LocalDateTime.now());
+            this.initiativeRepository.save(initiative);
+            log.info("[LOGICAL_INITIATIVE_ELIMINATION] - Initiative: {}. Successfully logical elimination.", initiative.getInitiativeId());
+        }
     }
 
     @Override

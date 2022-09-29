@@ -62,6 +62,7 @@ public class InitiativeApiController implements InitiativeApi {
         initiativeToSave.setOrganizationId(organizationId);
         initiativeToSave.setCreationDate(LocalDateTime.now());
         initiativeToSave.setUpdateDate(LocalDateTime.now());
+        initiativeToSave.setDeleted(false);
         //TODO verificare se necessario controllo per serviceId e organization non sovrapposti prima di creare una ulteriore iniziativa
         Initiative insertedInitiative = initiativeService.insertInitiative(initiativeToSave);
         return new ResponseEntity<>(this.initiativeModelToDTOMapper.toDtoOnlyId(insertedInitiative), HttpStatus.CREATED);
@@ -156,6 +157,14 @@ public class InitiativeApiController implements InitiativeApi {
     public ResponseEntity<Void> updateInitiativeToCheckStatus(String organizationId, String initiativeId ){
         log.info("[UPDATE_TO_CHECK_STATUS] - Initiative: {}. Start processing...", initiativeId);
         this.initiativeService.updateInitiativeToCheckStatus(organizationId, initiativeId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Override
+    public ResponseEntity<Void> logicallyDeleteInitiative(String organizationId, String initiativeId){
+        log.info("[LOGICAL_INITIATIVE_ELIMINATION] - Initiative: {}. Start processing...", initiativeId);
+        this.initiativeService.logicallyDeleteInitiative(organizationId, initiativeId);
         return ResponseEntity.noContent().build();
     }
 

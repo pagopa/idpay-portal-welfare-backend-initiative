@@ -88,6 +88,7 @@ class InitiativeApiTest {
     private static final String PUT_INITIATIVE_STATUS_APPROVED_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/approved";
     private static final String PUT_INITIATIVE_TO_CHECK_STATUS_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/rejected";
     private static final String PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/published";
+    private static final String LOGICALLY_DELETE_INITIATIVE_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER;
     private static final String ROLE = "TEST_ROLE";
     private static final String ORGANIZATION_NAME = "organizationName";
     private static final String ORGANIZATION_VAT = "organizationVat";
@@ -481,6 +482,22 @@ class InitiativeApiTest {
     }
 
     @Test
+    void DEL_logicallyDeleteInitiative_whenCurrentDeletedIsFalse_thenBecomeTrue() throws Exception{
+        Initiative initiative = createStep5Initiative();
+        initiative.setDeleted(false);
+
+
+        MvcResult res =
+                mvc.perform(MockMvcRequestBuilders.delete(BASE_URL + String.format(LOGICALLY_DELETE_INITIATIVE_URL, initiative.getOrganizationId(), initiative.getInitiativeId()))
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .accept(MediaType.APPLICATION_JSON))
+                        .andExpect(MockMvcResultMatchers.status().isNoContent())
+                        .andDo(print())
+                        .andReturn();
+//        assertEquals(true, initiative.getDeleted());
+    }
+
+    @Test
     void anyUpdate_PUT_whenBodyRequestIsNotValid_then400BadRequest_MethodArgumentNotValidExceptionElseCase() throws Exception {
         InitiativeRefundRuleDTO refundRuleDTO = createRefundRuleWithAccumulatedAmountAndTimeParameter_NotValid();
 
@@ -855,12 +872,14 @@ class InitiativeApiTest {
         return initiativeDTO;
     }
 
+
     /*
      * ############### Step 5 ###############
      */
 
     private Initiative createStep5Initiative () {
         Initiative initiative = createStep5Initiative(false);
+        initiative.setRefundRule(createRefundRuleValidWithTimeParameter());
         return initiative;
     }
 
@@ -871,6 +890,7 @@ class InitiativeApiTest {
 
     private InitiativeDTO createStep5InitiativeDTO () {
         InitiativeDTO initiativeDTO = createStep5InitiativeDTO(false);
+        initiativeDTO.setRefundRule(createRefundRuleDTOValidWithTimeParameter());
         return initiativeDTO;
     }
 

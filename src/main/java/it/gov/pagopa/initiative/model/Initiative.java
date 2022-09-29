@@ -21,6 +21,7 @@ public class Initiative {
     private String initiativeId;
     private String initiativeName;
     private String organizationId;
+    private Boolean deleted;
     private String pdndToken;
     private LocalDateTime creationDate;
     private LocalDateTime updateDate;
