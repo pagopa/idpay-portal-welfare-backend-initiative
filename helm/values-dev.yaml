@@ -87,6 +87,8 @@ microservice-chart:
     APPLICATIONINSIGHTS_INSTRUMENTATION_MICROMETER_ENABLED: "false"
     APP_INITIATIVE_CONDITIONS_NOTIFY_RE: true
     APP_INITIATIVE_CONDITIONS_NOTIFY_IO: true
+    IO_BACKEND_SERVICE_DEPARTMENT_NAME: IDPAY
+    IO_BACKEND_SERVICE_IS_VISIBLE: false #true per PROD
 
   envConfigMapExternals:
     idpay-common:
@@ -94,8 +96,6 @@ microservice-chart:
       JAVA_TOOL_OPTIONS: JAVA_TOOL_OPTIONS
     rest-client:
       IO_BACKEND_SERVICE_BASE_URL: io_backend_base_url
-      IO_BACKEND_SERVICE_DEPARTMENT_NAME: idpay
-      IO_BACKEND_SERVICE_IS_VISIBLE: false #true per PROD
     idpay-eventhub-01:
       KAFKA_BINDER_BROKER_ENDPOINT_LIST: kafka_broker
       KAFKA_INITIATIVE_SASL_MECHANISM: kafka_sasl_mechanism
@@ -106,7 +106,7 @@ microservice-chart:
     aks-api-url: cstar-d-weu-dev01-aks-apiserver-url
     MONGODB_URI: mongodb-connection-string
     KAFKA_INITIATIVE_SASL_JAAS_CONFIG: evh-idpay-rule-update-idpay-rule-update-producer-jaas-config-idpay-01
-    IO_BACKEND_SERVICE_SUBSCRIPTION_API_KEY: io-backend-subscription-api-key
+    IO_BACKEND_SERVICE_SUBSCRIPTION_API_KEY: io-backend-aggregate-api-key
 
   keyvault:
     name: "cstar-d-idpay-kv"
