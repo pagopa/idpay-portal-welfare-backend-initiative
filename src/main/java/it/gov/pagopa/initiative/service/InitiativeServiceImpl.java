@@ -263,7 +263,7 @@ public class InitiativeServiceImpl implements InitiativeService {
         ServiceRequestDTO serviceRequestDTO = initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServicePayloadDTO(additionalInfo, initiativeOrganizationInfoDTO);
         ServiceResponseDTO serviceResponseDTO = ioBackEndRestConnector.createService(serviceRequestDTO);
         additionalInfo.setServiceId(serviceResponseDTO.getServiceId());
-        initiativeDTO.setUpdateDate(LocalDateTime.now()); //TODO Needed??
+        initiativeDTO.setUpdateDate(LocalDateTime.now());
         return initiativeDTO;
     }
 
