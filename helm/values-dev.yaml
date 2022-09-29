@@ -88,7 +88,7 @@ microservice-chart:
     APP_INITIATIVE_CONDITIONS_NOTIFY_RE: true
     APP_INITIATIVE_CONDITIONS_NOTIFY_IO: true
     IO_BACKEND_SERVICE_DEPARTMENT_NAME: IDPAY
-    IO_BACKEND_SERVICE_IS_VISIBLE: false #true per PROD
+    IO_BACKEND_SERVICE_IS_VISIBLE: false
 
   envConfigMapExternals:
     idpay-common:
