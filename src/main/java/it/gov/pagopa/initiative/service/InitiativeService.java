@@ -32,6 +32,8 @@ public interface InitiativeService {
 
     void updateInitiativeToCheckStatus(String organizationId, String initiativeId);
 
+    void logicallyDeleteInitiative(String organizationId, String initiativeId);
+
     void sendInitiativeInfoToRuleEngine(InitiativeDTO initiativeDTO);
 
     void isInitiativeAllowedToBeNextStatusThenThrows(Initiative initiative, String statusToBeUpdated);
