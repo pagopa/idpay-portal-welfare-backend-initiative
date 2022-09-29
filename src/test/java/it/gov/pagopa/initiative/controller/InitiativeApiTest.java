@@ -484,7 +484,7 @@ class InitiativeApiTest {
     @Test
     void DEL_logicallyDeleteInitiative_whenCurrentDeletedIsFalse_thenBecomeTrue() throws Exception{
         Initiative initiative = createStep5Initiative();
-        initiative.setDeleted(false);
+        initiative.setEnabled(true);
 
 
         MvcResult res =
