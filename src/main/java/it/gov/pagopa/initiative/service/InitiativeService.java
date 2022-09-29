@@ -1,6 +1,7 @@
 package it.gov.pagopa.initiative.service;
 
 import it.gov.pagopa.initiative.dto.InitiativeDTO;
+import it.gov.pagopa.initiative.dto.InitiativeOrganizationInfoDTO;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
 import org.springframework.stereotype.Service;
@@ -37,4 +38,6 @@ public interface InitiativeService {
     void isInitiativeAllowedToBeNextStatusThenThrows(Initiative initiative, String statusToBeUpdated);
 
     void updateInitiative(Initiative initiative);
+
+    InitiativeDTO sendInitiativeInfoToIOBackEndServiceAndSaveItOnInitiative(InitiativeDTO initiativeDTO, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO);
 }

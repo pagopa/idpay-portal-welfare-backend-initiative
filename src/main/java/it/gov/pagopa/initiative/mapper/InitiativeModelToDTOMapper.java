@@ -39,9 +39,6 @@ public class InitiativeModelToDTOMapper {
         initiativeDto.setCreationDate(initiative.getCreationDate());
         initiativeDto.setUpdateDate(initiative.getUpdateDate());
         initiativeDto.setPdndToken(initiative.getPdndToken());
-        initiativeDto.setPdndCheck(initiative.getPdndCheck());
-        initiativeDto.setAutocertificationCheck(initiative.getAutocertificationCheck());
-        initiativeDto.setBeneficiaryRanking(initiative.getBeneficiaryRanking());
         initiativeDto.setGeneral(this.toInitiativeGeneralDTO(initiative.getGeneral()));
         initiativeDto.setAdditionalInfo(this.toInitiativeAdditionalDTO(initiative.getAdditionalInfo()));
         initiativeDto.setBeneficiaryRule(this.toInitiativeBeneficiaryRuleDTO(initiative.getBeneficiaryRule()));

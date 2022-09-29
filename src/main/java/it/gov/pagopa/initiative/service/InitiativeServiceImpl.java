@@ -1,9 +1,15 @@
 package it.gov.pagopa.initiative.service;
 
+import it.gov.pagopa.initiative.connector.io.service.IOBackEndRestConnector;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
+import it.gov.pagopa.initiative.dto.InitiativeAdditionalDTO;
 import it.gov.pagopa.initiative.dto.InitiativeDTO;
+import it.gov.pagopa.initiative.dto.InitiativeOrganizationInfoDTO;
+import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
+import it.gov.pagopa.initiative.dto.io.service.ServiceResponseDTO;
 import it.gov.pagopa.initiative.event.InitiativeProducer;
 import it.gov.pagopa.initiative.exception.InitiativeException;
+import it.gov.pagopa.initiative.mapper.InitiativeAdditionalDTOsToIOServiceRequestDTOMapper;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
@@ -19,7 +25,6 @@ import java.util.Arrays;
 import java.util.List;
 
 
-
 @Service
 @Slf4j
 public class InitiativeServiceImpl implements InitiativeService {
@@ -32,6 +37,12 @@ public class InitiativeServiceImpl implements InitiativeService {
 
     @Autowired
     private InitiativeProducer initiativeProducer;
+
+    @Autowired
+    private InitiativeAdditionalDTOsToIOServiceRequestDTOMapper initiativeAdditionalDTOsToIOServiceRequestDTOMapper;
+
+    @Autowired
+    IOBackEndRestConnector ioBackEndRestConnector;
 
     public List<Initiative> retrieveInitiativeSummary(String organizationId) {
         List<Initiative> initiatives = initiativeRepository.retrieveInitiativeSummary(organizationId);
@@ -222,6 +233,16 @@ public class InitiativeServiceImpl implements InitiativeService {
     @Override
     public void updateInitiative(Initiative initiative) {
         initiativeRepository.save(initiative);
+    }
+
+    @Override
+    public InitiativeDTO sendInitiativeInfoToIOBackEndServiceAndSaveItOnInitiative(InitiativeDTO initiativeDTO, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO) {
+        InitiativeAdditionalDTO additionalInfo = initiativeDTO.getAdditionalInfo();
+        ServiceRequestDTO serviceRequestDTO = initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServicePayloadDTO(additionalInfo, initiativeOrganizationInfoDTO);
+        ServiceResponseDTO serviceResponseDTO = ioBackEndRestConnector.createService(serviceRequestDTO);
+        additionalInfo.setServiceId(serviceResponseDTO.getServiceId());
+        initiativeDTO.setUpdateDate(LocalDateTime.now()); //TODO Needed??
+        return initiativeDTO;
     }
 
     private void isInitiativeAllowedToBeEditableThenThrows(Initiative initiative){

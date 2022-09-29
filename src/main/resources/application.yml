@@ -52,6 +52,22 @@ management:
       exposure:
         include: "*"
 
+rest-client:
+  backend-io:
+    service:
+      base-url: ${IO_BACKEND_SERVICE_BASE_URL:}/api/v1
+      name: backend-io
+      subscriptionKey: ${IO_BACKEND_SERVICE_SUBSCRIPTION_API_KEY:}
+      request:
+        departmentName: ${IO_BACKEND_SERVICE_DEPARTMENT_NAME:}
+        isVisible: ${IO_BACKEND_SERVICE_IS_VISIBLE:false}
+feign:
+  okhttp:
+    enabled: true
+  client:
+    config:
+      backend-io:
+        loggerLevel: basic
 
 logging:
   level:
@@ -65,3 +81,9 @@ logging:
     javax.persistence: ${LOG_LEVEL_JAVAX_PERSISTENCE:INFO}
     org.hibernate: ${LOG_LEVEL_ORG_HIBERNATE:INFO}
     org.mongodb.driver: ${LOG_LEVEL_MONGODB_DRIVER:WARN}
+
+app:
+  initiative:
+    conditions:
+      notifyIO: ${APP_INITIATIVE_CONDITIONS_NOTIFY_IO:true}
+      notifyRE: ${APP_INITIATIVE_CONDITIONS_NOTIFY_RE:true}
