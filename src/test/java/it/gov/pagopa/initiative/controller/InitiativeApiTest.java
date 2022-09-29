@@ -49,6 +49,8 @@ import java.util.List;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest.CODE;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.ErrorDtoDefaultMsg.ACCUMULATED_AMOUNT_TYPE;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.ErrorDtoDefaultMsg.SOMETHING_WRONG_WITH_THE_REFUND_TYPE;
+import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.ADMIN;
+import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.OPE_BASE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
@@ -111,7 +113,7 @@ class InitiativeApiTest {
     protected MockMvc mvc;
 
     @Test
-    void getInitiativeSummary_statutsOk() throws Exception {
+    void whenAdmin_getInitiativeSummary_statusOk() throws Exception {
 
         Boolean beneficiaryKnown = false;
         //create Dummy Initiative
@@ -120,10 +122,10 @@ class InitiativeApiTest {
         List<Initiative> initiatives = Arrays.asList(step2Initiative, step2Initiative2);
 
         // Returning something from Repo by using ServiceMock
-        when(initiativeService.retrieveInitiativeSummary(anyString())).thenReturn(initiatives);
+        when(initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, ADMIN)).thenReturn(initiatives);
 
         // When
-        List<Initiative> retrieveInitiativeSummary = initiativeService.retrieveInitiativeSummary(anyString());
+        List<Initiative> retrieveInitiativeSummary = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, ADMIN);
 
         // Then
         // you are expecting service to return whatever returned by repo
@@ -132,6 +134,33 @@ class InitiativeApiTest {
         mvc.perform(
             MockMvcRequestBuilders.get(BASE_URL + String.format(GET_INITIATIVES_SUMMARY_URL, ORGANIZATION_ID))
                 .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    void whenOpeBase_getInitiativeSummary_statusOk() throws Exception {
+
+        Boolean beneficiaryKnown = false;
+        //create Dummy Initiative
+        Initiative step2Initiative = createStep2Initiative(beneficiaryKnown);
+        Initiative step2Initiative2 = createStep2Initiative(beneficiaryKnown);
+        List<Initiative> initiatives = Arrays.asList(step2Initiative, step2Initiative2);
+
+        // Returning something from Repo by using ServiceMock
+        when(initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, OPE_BASE)).thenReturn(initiatives);
+
+        // When
+        List<Initiative> retrieveInitiativeSummary = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, OPE_BASE);
+
+        // Then
+        // you are expecting service to return whatever returned by repo
+        assertThat("Reason of result", retrieveInitiativeSummary, is(sameInstance(initiatives)));
+
+        mvc.perform(
+                        MockMvcRequestBuilders.get(BASE_URL + String.format(GET_INITIATIVES_SUMMARY_URL, ORGANIZATION_ID))
+                                .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(print())
                 .andReturn();

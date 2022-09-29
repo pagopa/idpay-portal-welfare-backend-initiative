@@ -11,7 +11,7 @@ import java.util.List;
 @Service
 public interface InitiativeService {
 
-    List<Initiative> retrieveInitiativeSummary(String organizationId);
+    List<Initiative> retrieveInitiativeSummary(String organizationId, String role);
 
     Initiative insertInitiative(Initiative initiative);
 

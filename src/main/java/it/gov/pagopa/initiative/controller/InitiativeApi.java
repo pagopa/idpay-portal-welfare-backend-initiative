@@ -29,7 +29,7 @@ public interface InitiativeApi {
             @ApiResponse(responseCode = "500", description = "Server ERROR", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))})
     @GetMapping(value = "/idpay/organization/{organizationId}/initiative/summary",
             produces = {"application/json"})
-    ResponseEntity<List<InitiativeSummaryDTO>> getInitativeSummary(@PathVariable("organizationId") String organizationId);
+    ResponseEntity<List<InitiativeSummaryDTO>> getInitiativeSummary(@PathVariable("organizationId") String organizationId, @RequestParam(required = false) String role);
 
     @Operation(summary = "Returns the detail of an active initiative", description = "", security = {
             @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})

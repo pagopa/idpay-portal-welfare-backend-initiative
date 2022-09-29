@@ -5,11 +5,14 @@ import it.gov.pagopa.initiative.dto.InitiativeAdditionalDTO;
 import it.gov.pagopa.initiative.dto.InitiativeOrganizationInfoDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceMetadataDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class InitiativeAdditionalDTOsToIOServiceRequestDTOMapper {
@@ -20,11 +23,11 @@ public class InitiativeAdditionalDTOsToIOServiceRequestDTOMapper {
     private Boolean isVisible;
 
     public ServiceRequestDTO toServicePayloadDTO(InitiativeAdditionalDTO initiativeAdditionalDTO, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO){
-        ChannelDTO channelDTO = Optional.ofNullable(initiativeAdditionalDTO.getChannels()).stream().flatMap(Collection::stream).findFirst().orElseThrow(() -> new IllegalStateException("At least one channel should have been associated"));
+        Map<ChannelDTO.TypeEnum, String> channelMap = initiativeAdditionalDTO.getChannels().stream().collect(Collectors.toMap(ChannelDTO::getType, ChannelDTO::getContact));
         ServiceMetadataDTO serviceMetadataDTO = ServiceMetadataDTO.builder()
-                .email(channelDTO.getType() == ChannelDTO.TypeEnum.EMAIL ? channelDTO.getContact() : null)
-                .phone(channelDTO.getType() == ChannelDTO.TypeEnum.MOBILE ? channelDTO.getContact() : null)
-                .supportUrl(channelDTO.getType() == ChannelDTO.TypeEnum.WEB ? channelDTO.getContact() : null)
+                .email(channelMap.get(ChannelDTO.TypeEnum.EMAIL))
+                .phone(channelMap.get(ChannelDTO.TypeEnum.MOBILE))
+                .supportUrl(channelMap.get(ChannelDTO.TypeEnum.WEB))
                 .privacyUrl(initiativeAdditionalDTO.getPrivacyLink())
                 .tosUrl(initiativeAdditionalDTO.getTcLink())
                 .description(initiativeAdditionalDTO.getDescription())
@@ -33,7 +36,7 @@ public class InitiativeAdditionalDTOsToIOServiceRequestDTOMapper {
         return ServiceRequestDTO.builder()
                 .serviceMetadata(serviceMetadataDTO)
                 .serviceName(initiativeAdditionalDTO.getServiceName())
-                .departmentName(productDepartmentName)
+                .departmentName(StringUtils.isNotBlank(initiativeOrganizationInfoDTO.getOrganizationName()) ? initiativeOrganizationInfoDTO.getOrganizationName() : productDepartmentName)
                 .organizationName(initiativeOrganizationInfoDTO.getOrganizationName())
                 .organizationFiscalCode(initiativeOrganizationInfoDTO.getOrganizationVat())
                 .isVisible(isVisible)
