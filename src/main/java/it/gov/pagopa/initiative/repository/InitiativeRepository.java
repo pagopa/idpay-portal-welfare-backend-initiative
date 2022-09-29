@@ -9,13 +9,13 @@ import java.util.Optional;
 
 public interface InitiativeRepository extends MongoRepository<Initiative, String> {
 
-    @Query(value="{organizationId : ?0, deleted: ?1}", fields="{initiativeId : 1, initiativeName : 1, status : 1, 'additionalInfo.serviceName' : 1, creationDate : 1, updateDate : 1}")
-    List<Initiative> retrieveInitiativeSummary(String organizationId, Boolean deleted);
+    @Query(value="{organizationId : ?0, enabled: ?1}", fields="{initiativeId : 1, initiativeName : 1, status : 1, 'additionalInfo.serviceName' : 1, creationDate : 1, updateDate : 1}")
+    List<Initiative> retrieveInitiativeSummary(String organizationId, Boolean enabled);
 
-    Optional<Initiative> findByOrganizationIdAndInitiativeIdAndDeleted(String organizationId, String initiativeId, Boolean deleted);
+    Optional<Initiative> findByOrganizationIdAndInitiativeIdAndEnabled(String organizationId, String initiativeId, Boolean enabled);
 
     @Query(
-            value="{initiativeId : ?0, deleted: ?1}",
+            value="{initiativeId : ?0, enabled: ?1}",
             fields="{initiativeId : 1, " +
                     "initiativeName : 1, " +
                     "status : 1, " +
@@ -23,5 +23,5 @@ public interface InitiativeRepository extends MongoRepository<Initiative, String
                     "'additionalInfo.serviceScope' : 1, " +
                     "'general' : 1, " +
                     "'beneficiaryRule' : 1}")
-    Optional<Initiative> retrieveInitiativeBeneficiaryView(String initiativeId, Boolean deleted);
+    Optional<Initiative> retrieveInitiativeBeneficiaryView(String initiativeId, Boolean enabled);
 }

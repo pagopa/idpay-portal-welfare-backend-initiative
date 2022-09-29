@@ -260,4 +260,28 @@ public class InitiativeDTOsToModelMapper {
         }
         return AdditionalInfo.builder().identificationCode(refundAdditionalInfoDTO.getIdentificationCode()).build();
     }
+
+    public Initiative toInitiative(InitiativeDTO initiativeDTO) {
+        InitiativeAdditional initiativeAdditional = toInitiativeAdditional(initiativeDTO.getAdditionalInfo());
+        InitiativeGeneral initiativeGeneral = toInitiativeGeneral(initiativeDTO.getGeneral());
+        InitiativeBeneficiaryRule initiativeBeneficiaryRule = toBeneficiaryRule(initiativeDTO.getBeneficiaryRule());
+        InitiativeRewardRule initiativeRewardRule = toInitiativeRewardRule(initiativeDTO.getRewardRule());
+        InitiativeTrxConditions initiativeTrxConditions = toInitiativeTrxRule(initiativeDTO.getTrxRule());
+        InitiativeRefundRule initiativeRefundRule = toInitiativeRefundRule(initiativeDTO.getRefundRule());
+        return Initiative.builder()
+                .initiativeId(initiativeDTO.getInitiativeId())
+                .initiativeName(initiativeDTO.getInitiativeName())
+                .organizationId(initiativeDTO.getOrganizationId())
+                .pdndToken(initiativeDTO.getPdndToken())
+                .creationDate(initiativeDTO.getCreationDate())
+                .updateDate(initiativeDTO.getUpdateDate())
+                .status(initiativeDTO.getStatus())
+                .additionalInfo(initiativeAdditional)
+                .general(initiativeGeneral)
+                .beneficiaryRule(initiativeBeneficiaryRule)
+                .rewardRule(initiativeRewardRule)
+                .trxRule(initiativeTrxConditions)
+                .refundRule(initiativeRefundRule)
+                .build();
+    }
 }

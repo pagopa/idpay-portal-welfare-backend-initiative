@@ -23,7 +23,7 @@ public class AccumulatedAmountDTO {
     public enum AccumulatedTypeEnum {
         BUDGET_EXHAUSTED("BUDGET_EXHAUSTED"),
         THRESHOLD_REACHED("THRESHOLD_REACHED");
-        private String value;
+        private final String value;
         AccumulatedTypeEnum(String value) {
             this.value = value;
         }

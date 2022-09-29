@@ -97,6 +97,10 @@ class InitiativeDTOsToModelMapperTest {
 
     private Initiative initiativeTrxRuleNull;
 
+    private Initiative initiativeExpected;
+
+    private InitiativeDTO initiativeDTO;
+
     @BeforeEach
     public void setUp() {
         initiativeOnlyInfoGeneral = createStep1InitiativeOnlyInfoGeneral();
@@ -129,6 +133,15 @@ class InitiativeDTOsToModelMapperTest {
         initiativeRewardAndTrxRulesDTOTrxCountNull = createInitiativeRewardAndTrxRulesDTOTrxCountNull();
         initiativeTrxRuleNull = createStep4InitiativeTrxNull();
         initiativeRewardAndTrxRuleDTOTrxRuleNull = createInitiativeRewardAndTrxRulesDTOTrxRuleNull();
+
+        initiativeDTO = createStep5InitiativeDTO();
+        initiativeExpected = createStep5Initiative();
+    }
+
+    @Test
+    void toInitiativeFromInitiativeDTO_equals(){
+        Initiative initiative = initiativeDTOsToModelMapper.toInitiative(initiativeDTO);
+        assertEquals(initiativeExpected, initiative);
     }
 
     @Test
@@ -241,9 +254,6 @@ class InitiativeDTOsToModelMapperTest {
         initiative.setInitiativeName("initiativeName1");
         initiative.setOrganizationId("organizationId1");
         initiative.setStatus("DRAFT");
-        initiative.setAutocertificationCheck(true);
-        initiative.setBeneficiaryRanking(true);
-        initiative.setPdndCheck(true);
         initiative.setPdndToken("pdndToken1");
         return initiative;
     }
@@ -1303,27 +1313,14 @@ class InitiativeDTOsToModelMapperTest {
         return initiative;
     }
     private Initiative createStep5Initiative () {
-        Initiative initiative = new Initiative();
+        Initiative initiative = createStep4Initiative();
         return initiative;
     }
 
     private InitiativeDTO createStep5InitiativeDTO () {
-        InitiativeDTO initiativeDTO = new InitiativeDTO();
+        InitiativeDTO initiativeDTO = createStep4InitiativeDTO();
         return initiativeDTO;
     }
-
-    private Initiative createStep6Initiative () {
-        Initiative initiative = new Initiative();
-        return initiative;
-    }
-
-    private InitiativeDTO createStep6InitiativeDTO () {
-        InitiativeDTO initiativeDTO = new InitiativeDTO();
-        return initiativeDTO;
-    }
-
-
-
 
 
     private AccumulatedAmountDTO createAccumulatedAmountDTOValid(){

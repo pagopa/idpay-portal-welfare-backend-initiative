@@ -12,10 +12,10 @@ import lombok.*;
 @Builder
 public class Channel {
     @JsonProperty("type")
-    private TypeEnum type = null;
+    private TypeEnum type;
 
     @JsonProperty("contact")
-    private String contact = null;
+    private String contact;
 
     /**
      * Gets or Sets type
@@ -25,7 +25,7 @@ public class Channel {
         EMAIL("email"),
         MOBILE("mobile");
 
-        private String value;
+        private final String value;
 
         TypeEnum(String value) {
             this.value = value;

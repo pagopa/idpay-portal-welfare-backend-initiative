@@ -251,9 +251,6 @@ class InitiativeModelToDTOMapperTest {
         initiative.setInitiativeName("initiativeName1");
         initiative.setOrganizationId("organizationId1");
         initiative.setStatus("DRAFT");
-        initiative.setAutocertificationCheck(true);
-        initiative.setBeneficiaryRanking(true);
-        initiative.setPdndCheck(true);
         initiative.setPdndToken("pdndToken1");
 
         initiative.setAdditionalInfo(createInitiativeAdditional());
@@ -333,9 +330,6 @@ class InitiativeModelToDTOMapperTest {
                 .initiativeName("initiativeName1")
                 .organizationId("organizationId1")
                 .status("DRAFT")
-                .autocertificationCheck(true)
-                .beneficiaryRanking(true)
-                .pdndCheck(true)
                 .pdndToken("pdndToken1")
                 .additionalInfo(createInitiativeAdditionalDTO()).build();
     }

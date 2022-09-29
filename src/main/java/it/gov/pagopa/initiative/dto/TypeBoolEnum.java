@@ -13,7 +13,7 @@ public enum TypeBoolEnum {
     BOOLEAN("boolean");
 
     @JsonProperty("_type")
-    private String type;
+    private final String type;
 
     @Override
     public String toString() {

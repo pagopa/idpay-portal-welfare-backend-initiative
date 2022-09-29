@@ -14,7 +14,7 @@ public enum FilterOperatorEnum {
     BTW_CLOSED("BTW_CLOSED"),
     BTW_OPEN("BTW_OPEN");
 
-    private String value;
+    private final String value;
 
     FilterOperatorEnum(String value) {
         this.value = value;

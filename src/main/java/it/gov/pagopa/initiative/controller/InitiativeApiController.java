@@ -4,13 +4,16 @@ import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
 import it.gov.pagopa.initiative.exception.InitiativeException;
+import it.gov.pagopa.initiative.exception.IntegrationException;
 import it.gov.pagopa.initiative.mapper.InitiativeDTOsToModelMapper;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.service.InitiativeService;
 import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -24,6 +27,10 @@ import java.util.List;
 @RestController
 @Slf4j
 public class InitiativeApiController implements InitiativeApi {
+
+    @Value("${app.initiative.conditions.notifyRE}")
+    @Getter
+    private boolean notifyRE;
 
     @Autowired
     private InitiativeService initiativeService;
@@ -55,7 +62,7 @@ public class InitiativeApiController implements InitiativeApi {
         initiativeToSave.setOrganizationId(organizationId);
         initiativeToSave.setCreationDate(LocalDateTime.now());
         initiativeToSave.setUpdateDate(LocalDateTime.now());
-        initiativeToSave.setDeleted(false);
+        initiativeToSave.setEnabled(true);
         //TODO verificare se necessario controllo per serviceId e organization non sovrapposti prima di creare una ulteriore iniziativa
         Initiative insertedInitiative = initiativeService.insertInitiative(initiativeToSave);
         return new ResponseEntity<>(this.initiativeModelToDTOMapper.toDtoOnlyId(insertedInitiative), HttpStatus.CREATED);
@@ -192,22 +199,28 @@ public class InitiativeApiController implements InitiativeApi {
         initiativeService.updateInitiative(initiative);
         log.debug("Initiative saved in status PUBLISHED");
         try {
-            log.debug("Notification to Rule Engine of the published Initiative");
-            initiativeService.sendInitiativeInfoToRuleEngine(initiativeDTO);
-            //Creazione Servizio Iniziativa verso IO
-
-            //Sprint 9: In caso di beneficiaryKnown a true -> Invio al MS-Gruppi via API la richiesta di notifica della pubblicazione e, MS Gruppi la invia via coda al NotificationManager
-
-            //Nel caso una delle precedenti Integrazione si concludesse male, si fa rollback dell'Iniziativa allo stato TEMP iniziale
-
-            //Se tutto ok --> 204
+            if(notifyRE) {
+                log.info("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Notification to Rule Engine of the published Initiative", initiativeId);
+                initiativeService.sendInitiativeInfoToRuleEngine(initiativeDTO);
+            }
+            //1. Only for the Initiatives to be provided to IO, the integration is carried out with the creation of the Initiative Service to IO BackEnd
+            //2. Sprint 9: In caso di beneficiaryKnown a true -> Invio al MS-Gruppi via API la richiesta di notifica della pubblicazione e, MS Gruppi la invia via coda al NotificationManager
+            if(initiativeDTO.getAdditionalInfo().getServiceIO()) {
+                log.info("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Notification to IO BeckEnd of the published Initiative", initiativeId);
+                initiativeDTO = initiativeService.sendInitiativeInfoToIOBackEndServiceAndSaveItOnInitiative(initiativeDTO, initiativeOrganizationInfoDTO);
+                initiative = initiativeDTOsToModelMapper.toInitiative(initiativeDTO);
+                initiativeService.updateInitiative(initiative); //TODO Needed? Also: switch out of the IF clause?
+                //Invio al MS-Gruppi via API
+                //This integration necessarily takes place in succession to having created the service with IO in order not to send "orphan" resources (not associated with any Initiative known by IO).
+            }
         } catch (Exception e) {
+            //In case one of the previous Integrations ends badly, the Initiative is rolled back to the initial TEMP state
             log.error("[UPDATE_TO_PUBLISHED_STATUS] - [ROLLBACK STATUS] Initiative: {}. Generic Error: {}", initiativeId, e.getMessage());
             initiative.setStatus(statusTemp);
             initiative.setUpdateDate(updateDateTemp);
             initiativeService.updateInitiative(initiative);
             log.debug("Initiative Status has been roll-backed to {}", statusTemp);
-            return ResponseEntity.internalServerError().build();
+            throw new IntegrationException(HttpStatus.BAD_REQUEST);
         }
         return ResponseEntity.noContent().build();
     }

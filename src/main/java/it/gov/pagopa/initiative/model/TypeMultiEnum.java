@@ -10,7 +10,7 @@ public enum TypeMultiEnum {
 
     MULTI("multi");
 
-    private String value;
+    private final String value;
 
     TypeMultiEnum(String value) {
         this.value = value;

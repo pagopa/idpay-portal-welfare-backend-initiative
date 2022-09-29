@@ -1,9 +1,15 @@
 package it.gov.pagopa.initiative.service;
 
+import it.gov.pagopa.initiative.connector.io.service.IOBackEndRestConnector;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
+import it.gov.pagopa.initiative.dto.InitiativeAdditionalDTO;
 import it.gov.pagopa.initiative.dto.InitiativeDTO;
+import it.gov.pagopa.initiative.dto.InitiativeOrganizationInfoDTO;
+import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
+import it.gov.pagopa.initiative.dto.io.service.ServiceResponseDTO;
 import it.gov.pagopa.initiative.event.InitiativeProducer;
 import it.gov.pagopa.initiative.exception.InitiativeException;
+import it.gov.pagopa.initiative.mapper.InitiativeAdditionalDTOsToIOServiceRequestDTOMapper;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
@@ -19,7 +25,6 @@ import java.util.Arrays;
 import java.util.List;
 
 
-
 @Service
 @Slf4j
 public class InitiativeServiceImpl implements InitiativeService {
@@ -33,8 +38,14 @@ public class InitiativeServiceImpl implements InitiativeService {
     @Autowired
     private InitiativeProducer initiativeProducer;
 
+    @Autowired
+    private InitiativeAdditionalDTOsToIOServiceRequestDTOMapper initiativeAdditionalDTOsToIOServiceRequestDTOMapper;
+
+    @Autowired
+    IOBackEndRestConnector ioBackEndRestConnector;
+
     public List<Initiative> retrieveInitiativeSummary(String organizationId) {
-        List<Initiative> initiatives = initiativeRepository.retrieveInitiativeSummary(organizationId, false);
+        List<Initiative> initiatives = initiativeRepository.retrieveInitiativeSummary(organizationId, true);
         if(initiatives.isEmpty()){
             throw new InitiativeException(
                     InitiativeConstants.Exception.NotFound.CODE,
@@ -54,7 +65,7 @@ public class InitiativeServiceImpl implements InitiativeService {
 
     @Override
     public Initiative getInitiative(String organizationId, String initiativeId) {
-        return initiativeRepository.findByOrganizationIdAndInitiativeIdAndDeleted(organizationId, initiativeId, false)
+        return initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(organizationId, initiativeId, true)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
@@ -63,7 +74,7 @@ public class InitiativeServiceImpl implements InitiativeService {
 
     @Override
     public Initiative getInitiativeBeneficiaryView(String initiativeId) {
-        return initiativeRepository.retrieveInitiativeBeneficiaryView(initiativeId, false)
+        return initiativeRepository.retrieveInitiativeBeneficiaryView(initiativeId, true)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
@@ -72,7 +83,7 @@ public class InitiativeServiceImpl implements InitiativeService {
 
     @Override
     public void updateInitiativeGeneralInfo(String organizationId, String initiativeId, Initiative initiativeInfoModel) {
-        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeIdAndDeleted(organizationId, initiativeId, false)
+        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(organizationId, initiativeId, true)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
@@ -87,7 +98,7 @@ public class InitiativeServiceImpl implements InitiativeService {
 
     @Override
     public void updateInitiativeAdditionalInfo(String organizationId, String initiativeId, Initiative initiativeAdditionalInfo){
-        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeIdAndDeleted(organizationId, initiativeId, false)
+        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(organizationId, initiativeId, true)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
@@ -101,7 +112,7 @@ public class InitiativeServiceImpl implements InitiativeService {
 
     @Override
     public void updateInitiativeBeneficiary(String organizationId, String initiativeId, InitiativeBeneficiaryRule initiativeBeneficiaryRuleModel){
-        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeIdAndDeleted(organizationId, initiativeId, false)
+        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(organizationId, initiativeId, true)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
@@ -116,7 +127,7 @@ public class InitiativeServiceImpl implements InitiativeService {
 
     @Override
     public void updateTrxAndRewardRules(String organizationId, String initiativeId, Initiative rewardAndTrxRules) {
-        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeIdAndDeleted(organizationId, initiativeId, false)
+        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(organizationId, initiativeId, true)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
@@ -132,7 +143,7 @@ public class InitiativeServiceImpl implements InitiativeService {
 
     @Override
     public void updateInitiativeRefundRules(String organizationId, String initiativeId, Initiative refundRule, boolean changeInitiativeStatus){
-        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeIdAndDeleted(organizationId, initiativeId, false)
+        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(organizationId, initiativeId, true)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
@@ -150,7 +161,7 @@ public class InitiativeServiceImpl implements InitiativeService {
 
     @Override
     public void updateInitiativeApprovedStatus(String organizationId, String initiativeId){
-        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeIdAndDeleted(organizationId, initiativeId, false)
+        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(organizationId, initiativeId, true)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
@@ -164,7 +175,7 @@ public class InitiativeServiceImpl implements InitiativeService {
 
     @Override
     public void updateInitiativeToCheckStatus(String organizationId, String initiativeId){
-        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeIdAndDeleted(organizationId, initiativeId, false)
+        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(organizationId, initiativeId, true)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
@@ -178,7 +189,7 @@ public class InitiativeServiceImpl implements InitiativeService {
 
     @Override
     public void logicallyDeleteInitiative(String organizationId, String initiativeId){
-        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeIdAndDeleted(organizationId, initiativeId, false)
+        Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(organizationId, initiativeId, true)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
@@ -191,7 +202,7 @@ public class InitiativeServiceImpl implements InitiativeService {
                     HttpStatus.BAD_REQUEST
             );
         }else{
-            initiative.setDeleted(true);
+            initiative.setEnabled(false);
             initiative.setUpdateDate(LocalDateTime.now());
             this.initiativeRepository.save(initiative);
             log.info("[LOGICAL_INITIATIVE_ELIMINATION] - Initiative: {}. Successfully logical elimination.", initiative.getInitiativeId());
@@ -244,6 +255,16 @@ public class InitiativeServiceImpl implements InitiativeService {
     @Override
     public void updateInitiative(Initiative initiative) {
         initiativeRepository.save(initiative);
+    }
+
+    @Override
+    public InitiativeDTO sendInitiativeInfoToIOBackEndServiceAndSaveItOnInitiative(InitiativeDTO initiativeDTO, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO) {
+        InitiativeAdditionalDTO additionalInfo = initiativeDTO.getAdditionalInfo();
+        ServiceRequestDTO serviceRequestDTO = initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServicePayloadDTO(additionalInfo, initiativeOrganizationInfoDTO);
+        ServiceResponseDTO serviceResponseDTO = ioBackEndRestConnector.createService(serviceRequestDTO);
+        additionalInfo.setServiceId(serviceResponseDTO.getServiceId());
+        initiativeDTO.setUpdateDate(LocalDateTime.now()); //TODO Needed??
+        return initiativeDTO;
     }
 
     private void isInitiativeAllowedToBeEditableThenThrows(Initiative initiative){

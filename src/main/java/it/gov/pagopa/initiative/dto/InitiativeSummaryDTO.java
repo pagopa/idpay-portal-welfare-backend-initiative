@@ -26,9 +26,6 @@ public class InitiativeSummaryDTO   {
   @JsonProperty("status")
   private String status;
 
-  @JsonProperty("deleted")
-  private Boolean deleted;
-
   @JsonProperty("creationDate")
   private LocalDateTime creationDate;
 
