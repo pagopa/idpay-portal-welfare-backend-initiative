@@ -241,9 +241,6 @@ class InitiativeDTOsToModelMapperTest {
         initiative.setInitiativeName("initiativeName1");
         initiative.setOrganizationId("organizationId1");
         initiative.setStatus("DRAFT");
-        initiative.setAutocertificationCheck(true);
-        initiative.setBeneficiaryRanking(true);
-        initiative.setPdndCheck(true);
         initiative.setPdndToken("pdndToken1");
         return initiative;
     }

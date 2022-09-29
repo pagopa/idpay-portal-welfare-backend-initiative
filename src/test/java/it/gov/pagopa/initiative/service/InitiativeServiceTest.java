@@ -1,13 +1,19 @@
 package it.gov.pagopa.initiative.service;
 
 
+import it.gov.pagopa.initiative.connector.io.service.IOBackEndRestConnector;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.*;
+import it.gov.pagopa.initiative.dto.io.service.ServiceMetadataDTO;
+import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
+import it.gov.pagopa.initiative.dto.io.service.ServiceResponseDTO;
+import it.gov.pagopa.initiative.dto.io.service.ServiceResponseErrorDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardGroupsDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.*;
 import it.gov.pagopa.initiative.event.InitiativeProducer;
 import it.gov.pagopa.initiative.exception.InitiativeException;
+import it.gov.pagopa.initiative.mapper.InitiativeAdditionalDTOsToIOServiceRequestDTOMapper;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.TypeBoolEnum;
 import it.gov.pagopa.initiative.model.TypeMultiEnum;
@@ -45,10 +51,26 @@ import static org.mockito.Mockito.*;
 @Slf4j
 class InitiativeServiceTest {
 
+    private static final String ANY_NOT_INITIATIVE_STATE = "ANY_NOT_INITIATIVE_STATE";
     public static final String INITIATIVE_NAME = "initiativeName1";
     public static final String ORGANIZATION_ID = "organizationId1";
     public static final String INITIATIVE_ID = "initiativeId";
-    private static final String ANY_NOT_INITIATIVE_STATE = "ANY_NOT_INITIATIVE_STATE";
+    private static final String ORGANIZATION_NAME = "organizationName";
+    private static final String ORGANIZATION_VAT = "organizationVat";
+    private static final String ORGANIZATION_VAT_NOT_VALID = "organizationVatNotValid";
+    private static final String ORGANIZATION_USER_ID = "organizationUserId";
+    private static final String ORGANIZATION_USER_ROLE = "organizationUserRole";
+    private static final String EMAIL = "test@pagopa.it";
+    private static final String PHONE = "0123456789";
+    private static final String SUPPORT_URL = "support.url.it";
+    private static final String PRIVACY_URL = "privacy.url.it";
+    private static final String TOS_URL = "tos.url.it";
+    private static final String DESCRIPTION = "description";
+    private static final String SCOPE = "LOCAL";
+    private static final boolean IS_VISIBLE = false;
+    private static final String SERVICE_NAME = "serviceName";
+    private static final String PRODUCT_DEPARTMENT_NAME = "productDepartmentName";
+    private static final String SERVICE_ID = "serviceId";
 
     @Autowired
     InitiativeService initiativeService;
@@ -61,6 +83,12 @@ class InitiativeServiceTest {
 
     @MockBean
     InitiativeModelToDTOMapper initiativeModelToDTOMapper;
+
+    @MockBean
+    InitiativeAdditionalDTOsToIOServiceRequestDTOMapper initiativeAdditionalDTOsToIOServiceRequestDTOMapper;
+
+    @MockBean
+    IOBackEndRestConnector ioBackEndRestConnector;
 
     @Test
     void retrieveInitiativeSummary_ok() throws Exception {
@@ -501,7 +529,7 @@ class InitiativeServiceTest {
 
     @Test
     void givenInitiativeDTO_whenRuleEngineProduceIsValid_thenOk(){
-        //Instruct Initiative to have a status Not Valid
+        //Instruct Initiative
         InitiativeDTO initiativeDTO = createStep5InitiativeDTO();
 
         when(initiativeProducer.sendPublishInitiative(initiativeDTO)).thenReturn(true);
@@ -515,7 +543,7 @@ class InitiativeServiceTest {
 
     @Test
     void givenInitiativeDTO_whenRuleEngineProduceIsNotValid_thenThrowException(){
-        //Instruct Initiative to have a status Not Valid
+        //Instruct Initiative
         InitiativeDTO initiativeDTO = createStep5InitiativeDTO();
 
         when(initiativeProducer.sendPublishInitiative(initiativeDTO)).thenReturn(false);
@@ -525,6 +553,95 @@ class InitiativeServiceTest {
         Executable executable = () -> initiativeService.sendInitiativeInfoToRuleEngine(initiativeDTO);
 
         IllegalStateException exception = Assertions.assertThrows(IllegalStateException.class, executable);
+    }
+
+    @Test //Mancano i test con Exception
+    void givenDTOsInitiativeAndInitiativeOrganizationInfo_whenIntegrationWithIOBackEndIsOK_thenReturnInitiativeUpdated(){
+        //Instruct Initiative
+        InitiativeDTO initiativeDTO = createStep5InitiativeDTO();
+
+        //FIXME Should not be created with ServiceId, but raise Exception because during the main calling, additioanlInfo.serviceId are added in execution
+        InitiativeAdditionalDTO initiativeAdditionalDTO = createInitiativeAdditionalDTO();
+
+        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = InitiativeOrganizationInfoDTO.builder()
+                .organizationName(ORGANIZATION_NAME)
+                .organizationVat(ORGANIZATION_VAT)
+                .organizationUserId(ORGANIZATION_USER_ID)
+                .organizationUserRole(ORGANIZATION_USER_ROLE)
+                .build();
+
+        ServiceRequestDTO serviceRequestDTOexpected = createServiceRequestDTO();
+        ServiceResponseDTO serviceResponseDTOexpected = createServiceResponseDTO();
+
+        when(initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServicePayloadDTO(initiativeAdditionalDTO, initiativeOrganizationInfoDTO)).thenReturn(serviceRequestDTOexpected);
+        when(ioBackEndRestConnector.createService(serviceRequestDTOexpected)).thenReturn(serviceResponseDTOexpected);
+
+        //Try to call the Real Service
+        //Prepare Executable with invocation of the method on your system under test
+        Executable executable = () -> initiativeService.sendInitiativeInfoToIOBackEndServiceAndSaveItOnInitiative(initiativeDTO, initiativeOrganizationInfoDTO);
+        Assertions.assertDoesNotThrow(executable);
+
+        //FIXME Eventuale costruzione del serviceResponse expected da confrontare con l'actual in assertEquals
+//        InitiativeDTO initiativeDTOactual = initiativeService.sendInitiativeInfoToIOBackEndService(initiativeDTO, initiativeOrganizationInfoDTO);
+//        assertEquals(serviceResponseDTOexpected, initiativeDTOactual);
+
+        //Expecting mapper to be called once with correct param
+        verify(initiativeAdditionalDTOsToIOServiceRequestDTOMapper, times(1)).toServicePayloadDTO(initiativeAdditionalDTO, initiativeOrganizationInfoDTO);
+
+        //Expecting connector to be called once with correct param
+        verify(ioBackEndRestConnector, times(1)).createService(serviceRequestDTOexpected);
+    }
+
+    private ServiceResponseErrorDTO createServiceResponseErrorDTO(int httpStatus) {
+        return ServiceResponseErrorDTO.builder()
+                .type("https://example.com/problem/constraint-violation")
+                .title("title")
+                .status(httpStatus)
+                .detail("There was an error processing the request")
+                .instance("http://example.com")
+                .build();
+    }
+
+    private ServiceRequestDTO createServiceRequestDTOnotValid() {
+        ServiceMetadataDTO serviceMetadataDTO = createServiceMetadataDTO();
+        return ServiceRequestDTO.builder()
+                .serviceMetadata(serviceMetadataDTO)
+                .serviceName(SERVICE_NAME)
+                .departmentName(PRODUCT_DEPARTMENT_NAME)
+                .organizationName(ORGANIZATION_NAME)
+                .organizationFiscalCode(ORGANIZATION_VAT_NOT_VALID)
+                .isVisible(IS_VISIBLE)
+                .build();
+    }
+
+    private ServiceRequestDTO createServiceRequestDTO() {
+        ServiceMetadataDTO serviceMetadataDTO = createServiceMetadataDTO();
+        return ServiceRequestDTO.builder()
+                .serviceMetadata(serviceMetadataDTO)
+                .serviceName(SERVICE_NAME)
+                .departmentName(PRODUCT_DEPARTMENT_NAME)
+                .organizationName(ORGANIZATION_NAME)
+                .organizationFiscalCode(ORGANIZATION_VAT)
+                .isVisible(IS_VISIBLE)
+                .build();
+    }
+
+    private ServiceMetadataDTO createServiceMetadataDTO() {
+        return ServiceMetadataDTO.builder()
+                .email(EMAIL)
+                .phone(PHONE)
+                .supportUrl(SUPPORT_URL)
+                .privacyUrl(PRIVACY_URL)
+                .tosUrl(TOS_URL)
+                .description(DESCRIPTION)
+                .scope(SCOPE)
+                .build();
+    }
+
+    private ServiceResponseDTO createServiceResponseDTO() {
+        return ServiceResponseDTO.builder()
+                .serviceId(SERVICE_ID)
+                .build();
     }
 
     Initiative createFullInitiative () {
@@ -547,9 +664,6 @@ class InitiativeServiceTest {
         initiative.setInitiativeName(INITIATIVE_NAME);
         initiative.setOrganizationId(ORGANIZATION_ID);
         initiative.setStatus("DRAFT");
-        initiative.setAutocertificationCheck(true);
-        initiative.setBeneficiaryRanking(true);
-        initiative.setPdndCheck(true);
         initiative.setPdndToken("pdndToken1");
         initiative.setAdditionalInfo(createInitiativeAdditional());
 //        initiative.setBeneficiaryRule(createInitiativeBeneficiaryRule());
@@ -573,7 +687,6 @@ class InitiativeServiceTest {
     private InitiativeAdditional createInitiativeAdditional() {
         InitiativeAdditional initiativeAdditional = new InitiativeAdditional();
         initiativeAdditional.setServiceIO(true);
-        initiativeAdditional.setServiceId("serviceId");
         initiativeAdditional.setServiceName("serviceName");
         initiativeAdditional.setServiceScope(InitiativeAdditional.ServiceScope.LOCAL);
         initiativeAdditional.setDescription("Description");
@@ -623,14 +736,15 @@ class InitiativeServiceTest {
     private InitiativeAdditionalDTO createInitiativeAdditionalDTO() {
         InitiativeAdditionalDTO initiativeAdditionalDTO = new InitiativeAdditionalDTO();
         initiativeAdditionalDTO.setServiceIO(true);
+        initiativeAdditionalDTO.setServiceId(SERVICE_ID);
         initiativeAdditionalDTO.setServiceName("serviceName");
         initiativeAdditionalDTO.setServiceScope(InitiativeAdditionalDTO.ServiceScope.LOCAL);
-        initiativeAdditionalDTO.setDescription("Description");
-        initiativeAdditionalDTO.setPrivacyLink("privacyLink");
-        initiativeAdditionalDTO.setTcLink("tcLink");
+        initiativeAdditionalDTO.setDescription("description");
+        initiativeAdditionalDTO.setPrivacyLink("privacy.url.it");;
+        initiativeAdditionalDTO.setTcLink("tos.url.it");
         ChannelDTO channelDTO = new ChannelDTO();
-        channelDTO.setType(ChannelDTO.TypeEnum.EMAIL);
-        channelDTO.setContact("contact");
+        channelDTO.setType(ChannelDTO.TypeEnum.WEB);
+        channelDTO.setContact("support.url.it");
         List<ChannelDTO> channelDTOS = new ArrayList<>();
         channelDTOS.add(channelDTO);
         initiativeAdditionalDTO.setChannels(channelDTOS);
@@ -805,7 +919,7 @@ class InitiativeServiceTest {
     }
 
     InitiativeDTO createStep3InitiativeDTO () {
-        InitiativeDTO initiativeDTO = new InitiativeDTO();
+        InitiativeDTO initiativeDTO = createStep2InitiativeDTO();
         //TODO ora settato con l'utilizzo dei RewardGroups. Associare un faker booleano per i casi OK, altrimenti separare i 2 casi
         initiativeDTO.setRewardRule(createRewardRuleDTO(false));
         initiativeDTO.setTrxRule(createTrxRuleConditionDTO());

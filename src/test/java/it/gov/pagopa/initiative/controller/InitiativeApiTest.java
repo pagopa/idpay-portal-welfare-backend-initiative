@@ -2,6 +2,10 @@ package it.gov.pagopa.initiative.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import feign.FeignException;
+import feign.Request;
+import feign.RequestTemplate;
+import feign.Response;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.rule.refund.AccumulatedAmountDTO;
@@ -28,15 +32,18 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.math.BigDecimal;
+import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest.CODE;
@@ -45,12 +52,16 @@ import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.E
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
+@TestPropertySource(
+        locations = "classpath:application.yml",
+        properties = {
+                "app.initiative.conditions.notifyRE=true"
+        })
 @WebMvcTest(value = {
         InitiativeApi.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
 @Slf4j
@@ -516,6 +527,11 @@ class InitiativeApiTest {
 
         doNothing().when(initiativeService).sendInitiativeInfoToRuleEngine(any(InitiativeDTO.class));
 
+        when(initiativeService.sendInitiativeInfoToIOBackEndServiceAndSaveItOnInitiative(step5InitiativeDTO, initiativeOrganizationInfoDTO)).thenReturn(step5InitiativeDTO);
+        when(initiativeDTOsToModelMapper.toInitiative(step5InitiativeDTO)).thenReturn(step5Initiative);
+        doNothing().when(initiativeService).updateInitiative(any(Initiative.class));
+
+
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(initiativeOrganizationInfoDTO))
@@ -526,7 +542,7 @@ class InitiativeApiTest {
     }
 
     @Test
-    void when_PUT_updateInitiativePublishedStatus_thenThrowException() throws Exception {
+    void givenRuleEngineError_when_PUT_updateInitiativePublishedStatus_thenThrowException() throws Exception {
         InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = InitiativeOrganizationInfoDTO.builder()
                 .organizationName(ORGANIZATION_NAME)
                 .organizationVat(ORGANIZATION_VAT)
@@ -561,11 +577,70 @@ class InitiativeApiTest {
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(objectMapper.writeValueAsString(initiativeOrganizationInfoDTO))
                                 .accept(MediaType.APPLICATION_JSON))
-                        .andExpect(MockMvcResultMatchers.status().is5xxServerError())
+                        .andExpect(MockMvcResultMatchers.status().isBadRequest())
                         .andDo(print())
                         .andReturn();
 
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), res.getResponse().getStatus());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), res.getResponse().getStatus());
+    }
+
+    @Test
+    void givenIOBackEndError_when_PUT_updateInitiativePublishedStatus_thenThrowException() throws Exception {
+        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = InitiativeOrganizationInfoDTO.builder()
+                .organizationName(ORGANIZATION_NAME)
+                .organizationVat(ORGANIZATION_VAT)
+                .organizationUserId(ORGANIZATION_USER_ID)
+                .organizationUserRole(ORGANIZATION_USER_ROLE)
+                .build();
+
+        //create Dummy Initiative
+        Initiative step5Initiative = createStep5Initiative();
+        InitiativeDTO step5InitiativeDTO = createStep5InitiativeDTO();
+
+        // When
+        // With this instruction, I instruct the service (via Mockito's when) to always return the DummyInitiative to me anytime I call the same service's function
+        when(initiativeService.getInitiative(anyString(), anyString())).thenReturn(step5Initiative);
+        Initiative initiative = initiativeService.getInitiative(anyString(), anyString());
+        // Expecting same instance
+        assertThat("Reason of result", initiative, is(sameInstance(step5Initiative)));
+
+        doNothing().when(initiativeService).isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED);
+
+        // Instruct the Service to insert a Dummy Initiative
+        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative)).thenReturn(step5InitiativeDTO);
+
+        doNothing().when(initiativeService).updateInitiative(any(Initiative.class));
+
+        doNothing().when(initiativeService).sendInitiativeInfoToRuleEngine(any(InitiativeDTO.class));
+
+        doThrow(
+                FeignException.errorStatus("Bad Request", responseStub(400, "Bad Request"))
+        ).when(initiativeService).sendInitiativeInfoToIOBackEndServiceAndSaveItOnInitiative(step5InitiativeDTO, initiativeOrganizationInfoDTO);
+
+        MvcResult res =
+                mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID))
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .content(objectMapper.writeValueAsString(initiativeOrganizationInfoDTO))
+                                .accept(MediaType.APPLICATION_JSON))
+                        .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                        .andDo(print())
+                        .andReturn();
+
+        ErrorDTO error = objectMapper.readValue(res.getResponse().getContentAsString(), ErrorDTO.class);
+        assertEquals(HttpStatus.BAD_REQUEST.value(), res.getResponse().getStatus());
+        assertEquals(InitiativeConstants.Exception.Publish.BadRequest.CODE, error.getCode());
+        assertTrue(error.getMessage().contains(InitiativeConstants.Exception.Publish.BadRequest.INTEGRATION_FAILED));
+
+    }
+
+    private Response responseStub(int status, String reasonExceptionMessage) {
+        return Response.builder()
+                .request(
+                        Request.create(Request.HttpMethod.POST, "url", Collections.emptyMap(), new byte[0], Charset.defaultCharset(), new RequestTemplate()))
+                .status(status)
+                .reason(reasonExceptionMessage)
+//                .headers(Collections.emptyMap()
+                .build();
     }
 
     /*
@@ -578,9 +653,6 @@ class InitiativeApiTest {
         initiative.setInitiativeName("initiativeName1");
         initiative.setOrganizationId(ORGANIZATION_ID);
         initiative.setStatus("DRAFT");
-        initiative.setAutocertificationCheck(true);
-        initiative.setBeneficiaryRanking(true);
-        initiative.setPdndCheck(true);
         initiative.setPdndToken("pdndToken1");
         initiative.setAdditionalInfo(createInitiativeAdditional());
         return initiative;
