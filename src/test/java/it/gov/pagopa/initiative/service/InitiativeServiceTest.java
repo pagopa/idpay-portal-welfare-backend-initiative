@@ -409,24 +409,16 @@ class InitiativeServiceTest {
     void logicallyDeleteInitiative_thenThrowNewInitiativeException(){
         Initiative initiative = createStep5Initiative();
         initiative.setDeleted(false);
+        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndDeleted(ORGANIZATION_ID, INITIATIVE_ID, false)).thenReturn(Optional.empty());
 
-        //Instruct the Repo Mock to return Dummy Initiatives
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndDeleted(ORGANIZATION_ID, INITIATIVE_ID, false)).thenThrow(
-                new InitiativeException(
-                        InitiativeConstants.Exception.NotFound.CODE,
-                        String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID),
-                        HttpStatus.NOT_FOUND)
-                );
+        //Try to call the Real Service
+        //Prepare Executable with invocation of the method on your system under test
+        Executable executable = () -> initiativeService.logicallyDeleteInitiative(ORGANIZATION_ID, INITIATIVE_ID);
 
-        try{
-            initiativeService.logicallyDeleteInitiative(ORGANIZATION_ID, INITIATIVE_ID);
-        }catch (InitiativeException e){
-            log.info("InitiativeException: " + e.getCode());
-            assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
-            assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
-            assertEquals(String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID), e.getMessage());
-        }
-
+        InitiativeException exception = Assertions.assertThrows(InitiativeException.class, executable);
+        assertEquals(InitiativeConstants.Exception.NotFound.CODE, exception.getCode());
+        assertEquals(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE.formatted(initiative.getInitiativeId()), exception.getMessage());
+        assertEquals(HttpStatus.NOT_FOUND, exception.getHttpStatus());
     }
 
     @Test

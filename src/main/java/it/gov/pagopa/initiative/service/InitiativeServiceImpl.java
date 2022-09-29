@@ -183,8 +183,8 @@ public class InitiativeServiceImpl implements InitiativeService {
                         InitiativeConstants.Exception.NotFound.CODE,
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
                         HttpStatus.NOT_FOUND));
-        if (initiative.getStatus().compareTo(InitiativeConstants.Status.IN_REVISION) == 0){
-            log.info("[LOGICAL_INITIATIVE_ELIMINATION] - Initiative: {}. Cannot be deleted. Current status is IN_REVISION.", initiative.getInitiativeId());
+        if (initiative.getStatus().equals(InitiativeConstants.Status.IN_REVISION)){
+            log.error("[LOGICAL_INITIATIVE_ELIMINATION] - Initiative: {}. Cannot be deleted. Current status is IN_REVISION.", initiative.getInitiativeId());
             throw new InitiativeException(
                     InitiativeConstants.Exception.BadRequest.CODE,
                     String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_CANNOT_BE_DELETED, initiativeId),
