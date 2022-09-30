@@ -254,6 +254,7 @@ public class InitiativeServiceImpl implements InitiativeService {
 
     @Override
     public void updateInitiative(Initiative initiative) {
+        initiative.setEnabled(true); //FIXME
         initiativeRepository.save(initiative);
     }
 
