@@ -87,6 +87,9 @@ public class InitiativeDTOsToModelMapper {
     }
 
     public InitiativeBeneficiaryRule toBeneficiaryRule(InitiativeBeneficiaryRuleDTO beneficiaryRuleDto) {
+        if (beneficiaryRuleDto == null) {
+            return null;
+        }
         InitiativeBeneficiaryRule beneficiaryRule = new InitiativeBeneficiaryRule();
         if (CollectionUtils.isEmpty(beneficiaryRuleDto.getAutomatedCriteria())) {
             beneficiaryRule.setAutomatedCriteria(Collections.emptyList());

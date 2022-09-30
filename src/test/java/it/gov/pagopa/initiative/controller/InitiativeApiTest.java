@@ -892,7 +892,9 @@ class InitiativeApiTest {
 
     private InitiativeDTO createStep3InitiativeDTO (Boolean beneficiaryKnown) {
         InitiativeDTO initiativeDTO = createStep2InitiativeDTO(beneficiaryKnown);
-        initiativeDTO.setBeneficiaryRule(createInitiativeBeneficiaryRuleDTO());
+        if(beneficiaryKnown) {
+            initiativeDTO.setBeneficiaryRule(createInitiativeBeneficiaryRuleDTO());
+        }
         return initiativeDTO;
     }
 
