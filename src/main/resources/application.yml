@@ -67,7 +67,7 @@ feign:
   client:
     config:
       backend-io:
-        loggerLevel: basic
+        loggerLevel: ${FEIGN_CLIENT_CONFIG_IO_LOG_LEVEL:basic}
 
 logging:
   level:

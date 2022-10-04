@@ -1,6 +1,5 @@
 package it.gov.pagopa.initiative.service;
 
-import it.gov.pagopa.initiative.dto.InitiativeDTO;
 import it.gov.pagopa.initiative.dto.InitiativeOrganizationInfoDTO;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
@@ -35,11 +34,11 @@ public interface InitiativeService {
 
     void logicallyDeleteInitiative(String organizationId, String initiativeId);
 
-    void sendInitiativeInfoToRuleEngine(InitiativeDTO initiativeDTO);
+    void sendInitiativeInfoToRuleEngine(Initiative initiative);
 
     void isInitiativeAllowedToBeNextStatusThenThrows(Initiative initiative, String statusToBeUpdated);
 
     void updateInitiative(Initiative initiative);
 
-    InitiativeDTO sendInitiativeInfoToIOBackEndServiceAndSaveItOnInitiative(InitiativeDTO initiativeDTO, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO);
+    Initiative sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(Initiative initiative, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO);
 }

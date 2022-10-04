@@ -567,16 +567,11 @@ class InitiativeApiTest {
 
         doNothing().when(initiativeService).isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED);
 
-        // Instruct the Service to insert a Dummy Initiative
-        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative)).thenReturn(step5InitiativeDTO);
-
         doNothing().when(initiativeService).updateInitiative(any(Initiative.class));
 
-        doNothing().when(initiativeService).sendInitiativeInfoToRuleEngine(any(InitiativeDTO.class));
+        doNothing().when(initiativeService).sendInitiativeInfoToRuleEngine(any(Initiative.class));
 
-        when(initiativeService.sendInitiativeInfoToIOBackEndServiceAndSaveItOnInitiative(step5InitiativeDTO, initiativeOrganizationInfoDTO)).thenReturn(step5InitiativeDTO);
-        when(initiativeDTOsToModelMapper.toInitiative(step5InitiativeDTO)).thenReturn(step5Initiative);
-        doNothing().when(initiativeService).updateInitiative(any(Initiative.class));
+        when(initiativeService.sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(step5Initiative, initiativeOrganizationInfoDTO)).thenReturn(step5Initiative);
 
 
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID))
@@ -618,7 +613,7 @@ class InitiativeApiTest {
 
         doNothing().when(initiativeService).updateInitiative(any(Initiative.class));
 
-        doNothing().when(initiativeService).sendInitiativeInfoToRuleEngine(any(InitiativeDTO.class));
+        doNothing().when(initiativeService).sendInitiativeInfoToRuleEngine(any(Initiative.class));
 
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -658,7 +653,7 @@ class InitiativeApiTest {
 
         doThrow(
                 new KafkaException()
-        ).when(initiativeService).sendInitiativeInfoToRuleEngine(any(InitiativeDTO.class));
+        ).when(initiativeService).sendInitiativeInfoToRuleEngine(any(Initiative.class));
 
         MvcResult res =
                 mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID))
@@ -699,11 +694,11 @@ class InitiativeApiTest {
 
         doNothing().when(initiativeService).updateInitiative(any(Initiative.class));
 
-        doNothing().when(initiativeService).sendInitiativeInfoToRuleEngine(any(InitiativeDTO.class));
+        doNothing().when(initiativeService).sendInitiativeInfoToRuleEngine(any(Initiative.class));
 
         doThrow(
                 FeignException.errorStatus("Bad Request", responseStub(400, "Bad Request"))
-        ).when(initiativeService).sendInitiativeInfoToIOBackEndServiceAndSaveItOnInitiative(step5InitiativeDTO, initiativeOrganizationInfoDTO);
+        ).when(initiativeService).sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(step5Initiative, initiativeOrganizationInfoDTO);
 
         MvcResult res =
                 mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID))

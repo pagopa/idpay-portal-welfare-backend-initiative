@@ -89,6 +89,8 @@ microservice-chart:
     APP_INITIATIVE_CONDITIONS_NOTIFY_IO: "true"
     IO_BACKEND_SERVICE_DEPARTMENT_NAME: IDPAY
     IO_BACKEND_SERVICE_IS_VISIBLE: "false"
+    LOG_LEVEL_INITIATIVE: INFO
+    FEIGN_CLIENT_CONFIG_IO_LOG_LEVEL: basic
 
   envConfigMapExternals:
     idpay-common:

@@ -28,18 +28,17 @@ import java.util.List;
 @Slf4j
 public class InitiativeApiController implements InitiativeApi {
 
-    @Value("${app.initiative.conditions.notifyRE}")
-    @Getter
-    private boolean notifyRE;
+    private final boolean notifyRE;
+    private final InitiativeService initiativeService;
+    private final InitiativeModelToDTOMapper initiativeModelToDTOMapper;
+    private final InitiativeDTOsToModelMapper initiativeDTOsToModelMapper;
 
-    @Autowired
-    private InitiativeService initiativeService;
-
-    @Autowired
-    private InitiativeModelToDTOMapper initiativeModelToDTOMapper;
-
-    @Autowired
-    private InitiativeDTOsToModelMapper initiativeDTOsToModelMapper;
+    public InitiativeApiController(@Value("${app.initiative.conditions.notifyRE}") boolean notifyRE, InitiativeService initiativeService, InitiativeModelToDTOMapper initiativeModelToDTOMapper, InitiativeDTOsToModelMapper initiativeDTOsToModelMapper) {
+        this.notifyRE = notifyRE;
+        this.initiativeService = initiativeService;
+        this.initiativeModelToDTOMapper = initiativeModelToDTOMapper;
+        this.initiativeDTOsToModelMapper = initiativeDTOsToModelMapper;
+    }
 
     @ResponseStatus(HttpStatus.OK)
     @Override
@@ -186,14 +185,11 @@ public class InitiativeApiController implements InitiativeApi {
         log.debug("Validating current Status");
         initiativeService.isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED);
         log.debug("Current Status validated");
-        InitiativeDTO initiativeDTO = this.initiativeModelToDTOMapper.toInitiativeDTO(initiative);
 
         log.debug("Retrieve current state and save it as TEMP");
         String statusTemp = initiative.getStatus();
         LocalDateTime updateDateTemp = initiative.getUpdateDate();
 
-        initiativeDTO.setStatus(InitiativeConstants.Status.PUBLISHED);
-        initiativeDTO.setUpdateDate(LocalDateTime.now());
         initiative.setStatus(InitiativeConstants.Status.PUBLISHED);
         initiative.setUpdateDate(LocalDateTime.now());
         initiativeService.updateInitiative(initiative);
@@ -201,14 +197,13 @@ public class InitiativeApiController implements InitiativeApi {
         try {
             if(notifyRE) {
                 log.info("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Notification to Rule Engine of the published Initiative", initiativeId);
-                initiativeService.sendInitiativeInfoToRuleEngine(initiativeDTO);
+                initiativeService.sendInitiativeInfoToRuleEngine(initiative);
             }
             //1. Only for the Initiatives to be provided to IO, the integration is carried out with the creation of the Initiative Service to IO BackEnd
             //2. Sprint 9: In caso di beneficiaryKnown a true -> Invio al MS-Gruppi via API la richiesta di notifica della pubblicazione e, MS Gruppi la invia via coda al NotificationManager
-            if(initiativeDTO.getAdditionalInfo().getServiceIO()) {
+            if(initiative.getAdditionalInfo().getServiceIO()) {
                 log.info("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Notification to IO BeckEnd of the published Initiative", initiativeId);
-                initiativeDTO = initiativeService.sendInitiativeInfoToIOBackEndServiceAndSaveItOnInitiative(initiativeDTO, initiativeOrganizationInfoDTO);
-                initiative = initiativeDTOsToModelMapper.toInitiative(initiativeDTO);
+                initiative = initiativeService.sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(initiative, initiativeOrganizationInfoDTO);
                 initiativeService.updateInitiative(initiative);
                 //Invio al MS-Gruppi via API
                 //This integration necessarily takes place in succession to having created the service with IO in order not to send "orphan" resources (not associated with any Initiative known by IO).

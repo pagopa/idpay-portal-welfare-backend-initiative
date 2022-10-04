@@ -611,13 +611,13 @@ class InitiativeServiceTest {
     @Test
     void givenInitiativeDTO_whenRuleEngineProduceIsValid_thenOk(){
         //Instruct Initiative
-        InitiativeDTO initiativeDTO = createStep5InitiativeDTO();
+        Initiative initiative = createStep5Initiative();
 
-        when(initiativeProducer.sendPublishInitiative(initiativeDTO)).thenReturn(true);
+        when(initiativeProducer.sendPublishInitiative(initiative)).thenReturn(true);
 
         //Try to call the Real Service
         //Prepare Executable with invocation of the method on your system under test
-        Executable executable = () -> initiativeService.sendInitiativeInfoToRuleEngine(initiativeDTO);
+        Executable executable = () -> initiativeService.sendInitiativeInfoToRuleEngine(initiative);
 
         Assertions.assertDoesNotThrow(executable);
     }
@@ -625,13 +625,13 @@ class InitiativeServiceTest {
     @Test
     void givenInitiativeDTO_whenRuleEngineProduceIsNotValid_thenThrowException(){
         //Instruct Initiative
-        InitiativeDTO initiativeDTO = createStep5InitiativeDTO();
+        Initiative initiative = createStep5Initiative();
 
-        when(initiativeProducer.sendPublishInitiative(initiativeDTO)).thenReturn(false);
+        when(initiativeProducer.sendPublishInitiative(initiative)).thenReturn(false);
 
         //Try to call the Real Service
         //Prepare Executable with invocation of the method on your system under test
-        Executable executable = () -> initiativeService.sendInitiativeInfoToRuleEngine(initiativeDTO);
+        Executable executable = () -> initiativeService.sendInitiativeInfoToRuleEngine(initiative);
 
         IllegalStateException exception = Assertions.assertThrows(IllegalStateException.class, executable);
     }
@@ -639,10 +639,9 @@ class InitiativeServiceTest {
     @Test //Mancano i test con Exception
     void givenDTOsInitiativeAndInitiativeOrganizationInfo_whenIntegrationWithIOBackEndIsOK_thenReturnInitiativeUpdated(){
         //Instruct Initiative
-        InitiativeDTO initiativeDTO = createStep5InitiativeDTO();
+        Initiative initiative = createStep5Initiative();
 
-        //FIXME Should not be created with ServiceId, but raise Exception because during the main calling, additioanlInfo.serviceId are added in execution
-        InitiativeAdditionalDTO initiativeAdditionalDTO = createInitiativeAdditionalDTO();
+        InitiativeAdditional initiativeAdditional = createInitiativeAdditional();
 
         InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = InitiativeOrganizationInfoDTO.builder()
                 .organizationName(ORGANIZATION_NAME)
@@ -654,20 +653,11 @@ class InitiativeServiceTest {
         ServiceRequestDTO serviceRequestDTOexpected = createServiceRequestDTO();
         ServiceResponseDTO serviceResponseDTOexpected = createServiceResponseDTO();
 
-        when(initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServicePayloadDTO(initiativeAdditionalDTO, initiativeOrganizationInfoDTO)).thenReturn(serviceRequestDTOexpected);
+        when(initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(initiativeAdditional, initiativeOrganizationInfoDTO)).thenReturn(serviceRequestDTOexpected);
         when(ioBackEndRestConnector.createService(serviceRequestDTOexpected)).thenReturn(serviceResponseDTOexpected);
 
-        //Try to call the Real Service
-        //Prepare Executable with invocation of the method on your system under test
-        Executable executable = () -> initiativeService.sendInitiativeInfoToIOBackEndServiceAndSaveItOnInitiative(initiativeDTO, initiativeOrganizationInfoDTO);
-        Assertions.assertDoesNotThrow(executable);
-
-        //FIXME Eventuale costruzione del serviceResponse expected da confrontare con l'actual in assertEquals
-//        InitiativeDTO initiativeDTOactual = initiativeService.sendInitiativeInfoToIOBackEndService(initiativeDTO, initiativeOrganizationInfoDTO);
-//        assertEquals(serviceResponseDTOexpected, initiativeDTOactual);
-
-        //Expecting mapper to be called once with correct param
-        verify(initiativeAdditionalDTOsToIOServiceRequestDTOMapper, times(1)).toServicePayloadDTO(initiativeAdditionalDTO, initiativeOrganizationInfoDTO);
+        Initiative initiativeActual = initiativeService.sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(initiative, initiativeOrganizationInfoDTO);
+        assertEquals(SERVICE_ID, initiativeActual.getAdditionalInfo().getServiceId());
 
         //Expecting connector to be called once with correct param
         verify(ioBackEndRestConnector, times(1)).createService(serviceRequestDTOexpected);
