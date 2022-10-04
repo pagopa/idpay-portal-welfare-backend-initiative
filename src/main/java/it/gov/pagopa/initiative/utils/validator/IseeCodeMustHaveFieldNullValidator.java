@@ -1,12 +1,12 @@
 package it.gov.pagopa.initiative.utils.validator;
 
 import it.gov.pagopa.initiative.dto.AutomatedCriteriaDTO;
-import it.gov.pagopa.initiative.utils.constraint.IseeHasFieldNull;
+import it.gov.pagopa.initiative.utils.constraint.IseeCodeMustHaveFieldNull;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class IseeHasFieldNullValidator implements ConstraintValidator<IseeHasFieldNull, AutomatedCriteriaDTO> {
+public class IseeCodeMustHaveFieldNullValidator implements ConstraintValidator<IseeCodeMustHaveFieldNull, AutomatedCriteriaDTO> {
 
     @Override
     public boolean isValid(AutomatedCriteriaDTO value, ConstraintValidatorContext context) {
