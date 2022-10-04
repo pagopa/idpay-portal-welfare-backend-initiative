@@ -4465,7 +4465,7 @@
 			]
 		},
 		{
-			"name": "4th.Intiative Revision By PagoPA Operator",
+			"name": "5th.Intiative Revision By PagoPA Operator",
 			"item": [
 				{
 					"name": "Update initiative into APPROVED status",
@@ -4659,7 +4659,7 @@
 			]
 		},
 		{
-			"name": "4th.Intiative Revision By PagoPA Operator",
+			"name": "5th.b.Intiative Revision By PagoPA Operator",
 			"item": [
 				{
 					"name": "Update initiative into PUBLISHED",
@@ -4674,29 +4674,11 @@
 								],
 								"type": "text/javascript"
 							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
 						}
 					],
 					"request": {
 						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Accept",
-								"value": "application/json"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{baseUrlInitiative}}/:initiativeId/published",
 							"host": [
