@@ -40,5 +40,5 @@ public interface InitiativeService {
 
     void updateInitiative(Initiative initiative);
 
-    Initiative sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(Initiative initiative, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO);
+    Initiative sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(Initiative initiative, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO) throws Exception;
 }

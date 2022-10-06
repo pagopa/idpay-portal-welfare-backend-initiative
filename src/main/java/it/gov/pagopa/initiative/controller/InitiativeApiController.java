@@ -10,9 +10,7 @@ import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.service.InitiativeService;
 import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -202,7 +200,7 @@ public class InitiativeApiController implements InitiativeApi {
             //1. Only for the Initiatives to be provided to IO, the integration is carried out with the creation of the Initiative Service to IO BackEnd
             //2. Sprint 9: In caso di beneficiaryKnown a true -> Invio al MS-Gruppi via API la richiesta di notifica della pubblicazione e, MS Gruppi la invia via coda al NotificationManager
             if(initiative.getAdditionalInfo().getServiceIO()) {
-                log.info("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Notification to IO BeckEnd of the published Initiative", initiativeId);
+                log.info("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Notification to IO BackEnd of the published Initiative", initiativeId);
                 initiative = initiativeService.sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(initiative, initiativeOrganizationInfoDTO);
                 initiativeService.updateInitiative(initiative);
                 //Invio al MS-Gruppi via API

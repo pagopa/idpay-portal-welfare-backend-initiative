@@ -24,6 +24,7 @@ public class InitiativeAdditional {
   private String serviceName;
   private ServiceScope serviceScope;
   private String description;
+  private String primaryTokenIO;
   private String privacyLink;
   private String tcLink;
   private List<Channel> channels;

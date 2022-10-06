@@ -637,7 +637,7 @@ class InitiativeServiceTest {
     }
 
     @Test //Mancano i test con Exception
-    void givenDTOsInitiativeAndInitiativeOrganizationInfo_whenIntegrationWithIOBackEndIsOK_thenReturnInitiativeUpdated(){
+    void givenDTOsInitiativeAndInitiativeOrganizationInfo_whenIntegrationWithIOBackEndIsOK_thenReturnInitiativeUpdated() throws Exception {
         //Instruct Initiative
         Initiative initiative = createStep5Initiative();
 

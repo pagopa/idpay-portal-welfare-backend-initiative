@@ -87,3 +87,9 @@ app:
     conditions:
       notifyIO: ${APP_INITIATIVE_CONDITIONS_NOTIFY_IO:true}
       notifyRE: ${APP_INITIATIVE_CONDITIONS_NOTIFY_RE:true}
+
+aes:
+  salt: ${AES_SALT:saltsalt}
+  iv: ${AES_IV:iviviv}
+  keySize: ${KEYSIZE:256}
+  iterationCount: ${ITERATION_COUNT:10000}
