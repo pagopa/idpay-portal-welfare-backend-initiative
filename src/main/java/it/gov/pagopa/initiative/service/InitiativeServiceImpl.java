@@ -267,10 +267,10 @@ public class InitiativeServiceImpl implements InitiativeService {
         InitiativeAdditional additionalInfo = initiative.getAdditionalInfo();
         ServiceRequestDTO serviceRequestDTO = initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(additionalInfo, initiativeOrganizationInfoDTO);
         ServiceResponseDTO serviceResponseDTO = ioBackEndRestConnector.createService(serviceRequestDTO);
-        log.debug("[ENCYPTION_ON_GOING]. Initiative: {}. Start encryption...", initiative.getInitiativeId());
-        String cryptedToken = aesutil.encrypt(InitiativeConstants.AES.PASSPHRASE, serviceResponseDTO.getPrimaryKey());
-        log.debug("[ENCYPTION_COMPLETED]. Initiative: {}. Encryption completed.", initiative.getInitiativeId());
-        initiative.getAdditionalInfo().setPrimaryTokenIO(cryptedToken);
+        log.debug("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Start encryption...", initiative.getInitiativeId());
+        String cryptedPrimaryToken = aesutil.encrypt(InitiativeConstants.AES.PASSPHRASE, serviceResponseDTO.getPrimaryKey());
+        log.debug("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Encryption completed.", initiative.getInitiativeId());
+        initiative.getAdditionalInfo().setPrimaryTokenIO(cryptedPrimaryToken);
         additionalInfo.setServiceId(serviceResponseDTO.getServiceId());
         initiative.setUpdateDate(LocalDateTime.now());
         return initiative;

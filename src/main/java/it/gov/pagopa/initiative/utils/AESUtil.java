@@ -1,5 +1,7 @@
 package it.gov.pagopa.initiative.utils;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -17,29 +19,38 @@ import java.util.Base64;
 
 @Component
 public class AESUtil {
-    @Value("${aes.salt}")
-    private String salt;
-    @Value("${aes.iv}")
-    private String iv;
-    @Value("${aes.keySize}")
-    private int keySize;
-    @Value("${aes.iterationCount}")
-    private int iterationCount;
+    @Setter
+    public String pbkdf2WithHmacSha1 = "PBKDF2WithHmacSHA1";
+    @Getter
+    @Setter
+    public String encoding = "UTF-8";
+    private final String salt;
+    private final String iv;
+    private final int keySize;
+    private final int iterationCount;
+
     private final Cipher cipher;
 
-    public AESUtil() {
+    public AESUtil(@Value("${util.crypto.aes.salt}") String salt,
+                   @Value("${util.crypto.aes.iv}") String iv,
+                   @Value("${util.crypto.aes.keySize}") int keySize,
+                   @Value("${util.crypto.aes.iterationCount}") int iterationCount,
+                   @Value("${util.crypto.aes.cipherInstance}") String cipherInstance) {
+        this.salt = salt;
+        this.iv = iv;
+        this.keySize = keySize;
+        this.iterationCount = iterationCount;
         try {
-//            cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            cipher = Cipher.getInstance(cipherInstance);
         }
-        catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
+        catch (NoSuchPaddingException | NoSuchAlgorithmException e) {
             throw fail(e);
         }
     }
 
     private SecretKey generateKey(String passphrase) {
         try {
-            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+            SecretKeyFactory factory = SecretKeyFactory.getInstance(pbkdf2WithHmacSha1);
             KeySpec spec = new PBEKeySpec(passphrase.toCharArray(), salt.getBytes(), iterationCount, keySize);
             SecretKey key = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
             return key;
@@ -52,18 +63,7 @@ public class AESUtil {
     public String encrypt(String passphrase, String plaintext) {
         try {
             SecretKey key = generateKey(passphrase);
-            byte[] encrypted = doFinal(Cipher.ENCRYPT_MODE, key, plaintext.getBytes("UTF-8"));
-            return base64(encrypted);
-        }
-        catch (UnsupportedEncodingException e) {
-            throw fail(e);
-        }
-    }
-
-    public String encryptIvByte(String passphrase, String plaintext) {
-        try {
-            SecretKey key = generateKey(passphrase);
-            byte[] encrypted = doFinalIvByte(Cipher.ENCRYPT_MODE, key, plaintext.getBytes("UTF-8"));
+            byte[] encrypted = doFinal(Cipher.ENCRYPT_MODE, key, plaintext.getBytes(encoding));
             return base64(encrypted);
         }
         catch (UnsupportedEncodingException e) {
@@ -75,7 +75,7 @@ public class AESUtil {
         try {
             SecretKey key = generateKey(passphrase);
             byte[] decrypted = doFinal(Cipher.DECRYPT_MODE, key, base64(ciphertext));
-            return new String(decrypted, "UTF-8");
+            return new String(decrypted, encoding);
         }
         catch (UnsupportedEncodingException e) {
             throw fail(e);
@@ -84,7 +84,6 @@ public class AESUtil {
 
     private byte[] doFinal(int encryptMode, SecretKey key, byte[] bytes) {
         try {
-//            cipher.init(encryptMode, key, new IvParameterSpec(hex(iv)));
             GCMParameterSpec parameterSpec = new GCMParameterSpec(128, iv.getBytes());
             cipher.init(encryptMode, key, parameterSpec);
             return cipher.doFinal(bytes);
@@ -96,27 +95,6 @@ public class AESUtil {
             throw fail(e);
         }
     }
-
-    private byte[] doFinalIvByte(int encryptMode, SecretKey key, byte[] bytes) {
-        try {
-//            cipher.init(encryptMode, key, new IvParameterSpec(hex(iv)));
-            GCMParameterSpec parameterSpec = new GCMParameterSpec(128, iv.getBytes());
-            cipher.init(encryptMode, key, parameterSpec);
-            return cipher.doFinal(bytes);
-        }
-        catch (InvalidKeyException
-               | InvalidAlgorithmParameterException
-               | IllegalBlockSizeException
-               | BadPaddingException e) {
-            throw fail(e);
-        }
-    }
-
-//    public static String random(int length) {
-//        byte[] salt = new byte[length];
-//        new SecureRandom().nextBytes(salt);
-//        return hex(salt);
-//    }
 
     public static String base64(byte[] bytes) {
         return Base64.getEncoder().withoutPadding().encodeToString(bytes);
@@ -125,19 +103,6 @@ public class AESUtil {
     public static byte[] base64(String str) {
         return Base64.getDecoder().decode(str);
     }
-
-//    public static String hex(byte[] bytes) {
-//        return Hex.encodeHexString(bytes);
-//    }
-
-//    public static byte[] hex(String str) {
-//        try {
-//            return Hex.decodeHex(str.toCharArray());
-//        }
-//        catch (DecoderException e) {
-//            throw new IllegalStateException(e);
-//        }
-//    }
 
     private IllegalStateException fail(Exception e) {
         return new IllegalStateException(e);
