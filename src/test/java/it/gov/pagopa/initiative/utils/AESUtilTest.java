@@ -33,20 +33,12 @@ class AESUtilTest {
 
     private static final String IV = "IVIVIVIVIVIVIVIVIVIVIV";
     private static final String SALT = "SALTSALTSALTSALTSALTSALTSALTSALTSALTSALT";
-    private static final String PLAIN_TEXT = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy "
-            + "eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed "
-            + "diam voluptua. At vero eos et accusam et justo duo dolores et ea "
-            + "rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem "
-            + "ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur "
-            + "sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et "
-            + "dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam "
-            + "et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea "
-            + "takimata sanctus est Lorem ipsum dolor sit amet.";
+    private static final String PLAIN_TEXT = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy ";
     private static final int KEY_SIZE = 256;
     private static final int ITERATION_COUNT = 10000;
     private static final String PASSPHRASE = "the quick brown fox jumps over the lazy dog";
 
-    private static final String CIPHER_TEXT_AES_GCM_NO_PADDING_KEY_256_ITERATION_10000 = "H4E45nRUxAb+p46VcWmfyDxGUBRHhTN2lgec8oOWJBEVVu/fIDCUciuOYQ4yQup797L2V/6PpyMWz0az35HXBXv/B4Y/B7Oj7KJb0OyMLaaomskhlJVBmKz1a8zUv3Y25zKstRDYjSnTRG/GrCaiDnNTeiaYpvnA6KI9ZoRfEVZUMnBvaAvyxSXpytxvaz9RRSTERBfCJK8SXIdeBK1Jldu47dcaQzk6Z3bH1Ja1RTYNH+xPnn4hugoDQLr5XGUGSSZegjPvSp2AvgRx7Zc1O5lpPu8BTQkRfrPC4VZN6ftVM/W2b5iDsYrhP6nf4EIpN4yCJ6Izo2K4HTC62tJepYLyyOlEu30h+bAgvpVpgdCx/f3co8b4BtLSaOVuok6yVa9GcAlGAnZZWKlxJs1g6HUODtPGjWgiiHRcHYIInx1hFO+Bd5OAIwqCFVoURZvV0BgfORc3ULh1z8wPBKUhzvLHqx6oe6PvtIlavYKskhMn25Bw5pKjoG66fEjIN20cRvHt5cjsTPuxIKs/897J+QOQEnioykQAF/yAHnpSgy4DCGYMvnPy4h9quSLc1jhS/Xv+m0vto1MwuBzzsfdPD/8P0yzzs/QrFh+/JzsvUQ6AFTS3NXBtD75GEm/St8zRtyJVXcf+x/h1QqAhAj2aKyfEDHwDJJGcxbmu4tZqGYvK0ZH4FXjeZ03bMqDVy/cLHi5MT7TOWNZRAk2flaVRwHF6qu2IKUXBsMLl01QRe+STB82vwDZx83KuMtjFMIeR2LoffU6rwlklRYddKwxFDAyGhzfsNehUNx8KC/VUMg";
+    private static final String CIPHER_TEXT_AES_GCM_NO_PADDING_KEY_256_ITERATION_10000 = "H4E45nRUxAb+p46VcWmfyDxGUBRHhTN2lgec8oOWJBEVVu/fIDCUciuOYQ4yQup797L2V/6PpyMWz0az35HXBXv/B4Y/B7Oj7HuUrMsgzdCfVvqdLO+TnKQ";
 
     public static final int AES_KEY_SIZE = 256;
     public static final int GCM_IV_LENGTH = 12;

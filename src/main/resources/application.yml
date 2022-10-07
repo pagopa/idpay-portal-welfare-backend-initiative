@@ -91,8 +91,9 @@ app:
 util:
   crypto:
     aes:
-      salt: ${UTIL_CRYPTO_AES_SALT:saltsalt}
-      iv: ${UTIL_CRYPTO_AES_IV:iviviv}
+      salt: ${UTIL_CRYPTO_AES_SALT:}
+      iv: ${UTIL_CRYPTO_AES_IV:}
       keySize: ${UTIL_CRYPTO_AES_KEY_SIZE:256}
       iterationCount: ${UTIL_CRYPTO_AES_ITERATION_COUNT:10000}
       cipherInstance: AES/GCM/NoPadding
+      passphrase: ${UTIL_CRYPTO_AES_PASSPHRASE:}
