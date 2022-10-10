@@ -5,12 +5,14 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.*;
 import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.Base64;
@@ -88,6 +90,11 @@ public class AESUtil {
         try {
             GCMParameterSpec parameterSpec = new GCMParameterSpec(gcmTagLength * 8, iv.getBytes());
             cipher.init(encryptMode, key, parameterSpec);
+
+//            SecureRandom SECURE_RANDOM = new SecureRandom();
+//            byte[] ivBytes = new byte[]{-15, -60, -48, 126, -41, -117, -68, -94, -88, -56, 39, 53, -56, -9, 71, -35};
+//            cipher.init(encryptMode, key, new IvParameterSpec(iv.getBytes()));
+//            cipher.init(encryptMode, key, new IvParameterSpec(ivBytes), SECURE_RANDOM);
             return cipher.doFinal(bytes);
         }
         catch (InvalidKeyException

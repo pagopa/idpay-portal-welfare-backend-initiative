@@ -267,8 +267,10 @@ public class InitiativeServiceImpl implements InitiativeService {
         ServiceRequestDTO serviceRequestDTO = initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(additionalInfo, initiativeOrganizationInfoDTO);
         ServiceResponseDTO serviceResponseDTO = ioBackEndRestConnector.createService(serviceRequestDTO);
         log.debug("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Start ServiceIO Keys encryption...", initiative.getInitiativeId());
-        String encryptedPrimaryToken = ioTokenService.encrypt(serviceResponseDTO.getPrimaryKey());
-        String encryptedSecondaryToken = ioTokenService.encrypt(serviceResponseDTO.getSecondaryKey());
+//        String encryptedPrimaryToken = ioTokenService.encrypt(serviceResponseDTO.getPrimaryKey());
+//        String encryptedSecondaryToken = ioTokenService.encrypt(serviceResponseDTO.getSecondaryKey());
+        String encryptedPrimaryToken = serviceResponseDTO.getPrimaryKey(); //FIXME: Choose a different Algo to evict java.security.InvalidAlgorithmParameterException: Cannot reuse iv for GCM encryption
+        String encryptedSecondaryToken = serviceResponseDTO.getSecondaryKey();
         log.debug("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Encryption completed.", initiative.getInitiativeId());
         initiative.getAdditionalInfo().setPrimaryTokenIO(encryptedPrimaryToken);
         initiative.getAdditionalInfo().setSecondaryTokenIO(encryptedSecondaryToken);
