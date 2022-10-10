@@ -8,6 +8,7 @@ import it.gov.pagopa.initiative.exception.IntegrationException;
 import it.gov.pagopa.initiative.mapper.InitiativeDTOsToModelMapper;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.Initiative;
+import it.gov.pagopa.initiative.model.InitiativeAdditional;
 import it.gov.pagopa.initiative.service.InitiativeService;
 import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
 import lombok.extern.slf4j.Slf4j;
@@ -221,8 +222,16 @@ public class InitiativeApiController implements InitiativeApi {
     @ResponseStatus(HttpStatus.OK)
     @Override
     public ResponseEntity<InitiativeDTO> getInitiativeIdFromServiceId(String organizationId, String serviceId){
-        log.info("[GET_INITIATIVE_ID_FROM_SERVICE_ID] - Start searching the initiativeId for serviceId {}..", serviceId);
+        log.info("[GET_INITIATIVE_ID_FROM_SERVICE_ID] - Start searching the initiativeId for serviceId {}...", serviceId);
         return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDTO(this.initiativeService.getInitiativeIdFromServiceId(serviceId)));
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @Override
+    public ResponseEntity<InitiativeAdditionalDTO> getPrimaryAndSecondaryTokenIO(String organizationId, String initiativeId){
+        log.info("[GET_PRIMARY_AND_SECONDARY_TOKEN] - Start searching tokens for initiativeId {}...", initiativeId);
+//        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeAdditionalDTOOnlyTokens(this.initiativeService.getPrimaryAndSecondaryTokenIO(initiativeId)));
+        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeAdditionalDTOOnlyTokens(this.initiativeService.getPrimaryAndSecondaryTokenIO(organizationId, initiativeId)));
     }
 
 }

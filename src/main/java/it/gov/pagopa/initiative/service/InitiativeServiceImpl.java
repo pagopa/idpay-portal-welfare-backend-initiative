@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -308,5 +309,21 @@ public class InitiativeServiceImpl implements InitiativeService {
                         InitiativeConstants.Exception.NotFound.CODE,
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_ID_BY_SERVICE_ID_MESSAGE, serviceId),
                         HttpStatus.NOT_FOUND));
+    }
+
+    @Override
+    public InitiativeAdditional getPrimaryAndSecondaryTokenIO(String organizationId, String initiativeId){
+//        return initiativeRepository.retrievePrimarySecondaryTokenIO(initiativeId)
+//                .orElseThrow(() -> new InitiativeException(
+//                        InitiativeConstants.Exception.NotFound.CODE,
+//                        String.format(InitiativeConstants.Exception.NotFound.PRIMARY_AND_SECONDARY_TOKEN_MESSAGE, initiativeId),
+//                        HttpStatus.NOT_FOUND));
+        Optional<Initiative> initiative = Optional.ofNullable(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(organizationId, initiativeId, true)
+                .orElseThrow(() -> new InitiativeException(
+                        InitiativeConstants.Exception.NotFound.CODE,
+                        String.format(InitiativeConstants.Exception.NotFound.PRIMARY_AND_SECONDARY_TOKEN_MESSAGE, initiativeId),
+                        HttpStatus.NOT_FOUND)));
+
+        return initiative.get().getAdditionalInfo();
     }
 }

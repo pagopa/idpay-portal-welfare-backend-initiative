@@ -2,6 +2,7 @@ package it.gov.pagopa.initiative.service;
 
 import it.gov.pagopa.initiative.dto.InitiativeOrganizationInfoDTO;
 import it.gov.pagopa.initiative.model.Initiative;
+import it.gov.pagopa.initiative.model.InitiativeAdditional;
 import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
 import org.springframework.stereotype.Service;
 
@@ -43,4 +44,6 @@ public interface InitiativeService {
     Initiative sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(Initiative initiative, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO);
 
     Initiative getInitiativeIdFromServiceId(String serviceId);
+
+    InitiativeAdditional getPrimaryAndSecondaryTokenIO(String organizationId, String initiativeId);
 }

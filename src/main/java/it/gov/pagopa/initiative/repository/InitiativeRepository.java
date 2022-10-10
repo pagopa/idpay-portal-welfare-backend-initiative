@@ -1,6 +1,7 @@
 package it.gov.pagopa.initiative.repository;
 
 import it.gov.pagopa.initiative.model.Initiative;
+import it.gov.pagopa.initiative.model.InitiativeAdditional;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
@@ -30,4 +31,10 @@ public interface InitiativeRepository extends MongoRepository<Initiative, String
             fields = "{initiativeId : 1}"
     )
     Optional<Initiative> retrieveServiceId(String serviceId);
+
+//    @Query(
+//            value = "{initiativeId : ?0}",
+//            fields = "{'additionalInfo.primaryTokenIO' : 1, 'additionalInfo.secondaryTokenIO' : 1}"
+//    )
+//    Optional<InitiativeAdditional> retrievePrimarySecondaryTokenIO(String initiativeId);
 }
