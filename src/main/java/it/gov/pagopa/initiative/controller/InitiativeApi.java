@@ -273,8 +273,8 @@ public interface InitiativeApi {
             @ApiResponse(responseCode = "404", description = "Initiative ID not found for this service", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
             @ApiResponse(responseCode = "429", description = "Too many Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
             @ApiResponse(responseCode = "500", description = "Server ERROR", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))})
-    @GetMapping(value = "/idpay/organization/{organizationId}/initiative",
+    @GetMapping(value = "/idpay/initiative",
             produces = {"application/json"})
-    ResponseEntity<InitiativeDTO> getInitiativeIdFromServiceId(@PathVariable("organizationId") String organizationId, @RequestParam String serviceId);
+    ResponseEntity<InitiativeDTO> getInitiativeIdFromServiceId(@RequestParam(required = true) String serviceId);
 }
 
