@@ -72,6 +72,7 @@ class InitiativeServiceTest {
     private static final String SERVICE_NAME = "serviceName";
     private static final String PRODUCT_DEPARTMENT_NAME = "productDepartmentName";
     private static final String SERVICE_ID = "serviceId";
+    public static final String ANY_KEY_TOKEN_IO = "ANY_KEY_TOKEN_IO";
 
     @Autowired
     InitiativeService initiativeService;
@@ -90,6 +91,9 @@ class InitiativeServiceTest {
 
     @MockBean
     IOBackEndRestConnector ioBackEndRestConnector;
+
+    @MockBean
+    IOTokenService ioTokenService;
 
     @Test
     void givenRoleAdmin_retrieveInitiativeSummary_ok() throws Exception {
@@ -637,7 +641,7 @@ class InitiativeServiceTest {
     }
 
     @Test //Mancano i test con Exception
-    void givenDTOsInitiativeAndInitiativeOrganizationInfo_whenIntegrationWithIOBackEndIsOK_thenReturnInitiativeUpdated(){
+    void givenDTOsInitiativeAndInitiativeOrganizationInfo_whenIntegrationWithIOBackEndIsOK_thenReturnInitiativeUpdated() throws Exception {
         //Instruct Initiative
         Initiative initiative = createStep5Initiative();
 
@@ -655,9 +659,11 @@ class InitiativeServiceTest {
 
         when(initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(initiativeAdditional, initiativeOrganizationInfoDTO)).thenReturn(serviceRequestDTOexpected);
         when(ioBackEndRestConnector.createService(serviceRequestDTOexpected)).thenReturn(serviceResponseDTOexpected);
+        when(ioTokenService.encrypt(anyString())).thenReturn(ANY_KEY_TOKEN_IO);
 
         Initiative initiativeActual = initiativeService.sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(initiative, initiativeOrganizationInfoDTO);
         assertEquals(SERVICE_ID, initiativeActual.getAdditionalInfo().getServiceId());
+        assertEquals(ANY_KEY_TOKEN_IO, initiativeActual.getAdditionalInfo().getPrimaryTokenIO());
 
         //Expecting connector to be called once with correct param
         verify(ioBackEndRestConnector, times(1)).createService(serviceRequestDTOexpected);
@@ -712,6 +718,7 @@ class InitiativeServiceTest {
     private ServiceResponseDTO createServiceResponseDTO() {
         return ServiceResponseDTO.builder()
                 .serviceId(SERVICE_ID)
+                .primaryKey(ANY_KEY_TOKEN_IO)
                 .build();
     }
 

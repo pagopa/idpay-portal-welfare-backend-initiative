@@ -27,7 +27,6 @@ import java.util.List;
 @Service
 @Slf4j
 public class InitiativeServiceImpl implements InitiativeService {
-
     @Autowired
     private InitiativeRepository initiativeRepository;
 
@@ -42,6 +41,9 @@ public class InitiativeServiceImpl implements InitiativeService {
 
     @Autowired
     IOBackEndRestConnector ioBackEndRestConnector;
+
+    @Autowired
+    IOTokenService ioTokenService;
 
     public List<Initiative> retrieveInitiativeSummary(String organizationId, String role) {
         List<Initiative> initiatives = initiativeRepository.retrieveInitiativeSummary(organizationId, true);
@@ -150,10 +152,12 @@ public class InitiativeServiceImpl implements InitiativeService {
         //Check Initiative Status
         isInitiativeAllowedToBeEditableThenThrows(initiative);
         initiative.setRefundRule(refundRule.getRefundRule());
+        log.info("[UPDATE_REFUND_RULE] - Initiative: {}. Refund rules successfully setted.", initiativeId);
         initiative.setUpdateDate(LocalDateTime.now());
         initiative.setStatus(InitiativeConstants.Status.DRAFT);
         if (changeInitiativeStatus) {
             initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
+            log.info("[UPDATE_TO_IN_REVISION_STATUS] - Initiative: {}. Status successfully setted to IN_REVISION.", initiativeId);
         }
         this.initiativeRepository.save(initiative);
     }
@@ -262,6 +266,14 @@ public class InitiativeServiceImpl implements InitiativeService {
         InitiativeAdditional additionalInfo = initiative.getAdditionalInfo();
         ServiceRequestDTO serviceRequestDTO = initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(additionalInfo, initiativeOrganizationInfoDTO);
         ServiceResponseDTO serviceResponseDTO = ioBackEndRestConnector.createService(serviceRequestDTO);
+        log.debug("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Start ServiceIO Keys encryption...", initiative.getInitiativeId());
+//        String encryptedPrimaryToken = ioTokenService.encrypt(serviceResponseDTO.getPrimaryKey());
+//        String encryptedSecondaryToken = ioTokenService.encrypt(serviceResponseDTO.getSecondaryKey());
+        String encryptedPrimaryToken = serviceResponseDTO.getPrimaryKey(); //FIXME: Choose a different Algo to evict java.security.InvalidAlgorithmParameterException: Cannot reuse iv for GCM encryption
+        String encryptedSecondaryToken = serviceResponseDTO.getSecondaryKey();
+        log.debug("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Encryption completed.", initiative.getInitiativeId());
+        initiative.getAdditionalInfo().setPrimaryTokenIO(encryptedPrimaryToken);
+        initiative.getAdditionalInfo().setSecondaryTokenIO(encryptedSecondaryToken);
         additionalInfo.setServiceId(serviceResponseDTO.getServiceId());
         initiative.setUpdateDate(LocalDateTime.now());
         return initiative;
