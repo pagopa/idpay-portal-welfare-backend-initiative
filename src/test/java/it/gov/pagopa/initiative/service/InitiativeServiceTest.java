@@ -26,7 +26,6 @@ import it.gov.pagopa.initiative.model.rule.reward.InitiativeRewardRule;
 import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
 import it.gov.pagopa.initiative.model.rule.trx.*;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
-import it.gov.pagopa.initiative.utils.AESUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -73,7 +72,7 @@ class InitiativeServiceTest {
     private static final String SERVICE_NAME = "serviceName";
     private static final String PRODUCT_DEPARTMENT_NAME = "productDepartmentName";
     private static final String SERVICE_ID = "serviceId";
-    public static final String PRIMARY_TOKEN_IO = "PRIMARY_TOKEN_IO";
+    public static final String ANY_KEY_TOKEN_IO = "ANY_KEY_TOKEN_IO";
 
     @Autowired
     InitiativeService initiativeService;
@@ -94,7 +93,7 @@ class InitiativeServiceTest {
     IOBackEndRestConnector ioBackEndRestConnector;
 
     @MockBean
-    AESUtil aesUtil;
+    IOTokenService ioTokenService;
 
     @Test
     void givenRoleAdmin_retrieveInitiativeSummary_ok() throws Exception {
@@ -660,11 +659,11 @@ class InitiativeServiceTest {
 
         when(initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(initiativeAdditional, initiativeOrganizationInfoDTO)).thenReturn(serviceRequestDTOexpected);
         when(ioBackEndRestConnector.createService(serviceRequestDTOexpected)).thenReturn(serviceResponseDTOexpected);
-        when(aesUtil.encrypt(anyString(), anyString())).thenReturn(PRIMARY_TOKEN_IO);
+        when(ioTokenService.encrypt(anyString())).thenReturn(ANY_KEY_TOKEN_IO);
 
         Initiative initiativeActual = initiativeService.sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(initiative, initiativeOrganizationInfoDTO);
         assertEquals(SERVICE_ID, initiativeActual.getAdditionalInfo().getServiceId());
-        assertEquals(PRIMARY_TOKEN_IO, initiativeActual.getAdditionalInfo().getPrimaryTokenIO());
+        assertEquals(ANY_KEY_TOKEN_IO, initiativeActual.getAdditionalInfo().getPrimaryTokenIO());
 
         //Expecting connector to be called once with correct param
         verify(ioBackEndRestConnector, times(1)).createService(serviceRequestDTOexpected);
@@ -719,7 +718,7 @@ class InitiativeServiceTest {
     private ServiceResponseDTO createServiceResponseDTO() {
         return ServiceResponseDTO.builder()
                 .serviceId(SERVICE_ID)
-                .primaryKey(PRIMARY_TOKEN_IO)
+                .primaryKey(ANY_KEY_TOKEN_IO)
                 .build();
     }
 

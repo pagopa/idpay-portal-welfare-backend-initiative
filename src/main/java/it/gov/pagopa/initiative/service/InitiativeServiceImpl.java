@@ -13,7 +13,6 @@ import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeAdditional;
 import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
-import it.gov.pagopa.initiative.utils.AESUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +43,7 @@ public class InitiativeServiceImpl implements InitiativeService {
     IOBackEndRestConnector ioBackEndRestConnector;
 
     @Autowired
-    private AESUtil aesutil;
+    IOTokenService ioTokenService;
 
     public List<Initiative> retrieveInitiativeSummary(String organizationId, String role) {
         List<Initiative> initiatives = initiativeRepository.retrieveInitiativeSummary(organizationId, true);
@@ -263,14 +262,16 @@ public class InitiativeServiceImpl implements InitiativeService {
     }
 
     @Override
-    public Initiative sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(Initiative initiative, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO) throws Exception {
+    public Initiative sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(Initiative initiative, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO) {
         InitiativeAdditional additionalInfo = initiative.getAdditionalInfo();
         ServiceRequestDTO serviceRequestDTO = initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(additionalInfo, initiativeOrganizationInfoDTO);
         ServiceResponseDTO serviceResponseDTO = ioBackEndRestConnector.createService(serviceRequestDTO);
-        log.debug("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Start encryption...", initiative.getInitiativeId());
-        String cryptedPrimaryToken = aesutil.encrypt(InitiativeConstants.AES.PASSPHRASE, serviceResponseDTO.getPrimaryKey());
+        log.debug("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Start ServiceIO Keys encryption...", initiative.getInitiativeId());
+        String encryptedPrimaryToken = ioTokenService.encrypt(serviceResponseDTO.getPrimaryKey());
+        String encryptedSecondaryToken = ioTokenService.encrypt(serviceResponseDTO.getSecondaryKey());
         log.debug("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Encryption completed.", initiative.getInitiativeId());
-        initiative.getAdditionalInfo().setPrimaryTokenIO(cryptedPrimaryToken);
+        initiative.getAdditionalInfo().setPrimaryTokenIO(encryptedPrimaryToken);
+        initiative.getAdditionalInfo().setSecondaryTokenIO(encryptedSecondaryToken);
         additionalInfo.setServiceId(serviceResponseDTO.getServiceId());
         initiative.setUpdateDate(LocalDateTime.now());
         return initiative;

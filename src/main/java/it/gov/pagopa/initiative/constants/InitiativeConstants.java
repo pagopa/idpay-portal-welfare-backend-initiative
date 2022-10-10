@@ -5,12 +5,6 @@ public class InitiativeConstants {
 
     private InitiativeConstants(){}
 
-    public static final class AES{
-        public static final int KEY_SIZE = 256;
-        public static final int ITERATION_COUNT = 10000;
-        public static final String PASSPHRASE = "the quick brown fox jumps over the lazy dog";
-    }
-
     public static final class Status {
         public static final String DRAFT = "DRAFT"; //In bozza
         public static final String IN_REVISION = "IN_REVISION"; //In revisione

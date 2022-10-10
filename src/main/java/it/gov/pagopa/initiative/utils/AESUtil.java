@@ -1,7 +1,5 @@
 package it.gov.pagopa.initiative.utils;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -19,38 +17,42 @@ import java.util.Base64;
 
 @Component
 public class AESUtil {
-    @Setter
-    public String pbkdf2WithHmacSha1 = "PBKDF2WithHmacSHA1";
-    @Getter
-    @Setter
-    public String encoding = "UTF-8";
+    public final String pbeAlgorithm;
+    public final String encoding;
     private final String salt;
     private final String iv;
     private final int keySize;
     private final int iterationCount;
+    private final int gcmTagLength;
 
     private final Cipher cipher;
 
-    public AESUtil(@Value("${util.crypto.aes.salt}") String salt,
-                   @Value("${util.crypto.aes.iv}") String iv,
-                   @Value("${util.crypto.aes.keySize}") int keySize,
-                   @Value("${util.crypto.aes.iterationCount}") int iterationCount,
-                   @Value("${util.crypto.aes.cipherInstance}") String cipherInstance) {
-        this.salt = salt;
-        this.iv = iv;
-        this.keySize = keySize;
-        this.iterationCount = iterationCount;
+    public AESUtil(@Value("${util.crypto.aes.cipherInstance}") String cipherInstance,
+                   @Value("${util.crypto.aes.encoding}") String encoding,
+                   @Value("${util.crypto.aes.secret-type.pbe.algorithm}") String pbeAlgorithm,
+                   @Value("${util.crypto.aes.secret-type.pbe.salt}") String salt,
+                   @Value("${util.crypto.aes.secret-type.pbe.keySize}") int keySize,
+                   @Value("${util.crypto.aes.secret-type.pbe.iterationCount}") int iterationCount,
+                   @Value("${util.crypto.aes.mode.gcm.iv}") String iv,
+                   @Value("${util.crypto.aes.mode.gcm.tLen}") int gcmTagLength) {
         try {
             cipher = Cipher.getInstance(cipherInstance);
         }
         catch (NoSuchPaddingException | NoSuchAlgorithmException e) {
             throw fail(e);
         }
+        this.encoding = encoding;
+        this.pbeAlgorithm = pbeAlgorithm;
+        this.salt = salt;
+        this.keySize = keySize;
+        this.iterationCount = iterationCount;
+        this.iv = iv;
+        this.gcmTagLength = gcmTagLength;
     }
 
     private SecretKey generateKey(String passphrase) {
         try {
-            SecretKeyFactory factory = SecretKeyFactory.getInstance(pbkdf2WithHmacSha1);
+            SecretKeyFactory factory = SecretKeyFactory.getInstance(pbeAlgorithm);
             KeySpec spec = new PBEKeySpec(passphrase.toCharArray(), salt.getBytes(), iterationCount, keySize);
             SecretKey key = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
             return key;
@@ -84,7 +86,7 @@ public class AESUtil {
 
     private byte[] doFinal(int encryptMode, SecretKey key, byte[] bytes) {
         try {
-            GCMParameterSpec parameterSpec = new GCMParameterSpec(128, iv.getBytes());
+            GCMParameterSpec parameterSpec = new GCMParameterSpec(gcmTagLength * 8, iv.getBytes());
             cipher.init(encryptMode, key, parameterSpec);
             return cipher.doFinal(bytes);
         }
