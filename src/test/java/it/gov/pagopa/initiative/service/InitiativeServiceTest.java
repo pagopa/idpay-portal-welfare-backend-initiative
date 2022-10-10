@@ -164,6 +164,29 @@ class InitiativeServiceTest {
     }
 
     @Test
+    void getInitiativeIdFromServiceId_thenValidationIsPassed(){
+        Initiative step1Initiative = createStep1Initiative();
+        when(initiativeRepository.retrieveServiceId(SERVICE_ID)).thenReturn(Optional.ofNullable(step1Initiative));
+        Initiative initiative = initiativeService.getInitiativeIdFromServiceId(SERVICE_ID);
+        assertEquals(Optional.ofNullable(step1Initiative).get(), initiative);
+        verify(initiativeRepository, times(1)).retrieveServiceId(SERVICE_ID);
+    }
+
+    @Test
+    void getInitiativeIdFromServiceId_throwInitiativeException_thenValidationFailed() throws Exception{
+        Initiative step1Initiative = new Initiative();
+        when(initiativeRepository.retrieveServiceId(SERVICE_ID)).thenReturn(Optional.empty());
+        try{
+            Initiative initiative = initiativeService.getInitiativeIdFromServiceId(SERVICE_ID);
+        }catch (InitiativeException e){
+            log.info("InitiativeException: " + e.getCode());
+            assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
+            assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
+            assertEquals(String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_ID_BY_SERVICE_ID_MESSAGE, SERVICE_ID), e.getMessage());
+        }
+    }
+
+    @Test
     void getInitiative_ok() throws Exception {
         Initiative step2Initiative = createStep2Initiative();
 
@@ -765,6 +788,7 @@ class InitiativeServiceTest {
     private InitiativeAdditional createInitiativeAdditional() {
         InitiativeAdditional initiativeAdditional = new InitiativeAdditional();
         initiativeAdditional.setServiceIO(true);
+        initiativeAdditional.setServiceId(SERVICE_ID);
         initiativeAdditional.setServiceName("serviceName");
         initiativeAdditional.setServiceScope(InitiativeAdditional.ServiceScope.LOCAL);
         initiativeAdditional.setDescription("Description");

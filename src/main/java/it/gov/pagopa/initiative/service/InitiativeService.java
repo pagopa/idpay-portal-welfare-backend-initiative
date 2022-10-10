@@ -41,4 +41,6 @@ public interface InitiativeService {
     void updateInitiative(Initiative initiative);
 
     Initiative sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(Initiative initiative, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO);
+
+    Initiative getInitiativeIdFromServiceId(String serviceId);
 }

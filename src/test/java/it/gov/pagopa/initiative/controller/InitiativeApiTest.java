@@ -72,13 +72,16 @@ class InitiativeApiTest {
 
     public static final String INITIATIVE_ID = "Id1";
     public static final String ORGANIZATION_ID = "O1";
+    public static final String SERVICE_ID = "service1";
 
     private static final String ORGANIZATION_ID_PLACEHOLDER = "%s";
     private static final String INITIATIVE_ID_PLACEHOLDER = "%s";
+    private static final String SERVICE_ID_PLACEHOLDER = "%s";
 
     private static final String BASE_URL = "http://localhost:8080/idpay";
     private static final String GET_INITIATIVES_SUMMARY_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/summary";
     private static final String GET_INITIATIVE_ACTIVE_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER;
+    private static final String GET_INITIATIVE_ID_FROM_SERVICE_ID = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative?serviceId=" + SERVICE_ID_PLACEHOLDER;
     private static final String GET_INITIATIVE_BENEFICIARY_VIEW_URL = "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/beneficiary/view";
     private static final String POST_INITIATIVE_ADDITIONAL_INFO_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/info";
 
@@ -187,6 +190,20 @@ class InitiativeApiTest {
         mvc.perform(
                 MockMvcRequestBuilders.get(BASE_URL + String.format(GET_INITIATIVE_ACTIVE_URL, ORGANIZATION_ID, INITIATIVE_ID))
                         .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    void getInitiativeIdFromServiceId_statusOk() throws Exception {
+        Initiative step1Initiative = createStep1Initiative();
+        when(initiativeService.getInitiativeIdFromServiceId(SERVICE_ID)).thenReturn(step1Initiative);
+        Initiative initiative = initiativeService.getInitiativeIdFromServiceId(SERVICE_ID);
+        assertThat("Reason of result", initiative, is(sameInstance(step1Initiative)));
+        mvc.perform(
+                        MockMvcRequestBuilders.get(BASE_URL + String.format(GET_INITIATIVE_ID_FROM_SERVICE_ID, ORGANIZATION_ID, SERVICE_ID))
+                                .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(print())
                 .andReturn();
@@ -743,7 +760,7 @@ class InitiativeApiTest {
     private InitiativeAdditional createInitiativeAdditional() {
         InitiativeAdditional initiativeAdditional = new InitiativeAdditional();
         initiativeAdditional.setServiceIO(true);
-        initiativeAdditional.setServiceId("serviceId");
+        initiativeAdditional.setServiceId(SERVICE_ID);
         initiativeAdditional.setServiceName("serviceName");
         initiativeAdditional.setServiceScope(InitiativeAdditional.ServiceScope.LOCAL);
         initiativeAdditional.setDescription("Description");

@@ -300,4 +300,13 @@ public class InitiativeServiceImpl implements InitiativeService {
                 InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_IN_REVISION,
                 HttpStatus.BAD_REQUEST);
     }
+
+    @Override
+    public Initiative getInitiativeIdFromServiceId(String serviceId){
+        return initiativeRepository.retrieveServiceId(serviceId)
+                .orElseThrow(() -> new InitiativeException(
+                        InitiativeConstants.Exception.NotFound.CODE,
+                        String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_ID_BY_SERVICE_ID_MESSAGE, serviceId),
+                        HttpStatus.NOT_FOUND));
+    }
 }
