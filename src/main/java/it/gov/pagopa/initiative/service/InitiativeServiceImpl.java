@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -197,8 +198,13 @@ public class InitiativeServiceImpl implements InitiativeService {
                         InitiativeConstants.Exception.NotFound.CODE,
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
                         HttpStatus.NOT_FOUND));
-        if (initiative.getStatus().equals(InitiativeConstants.Status.IN_REVISION)){
-            log.error("[LOGICAL_INITIATIVE_ELIMINATION] - Initiative: {}. Cannot be deleted. Current status is IN_REVISION.", initiative.getInitiativeId());
+        if (
+                initiative.getStatus().equals(InitiativeConstants.Status.IN_REVISION) ||
+                initiative.getStatus().equals(InitiativeConstants.Status.PUBLISHED) ||
+                initiative.getStatus().equals(InitiativeConstants.Status.CLOSED) ||
+                initiative.getStatus().equals(InitiativeConstants.Status.SUSPENDED)
+        ){
+            log.error("[LOGICAL_INITIATIVE_ELIMINATION] - Initiative: {}. Cannot be deleted. Current status is {}.", initiative.getInitiativeId(), initiative.getStatus());
             throw new InitiativeException(
                     InitiativeConstants.Exception.BadRequest.CODE,
                     String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_CANNOT_BE_DELETED, initiativeId),
@@ -308,5 +314,15 @@ public class InitiativeServiceImpl implements InitiativeService {
                         InitiativeConstants.Exception.NotFound.CODE,
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_ID_BY_SERVICE_ID_MESSAGE, serviceId),
                         HttpStatus.NOT_FOUND));
+    }
+
+    @Override
+    public InitiativeAdditional getPrimaryAndSecondaryTokenIO(String initiativeId){
+        Initiative initiative = initiativeRepository.findByInitiativeIdAndEnabled(initiativeId, true)
+                .orElseThrow(() -> new InitiativeException(
+                        InitiativeConstants.Exception.NotFound.CODE,
+                        String.format(InitiativeConstants.Exception.NotFound.PRIMARY_AND_SECONDARY_TOKEN_MESSAGE, initiativeId),
+                        HttpStatus.NOT_FOUND));
+        return initiative.getAdditionalInfo();
     }
 }

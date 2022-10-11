@@ -225,4 +225,11 @@ public class InitiativeApiController implements InitiativeApi {
         return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDTO(this.initiativeService.getInitiativeIdFromServiceId(serviceId)));
     }
 
+    @ResponseStatus(HttpStatus.OK)
+    @Override
+    public ResponseEntity<InitiativeAdditionalDTO> getPrimaryAndSecondaryTokenIO(String initiativeId){
+        log.info("[GET_PRIMARY_AND_SECONDARY_TOKEN] - Start searching tokens for initiativeId {}...", initiativeId);
+        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeAdditionalDTOOnlyTokens(this.initiativeService.getPrimaryAndSecondaryTokenIO(initiativeId)));
+    }
+
 }

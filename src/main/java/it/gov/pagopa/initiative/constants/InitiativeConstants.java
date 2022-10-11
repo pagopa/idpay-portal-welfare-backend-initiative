@@ -53,6 +53,7 @@ public class InitiativeConstants {
             public static final String INITIATIVE_LIST_BY_ORGANIZATION_MESSAGE = "List of Initiatives with organizationId %s not found.";
             public static final String INITIATIVE_BY_INITIATIVE_ID_MESSAGE = "Initiative with initiativeId %s not found.";
             public static final String INITIATIVE_ID_BY_SERVICE_ID_MESSAGE = "Initiative with serviceId %s not found.";
+            public static final String PRIMARY_AND_SECONDARY_TOKEN_MESSAGE = "Primary and secondary tokenIO not found for initiativeId %s.";
         }
         public static final class UnprocessableEntity { //422
             public static final String CODE = BASE_CODE + ".unprocessable.entity";

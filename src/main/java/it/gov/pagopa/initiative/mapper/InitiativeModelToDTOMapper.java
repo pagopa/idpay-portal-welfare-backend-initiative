@@ -48,6 +48,16 @@ public class InitiativeModelToDTOMapper {
         return initiativeDto;
     }
 
+    public InitiativeAdditionalDTO toInitiativeAdditionalDTOOnlyTokens(InitiativeAdditional additional){
+        if (additional == null) {
+            return null;
+        }
+        InitiativeAdditionalDTO initiativeAdditionalDTO = new InitiativeAdditionalDTO();
+        initiativeAdditionalDTO.setPrimaryTokenIO(additional.getPrimaryTokenIO());
+        initiativeAdditionalDTO.setSecondaryTokenIO(additional.getSecondaryTokenIO());
+        return initiativeAdditionalDTO;
+    }
+
 
     public InitiativeDTO toDtoOnlyId(Initiative initiative) {
         if (initiative == null) {
