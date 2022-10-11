@@ -36,6 +36,8 @@ microservice-chart:
 #          metricAggregationType: Count
 #          targetValue: "30"
 
+  envSecret:
+    aks-api-url: cstar-u-weu-uat01-aks-apiserver-url
 
   keyvault:
     name: "cstar-u-idpay-kv"
