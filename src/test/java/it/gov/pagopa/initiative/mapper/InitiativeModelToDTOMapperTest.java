@@ -92,6 +92,9 @@ class InitiativeModelToDTOMapperTest {
 
     private Initiative fullInitiativeStep4ThresholdNull;
 
+    private InitiativeAdditionalDTO initiativeAdditionalDTOOnlyTokens;
+    private InitiativeAdditional initiativeAdditionalOnlyTokens;
+
 
     @BeforeEach
     public void setUp() {
@@ -129,8 +132,20 @@ class InitiativeModelToDTOMapperTest {
         fullInitiativeDTOStep4TrxCountNull = createStep4InitiativeDTOTrxCountNull();
         fullInitiativeStep4ThresholdNull = createStep4InitiativeThresholdNull();
         fullInitiativeDTOStep4ThresholdNull = createStep4InitiativeDTOThresholdNull();
+        initiativeAdditionalOnlyTokens = createInitiativeAdditionalOnlyTokens();
+        initiativeAdditionalDTOOnlyTokens = createInitiativeAdditionalDTOOnlyTokens();
     }
 
+    @Test
+    void toInitiativeAdditionalDTOOnlyTokens(){
+        InitiativeAdditionalDTO additionalDTO = initiativeModelToDTOMapper.toInitiativeAdditionalDTOOnlyTokens(initiativeAdditionalOnlyTokens);
+        assertEquals(initiativeAdditionalDTOOnlyTokens, additionalDTO);
+    }
+    @Test
+    void toInitiativeAdditionalDTOOnlyTokensNull(){
+        InitiativeAdditionalDTO additionalDTO = initiativeModelToDTOMapper.toInitiativeAdditionalDTOOnlyTokens(null);
+        assertEquals(null, additionalDTO);
+    }
     @Test
     void toInitiativeDTOStep4WithRewardAndTrxRulesThresholdNull_equals(){
         InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiativeStep4ThresholdNull);
@@ -291,6 +306,20 @@ class InitiativeModelToDTOMapperTest {
         channels.add(channel);
         initiativeAdditional.setChannels(channels);
         return initiativeAdditional;
+    }
+
+    private InitiativeAdditional createInitiativeAdditionalOnlyTokens(){
+        InitiativeAdditional initiativeAdditional = new InitiativeAdditional();
+        initiativeAdditional.setPrimaryTokenIO("firstToken");
+        initiativeAdditional.setSecondaryTokenIO("secondToken");
+        return initiativeAdditional;
+    }
+
+    private InitiativeAdditionalDTO createInitiativeAdditionalDTOOnlyTokens(){
+        InitiativeAdditionalDTO initiativeAdditionalDTO = new InitiativeAdditionalDTO();
+        initiativeAdditionalDTO.setPrimaryTokenIO("firstToken");
+        initiativeAdditionalDTO.setSecondaryTokenIO("secondToken");
+        return initiativeAdditionalDTO;
     }
 
     private InitiativeBeneficiaryRule createInitiativeBeneficiaryRule() {

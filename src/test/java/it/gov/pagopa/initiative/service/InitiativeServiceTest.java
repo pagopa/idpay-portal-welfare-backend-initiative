@@ -187,6 +187,28 @@ class InitiativeServiceTest {
     }
 
     @Test
+    void getPrimaryAndSecondaryToken_thenValidationIsPassed(){
+        Initiative step1Initiative = createStep1Initiative();
+        when(initiativeRepository.findByInitiativeIdAndEnabled(INITIATIVE_ID, true)).thenReturn(Optional.ofNullable(step1Initiative));
+        InitiativeAdditional additional = initiativeService.getPrimaryAndSecondaryTokenIO(INITIATIVE_ID);
+        assertEquals(Optional.ofNullable(step1Initiative.getAdditionalInfo()).get(), additional);
+        verify(initiativeRepository, times(1)).findByInitiativeIdAndEnabled(INITIATIVE_ID, true);
+    }
+
+    @Test
+    void getPrimaryAndSecondaryToken_throwInitiativeException_thenValidationFailed() throws Exception{
+        when(initiativeRepository.findByInitiativeIdAndEnabled(INITIATIVE_ID, true)).thenReturn(Optional.empty());
+        try{
+            InitiativeAdditional additional = initiativeService.getPrimaryAndSecondaryTokenIO(INITIATIVE_ID);
+        }catch (InitiativeException e){
+            log.info("InitiativeException: " + e.getCode());
+            assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
+            assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
+            assertEquals(String.format(InitiativeConstants.Exception.NotFound.PRIMARY_AND_SECONDARY_TOKEN_MESSAGE, INITIATIVE_ID), e.getMessage());
+        }
+    }
+
+    @Test
     void getInitiative_ok() throws Exception {
         Initiative step2Initiative = createStep2Initiative();
 

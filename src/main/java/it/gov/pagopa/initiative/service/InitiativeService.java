@@ -45,5 +45,5 @@ public interface InitiativeService {
 
     Initiative getInitiativeIdFromServiceId(String serviceId);
 
-    InitiativeAdditional getPrimaryAndSecondaryTokenIO(String organizationId, String initiativeId);
+    InitiativeAdditional getPrimaryAndSecondaryTokenIO(String initiativeId);
 }

@@ -52,19 +52,9 @@ public class InitiativeModelToDTOMapper {
         if (additional == null) {
             return null;
         }
-        System.out.println(additional.getPrimaryTokenIO());
-        System.out.println(additional.getSecondaryTokenIO());
         InitiativeAdditionalDTO initiativeAdditionalDTO = new InitiativeAdditionalDTO();
-//        initiativeAdditionalDTO.setServiceIO();
-//        initiativeAdditionalDTO.setServiceId();
-//        initiativeAdditionalDTO.setServiceName();
-//        initiativeAdditionalDTO.setServiceScope(InitiativeAdditionalDTO.ServiceScope.valueOf(additional.getServiceScope().name()));
-//        initiativeAdditionalDTO.setDescription();
         initiativeAdditionalDTO.setPrimaryTokenIO(additional.getPrimaryTokenIO());
         initiativeAdditionalDTO.setSecondaryTokenIO(additional.getSecondaryTokenIO());
-//        initiativeAdditionalDTO.setPrivacyLink();
-//        initiativeAdditionalDTO.setTcLink();
-//        initiativeAdditionalDTO.setChannels(toChannelsDTO(additional.getChannels()));
         return initiativeAdditionalDTO;
     }
 

@@ -312,18 +312,12 @@ public class InitiativeServiceImpl implements InitiativeService {
     }
 
     @Override
-    public InitiativeAdditional getPrimaryAndSecondaryTokenIO(String organizationId, String initiativeId){
-//        return initiativeRepository.retrievePrimarySecondaryTokenIO(initiativeId)
-//                .orElseThrow(() -> new InitiativeException(
-//                        InitiativeConstants.Exception.NotFound.CODE,
-//                        String.format(InitiativeConstants.Exception.NotFound.PRIMARY_AND_SECONDARY_TOKEN_MESSAGE, initiativeId),
-//                        HttpStatus.NOT_FOUND));
-        Optional<Initiative> initiative = Optional.ofNullable(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(organizationId, initiativeId, true)
+    public InitiativeAdditional getPrimaryAndSecondaryTokenIO(String initiativeId){
+        Optional<Initiative> initiative = Optional.ofNullable(initiativeRepository.findByInitiativeIdAndEnabled(initiativeId, true)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
                         String.format(InitiativeConstants.Exception.NotFound.PRIMARY_AND_SECONDARY_TOKEN_MESSAGE, initiativeId),
                         HttpStatus.NOT_FOUND)));
-
         return initiative.get().getAdditionalInfo();
     }
 }
