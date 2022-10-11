@@ -15,7 +15,7 @@ public interface InitiativeService {
 
     Initiative insertInitiative(Initiative initiative);
 
-    Initiative getInitiative(String organizationId, String initiativeId);
+    Initiative getInitiative(String organizationId, String initiativeId, String role);
 
     Initiative getInitiativeBeneficiaryView(String initiativeId);
 

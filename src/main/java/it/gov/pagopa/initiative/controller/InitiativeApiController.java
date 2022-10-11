@@ -47,9 +47,8 @@ public class InitiativeApiController implements InitiativeApi {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @Override
-    public ResponseEntity<InitiativeDTO> getInitiativeDetail(String organizationId, String initiativeId) {
-        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDTO(this.initiativeService.getInitiative(organizationId, initiativeId)));
+    public ResponseEntity<InitiativeDTO> getInitiativeDetail(String organizationId, String initiativeId, String role) {
+        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDTO(this.initiativeService.getInitiative(organizationId, initiativeId, role)));
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -89,8 +88,8 @@ public class InitiativeApiController implements InitiativeApi {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Override
-    public ResponseEntity<Void> updateInitiativeBeneficiary(String organizationId, String initiativeId, @RequestBody @Validated(ValidationOnGroup.class) InitiativeBeneficiaryRuleDTO beneficiaryRuleDto) {
-        if(Boolean.TRUE.equals(this.initiativeService.getInitiative(organizationId, initiativeId).getGeneral().getBeneficiaryKnown())){
+    public ResponseEntity<Void> updateInitiativeBeneficiary(String organizationId, String initiativeId, @RequestBody @Validated(ValidationOnGroup.class) InitiativeBeneficiaryRuleDTO beneficiaryRuleDto, String role) {
+        if(Boolean.TRUE.equals(this.initiativeService.getInitiative(organizationId, initiativeId, role).getGeneral().getBeneficiaryKnown())){
             throw new InitiativeException(
                     InitiativeConstants.Exception.BadRequest.CODE,
                     String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_PROPERTIES_NOT_VALID, initiativeId),
@@ -173,10 +172,10 @@ public class InitiativeApiController implements InitiativeApi {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Override
-    public ResponseEntity<Void> updateInitiativePublishedStatus(String organizationId, String initiativeId, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO) {
+    public ResponseEntity<Void> updateInitiativePublishedStatus(String organizationId, String initiativeId, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO, String role) {
         //Retrieve Initiative
         log.info("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Start processing...", initiativeId);
-        Initiative initiative = this.initiativeService.getInitiative(organizationId, initiativeId);
+        Initiative initiative = this.initiativeService.getInitiative(organizationId, initiativeId, role);
         log.debug("Initiative retrieved");
 
         //Validation for current Status

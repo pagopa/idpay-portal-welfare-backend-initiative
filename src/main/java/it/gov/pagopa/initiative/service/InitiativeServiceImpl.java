@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 
 @Service
@@ -54,7 +53,12 @@ public class InitiativeServiceImpl implements InitiativeService {
                     String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_LIST_BY_ORGANIZATION_MESSAGE, organizationId),
                     HttpStatus.NOT_FOUND);
         }
-        return InitiativeConstants.Role.OPE_BASE.equals(role) ? initiatives.stream().filter(initiative -> initiative.getStatus().equals(InitiativeConstants.Status.IN_REVISION)).toList() : initiatives;
+        return InitiativeConstants.Role.OPE_BASE.equals(role) ? initiatives.stream().filter(
+                initiative -> (
+                        initiative.getStatus().equals(InitiativeConstants.Status.IN_REVISION) ||
+                        initiative.getStatus().equals(InitiativeConstants.Status.TO_CHECK) ||
+                        initiative.getStatus().equals(InitiativeConstants.Status.APPROVED)))
+                .toList() : initiatives;
     }
 
     @Override
@@ -66,12 +70,25 @@ public class InitiativeServiceImpl implements InitiativeService {
     }
 
     @Override
-    public Initiative getInitiative(String organizationId, String initiativeId) {
-        return initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(organizationId, initiativeId, true)
+    public Initiative getInitiative(String organizationId, String initiativeId, String role) {
+        Initiative initiative = initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(organizationId, initiativeId, true)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
                         HttpStatus.NOT_FOUND));
+        if (InitiativeConstants.Role.OPE_BASE.equals(role)){
+            if (initiative.getStatus().equals(InitiativeConstants.Status.IN_REVISION) || initiative.getStatus().equals(InitiativeConstants.Status.TO_CHECK) || initiative.getStatus().equals(InitiativeConstants.Status.APPROVED)){
+                return initiative;
+            }else {
+                throw new InitiativeException(
+                        InitiativeConstants.Exception.BadRequest.CODE,
+                        String.format(InitiativeConstants.Exception.BadRequest.PERMISSION_NOT_VALID, role),
+                        HttpStatus.BAD_REQUEST
+                );
+            }
+        }else{
+            return initiative;
+        }
     }
 
     @Override

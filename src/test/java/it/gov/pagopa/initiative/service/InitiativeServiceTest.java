@@ -73,6 +73,7 @@ class InitiativeServiceTest {
     private static final String PRODUCT_DEPARTMENT_NAME = "productDepartmentName";
     private static final String SERVICE_ID = "serviceId";
     public static final String ANY_KEY_TOKEN_IO = "ANY_KEY_TOKEN_IO";
+    private static final String ROLE = "admin";
 
     @Autowired
     InitiativeService initiativeService;
@@ -216,7 +217,7 @@ class InitiativeServiceTest {
         when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.ofNullable(step2Initiative));
 
         //Try to call the Real Service (which is using the instructed Repo)
-        Initiative initiative = initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID);
+        Initiative initiative = initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
 
         //Check the equality of the results
         assertEquals(Optional.ofNullable(step2Initiative).get(), initiative);
@@ -234,7 +235,7 @@ class InitiativeServiceTest {
                 HttpStatus.NOT_FOUND
         ));
         try {
-            Initiative initiative = initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID);
+            Initiative initiative = initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
         } catch (InitiativeException e) {
             log.info("InitiativeException: " + e.getCode());
             assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
