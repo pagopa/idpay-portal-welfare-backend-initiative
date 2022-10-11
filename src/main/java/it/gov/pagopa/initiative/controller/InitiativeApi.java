@@ -276,5 +276,18 @@ public interface InitiativeApi {
     @GetMapping(value = "/idpay/initiative",
             produces = {"application/json"})
     ResponseEntity<InitiativeDTO> getInitiativeIdFromServiceId(@RequestParam(required = true) String serviceId);
+
+    @Operation(summary = "Return primary and secondary token of the specified initiative", description = "", security = {
+            @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = InitiativeAdditionalDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "401", description = "Authentication failed", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Initiative ID not found for this service", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "429", description = "Too many Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "500", description = "Server ERROR", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))})
+    @GetMapping(value = "/idpay/initiative/{initiativeId}/token",
+            produces = {"application/json"})
+    ResponseEntity<InitiativeAdditionalDTO> getPrimaryAndSecondaryTokenIO(@PathVariable("initiativeId") String initiativeId);
 }
 

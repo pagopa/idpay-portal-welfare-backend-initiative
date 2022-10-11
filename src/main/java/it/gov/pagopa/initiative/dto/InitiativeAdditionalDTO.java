@@ -48,6 +48,12 @@ public class InitiativeAdditionalDTO   {
   @NotBlank(groups = ValidationOnGroup.class)
   private String description;
 
+  @JsonProperty("primaryTokenIO")
+  private String primaryTokenIO;
+
+  @JsonProperty("secondaryTokenIO")
+  private String secondaryTokenIO;
+
   @JsonProperty("privacyLink")
   @URL(protocol = "https", regexp = VALID_LINK, groups = ValidationOnGroup.class)
   private String privacyLink;

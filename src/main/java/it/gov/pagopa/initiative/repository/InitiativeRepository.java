@@ -14,6 +14,8 @@ public interface InitiativeRepository extends MongoRepository<Initiative, String
 
     Optional<Initiative> findByOrganizationIdAndInitiativeIdAndEnabled(String organizationId, String initiativeId, Boolean enabled);
 
+    Optional<Initiative> findByInitiativeIdAndEnabled(String initiativeId, Boolean enabled);
+
     @Query(
             value="{initiativeId : ?0, enabled: ?1}",
             fields="{initiativeId : 1, " +

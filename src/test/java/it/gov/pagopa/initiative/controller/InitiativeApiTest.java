@@ -82,6 +82,7 @@ class InitiativeApiTest {
     private static final String GET_INITIATIVES_SUMMARY_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/summary";
     private static final String GET_INITIATIVE_ACTIVE_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER;
     private static final String GET_INITIATIVE_ID_FROM_SERVICE_ID = "/initiative?serviceId=" + SERVICE_ID_PLACEHOLDER;
+    private static final String GET_PRIMARY_AND_SECONDARY_TOKEN_FROM_INITIATIVE_ID = "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/token";
     private static final String GET_INITIATIVE_BENEFICIARY_VIEW_URL = "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/beneficiary/view";
     private static final String POST_INITIATIVE_ADDITIONAL_INFO_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/info";
 
@@ -203,6 +204,20 @@ class InitiativeApiTest {
         assertThat("Reason of result", initiative, is(sameInstance(step1Initiative)));
         mvc.perform(
                         MockMvcRequestBuilders.get(BASE_URL + String.format(GET_INITIATIVE_ID_FROM_SERVICE_ID, ORGANIZATION_ID, SERVICE_ID))
+                                .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    void getPrimaryAndSecondaryTokenIO_statusOk() throws Exception {
+        InitiativeAdditional initiativeAdditional = createInitiativeAdditional();
+        when(initiativeService.getPrimaryAndSecondaryTokenIO(INITIATIVE_ID)).thenReturn(initiativeAdditional);
+        InitiativeAdditional additional = initiativeService.getPrimaryAndSecondaryTokenIO(INITIATIVE_ID);
+        assertThat("Reason of result", additional, is(sameInstance(initiativeAdditional)));
+        mvc.perform(
+                        MockMvcRequestBuilders.get(BASE_URL + String.format(GET_PRIMARY_AND_SECONDARY_TOKEN_FROM_INITIATIVE_ID, SERVICE_ID))
                                 .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(print())
