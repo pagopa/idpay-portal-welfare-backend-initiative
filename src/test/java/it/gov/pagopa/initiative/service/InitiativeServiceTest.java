@@ -537,7 +537,63 @@ class InitiativeServiceTest {
             assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
             assertEquals(String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_CANNOT_BE_DELETED, INITIATIVE_ID), e.getMessage());
         }
+    }
 
+    @Test
+    void logicallyDeleteInitiativeStatusPublished_thenThrowNewInitiativeException(){
+        Initiative initiative = createStep5Initiative();
+        initiative.setEnabled(true);
+        initiative.setStatus(InitiativeConstants.Status.PUBLISHED);
+
+        //Instruct the Repo Mock to return Dummy Initiatives
+        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
+
+        try{
+            initiativeService.logicallyDeleteInitiative(ORGANIZATION_ID, INITIATIVE_ID);
+        }catch (InitiativeException e){
+            log.info("InitiativeException: " + e.getCode());
+            assertEquals(HttpStatus.BAD_REQUEST, e.getHttpStatus());
+            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
+            assertEquals(String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_CANNOT_BE_DELETED, INITIATIVE_ID), e.getMessage());
+        }
+    }
+
+    @Test
+    void logicallyDeleteInitiativeStatusClosed_thenThrowNewInitiativeException(){
+        Initiative initiative = createStep5Initiative();
+        initiative.setEnabled(true);
+        initiative.setStatus(InitiativeConstants.Status.CLOSED);
+
+        //Instruct the Repo Mock to return Dummy Initiatives
+        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
+
+        try{
+            initiativeService.logicallyDeleteInitiative(ORGANIZATION_ID, INITIATIVE_ID);
+        }catch (InitiativeException e){
+            log.info("InitiativeException: " + e.getCode());
+            assertEquals(HttpStatus.BAD_REQUEST, e.getHttpStatus());
+            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
+            assertEquals(String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_CANNOT_BE_DELETED, INITIATIVE_ID), e.getMessage());
+        }
+    }
+
+    @Test
+    void logicallyDeleteInitiativeStatusSuspended_thenThrowNewInitiativeException(){
+        Initiative initiative = createStep5Initiative();
+        initiative.setEnabled(true);
+        initiative.setStatus(InitiativeConstants.Status.SUSPENDED);
+
+        //Instruct the Repo Mock to return Dummy Initiatives
+        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
+
+        try{
+            initiativeService.logicallyDeleteInitiative(ORGANIZATION_ID, INITIATIVE_ID);
+        }catch (InitiativeException e){
+            log.info("InitiativeException: " + e.getCode());
+            assertEquals(HttpStatus.BAD_REQUEST, e.getHttpStatus());
+            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
+            assertEquals(String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_CANNOT_BE_DELETED, INITIATIVE_ID), e.getMessage());
+        }
     }
 
     @Test
