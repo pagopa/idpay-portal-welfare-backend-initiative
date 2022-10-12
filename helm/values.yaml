@@ -85,6 +85,7 @@ microservice-chart:
       JAVA_TOOL_OPTIONS: JAVA_TOOL_OPTIONS
     rest-client:
       IO_BACKEND_SERVICE_BASE_URL: io_backend_base_url
+      GROUP_MS_BASE_URL: group_ms_base_url
     idpay-eventhub-01:
       KAFKA_BINDER_BROKER_ENDPOINT_LIST: kafka_broker
       KAFKA_INITIATIVE_SASL_MECHANISM: kafka_sasl_mechanism

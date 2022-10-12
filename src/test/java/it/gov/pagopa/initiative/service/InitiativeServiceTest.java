@@ -1,7 +1,8 @@
 package it.gov.pagopa.initiative.service;
 
 
-import it.gov.pagopa.initiative.connector.io.service.IOBackEndRestConnector;
+import it.gov.pagopa.initiative.connector.group.GroupRestConnector;
+import it.gov.pagopa.initiative.connector.io_service.IOBackEndRestConnector;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.io.service.ServiceMetadataDTO;
@@ -91,6 +92,9 @@ class InitiativeServiceTest {
 
     @MockBean
     IOBackEndRestConnector ioBackEndRestConnector;
+
+    @MockBean
+    GroupRestConnector groupRestConnector;
 
     @MockBean
     IOTokenService ioTokenService;

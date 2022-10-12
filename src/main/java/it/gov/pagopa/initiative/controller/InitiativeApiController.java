@@ -198,13 +198,16 @@ public class InitiativeApiController implements InitiativeApi {
                 initiativeService.sendInitiativeInfoToRuleEngine(initiative);
             }
             //1. Only for the Initiatives to be provided to IO, the integration is carried out with the creation of the Initiative Service to IO BackEnd
-            //2. Sprint 9: In caso di beneficiaryKnown a true -> Invio al MS-Gruppi via API la richiesta di notifica della pubblicazione e, MS Gruppi la invia via coda al NotificationManager
             if(initiative.getAdditionalInfo().getServiceIO()) {
                 log.info("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Notification to IO BackEnd of the published Initiative", initiativeId);
                 initiative = initiativeService.sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(initiative, initiativeOrganizationInfoDTO);
                 initiativeService.updateInitiative(initiative);
                 //Invio al MS-Gruppi via API
                 //This integration necessarily takes place in succession to having created the service with IO in order not to send "orphan" resources (not associated with any Initiative known by IO).
+                //2. BeneficiaryKnown a true -> Invio al MS-Gruppi via API la richiesta di notifica della pubblicazione e, MS Gruppi la invia via coda al NotificationManager
+                if(null!= initiative.getGeneral() && initiative.getGeneral().getBeneficiaryKnown()){
+                    initiativeService.sendInitiativeInfoToNotificationManager(initiative);
+                }
             }
         } catch (Exception e) {
             //In case one of the previous Integrations ends badly, the Initiative is rolled back to the initial TEMP state

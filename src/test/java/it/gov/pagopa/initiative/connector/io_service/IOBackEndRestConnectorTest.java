@@ -1,4 +1,4 @@
-package it.gov.pagopa.initiative.connector.io.service;
+package it.gov.pagopa.initiative.connector.io_service;
 
 import it.gov.pagopa.initiative.dto.io.service.ServiceMetadataDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
