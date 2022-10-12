@@ -77,6 +77,7 @@ class InitiativeApiTest {
     private static final String ORGANIZATION_ID_PLACEHOLDER = "%s";
     private static final String INITIATIVE_ID_PLACEHOLDER = "%s";
     private static final String SERVICE_ID_PLACEHOLDER = "%s";
+    private static final String ROLE = "admin";
 
     private static final String BASE_URL = "http://localhost:8080/idpay";
     private static final String GET_INITIATIVES_SUMMARY_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/summary";
@@ -95,7 +96,7 @@ class InitiativeApiTest {
     private static final String PUT_INITIATIVE_TO_CHECK_STATUS_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/rejected";
     private static final String PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/published";
     private static final String LOGICALLY_DELETE_INITIATIVE_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER;
-    private static final String ROLE = "TEST_ROLE";
+//    private static final String ROLE = "TEST_ROLE";
     private static final String ORGANIZATION_NAME = "organizationName";
     private static final String ORGANIZATION_VAT = "organizationVat";
     private static final String ORGANIZATION_USER_ID = "organizationUserId";
@@ -179,9 +180,9 @@ class InitiativeApiTest {
 
         // When
         // With this instruction, I instruct the service (via Mockito's when) to always return the DummyInitiative to me anytime I call the same service's function
-        when(initiativeService.getInitiative(anyString(), anyString())).thenReturn(step2Initiative);
+        when(initiativeService.getInitiative(anyString(), anyString(), ROLE)).thenReturn(step2Initiative);
 
-        Initiative initiative = initiativeService.getInitiative(anyString(), anyString());
+        Initiative initiative = initiativeService.getInitiative(anyString(), anyString(), ROLE);
 
         // Then
         // you are expecting service to return whatever returned by repo
@@ -311,7 +312,7 @@ class InitiativeApiTest {
         when(initiativeDTOsToModelMapper.toBeneficiaryRule(initiativeBeneficiaryRuleDTO)).thenReturn(initiativeBeneficiaryRule);
 
         // Instruct the Service to get a Dummy Initiative
-        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID)).thenReturn(step2Initiative);
+        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step2Initiative);
 
         //doNothing only for Void method
         doNothing().when(initiativeService).updateInitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule);
@@ -339,7 +340,7 @@ class InitiativeApiTest {
         when(initiativeDTOsToModelMapper.toBeneficiaryRule(initiativeBeneficiaryRuleDTO)).thenReturn(initiativeBeneficiaryRule);
 
         // Instruct the Service to get a Dummy Initiative
-        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID)).thenReturn(step2Initiative);
+        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step2Initiative);
 
         //doNothing only for Void method
         doNothing().when(initiativeService).updateInitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule);
@@ -592,8 +593,8 @@ class InitiativeApiTest {
 
         // When
         // With this instruction, I instruct the service (via Mockito's when) to always return the DummyInitiative to me anytime I call the same service's function
-        when(initiativeService.getInitiative(anyString(), anyString())).thenReturn(step5Initiative);
-        Initiative initiative = initiativeService.getInitiative(anyString(), anyString());
+        when(initiativeService.getInitiative(anyString(), anyString(), ROLE)).thenReturn(step5Initiative);
+        Initiative initiative = initiativeService.getInitiative(anyString(), anyString(), ROLE);
         // Expecting same instance
         assertThat("Reason of result", initiative, is(sameInstance(step5Initiative)));
 
@@ -633,8 +634,8 @@ class InitiativeApiTest {
 
         // When
         // With this instruction, I instruct the service (via Mockito's when) to always return the DummyInitiative to me anytime I call the same service's function
-        when(initiativeService.getInitiative(anyString(), anyString())).thenReturn(step5Initiative);
-        Initiative initiative = initiativeService.getInitiative(anyString(), anyString());
+        when(initiativeService.getInitiative(anyString(), anyString(), ROLE)).thenReturn(step5Initiative);
+        Initiative initiative = initiativeService.getInitiative(anyString(), anyString(), ROLE);
         // Expecting same instance
         assertThat("Reason of result", initiative, is(sameInstance(step5Initiative)));
 
@@ -671,8 +672,8 @@ class InitiativeApiTest {
 
         // When
         // With this instruction, I instruct the service (via Mockito's when) to always return the DummyInitiative to me anytime I call the same service's function
-        when(initiativeService.getInitiative(anyString(), anyString())).thenReturn(step5Initiative);
-        Initiative initiative = initiativeService.getInitiative(anyString(), anyString());
+        when(initiativeService.getInitiative(anyString(), anyString(), ROLE)).thenReturn(step5Initiative);
+        Initiative initiative = initiativeService.getInitiative(anyString(), anyString(), ROLE);
         // Expecting same instance
         assertThat("Reason of result", initiative, is(sameInstance(step5Initiative)));
 
@@ -714,8 +715,8 @@ class InitiativeApiTest {
 
         // When
         // With this instruction, I instruct the service (via Mockito's when) to always return the DummyInitiative to me anytime I call the same service's function
-        when(initiativeService.getInitiative(anyString(), anyString())).thenReturn(step5Initiative);
-        Initiative initiative = initiativeService.getInitiative(anyString(), anyString());
+        when(initiativeService.getInitiative(anyString(), anyString(), ROLE)).thenReturn(step5Initiative);
+        Initiative initiative = initiativeService.getInitiative(anyString(), anyString(), ROLE);
         // Expecting same instance
         assertThat("Reason of result", initiative, is(sameInstance(step5Initiative)));
 
