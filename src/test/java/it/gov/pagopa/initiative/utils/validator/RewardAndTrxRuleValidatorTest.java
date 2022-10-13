@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
-public class RewardAndTrxRuleValidatorTest {
+class RewardAndTrxRuleValidatorTest {
     private Validator validator;
 
     @BeforeEach
@@ -65,13 +65,19 @@ public class RewardAndTrxRuleValidatorTest {
 
     }
 
-
     @Test
     void when_RewardValueDTOareValid_thenValidationIsPassed(){
         InitiativeRewardRuleDTO initiativeRewardRuleDTO = createInitiativeRewardRuleDTORewardValueDTO_ok();
         Set<ConstraintViolation<InitiativeRewardRuleDTO>> violations = validator.validate(initiativeRewardRuleDTO, ValidationOnGroup.class);
         assertTrue(violations.isEmpty());
+    }
 
+    @Test
+    void given_typeNULL_when_RewardValueDTO_thenValidationHas1Violation(){
+        InitiativeRewardRuleDTO initiativeRewardRuleDTO = createInitiativeRewardRuleDTORewardValueDTO_No_typeField();
+        Set<ConstraintViolation<InitiativeRewardRuleDTO>> violations = validator.validate(initiativeRewardRuleDTO, ValidationOnGroup.class);
+        assertFalse(violations.isEmpty());
+        assertThat(violations).hasSize(1);
     }
 
     @Test
@@ -217,6 +223,7 @@ public class RewardAndTrxRuleValidatorTest {
 
     InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardGroupsDTO_ok(){
         RewardGroupsDTO rewardGroupsDTO = new RewardGroupsDTO();
+        rewardGroupsDTO.setType("rewardGroups");
         RewardGroupsDTO.RewardGroupDTO rewardGroupDTO1 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(10), BigDecimal.valueOf(20), BigDecimal.valueOf(30));
         RewardGroupsDTO.RewardGroupDTO rewardGroupDTO2 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(10), BigDecimal.valueOf(30), BigDecimal.valueOf(40));
         List<RewardGroupsDTO.RewardGroupDTO> rewardGroupDTOList = new ArrayList<>();
@@ -227,6 +234,7 @@ public class RewardAndTrxRuleValidatorTest {
     }
     InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardGroupsDTO_ko(){
         RewardGroupsDTO rewardGroupsDTO = new RewardGroupsDTO();
+        rewardGroupsDTO.setType("rewardGroups");
         RewardGroupsDTO.RewardGroupDTO rewardGroupDTO1 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(10), BigDecimal.valueOf(20), BigDecimal.valueOf(30));
         RewardGroupsDTO.RewardGroupDTO rewardGroupDTO2 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(10), BigDecimal.valueOf(20), BigDecimal.valueOf(40));
         List<RewardGroupsDTO.RewardGroupDTO> rewardGroupDTOList = new ArrayList<>();
@@ -238,6 +246,7 @@ public class RewardAndTrxRuleValidatorTest {
 
     InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardGroupsDTORateNotValid_ko(){
         RewardGroupsDTO rewardGroupsDTO = new RewardGroupsDTO();
+        rewardGroupsDTO.setType("rewardGroups");
         RewardGroupsDTO.RewardGroupDTO rewardGroupDTO1 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(10), BigDecimal.valueOf(20), BigDecimal.valueOf(230));
         RewardGroupsDTO.RewardGroupDTO rewardGroupDTO2 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(5), BigDecimal.valueOf(20), BigDecimal.valueOf(140));
         List<RewardGroupsDTO.RewardGroupDTO> rewardGroupDTOList = new ArrayList<>();
@@ -248,6 +257,7 @@ public class RewardAndTrxRuleValidatorTest {
     }
     InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardGroupsDTOFromAndToNotValid_ko(){
         RewardGroupsDTO rewardGroupsDTO = new RewardGroupsDTO();
+        rewardGroupsDTO.setType("rewardGroups");
         RewardGroupsDTO.RewardGroupDTO rewardGroupDTO1 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(-10), BigDecimal.valueOf(-20), BigDecimal.valueOf(-30));
         RewardGroupsDTO.RewardGroupDTO rewardGroupDTO2 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(40), BigDecimal.valueOf(20), BigDecimal.valueOf(40));
         RewardGroupsDTO.RewardGroupDTO rewardGroupDTO3 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(30), BigDecimal.valueOf(20), BigDecimal.valueOf(40));
@@ -261,13 +271,27 @@ public class RewardAndTrxRuleValidatorTest {
         return rewardGroupsDTO;
     }
     InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardValueDTO_ok(){
-        return new RewardValueDTO(BigDecimal.valueOf(50));
+        return RewardValueDTO.builder()
+                .rewardValue(BigDecimal.valueOf(50))
+                .type("rewardValue")
+                .build();
+    }
+    InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardValueDTO_No_typeField(){
+        return RewardValueDTO.builder()
+                .rewardValue(BigDecimal.valueOf(50))
+                .build();
     }
     InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardValueDTOvalueTooBig_ko(){
-        return new RewardValueDTO(BigDecimal.valueOf(150));
+        return RewardValueDTO.builder()
+                .rewardValue(BigDecimal.valueOf(150))
+                .type("rewardValue")
+                .build();
     }
     InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardValueDTOvalueTooSmall_ko(){
-        return new RewardValueDTO(BigDecimal.valueOf(-10));
+        return RewardValueDTO.builder()
+                .rewardValue(BigDecimal.valueOf(-10))
+                .type("rewardValue")
+                .build();
     }
     void createInitiativeTrxCondition(InitiativeRewardRuleDTO initiativeRewardRuleDTO, InitiativeTrxConditionsDTO initiativeTrxConditionsDTO){
 

@@ -1,5 +1,6 @@
 package it.gov.pagopa.initiative.dto.rule.reward;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import it.gov.pagopa.initiative.utils.constraint.RewardGroupFromToValue;
 import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -19,6 +21,11 @@ import java.util.List;
 @Builder
 @RewardGroupFromToValue(listOfGroupValue = "rewardGroups", groups = ValidationOnGroup.class)
 public class RewardGroupsDTO implements InitiativeRewardRuleDTO {
+
+    @NotNull(groups = ValidationOnGroup.class)
+    @JsonProperty("_type")
+    private String type;
+
     @Valid
     private List<RewardGroupDTO> rewardGroups;
 

@@ -12,5 +12,6 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Builder
 public class RewardValue implements InitiativeRewardRule {
+    private String type;
     private BigDecimal rewardValue;
 }
