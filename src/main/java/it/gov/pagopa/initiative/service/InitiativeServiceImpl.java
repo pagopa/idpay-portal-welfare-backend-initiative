@@ -1,6 +1,7 @@
 package it.gov.pagopa.initiative.service;
 
-import it.gov.pagopa.initiative.connector.io.service.IOBackEndRestConnector;
+import it.gov.pagopa.initiative.connector.group.GroupRestConnector;
+import it.gov.pagopa.initiative.connector.io_service.IOBackEndRestConnector;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.InitiativeOrganizationInfoDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
@@ -41,6 +42,9 @@ public class InitiativeServiceImpl implements InitiativeService {
 
     @Autowired
     IOBackEndRestConnector ioBackEndRestConnector;
+
+    @Autowired
+    GroupRestConnector groupRestConnector;
 
     @Autowired
     IOTokenService ioTokenService;
@@ -240,6 +244,11 @@ public class InitiativeServiceImpl implements InitiativeService {
         if(!initiativeProducer.sendPublishInitiative(initiative)){
             throw new IllegalStateException("[UPDATE_TO_PUBLISHED_STATUS] - Something gone wrong while notify Initiative to RuleEngine");
         }
+    }
+
+    @Override
+    public void sendInitiativeInfoToNotificationManager(Initiative initiative) {
+        groupRestConnector.notifyInitiativeToGroup(initiative);
     }
 
     @Override

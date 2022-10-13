@@ -1,4 +1,4 @@
-package it.gov.pagopa.initiative.connector.io.service;
+package it.gov.pagopa.initiative.connector.io_service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,7 +6,7 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import feign.FeignException;
-import it.gov.pagopa.initiative.config.RestConnectorConfig;
+import it.gov.pagopa.initiative.config.IOBackEndRestConnectorConfig;
 import it.gov.pagopa.initiative.dto.io.service.ServiceMetadataDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceResponseDTO;
@@ -48,7 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
         classes = {
                 IOBackEndRestConnectorImpl.class,
                 IOBackEndFeignRestClient.class,
-                RestConnectorConfig.class,
+                IOBackEndRestConnectorConfig.class,
                 FeignAutoConfiguration.class,
                 HttpMessageConvertersAutoConfiguration.class
         })

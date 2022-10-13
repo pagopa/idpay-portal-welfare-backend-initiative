@@ -633,10 +633,9 @@ class InitiativeApiTest {
 
         //create Dummy Initiative
         Initiative step5Initiative = createStep5Initiative();
-        InitiativeDTO step5InitiativeDTO = createStep5InitiativeDTO();
-        InitiativeAdditionalDTO additionalInfoDTO = step5InitiativeDTO.getAdditionalInfo();
-        additionalInfoDTO.setServiceIO(false);
-        step5InitiativeDTO.setAdditionalInfo(additionalInfoDTO);
+        InitiativeAdditional additionalInfo = step5Initiative.getAdditionalInfo();
+        additionalInfo.setServiceIO(false);
+        step5Initiative.setAdditionalInfo(additionalInfo);
 
         // When
         // With this instruction, I instruct the service (via Mockito's when) to always return the DummyInitiative to me anytime I call the same service's function
@@ -646,9 +645,6 @@ class InitiativeApiTest {
         assertThat("Reason of result", initiative, is(sameInstance(step5Initiative)));
 
         doNothing().when(initiativeService).isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED);
-
-        // Instruct the Service to insert a Dummy Initiative
-        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative)).thenReturn(step5InitiativeDTO);
 
         doNothing().when(initiativeService).updateInitiative(any(Initiative.class));
 

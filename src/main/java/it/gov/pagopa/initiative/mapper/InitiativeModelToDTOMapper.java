@@ -182,11 +182,17 @@ public class InitiativeModelToDTOMapper {
         }
         InitiativeRewardRuleDTO dto = null;
         if (rewardRule instanceof RewardValue rewardValueInput) {
-            dto = RewardValueDTO.builder().rewardValue(rewardValueInput.getRewardValue()).build();
+            dto = RewardValueDTO.builder()
+                    .type(rewardValueInput.getType())
+                    .rewardValue(rewardValueInput.getRewardValue())
+                    .build();
         } else if (rewardRule instanceof RewardGroups rewardGroupsInput) {
-            dto = RewardGroupsDTO.builder().rewardGroups(rewardGroupsInput.getRewardGroups().stream().map(
+            dto = RewardGroupsDTO.builder()
+                    .type(rewardGroupsInput.getType())
+                    .rewardGroups(rewardGroupsInput.getRewardGroups().stream().map(
                     x -> RewardGroupsDTO.RewardGroupDTO.builder().from(x.getFrom()).to(x.getTo()).rewardValue(x.getRewardValue()).build()
-            ).toList()).build();
+            ).toList())
+                    .build();
         }
         return dto;
     }

@@ -13,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class RewardGroups implements InitiativeRewardRule {
+    private String type;
     private List<RewardGroup> rewardGroups;
 
     @Data

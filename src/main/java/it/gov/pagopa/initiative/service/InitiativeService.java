@@ -37,6 +37,8 @@ public interface InitiativeService {
 
     void sendInitiativeInfoToRuleEngine(Initiative initiative);
 
+    void sendInitiativeInfoToNotificationManager(Initiative initiative);
+
     void isInitiativeAllowedToBeNextStatusThenThrows(Initiative initiative, String statusToBeUpdated);
 
     void updateInitiative(Initiative initiative);
