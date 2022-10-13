@@ -1,5 +1,6 @@
 package it.gov.pagopa.initiative.connector.group;
 
+import it.gov.pagopa.initiative.dto.group.InitiativeNotificationDTO;
 import it.gov.pagopa.initiative.model.Initiative;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +16,11 @@ public class GroupRestConnectorImpl implements GroupRestConnector {
 
     @Override
     public void notifyInitiativeToGroup(Initiative initiative) {
-        groupFeignRestClient.notifyInitiativeForCitizen(initiative.getInitiativeId(), initiative.getInitiativeName(), initiative.getAdditionalInfo().getServiceId());
+        InitiativeNotificationDTO initiativeNotificationDTO = InitiativeNotificationDTO.builder()
+                .initiativeName(initiative.getInitiativeName())
+                .serviceId(initiative.getAdditionalInfo().getServiceId())
+                .build();
+        groupFeignRestClient.notifyInitiativeForCitizen(initiative.getInitiativeId(), initiativeNotificationDTO);
     }
 
 }

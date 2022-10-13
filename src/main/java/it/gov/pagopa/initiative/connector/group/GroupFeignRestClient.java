@@ -1,12 +1,10 @@
 package it.gov.pagopa.initiative.connector.group;
 
+import it.gov.pagopa.initiative.dto.group.InitiativeNotificationDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 @FeignClient(
     name = "${rest-client.group.service.name}",
@@ -19,6 +17,5 @@ public interface GroupFeignRestClient {
   @ResponseBody
   ResponseEntity<Void> notifyInitiativeForCitizen(
           @PathVariable("initiativeId") String initiativeId,
-          @RequestParam String initiativeName,
-          @RequestParam String serviceId);
+          @RequestBody InitiativeNotificationDTO initiativeNotificationDTO);
 }

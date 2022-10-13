@@ -52,7 +52,7 @@ rest-client:
   group:
     service:
       name: ms-group
-      base-url: ${GROUP_MS_BASE_URL:}
+      base-url: ${GROUP_MS_HOST:}/idpay
 feign:
   okhttp:
     enabled: true
