@@ -49,6 +49,8 @@ import java.util.List;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest.CODE;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.ErrorDtoDefaultMsg.ACCUMULATED_AMOUNT_TYPE;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.ErrorDtoDefaultMsg.SOMETHING_WRONG_WITH_THE_REFUND_TYPE;
+import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.ADMIN;
+import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.OPE_BASE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
@@ -70,13 +72,23 @@ class InitiativeApiTest {
 
     public static final String INITIATIVE_ID = "Id1";
     public static final String ORGANIZATION_ID = "O1";
+    public static final String SERVICE_ID = "service1";
 
     private static final String ORGANIZATION_ID_PLACEHOLDER = "%s";
     private static final String INITIATIVE_ID_PLACEHOLDER = "%s";
+    private static final String SERVICE_ID_PLACEHOLDER = "%s";
+
+    private static final String ROLE_PLACEHOLDER = "%s";
+
+    private static final String ROLE = "admin";
+
+    private static final String ROLE_QUERY_PARAMETER_PLACEHOLDER = "?role=";
 
     private static final String BASE_URL = "http://localhost:8080/idpay";
     private static final String GET_INITIATIVES_SUMMARY_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/summary";
     private static final String GET_INITIATIVE_ACTIVE_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER;
+    private static final String GET_INITIATIVE_ID_FROM_SERVICE_ID = "/initiative?serviceId=" + SERVICE_ID_PLACEHOLDER;
+    private static final String GET_PRIMARY_AND_SECONDARY_TOKEN_FROM_INITIATIVE_ID = "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/token";
     private static final String GET_INITIATIVE_BENEFICIARY_VIEW_URL = "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/beneficiary/view";
     private static final String POST_INITIATIVE_ADDITIONAL_INFO_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/info";
 
@@ -84,12 +96,13 @@ class InitiativeApiTest {
     private static final String PUT_INITIATIVE_GENERAL_INFO_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/general";
 
     private static final String PUT_INITIATIVE_REFUND_RULES_INFO_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/refund";
-    private static final String PUT_INITIATIVE_BENEFICIARY_RULES_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/beneficiary";
+    private static final String PUT_INITIATIVE_BENEFICIARY_RULES_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/beneficiary" + ROLE_QUERY_PARAMETER_PLACEHOLDER + ROLE_PLACEHOLDER;
+    private static final String PUT_INITIATIVE_BENEFICIARY_RULES_DRAFT_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/beneficiary";
     private static final String PUT_INITIATIVE_STATUS_APPROVED_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/approved";
     private static final String PUT_INITIATIVE_TO_CHECK_STATUS_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/rejected";
-    private static final String PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/published";
+    private static final String PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/published" + ROLE_QUERY_PARAMETER_PLACEHOLDER + ROLE_PLACEHOLDER;
     private static final String LOGICALLY_DELETE_INITIATIVE_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER;
-    private static final String ROLE = "TEST_ROLE";
+//    private static final String ROLE = "TEST_ROLE";
     private static final String ORGANIZATION_NAME = "organizationName";
     private static final String ORGANIZATION_VAT = "organizationVat";
     private static final String ORGANIZATION_USER_ID = "organizationUserId";
@@ -111,7 +124,7 @@ class InitiativeApiTest {
     protected MockMvc mvc;
 
     @Test
-    void getInitiativeSummary_statutsOk() throws Exception {
+    void whenAdmin_getInitiativeSummary_statusOk() throws Exception {
 
         Boolean beneficiaryKnown = false;
         //create Dummy Initiative
@@ -120,10 +133,10 @@ class InitiativeApiTest {
         List<Initiative> initiatives = Arrays.asList(step2Initiative, step2Initiative2);
 
         // Returning something from Repo by using ServiceMock
-        when(initiativeService.retrieveInitiativeSummary(anyString())).thenReturn(initiatives);
+        when(initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, ADMIN)).thenReturn(initiatives);
 
         // When
-        List<Initiative> retrieveInitiativeSummary = initiativeService.retrieveInitiativeSummary(anyString());
+        List<Initiative> retrieveInitiativeSummary = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, ADMIN);
 
         // Then
         // you are expecting service to return whatever returned by repo
@@ -138,6 +151,33 @@ class InitiativeApiTest {
     }
 
     @Test
+    void whenOpeBase_getInitiativeSummary_statusOk() throws Exception {
+
+        Boolean beneficiaryKnown = false;
+        //create Dummy Initiative
+        Initiative step2Initiative = createStep2Initiative(beneficiaryKnown);
+        Initiative step2Initiative2 = createStep2Initiative(beneficiaryKnown);
+        List<Initiative> initiatives = Arrays.asList(step2Initiative, step2Initiative2);
+
+        // Returning something from Repo by using ServiceMock
+        when(initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, OPE_BASE)).thenReturn(initiatives);
+
+        // When
+        List<Initiative> retrieveInitiativeSummary = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, OPE_BASE);
+
+        // Then
+        // you are expecting service to return whatever returned by repo
+        assertThat("Reason of result", retrieveInitiativeSummary, is(sameInstance(initiatives)));
+
+        mvc.perform(
+                        MockMvcRequestBuilders.get(BASE_URL + String.format(GET_INITIATIVES_SUMMARY_URL, ORGANIZATION_ID))
+                                .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
     void getInitiativeDetail_statusOk() throws Exception {
 
         Boolean beneficiaryKnown = false;
@@ -146,9 +186,9 @@ class InitiativeApiTest {
 
         // When
         // With this instruction, I instruct the service (via Mockito's when) to always return the DummyInitiative to me anytime I call the same service's function
-        when(initiativeService.getInitiative(anyString(), anyString())).thenReturn(step2Initiative);
+        when(initiativeService.getInitiative(anyString(), anyString(), anyString())).thenReturn(step2Initiative);
 
-        Initiative initiative = initiativeService.getInitiative(anyString(), anyString());
+        Initiative initiative = initiativeService.getInitiative(anyString(), anyString(), anyString());
 
         // Then
         // you are expecting service to return whatever returned by repo
@@ -158,6 +198,34 @@ class InitiativeApiTest {
         mvc.perform(
                 MockMvcRequestBuilders.get(BASE_URL + String.format(GET_INITIATIVE_ACTIVE_URL, ORGANIZATION_ID, INITIATIVE_ID))
                         .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    void getInitiativeIdFromServiceId_statusOk() throws Exception {
+        Initiative step1Initiative = createStep1Initiative();
+        when(initiativeService.getInitiativeIdFromServiceId(SERVICE_ID)).thenReturn(step1Initiative);
+        Initiative initiative = initiativeService.getInitiativeIdFromServiceId(SERVICE_ID);
+        assertThat("Reason of result", initiative, is(sameInstance(step1Initiative)));
+        mvc.perform(
+                        MockMvcRequestBuilders.get(BASE_URL + String.format(GET_INITIATIVE_ID_FROM_SERVICE_ID, ORGANIZATION_ID, SERVICE_ID))
+                                .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    void getPrimaryAndSecondaryTokenIO_statusOk() throws Exception {
+        InitiativeAdditional initiativeAdditional = createInitiativeAdditional();
+        when(initiativeService.getPrimaryAndSecondaryTokenIO(INITIATIVE_ID)).thenReturn(initiativeAdditional);
+        InitiativeAdditional additional = initiativeService.getPrimaryAndSecondaryTokenIO(INITIATIVE_ID);
+        assertThat("Reason of result", additional, is(sameInstance(initiativeAdditional)));
+        mvc.perform(
+                        MockMvcRequestBuilders.get(BASE_URL + String.format(GET_PRIMARY_AND_SECONDARY_TOKEN_FROM_INITIATIVE_ID, SERVICE_ID))
+                                .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(print())
                 .andReturn();
@@ -250,12 +318,12 @@ class InitiativeApiTest {
         when(initiativeDTOsToModelMapper.toBeneficiaryRule(initiativeBeneficiaryRuleDTO)).thenReturn(initiativeBeneficiaryRule);
 
         // Instruct the Service to get a Dummy Initiative
-        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID)).thenReturn(step2Initiative);
+        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step2Initiative);
 
         //doNothing only for Void method
         doNothing().when(initiativeService).updateInitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule);
 
-        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_BENEFICIARY_RULES_URL, ORGANIZATION_ID, INITIATIVE_ID))
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_BENEFICIARY_RULES_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(initiativeBeneficiaryRuleDTO))
                 .accept(MediaType.APPLICATION_JSON))
@@ -278,12 +346,12 @@ class InitiativeApiTest {
         when(initiativeDTOsToModelMapper.toBeneficiaryRule(initiativeBeneficiaryRuleDTO)).thenReturn(initiativeBeneficiaryRule);
 
         // Instruct the Service to get a Dummy Initiative
-        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID)).thenReturn(step2Initiative);
+        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step2Initiative);
 
         //doNothing only for Void method
         doNothing().when(initiativeService).updateInitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule);
 
-        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_BENEFICIARY_RULES_URL, ORGANIZATION_ID, INITIATIVE_ID))
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_BENEFICIARY_RULES_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(initiativeBeneficiaryRuleDTO))
                 .accept(MediaType.APPLICATION_JSON))
@@ -378,7 +446,7 @@ class InitiativeApiTest {
         InitiativeBeneficiaryRule initiativeBeneficiaryRule2 = initiativeDTOsToModelMapper.toBeneficiaryRule(initiativeBeneficiaryRuleDTO);
         doNothing().when(initiativeService).updateInitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule2);
 
-        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_BENEFICIARY_RULES_URL + "/draft", ORGANIZATION_ID, INITIATIVE_ID))
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_BENEFICIARY_RULES_DRAFT_URL + "/draft", ORGANIZATION_ID, INITIATIVE_ID))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(initiativeBeneficiaryRuleDTO))
                         .accept(MediaType.APPLICATION_JSON))
@@ -531,26 +599,21 @@ class InitiativeApiTest {
 
         // When
         // With this instruction, I instruct the service (via Mockito's when) to always return the DummyInitiative to me anytime I call the same service's function
-        when(initiativeService.getInitiative(anyString(), anyString())).thenReturn(step5Initiative);
-        Initiative initiative = initiativeService.getInitiative(anyString(), anyString());
+        when(initiativeService.getInitiative(anyString(), anyString(), anyString())).thenReturn(step5Initiative);
+        Initiative initiative = initiativeService.getInitiative(anyString(), anyString(), anyString());
         // Expecting same instance
         assertThat("Reason of result", initiative, is(sameInstance(step5Initiative)));
 
         doNothing().when(initiativeService).isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED);
 
-        // Instruct the Service to insert a Dummy Initiative
-        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative)).thenReturn(step5InitiativeDTO);
-
         doNothing().when(initiativeService).updateInitiative(any(Initiative.class));
 
-        doNothing().when(initiativeService).sendInitiativeInfoToRuleEngine(any(InitiativeDTO.class));
+        doNothing().when(initiativeService).sendInitiativeInfoToRuleEngine(any(Initiative.class));
 
-        when(initiativeService.sendInitiativeInfoToIOBackEndServiceAndSaveItOnInitiative(step5InitiativeDTO, initiativeOrganizationInfoDTO)).thenReturn(step5InitiativeDTO);
-        when(initiativeDTOsToModelMapper.toInitiative(step5InitiativeDTO)).thenReturn(step5Initiative);
-        doNothing().when(initiativeService).updateInitiative(any(Initiative.class));
+        when(initiativeService.sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(step5Initiative, initiativeOrganizationInfoDTO)).thenReturn(step5Initiative);
 
 
-        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID))
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(initiativeOrganizationInfoDTO))
                         .accept(MediaType.APPLICATION_JSON))
@@ -570,28 +633,24 @@ class InitiativeApiTest {
 
         //create Dummy Initiative
         Initiative step5Initiative = createStep5Initiative();
-        InitiativeDTO step5InitiativeDTO = createStep5InitiativeDTO();
-        InitiativeAdditionalDTO additionalInfoDTO = step5InitiativeDTO.getAdditionalInfo();
-        additionalInfoDTO.setServiceIO(false);
-        step5InitiativeDTO.setAdditionalInfo(additionalInfoDTO);
+        InitiativeAdditional additionalInfo = step5Initiative.getAdditionalInfo();
+        additionalInfo.setServiceIO(false);
+        step5Initiative.setAdditionalInfo(additionalInfo);
 
         // When
         // With this instruction, I instruct the service (via Mockito's when) to always return the DummyInitiative to me anytime I call the same service's function
-        when(initiativeService.getInitiative(anyString(), anyString())).thenReturn(step5Initiative);
-        Initiative initiative = initiativeService.getInitiative(anyString(), anyString());
+        when(initiativeService.getInitiative(anyString(), anyString(), anyString())).thenReturn(step5Initiative);
+        Initiative initiative = initiativeService.getInitiative(anyString(), anyString(), anyString());
         // Expecting same instance
         assertThat("Reason of result", initiative, is(sameInstance(step5Initiative)));
 
         doNothing().when(initiativeService).isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED);
 
-        // Instruct the Service to insert a Dummy Initiative
-        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative)).thenReturn(step5InitiativeDTO);
-
         doNothing().when(initiativeService).updateInitiative(any(Initiative.class));
 
-        doNothing().when(initiativeService).sendInitiativeInfoToRuleEngine(any(InitiativeDTO.class));
+        doNothing().when(initiativeService).sendInitiativeInfoToRuleEngine(any(Initiative.class));
 
-        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID))
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(initiativeOrganizationInfoDTO))
                         .accept(MediaType.APPLICATION_JSON))
@@ -615,8 +674,8 @@ class InitiativeApiTest {
 
         // When
         // With this instruction, I instruct the service (via Mockito's when) to always return the DummyInitiative to me anytime I call the same service's function
-        when(initiativeService.getInitiative(anyString(), anyString())).thenReturn(step5Initiative);
-        Initiative initiative = initiativeService.getInitiative(anyString(), anyString());
+        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step5Initiative);
+        Initiative initiative = initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
         // Expecting same instance
         assertThat("Reason of result", initiative, is(sameInstance(step5Initiative)));
 
@@ -629,10 +688,10 @@ class InitiativeApiTest {
 
         doThrow(
                 new KafkaException()
-        ).when(initiativeService).sendInitiativeInfoToRuleEngine(any(InitiativeDTO.class));
+        ).when(initiativeService).sendInitiativeInfoToRuleEngine(any(Initiative.class));
 
         MvcResult res =
-                mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID))
+                mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(objectMapper.writeValueAsString(initiativeOrganizationInfoDTO))
                                 .accept(MediaType.APPLICATION_JSON))
@@ -645,12 +704,7 @@ class InitiativeApiTest {
 
     @Test
     void givenIOBackEndError_when_PUT_updateInitiativePublishedStatus_thenThrowException() throws Exception {
-        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = InitiativeOrganizationInfoDTO.builder()
-                .organizationName(ORGANIZATION_NAME)
-                .organizationVat(ORGANIZATION_VAT)
-                .organizationUserId(ORGANIZATION_USER_ID)
-                .organizationUserRole(ORGANIZATION_USER_ROLE)
-                .build();
+        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = createInitiativeOrganizationInfoDTO();
 
         //create Dummy Initiative
         Initiative step5Initiative = createStep5Initiative();
@@ -658,8 +712,8 @@ class InitiativeApiTest {
 
         // When
         // With this instruction, I instruct the service (via Mockito's when) to always return the DummyInitiative to me anytime I call the same service's function
-        when(initiativeService.getInitiative(anyString(), anyString())).thenReturn(step5Initiative);
-        Initiative initiative = initiativeService.getInitiative(anyString(), anyString());
+        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step5Initiative);
+        Initiative initiative = initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
         // Expecting same instance
         assertThat("Reason of result", initiative, is(sameInstance(step5Initiative)));
 
@@ -670,14 +724,14 @@ class InitiativeApiTest {
 
         doNothing().when(initiativeService).updateInitiative(any(Initiative.class));
 
-        doNothing().when(initiativeService).sendInitiativeInfoToRuleEngine(any(InitiativeDTO.class));
+        doNothing().when(initiativeService).sendInitiativeInfoToRuleEngine(any(Initiative.class));
 
         doThrow(
                 FeignException.errorStatus("Bad Request", responseStub(400, "Bad Request"))
-        ).when(initiativeService).sendInitiativeInfoToIOBackEndServiceAndSaveItOnInitiative(step5InitiativeDTO, initiativeOrganizationInfoDTO);
+        ).when(initiativeService).sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(step5Initiative, initiativeOrganizationInfoDTO);
 
         MvcResult res =
-                mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID))
+                mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(objectMapper.writeValueAsString(initiativeOrganizationInfoDTO))
                                 .accept(MediaType.APPLICATION_JSON))
@@ -689,6 +743,15 @@ class InitiativeApiTest {
         assertEquals(HttpStatus.BAD_REQUEST.value(), res.getResponse().getStatus());
         assertEquals(InitiativeConstants.Exception.Publish.BadRequest.CODE, error.getCode());
         assertTrue(error.getMessage().contains(InitiativeConstants.Exception.Publish.BadRequest.INTEGRATION_FAILED));
+    }
+
+    private InitiativeOrganizationInfoDTO createInitiativeOrganizationInfoDTO(){
+        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = new InitiativeOrganizationInfoDTO();
+        initiativeOrganizationInfoDTO.setOrganizationName(ORGANIZATION_NAME);
+        initiativeOrganizationInfoDTO.setOrganizationVat(ORGANIZATION_VAT);
+        initiativeOrganizationInfoDTO.setOrganizationUserId(ORGANIZATION_USER_ID);
+        initiativeOrganizationInfoDTO.setOrganizationUserRole(ORGANIZATION_USER_ROLE);
+        return initiativeOrganizationInfoDTO;
     }
 
     private Response responseStub(int status, String reasonExceptionMessage) {
@@ -719,7 +782,7 @@ class InitiativeApiTest {
     private InitiativeAdditional createInitiativeAdditional() {
         InitiativeAdditional initiativeAdditional = new InitiativeAdditional();
         initiativeAdditional.setServiceIO(true);
-        initiativeAdditional.setServiceId("serviceId");
+        initiativeAdditional.setServiceId(SERVICE_ID);
         initiativeAdditional.setServiceName("serviceName");
         initiativeAdditional.setServiceScope(InitiativeAdditional.ServiceScope.LOCAL);
         initiativeAdditional.setDescription("Description");
@@ -863,7 +926,9 @@ class InitiativeApiTest {
 
     private InitiativeDTO createStep3InitiativeDTO (Boolean beneficiaryKnown) {
         InitiativeDTO initiativeDTO = createStep2InitiativeDTO(beneficiaryKnown);
-        initiativeDTO.setBeneficiaryRule(createInitiativeBeneficiaryRuleDTO());
+        if(beneficiaryKnown) {
+            initiativeDTO.setBeneficiaryRule(createInitiativeBeneficiaryRuleDTO());
+        }
         return initiativeDTO;
     }
 

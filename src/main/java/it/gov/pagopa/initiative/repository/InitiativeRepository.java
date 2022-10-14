@@ -14,6 +14,8 @@ public interface InitiativeRepository extends MongoRepository<Initiative, String
 
     Optional<Initiative> findByOrganizationIdAndInitiativeIdAndEnabled(String organizationId, String initiativeId, Boolean enabled);
 
+    Optional<Initiative> findByInitiativeIdAndEnabled(String initiativeId, Boolean enabled);
+
     @Query(
             value="{initiativeId : ?0, enabled: ?1}",
             fields="{initiativeId : 1, " +
@@ -24,4 +26,10 @@ public interface InitiativeRepository extends MongoRepository<Initiative, String
                     "'general' : 1, " +
                     "'beneficiaryRule' : 1}")
     Optional<Initiative> retrieveInitiativeBeneficiaryView(String initiativeId, Boolean enabled);
+
+    @Query(
+            value = "{'additionalInfo.serviceId' : ?0}",
+            fields = "{initiativeId : 1}"
+    )
+    Optional<Initiative> retrieveServiceId(String serviceId);
 }

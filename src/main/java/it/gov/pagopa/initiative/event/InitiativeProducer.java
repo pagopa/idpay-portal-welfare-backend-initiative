@@ -1,6 +1,6 @@
 package it.gov.pagopa.initiative.event;
 
-import it.gov.pagopa.initiative.dto.InitiativeDTO;
+import it.gov.pagopa.initiative.model.Initiative;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.function.StreamBridge;
@@ -15,9 +15,9 @@ public class InitiativeProducer {
   @Autowired
   StreamBridge streamBridge;
 
-  public boolean sendPublishInitiative(InitiativeDTO initiativeDTO){
+  public boolean sendPublishInitiative(Initiative initiative){
     log.debug("Sending Initiative to {}", INITIATIVE_QUEUE_OUT_0);
-    return streamBridge.send(INITIATIVE_QUEUE_OUT_0, initiativeDTO);
+    return streamBridge.send(INITIATIVE_QUEUE_OUT_0, initiative);
   }
 
 }

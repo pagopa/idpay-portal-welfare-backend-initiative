@@ -87,6 +87,9 @@ public class InitiativeDTOsToModelMapper {
     }
 
     public InitiativeBeneficiaryRule toBeneficiaryRule(InitiativeBeneficiaryRuleDTO beneficiaryRuleDto) {
+        if (beneficiaryRuleDto == null) {
+            return null;
+        }
         InitiativeBeneficiaryRule beneficiaryRule = new InitiativeBeneficiaryRule();
         if (CollectionUtils.isEmpty(beneficiaryRuleDto.getAutomatedCriteria())) {
             beneficiaryRule.setAutomatedCriteria(Collections.emptyList());
@@ -143,9 +146,14 @@ public class InitiativeDTOsToModelMapper {
         }
         InitiativeRewardRule ret;
         if(rewardRuleDTO instanceof RewardValueDTO rewardValueInput){
-            ret = RewardValue.builder().rewardValue(rewardValueInput.getRewardValue()).build();
+            ret = RewardValue.builder()
+                    .type(rewardValueInput.getType())
+                    .rewardValue(rewardValueInput.getRewardValue())
+                    .build();
         } else if (rewardRuleDTO instanceof RewardGroupsDTO rewardGroupsInput) {
-            ret = RewardGroups.builder().rewardGroups(rewardGroupsInput.getRewardGroups().stream().map(
+            ret = RewardGroups.builder()
+                    .type(rewardGroupsInput.getType())
+                    .rewardGroups(rewardGroupsInput.getRewardGroups().stream().map(
                     x -> RewardGroups.RewardGroup.builder().from(x.getFrom()).to(x.getTo()).rewardValue(x.getRewardValue()).build()
             ).collect(Collectors.toList())).build();
         } else {

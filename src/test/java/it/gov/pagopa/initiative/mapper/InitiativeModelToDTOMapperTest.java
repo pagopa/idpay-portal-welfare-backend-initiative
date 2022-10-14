@@ -92,6 +92,9 @@ class InitiativeModelToDTOMapperTest {
 
     private Initiative fullInitiativeStep4ThresholdNull;
 
+    private InitiativeAdditionalDTO initiativeAdditionalDTOOnlyTokens;
+    private InitiativeAdditional initiativeAdditionalOnlyTokens;
+
 
     @BeforeEach
     public void setUp() {
@@ -129,8 +132,20 @@ class InitiativeModelToDTOMapperTest {
         fullInitiativeDTOStep4TrxCountNull = createStep4InitiativeDTOTrxCountNull();
         fullInitiativeStep4ThresholdNull = createStep4InitiativeThresholdNull();
         fullInitiativeDTOStep4ThresholdNull = createStep4InitiativeDTOThresholdNull();
+        initiativeAdditionalOnlyTokens = createInitiativeAdditionalOnlyTokens();
+        initiativeAdditionalDTOOnlyTokens = createInitiativeAdditionalDTOOnlyTokens();
     }
 
+    @Test
+    void toInitiativeAdditionalDTOOnlyTokens(){
+        InitiativeAdditionalDTO additionalDTO = initiativeModelToDTOMapper.toInitiativeAdditionalDTOOnlyTokens(initiativeAdditionalOnlyTokens);
+        assertEquals(initiativeAdditionalDTOOnlyTokens, additionalDTO);
+    }
+    @Test
+    void toInitiativeAdditionalDTOOnlyTokensNull(){
+        InitiativeAdditionalDTO additionalDTO = initiativeModelToDTOMapper.toInitiativeAdditionalDTOOnlyTokens(null);
+        assertEquals(null, additionalDTO);
+    }
     @Test
     void toInitiativeDTOStep4WithRewardAndTrxRulesThresholdNull_equals(){
         InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiativeStep4ThresholdNull);
@@ -293,6 +308,20 @@ class InitiativeModelToDTOMapperTest {
         return initiativeAdditional;
     }
 
+    private InitiativeAdditional createInitiativeAdditionalOnlyTokens(){
+        InitiativeAdditional initiativeAdditional = new InitiativeAdditional();
+        initiativeAdditional.setPrimaryTokenIO("firstToken");
+        initiativeAdditional.setSecondaryTokenIO("secondToken");
+        return initiativeAdditional;
+    }
+
+    private InitiativeAdditionalDTO createInitiativeAdditionalDTOOnlyTokens(){
+        InitiativeAdditionalDTO initiativeAdditionalDTO = new InitiativeAdditionalDTO();
+        initiativeAdditionalDTO.setPrimaryTokenIO("firstToken");
+        initiativeAdditionalDTO.setSecondaryTokenIO("secondToken");
+        return initiativeAdditionalDTO;
+    }
+
     private InitiativeBeneficiaryRule createInitiativeBeneficiaryRule() {
         InitiativeBeneficiaryRule initiativeBeneficiaryRule = new InitiativeBeneficiaryRule();
         SelfCriteriaBool selfCriteriaBool = new SelfCriteriaBool();
@@ -436,11 +465,15 @@ class InitiativeModelToDTOMapperTest {
 
 
     private InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardValueDTO(){
-        return new RewardValueDTO(BigDecimal.valueOf(50));
+        return RewardValueDTO.builder()
+                .rewardValue(BigDecimal.valueOf(50))
+                .type("rewardValue")
+                .build();
     }
 
     private InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardGroupDTO(){
         RewardGroupsDTO rewardGroupsDTO = new RewardGroupsDTO();
+        rewardGroupsDTO.setType("rewardGroups");
         List<RewardGroupsDTO.RewardGroupDTO> list = new ArrayList<RewardGroupsDTO.RewardGroupDTO>();
         RewardGroupsDTO.RewardGroupDTO groupDTO1 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(10), BigDecimal.valueOf(100), BigDecimal.valueOf(50));
         list.add(groupDTO1);
@@ -837,11 +870,15 @@ class InitiativeModelToDTOMapperTest {
 
 
     private InitiativeRewardRule createInitiativeRewardRuleRewardValue(){
-        return new RewardValue(BigDecimal.valueOf(50));
+        return RewardValue.builder()
+                .rewardValue(BigDecimal.valueOf(50))
+                .type("rewardValue")
+                .build();
     }
 
     private InitiativeRewardRule createInitiativeRewardRuleRewardGroup(){
         RewardGroups rewardGroups = new RewardGroups();
+        rewardGroups.setType("rewardGroups");
         List<RewardGroups.RewardGroup> list = new ArrayList<RewardGroups.RewardGroup>();
         RewardGroups.RewardGroup group1 = new RewardGroups.RewardGroup(BigDecimal.valueOf(10), BigDecimal.valueOf(100), BigDecimal.valueOf(50));
         list.add(group1);

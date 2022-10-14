@@ -1,5 +1,6 @@
 package it.gov.pagopa.initiative.model.rule.reward;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,5 +13,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Builder
 public class RewardValue implements InitiativeRewardRule {
+    @JsonProperty("_type")
+    private String type;
     private BigDecimal rewardValue;
 }

@@ -1,9 +1,8 @@
 package it.gov.pagopa.initiative.service;
 
-import it.gov.pagopa.initiative.connector.io.service.IOBackEndRestConnector;
+import it.gov.pagopa.initiative.connector.group.GroupRestConnector;
+import it.gov.pagopa.initiative.connector.io_service.IOBackEndRestConnector;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
-import it.gov.pagopa.initiative.dto.InitiativeAdditionalDTO;
-import it.gov.pagopa.initiative.dto.InitiativeDTO;
 import it.gov.pagopa.initiative.dto.InitiativeOrganizationInfoDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceResponseDTO;
@@ -12,6 +11,7 @@ import it.gov.pagopa.initiative.exception.InitiativeException;
 import it.gov.pagopa.initiative.mapper.InitiativeAdditionalDTOsToIOServiceRequestDTOMapper;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.Initiative;
+import it.gov.pagopa.initiative.model.InitiativeAdditional;
 import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +28,6 @@ import java.util.List;
 @Service
 @Slf4j
 public class InitiativeServiceImpl implements InitiativeService {
-
     @Autowired
     private InitiativeRepository initiativeRepository;
 
@@ -44,15 +43,26 @@ public class InitiativeServiceImpl implements InitiativeService {
     @Autowired
     IOBackEndRestConnector ioBackEndRestConnector;
 
-    public List<Initiative> retrieveInitiativeSummary(String organizationId) {
+    @Autowired
+    GroupRestConnector groupRestConnector;
+
+    @Autowired
+    IOTokenService ioTokenService;
+
+    public List<Initiative> retrieveInitiativeSummary(String organizationId, String role) {
         List<Initiative> initiatives = initiativeRepository.retrieveInitiativeSummary(organizationId, true);
-        if(initiatives.isEmpty()){
-            throw new InitiativeException(
-                    InitiativeConstants.Exception.NotFound.CODE,
-                    String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_LIST_BY_ORGANIZATION_MESSAGE, organizationId),
-                    HttpStatus.NOT_FOUND);
-        }
-        return initiatives;
+//        if(initiatives.isEmpty()){
+//            throw new InitiativeException(
+//                    InitiativeConstants.Exception.NotFound.CODE,
+//                    String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_LIST_BY_ORGANIZATION_MESSAGE, organizationId),
+//                    HttpStatus.NOT_FOUND);
+//        }
+        return InitiativeConstants.Role.OPE_BASE.equals(role) ? initiatives.stream().filter(
+                initiative -> (
+                        initiative.getStatus().equals(InitiativeConstants.Status.IN_REVISION) ||
+                        initiative.getStatus().equals(InitiativeConstants.Status.TO_CHECK) ||
+                        initiative.getStatus().equals(InitiativeConstants.Status.APPROVED)))
+                .toList() : initiatives;
     }
 
     @Override
@@ -64,12 +74,25 @@ public class InitiativeServiceImpl implements InitiativeService {
     }
 
     @Override
-    public Initiative getInitiative(String organizationId, String initiativeId) {
-        return initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(organizationId, initiativeId, true)
+    public Initiative getInitiative(String organizationId, String initiativeId, String role) {
+        Initiative initiative = initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(organizationId, initiativeId, true)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
                         HttpStatus.NOT_FOUND));
+        if (InitiativeConstants.Role.OPE_BASE.equals(role)){
+            if (initiative.getStatus().equals(InitiativeConstants.Status.IN_REVISION) || initiative.getStatus().equals(InitiativeConstants.Status.TO_CHECK) || initiative.getStatus().equals(InitiativeConstants.Status.APPROVED)){
+                return initiative;
+            }else {
+                throw new InitiativeException(
+                        InitiativeConstants.Exception.BadRequest.CODE,
+                        String.format(InitiativeConstants.Exception.BadRequest.PERMISSION_NOT_VALID, role),
+                        HttpStatus.BAD_REQUEST
+                );
+            }
+        }else{
+            return initiative;
+        }
     }
 
     @Override
@@ -151,10 +174,12 @@ public class InitiativeServiceImpl implements InitiativeService {
         //Check Initiative Status
         isInitiativeAllowedToBeEditableThenThrows(initiative);
         initiative.setRefundRule(refundRule.getRefundRule());
+        log.info("[UPDATE_REFUND_RULE] - Initiative: {}. Refund rules successfully setted.", initiativeId);
         initiative.setUpdateDate(LocalDateTime.now());
         initiative.setStatus(InitiativeConstants.Status.DRAFT);
         if (changeInitiativeStatus) {
             initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
+            log.info("[UPDATE_TO_IN_REVISION_STATUS] - Initiative: {}. Status successfully setted to IN_REVISION.", initiativeId);
         }
         this.initiativeRepository.save(initiative);
     }
@@ -194,8 +219,13 @@ public class InitiativeServiceImpl implements InitiativeService {
                         InitiativeConstants.Exception.NotFound.CODE,
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
                         HttpStatus.NOT_FOUND));
-        if (initiative.getStatus().equals(InitiativeConstants.Status.IN_REVISION)){
-            log.error("[LOGICAL_INITIATIVE_ELIMINATION] - Initiative: {}. Cannot be deleted. Current status is IN_REVISION.", initiative.getInitiativeId());
+        if (
+                initiative.getStatus().equals(InitiativeConstants.Status.IN_REVISION) ||
+                initiative.getStatus().equals(InitiativeConstants.Status.PUBLISHED) ||
+                initiative.getStatus().equals(InitiativeConstants.Status.CLOSED) ||
+                initiative.getStatus().equals(InitiativeConstants.Status.SUSPENDED)
+        ){
+            log.error("[LOGICAL_INITIATIVE_ELIMINATION] - Initiative: {}. Cannot be deleted. Current status is {}.", initiative.getInitiativeId(), initiative.getStatus());
             throw new InitiativeException(
                     InitiativeConstants.Exception.BadRequest.CODE,
                     String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_CANNOT_BE_DELETED, initiativeId),
@@ -210,10 +240,15 @@ public class InitiativeServiceImpl implements InitiativeService {
     }
 
     @Override
-    public void sendInitiativeInfoToRuleEngine(InitiativeDTO initiativeDTO) {
-        if(!initiativeProducer.sendPublishInitiative(initiativeDTO)){
+    public void sendInitiativeInfoToRuleEngine(Initiative initiative) {
+        if(!initiativeProducer.sendPublishInitiative(initiative)){
             throw new IllegalStateException("[UPDATE_TO_PUBLISHED_STATUS] - Something gone wrong while notify Initiative to RuleEngine");
         }
+    }
+
+    @Override
+    public void sendInitiativeInfoToNotificationManager(Initiative initiative) {
+        groupRestConnector.notifyInitiativeToGroup(initiative);
     }
 
     @Override
@@ -255,16 +290,25 @@ public class InitiativeServiceImpl implements InitiativeService {
     @Override
     public void updateInitiative(Initiative initiative) {
         initiativeRepository.save(initiative);
+        log.debug("Initiative {} updated", initiative.getInitiativeId());
     }
 
     @Override
-    public InitiativeDTO sendInitiativeInfoToIOBackEndServiceAndSaveItOnInitiative(InitiativeDTO initiativeDTO, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO) {
-        InitiativeAdditionalDTO additionalInfo = initiativeDTO.getAdditionalInfo();
-        ServiceRequestDTO serviceRequestDTO = initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServicePayloadDTO(additionalInfo, initiativeOrganizationInfoDTO);
+    public Initiative sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(Initiative initiative, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO) {
+        InitiativeAdditional additionalInfo = initiative.getAdditionalInfo();
+        ServiceRequestDTO serviceRequestDTO = initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(additionalInfo, initiativeOrganizationInfoDTO);
         ServiceResponseDTO serviceResponseDTO = ioBackEndRestConnector.createService(serviceRequestDTO);
+        log.debug("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Start ServiceIO Keys encryption...", initiative.getInitiativeId());
+//        String encryptedPrimaryToken = ioTokenService.encrypt(serviceResponseDTO.getPrimaryKey());
+//        String encryptedSecondaryToken = ioTokenService.encrypt(serviceResponseDTO.getSecondaryKey());
+        String encryptedPrimaryToken = serviceResponseDTO.getPrimaryKey(); //FIXME: Choose a different Algo to evict java.security.InvalidAlgorithmParameterException: Cannot reuse iv for GCM encryption
+        String encryptedSecondaryToken = serviceResponseDTO.getSecondaryKey();
+        log.debug("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Encryption completed.", initiative.getInitiativeId());
+        initiative.getAdditionalInfo().setPrimaryTokenIO(encryptedPrimaryToken);
+        initiative.getAdditionalInfo().setSecondaryTokenIO(encryptedSecondaryToken);
         additionalInfo.setServiceId(serviceResponseDTO.getServiceId());
-        initiativeDTO.setUpdateDate(LocalDateTime.now()); //TODO Needed??
-        return initiativeDTO;
+        initiative.setUpdateDate(LocalDateTime.now());
+        return initiative;
     }
 
     private void isInitiativeAllowedToBeEditableThenThrows(Initiative initiative){
@@ -287,5 +331,24 @@ public class InitiativeServiceImpl implements InitiativeService {
                 InitiativeConstants.Exception.BadRequest.CODE,
                 InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_IN_REVISION,
                 HttpStatus.BAD_REQUEST);
+    }
+
+    @Override
+    public Initiative getInitiativeIdFromServiceId(String serviceId){
+        return initiativeRepository.retrieveServiceId(serviceId)
+                .orElseThrow(() -> new InitiativeException(
+                        InitiativeConstants.Exception.NotFound.CODE,
+                        String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_ID_BY_SERVICE_ID_MESSAGE, serviceId),
+                        HttpStatus.NOT_FOUND));
+    }
+
+    @Override
+    public InitiativeAdditional getPrimaryAndSecondaryTokenIO(String initiativeId){
+        Initiative initiative = initiativeRepository.findByInitiativeIdAndEnabled(initiativeId, true)
+                .orElseThrow(() -> new InitiativeException(
+                        InitiativeConstants.Exception.NotFound.CODE,
+                        String.format(InitiativeConstants.Exception.NotFound.PRIMARY_AND_SECONDARY_TOKEN_MESSAGE, initiativeId),
+                        HttpStatus.NOT_FOUND));
+        return initiative.getAdditionalInfo();
     }
 }

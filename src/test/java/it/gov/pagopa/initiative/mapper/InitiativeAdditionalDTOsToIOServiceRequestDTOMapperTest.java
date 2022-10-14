@@ -1,11 +1,12 @@
 package it.gov.pagopa.initiative.mapper;
 
-import it.gov.pagopa.initiative.dto.ChannelDTO;
-import it.gov.pagopa.initiative.dto.InitiativeAdditionalDTO;
 import it.gov.pagopa.initiative.dto.InitiativeOrganizationInfoDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceMetadataDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
+import it.gov.pagopa.initiative.model.Channel;
+import it.gov.pagopa.initiative.model.InitiativeAdditional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -49,15 +50,28 @@ class InitiativeAdditionalDTOsToIOServiceRequestDTOMapperTest {
     private static final String SERVICE_NAME = "serviceName";
     private static final String PRODUCT_DEPARTMENT_NAME = "productDepartmentName";
 
-    private final ServiceRequestDTO serviceRequestDTOexpected;
+    private String organizationNameExpected;
 
-    InitiativeAdditionalDTOsToIOServiceRequestDTOMapperTest() {
-        serviceRequestDTOexpected = createServiceRequestDTO();;
+    @Test
+    void givenInitiativeAdditionalAndOrganizationInfo_whenOrganizationIsEmpty_thenServiceRequestContainDefaultProductDepartmentName(){
+        InitiativeAdditional initiativeAdditional = createInitiativeAdditional();
+
+        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = InitiativeOrganizationInfoDTO.builder()
+                .organizationName("")
+                .organizationVat(ORGANIZATION_VAT)
+                .organizationUserId(ORGANIZATION_USER_ID)
+                .organizationUserRole(ORGANIZATION_USER_ROLE)
+                .build();
+
+        organizationNameExpected = "";
+
+        ServiceRequestDTO serviceRequestDTO = initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(initiativeAdditional, initiativeOrganizationInfoDTO);
+        assertEquals(organizationNameExpected, serviceRequestDTO.getOrganizationName());
     }
 
     @Test
-    void toInitiativeTrxConditionsNull_equals(){
-        InitiativeAdditionalDTO initiativeAdditionalDTO = createInitiativeAdditionalDTO();
+    void givenInitiativeAdditionalAndOrganizationInfo_whenOrganizationIsNotEmpty_thenServiceRequestContainOrganizationNamePassedByParams(){
+        InitiativeAdditional initiativeAdditional = createInitiativeAdditional();
 
         InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = InitiativeOrganizationInfoDTO.builder()
                 .organizationName(ORGANIZATION_NAME)
@@ -66,16 +80,18 @@ class InitiativeAdditionalDTOsToIOServiceRequestDTOMapperTest {
                 .organizationUserRole(ORGANIZATION_USER_ROLE)
                 .build();
 
-        ServiceRequestDTO serviceRequestDTO = initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServicePayloadDTO(initiativeAdditionalDTO, initiativeOrganizationInfoDTO);
-        assertEquals(serviceRequestDTOexpected, serviceRequestDTO);
+        organizationNameExpected = ORGANIZATION_NAME;
+
+        ServiceRequestDTO serviceRequestDTO = initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(initiativeAdditional, initiativeOrganizationInfoDTO);
+        assertEquals(organizationNameExpected, serviceRequestDTO.getOrganizationName());
     }
 
-    private ServiceRequestDTO createServiceRequestDTO() {
+    private ServiceRequestDTO createServiceRequestDTO(String organizationName) {
         ServiceMetadataDTO serviceMetadataDTO = createServiceMetadataDTO();
         return ServiceRequestDTO.builder()
                 .serviceMetadata(serviceMetadataDTO)
                 .serviceName(SERVICE_NAME)
-                .departmentName(PRODUCT_DEPARTMENT_NAME)
+                .departmentName(StringUtils.isNotBlank(organizationName)? organizationName : PRODUCT_DEPARTMENT_NAME)
                 .organizationName(ORGANIZATION_NAME)
                 .organizationFiscalCode(ORGANIZATION_VAT)
                 .isVisible(IS_VISIBLE)
@@ -92,22 +108,22 @@ class InitiativeAdditionalDTOsToIOServiceRequestDTOMapperTest {
                 .build();
     }
 
-    private InitiativeAdditionalDTO createInitiativeAdditionalDTO() {
-        InitiativeAdditionalDTO initiativeAdditionalDTO = new InitiativeAdditionalDTO();
-        initiativeAdditionalDTO.setServiceIO(true);
-        initiativeAdditionalDTO.setServiceId("serviceId");
-        initiativeAdditionalDTO.setServiceName("serviceName");
-        initiativeAdditionalDTO.setServiceScope(InitiativeAdditionalDTO.ServiceScope.LOCAL);
-        initiativeAdditionalDTO.setDescription("description");
-        initiativeAdditionalDTO.setPrivacyLink("privacy.url.it");;
-        initiativeAdditionalDTO.setTcLink("tos.url.it");
-        ChannelDTO channelDTO = new ChannelDTO();
-        channelDTO.setType(ChannelDTO.TypeEnum.WEB);
-        channelDTO.setContact("support.url.it");
-        List<ChannelDTO> channelDTOS = new ArrayList<>();
-        channelDTOS.add(channelDTO);
-        initiativeAdditionalDTO.setChannels(channelDTOS);
-        return initiativeAdditionalDTO;
+    private InitiativeAdditional createInitiativeAdditional() {
+        InitiativeAdditional initiativeAdditional = new InitiativeAdditional();
+        initiativeAdditional.setServiceIO(true);
+        initiativeAdditional.setServiceId("serviceId");
+        initiativeAdditional.setServiceName("serviceName");
+        initiativeAdditional.setServiceScope(InitiativeAdditional.ServiceScope.LOCAL);
+        initiativeAdditional.setDescription("description");
+        initiativeAdditional.setPrivacyLink("privacy.url.it");;
+        initiativeAdditional.setTcLink("tos.url.it");
+        Channel channel = new Channel();
+        channel.setType(Channel.TypeEnum.WEB);
+        channel.setContact("support.url.it");
+        List<Channel> channelList = new ArrayList<>();
+        channelList.add(channel);
+        initiativeAdditional.setChannels(channelList);
+        return initiativeAdditional;
     }
 
 }

@@ -10,9 +10,7 @@ import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.service.InitiativeService;
 import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,31 +26,29 @@ import java.util.List;
 @Slf4j
 public class InitiativeApiController implements InitiativeApi {
 
-    @Value("${app.initiative.conditions.notifyRE}")
-    @Getter
-    private boolean notifyRE;
+    private final boolean notifyRE;
+    private final InitiativeService initiativeService;
+    private final InitiativeModelToDTOMapper initiativeModelToDTOMapper;
+    private final InitiativeDTOsToModelMapper initiativeDTOsToModelMapper;
 
-    @Autowired
-    private InitiativeService initiativeService;
-
-    @Autowired
-    private InitiativeModelToDTOMapper initiativeModelToDTOMapper;
-
-    @Autowired
-    private InitiativeDTOsToModelMapper initiativeDTOsToModelMapper;
-
-    @ResponseStatus(HttpStatus.OK)
-    @Override
-    public ResponseEntity<List<InitiativeSummaryDTO>> getInitativeSummary(String organizationId) {
-        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeSummaryDTOList(
-                this.initiativeService.retrieveInitiativeSummary(organizationId)
-        ));
+    public InitiativeApiController(@Value("${app.initiative.conditions.notifyRE}") boolean notifyRE, InitiativeService initiativeService, InitiativeModelToDTOMapper initiativeModelToDTOMapper, InitiativeDTOsToModelMapper initiativeDTOsToModelMapper) {
+        this.notifyRE = notifyRE;
+        this.initiativeService = initiativeService;
+        this.initiativeModelToDTOMapper = initiativeModelToDTOMapper;
+        this.initiativeDTOsToModelMapper = initiativeDTOsToModelMapper;
     }
 
     @ResponseStatus(HttpStatus.OK)
     @Override
-    public ResponseEntity<InitiativeDTO> getInitiativeDetail(String organizationId, String initiativeId) {
-        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDTO(this.initiativeService.getInitiative(organizationId, initiativeId)));
+    public ResponseEntity<List<InitiativeSummaryDTO>> getInitiativeSummary(String organizationId, String role) {
+        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeSummaryDTOList(
+                this.initiativeService.retrieveInitiativeSummary(organizationId, role)
+        ));
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<InitiativeDTO> getInitiativeDetail(String organizationId, String initiativeId, String role) {
+        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDTO(this.initiativeService.getInitiative(organizationId, initiativeId, role)));
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -92,8 +88,8 @@ public class InitiativeApiController implements InitiativeApi {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Override
-    public ResponseEntity<Void> updateInitiativeBeneficiary(String organizationId, String initiativeId, @RequestBody @Validated(ValidationOnGroup.class) InitiativeBeneficiaryRuleDTO beneficiaryRuleDto) {
-        if(Boolean.TRUE.equals(this.initiativeService.getInitiative(organizationId, initiativeId).getGeneral().getBeneficiaryKnown())){
+    public ResponseEntity<Void> updateInitiativeBeneficiary(String organizationId, String initiativeId, @RequestBody @Validated(ValidationOnGroup.class) InitiativeBeneficiaryRuleDTO beneficiaryRuleDto, String role) {
+        if(Boolean.TRUE.equals(this.initiativeService.getInitiative(organizationId, initiativeId, role).getGeneral().getBeneficiaryKnown())){
             throw new InitiativeException(
                     InitiativeConstants.Exception.BadRequest.CODE,
                     String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_PROPERTIES_NOT_VALID, initiativeId),
@@ -176,24 +172,21 @@ public class InitiativeApiController implements InitiativeApi {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Override
-    public ResponseEntity<Void> updateInitiativePublishedStatus(String organizationId, String initiativeId, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO) {
+    public ResponseEntity<Void> updateInitiativePublishedStatus(String organizationId, String initiativeId, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO, String role) {
         //Retrieve Initiative
         log.info("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Start processing...", initiativeId);
-        Initiative initiative = this.initiativeService.getInitiative(organizationId, initiativeId);
+        Initiative initiative = this.initiativeService.getInitiative(organizationId, initiativeId, role);
         log.debug("Initiative retrieved");
 
         //Validation for current Status
         log.debug("Validating current Status");
         initiativeService.isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED);
         log.debug("Current Status validated");
-        InitiativeDTO initiativeDTO = this.initiativeModelToDTOMapper.toInitiativeDTO(initiative);
 
         log.debug("Retrieve current state and save it as TEMP");
         String statusTemp = initiative.getStatus();
         LocalDateTime updateDateTemp = initiative.getUpdateDate();
 
-        initiativeDTO.setStatus(InitiativeConstants.Status.PUBLISHED);
-        initiativeDTO.setUpdateDate(LocalDateTime.now());
         initiative.setStatus(InitiativeConstants.Status.PUBLISHED);
         initiative.setUpdateDate(LocalDateTime.now());
         initiativeService.updateInitiative(initiative);
@@ -201,17 +194,19 @@ public class InitiativeApiController implements InitiativeApi {
         try {
             if(notifyRE) {
                 log.info("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Notification to Rule Engine of the published Initiative", initiativeId);
-                initiativeService.sendInitiativeInfoToRuleEngine(initiativeDTO);
+                initiativeService.sendInitiativeInfoToRuleEngine(initiative);
             }
             //1. Only for the Initiatives to be provided to IO, the integration is carried out with the creation of the Initiative Service to IO BackEnd
-            //2. Sprint 9: In caso di beneficiaryKnown a true -> Invio al MS-Gruppi via API la richiesta di notifica della pubblicazione e, MS Gruppi la invia via coda al NotificationManager
-            if(initiativeDTO.getAdditionalInfo().getServiceIO()) {
-                log.info("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Notification to IO BeckEnd of the published Initiative", initiativeId);
-                initiativeDTO = initiativeService.sendInitiativeInfoToIOBackEndServiceAndSaveItOnInitiative(initiativeDTO, initiativeOrganizationInfoDTO);
-                initiative = initiativeDTOsToModelMapper.toInitiative(initiativeDTO);
-                initiativeService.updateInitiative(initiative); //TODO Needed? Also: switch out of the IF clause?
+            if(initiative.getAdditionalInfo().getServiceIO()) {
+                log.info("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Notification to IO BackEnd of the published Initiative", initiativeId);
+                initiative = initiativeService.sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(initiative, initiativeOrganizationInfoDTO);
+                initiativeService.updateInitiative(initiative);
                 //Invio al MS-Gruppi via API
                 //This integration necessarily takes place in succession to having created the service with IO in order not to send "orphan" resources (not associated with any Initiative known by IO).
+                //2. BeneficiaryKnown a true -> Invio al MS-Gruppi via API la richiesta di notifica della pubblicazione e, MS Gruppi la invia via coda al NotificationManager
+                if(null!= initiative.getGeneral() && initiative.getGeneral().getBeneficiaryKnown()){
+                    initiativeService.sendInitiativeInfoToNotificationManager(initiative);
+                }
             }
         } catch (Exception e) {
             //In case one of the previous Integrations ends badly, the Initiative is rolled back to the initial TEMP state
@@ -223,6 +218,20 @@ public class InitiativeApiController implements InitiativeApi {
             throw new IntegrationException(HttpStatus.BAD_REQUEST);
         }
         return ResponseEntity.noContent().build();
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @Override
+    public ResponseEntity<InitiativeDTO> getInitiativeIdFromServiceId(String serviceId){
+        log.info("[GET_INITIATIVE_ID_FROM_SERVICE_ID] - Start searching the initiativeId for serviceId {}", serviceId);
+        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDTO(this.initiativeService.getInitiativeIdFromServiceId(serviceId)));
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @Override
+    public ResponseEntity<InitiativeAdditionalDTO> getPrimaryAndSecondaryTokenIO(String initiativeId){
+        log.info("[GET_PRIMARY_AND_SECONDARY_TOKEN] - Start searching tokens for initiativeId {}...", initiativeId);
+        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeAdditionalDTOOnlyTokens(this.initiativeService.getPrimaryAndSecondaryTokenIO(initiativeId)));
     }
 
 }

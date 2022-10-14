@@ -55,7 +55,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"aud\" : \"idpay.welfare.pagopa.it\",\r\n    \"uid\" : \"9abcbe25-99f4-40f9-a03b-afed9cd9bb8a\",\r\n    \"name\" : \"Mario\",\r\n    \"familyName\" : \"Rossi\",\r\n    \"email\" : \"test@token.it\",\r\n    \"orgId\" : \"2f63a151-da4e-4e1e-acf9-adecc0c4d727\",    \r\n    \"orgVAT\" : \"11122233344\",\r\n    \"orgPartyRole\" : \"ADMIN\",\r\n    \"orgRole\" : \"admin\"\r\n}",
+							"raw": "{\r\n    \"aud\": \"idpay.welfare.pagopa.it\",\r\n    \"uid\": \"9abcbe25-99f4-40f9-a03b-afed9cd9bb8a\",\r\n    \"name\": \"Mario\",\r\n    \"familyName\": \"Rossi\",\r\n    \"email\": \"test@token.it\",\r\n    \"orgId\": \"2f63a151-da4e-4e1e-acf9-adecc0c4d727\",\r\n    \"orgVAT\": \"11122233344\",\r\n    \"orgName\": \"EnteTest\",\r\n    \"orgPartyRole\": \"ADMIN\",\r\n    \"orgRole\": \"admin\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2065,6 +2065,13 @@
 							],
 							"path": [
 								"summary"
+							],
+							"query": [
+								{
+									"key": "role",
+									"value": "ope_base",
+									"disabled": true
+								}
 							]
 						},
 						"description": "Returns the list of initiatives names for a specific organization"
@@ -4434,7 +4441,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"aud\" : \"idpay.welfare.pagopa.it\",\r\n    \"uid\" : \"9abcbe25-99f4-40f9-a03b-afed9cd9bb8a\",\r\n    \"name\" : \"Mario\",\r\n    \"familyName\" : \"Rossi\",\r\n    \"email\" : \"test@token.it\",\r\n    \"orgId\" : \"2f63a151-da4e-4e1e-acf9-adecc0c4d727\",    \r\n    \"orgVAT\" : \"1199250158\",\r\n    \"orgPartyRole\" : \"ADMIN\",\r\n    \"orgRole\" : \"admin\"\r\n}",
+							"raw": "{\r\n    \"aud\": \"idpay.welfare.pagopa.it\",\r\n    \"uid\": \"9abcbe25-99f4-40f9-a03b-afed9cd9bb8a\",\r\n    \"name\": \"Mario\",\r\n    \"familyName\": \"Rossi\",\r\n    \"email\": \"test@token.it\",\r\n    \"orgId\": \"2f63a151-da4e-4e1e-acf9-adecc0c4d727\",\r\n    \"orgVAT\": \"1112223334\",\r\n    \"orgName\": \"EnteTest\",\r\n    \"orgPartyRole\": \"ADMIN\",\r\n    \"orgRole\": \"admin\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4458,7 +4465,7 @@
 			]
 		},
 		{
-			"name": "4th.Intiative Revision By PagoPA Operator",
+			"name": "5th.Intiative Revision By PagoPA Operator",
 			"item": [
 				{
 					"name": "Update initiative into APPROVED status",
@@ -4628,7 +4635,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"aud\" : \"idpay.welfare.pagopa.it\",\r\n    \"uid\" : \"9abcbe25-99f4-40f9-a03b-afed9cd9bb8a\",\r\n    \"name\" : \"Mario\",\r\n    \"familyName\" : \"Rossi\",\r\n    \"email\" : \"test@token.it\",\r\n    \"orgId\" : \"2f63a151-da4e-4e1e-acf9-adecc0c4d727\",    \r\n    \"orgVAT\" : \"11122233344\",\r\n    \"orgPartyRole\" : \"ADMIN\",\r\n    \"orgRole\" : \"admin\"\r\n}",
+							"raw": "{\r\n    \"aud\": \"idpay.welfare.pagopa.it\",\r\n    \"uid\": \"9abcbe25-99f4-40f9-a03b-afed9cd9bb8a\",\r\n    \"name\": \"Mario\",\r\n    \"familyName\": \"Rossi\",\r\n    \"email\": \"test@token.it\",\r\n    \"orgId\": \"2f63a151-da4e-4e1e-acf9-adecc0c4d727\",\r\n    \"orgVAT\": \"11122233344\",\r\n    \"orgName\": \"EnteTest\",\r\n    \"orgPartyRole\": \"ADMIN\",\r\n    \"orgRole\": \"admin\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4652,7 +4659,7 @@
 			]
 		},
 		{
-			"name": "4th.Intiative Revision By PagoPA Operator",
+			"name": "5th.b.Intiative Revision By PagoPA Operator",
 			"item": [
 				{
 					"name": "Update initiative into PUBLISHED",
@@ -4667,29 +4674,11 @@
 								],
 								"type": "text/javascript"
 							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
 						}
 					],
 					"request": {
 						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Accept",
-								"value": "application/json"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{baseUrlInitiative}}/:initiativeId/published",
 							"host": [

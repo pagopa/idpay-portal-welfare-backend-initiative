@@ -1,15 +1,16 @@
 package it.gov.pagopa.initiative.mapper;
 
-import it.gov.pagopa.initiative.dto.ChannelDTO;
-import it.gov.pagopa.initiative.dto.InitiativeAdditionalDTO;
 import it.gov.pagopa.initiative.dto.InitiativeOrganizationInfoDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceMetadataDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
+import it.gov.pagopa.initiative.model.Channel;
+import it.gov.pagopa.initiative.model.InitiativeAdditional;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
-import java.util.Optional;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class InitiativeAdditionalDTOsToIOServiceRequestDTOMapper {
@@ -19,21 +20,21 @@ public class InitiativeAdditionalDTOsToIOServiceRequestDTOMapper {
     @Value("${rest-client.backend-io.service.request.isVisible}")
     private Boolean isVisible;
 
-    public ServiceRequestDTO toServicePayloadDTO(InitiativeAdditionalDTO initiativeAdditionalDTO, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO){
-        ChannelDTO channelDTO = Optional.ofNullable(initiativeAdditionalDTO.getChannels()).stream().flatMap(Collection::stream).findFirst().orElseThrow(() -> new IllegalStateException("At least one channel should have been associated"));
+    public ServiceRequestDTO toServiceRequestDTO(InitiativeAdditional initiativeAdditional, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO){
+        Map<Channel.TypeEnum, String> channelMap = initiativeAdditional.getChannels().stream().collect(Collectors.toMap(Channel::getType, Channel::getContact));
         ServiceMetadataDTO serviceMetadataDTO = ServiceMetadataDTO.builder()
-                .email(channelDTO.getType() == ChannelDTO.TypeEnum.EMAIL ? channelDTO.getContact() : null)
-                .phone(channelDTO.getType() == ChannelDTO.TypeEnum.MOBILE ? channelDTO.getContact() : null)
-                .supportUrl(channelDTO.getType() == ChannelDTO.TypeEnum.WEB ? channelDTO.getContact() : null)
-                .privacyUrl(initiativeAdditionalDTO.getPrivacyLink())
-                .tosUrl(initiativeAdditionalDTO.getTcLink())
-                .description(initiativeAdditionalDTO.getDescription())
-                .scope(initiativeAdditionalDTO.getServiceScope().name())
+                .email(channelMap.get(Channel.TypeEnum.EMAIL))
+                .phone(channelMap.get(Channel.TypeEnum.MOBILE))
+                .supportUrl(channelMap.get(Channel.TypeEnum.WEB))
+                .privacyUrl(initiativeAdditional.getPrivacyLink())
+                .tosUrl(initiativeAdditional.getTcLink())
+                .description(initiativeAdditional.getDescription())
+                .scope(initiativeAdditional.getServiceScope().name())
                 .build();
         return ServiceRequestDTO.builder()
                 .serviceMetadata(serviceMetadataDTO)
-                .serviceName(initiativeAdditionalDTO.getServiceName())
-                .departmentName(productDepartmentName)
+                .serviceName(initiativeAdditional.getServiceName())
+                .departmentName(StringUtils.isNotBlank(initiativeOrganizationInfoDTO.getOrganizationName()) ? initiativeOrganizationInfoDTO.getOrganizationName() : productDepartmentName)
                 .organizationName(initiativeOrganizationInfoDTO.getOrganizationName())
                 .organizationFiscalCode(initiativeOrganizationInfoDTO.getOrganizationVat())
                 .isVisible(isVisible)
