@@ -7,12 +7,13 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 public class IseeCodeMustHaveFieldNullValidator implements ConstraintValidator<IseeCodeMustHaveFieldNull, AutomatedCriteriaDTO> {
+    private static final String ISEE = "ISEE";
 
     @Override
     public boolean isValid(AutomatedCriteriaDTO value, ConstraintValidatorContext context) {
         String code = value.getCode();
         String field = value.getField();
-        if (code.equals("ISEE") && field != null){
+        if (code.equals(ISEE) && field != null){
             return false;
         }
         return true;
