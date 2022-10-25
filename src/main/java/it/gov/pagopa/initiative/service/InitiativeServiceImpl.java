@@ -169,10 +169,10 @@ public class InitiativeServiceImpl implements InitiativeService {
                         HttpStatus.NOT_FOUND));
         //Check Initiative Status
         isInitiativeAllowedToBeEditableThenThrows(initiative);
-        initiative.setRewardRule(rewardAndTrxRules.getRewardRule());
         initiative.setTrxRule(rewardAndTrxRules.getTrxRule());
         initiative.setUpdateDate(LocalDateTime.now());
         initiative.setStatus(InitiativeConstants.Status.DRAFT);
+        initiative.setRewardRule(rewardAndTrxRules.getRewardRule());
         this.initiativeRepository.save(initiative);
     }
 

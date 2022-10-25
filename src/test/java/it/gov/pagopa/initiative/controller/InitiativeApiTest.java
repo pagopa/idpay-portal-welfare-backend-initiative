@@ -458,7 +458,7 @@ class InitiativeApiTest {
     @Test
     void updateInitiativeStatusApproved_statusNoContent() throws Exception {
         //doNothing only for Void method
-        doNothing().when(initiativeService).updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID);
+        doNothing().when(initiativeService).updateInitiativeApprovedStatus(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID);
 
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_STATUS_APPROVED_URL, ORGANIZATION_ID, INITIATIVE_ID))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -470,7 +470,7 @@ class InitiativeApiTest {
 
     @Test
     void updateInitiativeToCheckStatus_statusNoContent() throws Exception {
-        doNothing().when(initiativeService).updateInitiativeToCheckStatus(ORGANIZATION_ID, INITIATIVE_ID);
+        doNothing().when(initiativeService).updateInitiativeToCheckStatus(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID);
 
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_CHECK_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -533,7 +533,7 @@ class InitiativeApiTest {
                         InitiativeConstants.Exception.BadRequest.CODE,
                         String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_IN_REVISION),
                         HttpStatus.BAD_REQUEST)
-        ).when(initiativeService).updateInitiativeToCheckStatus(ORGANIZATION_ID, INITIATIVE_ID);
+        ).when(initiativeService).updateInitiativeToCheckStatus(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID);
 
         MvcResult res =
                 mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_CHECK_STATUS_URL, initiative.getOrganizationId(), initiative.getInitiativeId()))

@@ -14,15 +14,9 @@ spring:
         kafka-initiative-outcome:
           type: kafka
           environment:
-            spring:
-              cloud:
-                stream:
-                  kafka:
-                    binder:
-                      configuration:
-                        sasl:
-                          jaas:
-                            config: ${KAFKA_INITIATIVE_SASL_JAAS_CONFIG:}
+            spring.cloud.stream.kafka.binder:
+               configuration:
+                 sasl.jaas.config: ${KAFKA_INITIATIVE_SASL_JAAS_CONFIG:}
       kafka:
         binder:
           auto-create-topics: 'false'
@@ -33,12 +27,6 @@ spring:
             session.timeout.ms: ${KAFKA_CONFIG_INITIATIVE_SESSION_TIMEOUT_MS:60000}
             sasl.mechanism: ${KAFKA_INITIATIVE_SASL_MECHANISM}
             security.protocol: ${KAFKA_INITIATIVE_SECURITY_PROTOCOL}
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
 
 rest-client:
   backend-io:
@@ -58,6 +46,12 @@ rest-client:
       name: ms-email-notification
       base-url: ${EMAIL_NOTIFICATION_MS_HOST:}/idpay/email-notification
       path: /notify
+  selc:
+    service:
+      base-url: ${SELC_BASE_URL:}/external/v1
+      name: selc-prod-users
+      subscriptionKey: ${SELC_EXTERNAL_API_KEY:}
+      selfCareUid: ${SELC_UID:idpay}
 feign:
   okhttp:
     enabled: true
