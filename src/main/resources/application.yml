@@ -53,6 +53,10 @@ rest-client:
     service:
       name: ms-group
       base-url: ${GROUP_MS_HOST:}/idpay
+  email-notification:
+    service:
+      name: ms-email-notification
+      base-url: ${EMAIL_NOTIFICATION_MS_HOST:}/idpay
 feign:
   okhttp:
     enabled: true
@@ -81,6 +85,7 @@ app:
     conditions:
       notifyIO: ${APP_INITIATIVE_CONDITIONS_NOTIFY_IO:true}
       notifyRE: ${APP_INITIATIVE_CONDITIONS_NOTIFY_RE:true}
+      notifyEmail: ${APP_INITIATIVE_CONDITIONS_NOTIFY_EMAIL:true}
 
 util:
   crypto:

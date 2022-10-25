@@ -27,7 +27,7 @@ public interface InitiativeService {
 
     void updateTrxAndRewardRules(String organizationId, String initiativeId, Initiative rewardAndTrxRules);
 
-    void updateInitiativeRefundRules(String organizationId, String initiativeId, Initiative refundRule, boolean changeInitiativeStatus);
+    void updateInitiativeRefundRules(String organizationId, String organizationName, String initiativeId, Initiative refundRule, boolean changeInitiativeStatus);
 
     void updateInitiativeApprovedStatus(String organizationId, String initiativeId);
 

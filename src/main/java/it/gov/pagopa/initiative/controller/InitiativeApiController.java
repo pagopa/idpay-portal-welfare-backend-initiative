@@ -128,7 +128,8 @@ public class InitiativeApiController implements InitiativeApi {
     public ResponseEntity<Void> updateInitiativeRefundRule(String organizationId, String initiativeId, @RequestBody @Validated(ValidationOnGroup.class) InitiativeRefundRuleDTO initiativeRefundRuleDTO){
         log.info("[UPDATE_TO_IN_REVISION_STATUS]-[UPDATE_REFUND_RULE] - Initiative: {}. Start processing...", initiativeId);
         Initiative initiative = this.initiativeDTOsToModelMapper.toInitiative(initiativeRefundRuleDTO);
-        this.initiativeService.updateInitiativeRefundRules(organizationId, initiativeId, initiative, true);
+        String organizationName = initiativeRefundRuleDTO.getOrganizationName();
+        this.initiativeService.updateInitiativeRefundRules(organizationId, organizationName, initiativeId, initiative, true);
         return ResponseEntity.noContent().build();
     }
 
@@ -136,7 +137,8 @@ public class InitiativeApiController implements InitiativeApi {
     @Override
     public ResponseEntity<Void> updateInitiativeRefundRuleDraft(String organizationId, String initiativeId, @RequestBody InitiativeRefundRuleDTO initiativeRefundRuleDTO){
         Initiative initiative = this.initiativeDTOsToModelMapper.toInitiative(initiativeRefundRuleDTO);
-        this.initiativeService.updateInitiativeRefundRules(organizationId, initiativeId, initiative, false);
+        String organizationName = initiativeRefundRuleDTO.getOrganizationName();
+        this.initiativeService.updateInitiativeRefundRules(organizationId, organizationName, initiativeId, initiative, false);
         return ResponseEntity.noContent().build();
     }
 

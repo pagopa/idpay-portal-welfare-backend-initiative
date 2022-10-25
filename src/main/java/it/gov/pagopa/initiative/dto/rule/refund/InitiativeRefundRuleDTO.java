@@ -2,9 +2,14 @@ package it.gov.pagopa.initiative.dto.rule.refund;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import it.gov.pagopa.initiative.dto.InitiativeOrganizationInfoDTO;
 import it.gov.pagopa.initiative.utils.constraint.RefundRuleType;
 import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import javax.validation.Valid;
 
@@ -12,10 +17,10 @@ import javax.validation.Valid;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
-@Builder
+@SuperBuilder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @RefundRuleType(groups = ValidationOnGroup.class)
-public class InitiativeRefundRuleDTO {
+public class InitiativeRefundRuleDTO extends InitiativeOrganizationInfoDTO {
     @Valid
     @JsonProperty("accumulatedAmount")
     private AccumulatedAmountDTO accumulatedAmount;

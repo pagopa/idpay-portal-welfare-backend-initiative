@@ -1,12 +1,16 @@
 package it.gov.pagopa.initiative.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-@Builder
+@SuperBuilder
 public class InitiativeOrganizationInfoDTO {
     private String organizationName;
     private String organizationVat;
