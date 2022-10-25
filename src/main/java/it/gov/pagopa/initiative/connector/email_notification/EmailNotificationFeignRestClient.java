@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public interface EmailNotificationFeignRestClient {
 
   @PostMapping(
-      value = "/email-notification/notify",
+      value = "${rest-client.email-notification.service.path}",
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseBody
   ResponseEntity<Void> notifyInitiativeInfo(

@@ -56,12 +56,16 @@ rest-client:
   email-notification:
     service:
       name: ms-email-notification
-      base-url: ${EMAIL_NOTIFICATION_MS_HOST:}/idpay
+      base-url: ${EMAIL_NOTIFICATION_MS_HOST:}/idpay/email-notification
+      path: /notify
 feign:
   okhttp:
     enabled: true
   client:
     config:
+      default:
+        errorDecoder: it.gov.pagopa.initiative.connector.error.decoder.Custom5xxErrorDecoder
+        retryer: feign.Retryer.Default
       backend-io:
         loggerLevel: ${FEIGN_CLIENT_CONFIG_IO_LOG_LEVEL:basic}
       ms-group:

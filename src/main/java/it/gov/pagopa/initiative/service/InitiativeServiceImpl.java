@@ -177,6 +177,7 @@ public class InitiativeServiceImpl implements InitiativeService {
     }
 
     @Override
+//    @Transactional
     public void updateInitiativeRefundRules(String organizationId, String organizationName, String initiativeId, Initiative refundRule, boolean changeInitiativeStatus){
         Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(organizationId, initiativeId, true)
                 .orElseThrow(() -> new InitiativeException(
@@ -193,14 +194,14 @@ public class InitiativeServiceImpl implements InitiativeService {
             initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
             log.info("[UPDATE_TO_IN_REVISION_STATUS] - Initiative: {}. Status successfully set to IN_REVISION.", initiativeId);
         }
-        if(notifyEmail){
+        this.initiativeRepository.save(initiative);
+        if(changeInitiativeStatus && notifyEmail){
             emailNotificationService.sendInitiativeInRevision(initiative, organizationName);
         }
-        this.initiativeRepository.save(initiative);
     }
 
     @Override
-    public void updateInitiativeApprovedStatus(String organizationId, String initiativeId){
+    public void updateInitiativeApprovedStatus(String organizationId, String organizationName, String initiativeId){
         Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(organizationId, initiativeId, true)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
@@ -211,10 +212,13 @@ public class InitiativeServiceImpl implements InitiativeService {
         initiative.setUpdateDate(LocalDateTime.now());
         this.initiativeRepository.save(initiative);
         log.info("[UPDATE_TO_APPROVED_STATUS] - Initiative: {}. Status successfully changed", initiative.getInitiativeId());
+        if(notifyEmail){
+            emailNotificationService.sendInitiativeApprovedAndRejected(initiative, organizationName);
+        }
     }
 
     @Override
-    public void updateInitiativeToCheckStatus(String organizationId, String initiativeId){
+    public void updateInitiativeToCheckStatus(String organizationId, String organizationName, String initiativeId){
         Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(organizationId, initiativeId, true)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
@@ -225,6 +229,9 @@ public class InitiativeServiceImpl implements InitiativeService {
         initiative.setUpdateDate(LocalDateTime.now());
         this.initiativeRepository.save(initiative);
         log.info("[UPDATE_TO_CHECK_STATUS] - Initiative: {}. Status successfully changed", initiative.getInitiativeId());
+        if(notifyEmail){
+            emailNotificationService.sendInitiativeApprovedAndRejected(initiative, organizationName);
+        }
     }
 
     @Override
