@@ -26,16 +26,20 @@ class AESUtilTest {
     private static final String CIPHER_TEXT_AES_GCM_NO_PADDING_KEY_256_ITERATION_10000 = "wzQD/tLo8vghu5EvhZYDaUnp1B5x1e1pBZJHTLkUlNYLGh/rrzkGgFMtrjZUEgOsZoKfJ5gL4DWQN209PooN0kwq6XTt1Kuj5NF2tvyO5yadXmqvV0DbRIQ";
 
     @Test
-    void testEncrypt() throws NoSuchAlgorithmException {
+    void testMultiEncrypt() throws NoSuchAlgorithmException {
         util = new AESUtil(CIPHER_INSTANCE, ENCODING, PBE_ALGORITHM, SALT, KEY_SIZE, ITERATION_COUNT, GCM_IV, GCM_TAG_LENGTH);
         String encrypt = util.encrypt(PASSPHRASE, PLAIN_TEXT);
+        assertEquals(CIPHER_TEXT_AES_GCM_NO_PADDING_KEY_256_ITERATION_10000, encrypt);
+        encrypt = util.encrypt(PASSPHRASE, PLAIN_TEXT);
         assertEquals(CIPHER_TEXT_AES_GCM_NO_PADDING_KEY_256_ITERATION_10000, encrypt);
     }
 
     @Test
-    void testDecrypt() {
+    void testMultiDecrypt() {
         util = new AESUtil(CIPHER_INSTANCE, ENCODING, PBE_ALGORITHM, SALT, KEY_SIZE, ITERATION_COUNT, GCM_IV, GCM_TAG_LENGTH);
         String decrypt = util.decrypt(PASSPHRASE, CIPHER_TEXT_AES_GCM_NO_PADDING_KEY_256_ITERATION_10000);
+        assertEquals(PLAIN_TEXT, decrypt);
+        decrypt = util.decrypt(PASSPHRASE, CIPHER_TEXT_AES_GCM_NO_PADDING_KEY_256_ITERATION_10000);
         assertEquals(PLAIN_TEXT, decrypt);
     }
 
