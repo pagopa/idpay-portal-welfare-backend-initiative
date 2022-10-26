@@ -78,6 +78,7 @@ microservice-chart:
     IO_BACKEND_SERVICE_IS_VISIBLE: "false"
     LOG_LEVEL_INITIATIVE: INFO
     FEIGN_CLIENT_CONFIG_IO_LOG_LEVEL: basic
+    SELC_UID: idpay
 
   envConfigMapExternals:
     idpay-common:
@@ -86,6 +87,8 @@ microservice-chart:
     rest-client:
       IO_BACKEND_SERVICE_BASE_URL: io_backend_base_url
       GROUP_MS_HOST: idpay_group_host
+      EMAIL_NOTIFICATION_MS_HOST: email_notification_ms_host
+      SELC_BASE_URL: selc_base_url
     idpay-eventhub-01:
       KAFKA_BINDER_BROKER_ENDPOINT_LIST: kafka_broker
       KAFKA_INITIATIVE_SASL_MECHANISM: kafka_sasl_mechanism
@@ -96,6 +99,7 @@ microservice-chart:
     MONGODB_URI: mongodb-connection-string
     KAFKA_INITIATIVE_SASL_JAAS_CONFIG: evh-idpay-rule-update-idpay-rule-update-producer-jaas-config-idpay-01
     IO_BACKEND_SERVICE_SUBSCRIPTION_API_KEY: io-backend-aggregate-api-key
+    SELC_EXTERNAL_API_KEY: selc-external-api-key
   #    UTIL_CRYPTO_AES_SECRET_TYPE_PBE_SALT: util-crypto-aes-secret-type-pbe-salt
   #    UTIL_CRYPTO_AES_SECRET_TYPE_PBE_PASSPHRASE: util-crypto-aes-secret-type-pbe-passphrase
   #    UTIL_CRYPTO_AES_MODE_GCM_IV: util-crypto-aes-mode-gcm-iv
