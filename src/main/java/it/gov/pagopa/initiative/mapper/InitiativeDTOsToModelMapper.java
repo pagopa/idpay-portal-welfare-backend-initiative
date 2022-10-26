@@ -251,7 +251,7 @@ public class InitiativeDTOsToModelMapper {
         if(accomulatedAmountDTO == null){
             return null;
         }
-        return AccumulatedAmount.builder().accomulatedType(AccumulatedAmount.AccumulatedTypeEnum.valueOf(accomulatedAmountDTO.getAccumulatedType().name()))
+        return AccumulatedAmount.builder().accumulatedType(AccumulatedAmount.AccumulatedTypeEnum.valueOf(accomulatedAmountDTO.getAccumulatedType().name()))
                 .refundThreshold(accomulatedAmountDTO.getRefundThreshold()).build();
     }
 
