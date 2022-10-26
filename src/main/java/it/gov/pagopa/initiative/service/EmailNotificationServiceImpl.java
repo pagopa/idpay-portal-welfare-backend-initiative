@@ -8,7 +8,6 @@ import it.gov.pagopa.initiative.model.Initiative;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -24,7 +23,7 @@ public class EmailNotificationServiceImpl implements EmailNotificationService {
 
     private static final String SUBJECT_CHANGE_STATE = "Cambio stato iniziativa per il prodotto IdPay";
     private static final String RECIPIENTS_CHANGE_STATE_IN_REVISION = "Assistenza.IDPay@Pagopa.it";
-    public static final String COMMA_DELIMITER = ";";
+    public static final String COMMA_DELIMITER = ",";
     private final EmailNotificationRestConnector emailNotificationRestConnector;
     private final SelcRestConnector selcRestConnector;
 
@@ -37,18 +36,16 @@ public class EmailNotificationServiceImpl implements EmailNotificationService {
     }
 
     @Override
-    @Async
     public void sendInitiativeInRevision(Initiative initiative, String organizationName) {
         Map<String, String> templateValues = getMap(initiative, organizationName);
-        emailNotificationRestConnector.notifyInitiativeToEmailNotification(initiative, EMAIL_INITIATIVE_STATUS, templateValues, SUBJECT_CHANGE_STATE, RECIPIENTS_CHANGE_STATE_IN_REVISION);
+        emailNotificationRestConnector.notifyInitiativeToEmailNotification(initiative, EMAIL_INITIATIVE_STATUS, templateValues, SUBJECT_CHANGE_STATE, null, RECIPIENTS_CHANGE_STATE_IN_REVISION);
     }
 
     @Override
-    @Async
     public void sendInitiativeApprovedAndRejected(Initiative initiative, String organizationName) {
         Map<String, String> templateValues = getMap(initiative, organizationName);
         emailNotificationRestConnector.notifyInitiativeToEmailNotification(initiative,
-                EMAIL_INITIATIVE_STATUS, templateValues, SUBJECT_CHANGE_STATE,
+                EMAIL_INITIATIVE_STATUS, templateValues, SUBJECT_CHANGE_STATE, null,
                 getInstitutionProductUsers(initiative.getOrganizationId(), InitiativeConstants.Role.ADMIN)
         );
     }

@@ -6,6 +6,6 @@ import java.util.Map;
 
 public interface EmailNotificationRestConnector {
 
-    void notifyInitiativeToEmailNotification(Initiative initiative, String templateName, Map<String, String> templateValues, String subject, String recipients);
+    void notifyInitiativeToEmailNotification(Initiative initiative, String templateName, Map<String, String> templateValues, String subject, String sender, String recipients);
 
 }

@@ -17,11 +17,12 @@ public class EmailNotificationRestConnectorImpl implements EmailNotificationRest
     }
 
     @Override
-    public void notifyInitiativeToEmailNotification(Initiative initiative, String templateName, Map<String, String> templateValues, String subject, String recipients) {
+    public void notifyInitiativeToEmailNotification(Initiative initiative, String templateName, Map<String, String> templateValues, String subject, String sender, String recipients) {
         EmailMessageDTO emailMessageDTO = EmailMessageDTO.builder()
                 .templateName(templateName)
                 .templateValues(templateValues)
                 .subject(subject)
+                .senderEmail(sender)
                 .recipientEmail(recipients)
                 .build();
         emailNotificationFeignRestClient.notifyInitiativeInfo(emailMessageDTO);

@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -177,7 +178,7 @@ public class InitiativeServiceImpl implements InitiativeService {
     }
 
     @Override
-//    @Transactional
+    @Transactional
     public void updateInitiativeRefundRules(String organizationId, String organizationName, String initiativeId, Initiative refundRule, boolean changeInitiativeStatus){
         Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(organizationId, initiativeId, true)
                 .orElseThrow(() -> new InitiativeException(
@@ -201,6 +202,7 @@ public class InitiativeServiceImpl implements InitiativeService {
     }
 
     @Override
+    @Transactional
     public void updateInitiativeApprovedStatus(String organizationId, String organizationName, String initiativeId){
         Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(organizationId, initiativeId, true)
                 .orElseThrow(() -> new InitiativeException(
@@ -218,6 +220,7 @@ public class InitiativeServiceImpl implements InitiativeService {
     }
 
     @Override
+    @Transactional
     public void updateInitiativeToCheckStatus(String organizationId, String organizationName, String initiativeId){
         Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(organizationId, initiativeId, true)
                 .orElseThrow(() -> new InitiativeException(
