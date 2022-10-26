@@ -34,6 +34,7 @@ public class AESUtil {
                    @Value("${util.crypto.aes.secret-type.pbe.iterationCount}") int iterationCount,
                    @Value("${util.crypto.aes.mode.gcm.iv}") String iv,
                    @Value("${util.crypto.aes.mode.gcm.tLen}") int gcmTagLength) {
+        this.cipherInstance = cipherInstance;
         this.encoding = encoding;
         this.pbeAlgorithm = pbeAlgorithm;
         this.salt = salt;
