@@ -13,7 +13,7 @@ public class IseeCodeMustHaveFieldNullValidator implements ConstraintValidator<I
     public boolean isValid(AutomatedCriteriaDTO value, ConstraintValidatorContext context) {
         String code = value.getCode();
         String field = value.getField();
-        if (code != null && code.equals(ISEE) && field != null){
+        if (ISEE.equals(code) && field != null){
             return false;
         }
         return true;
