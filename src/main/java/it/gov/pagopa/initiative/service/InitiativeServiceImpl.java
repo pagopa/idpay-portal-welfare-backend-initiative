@@ -16,9 +16,10 @@ import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -28,26 +29,38 @@ import java.util.List;
 @Service
 @Slf4j
 public class InitiativeServiceImpl implements InitiativeService {
-    @Autowired
-    private InitiativeRepository initiativeRepository;
 
-    @Autowired
-    private InitiativeModelToDTOMapper initiativeModelToDTOMapper;
+    private final boolean notifyEmail;
+    private final InitiativeRepository initiativeRepository;
+    private final InitiativeModelToDTOMapper initiativeModelToDTOMapper;
+    private final InitiativeAdditionalDTOsToIOServiceRequestDTOMapper initiativeAdditionalDTOsToIOServiceRequestDTOMapper;
+    private final InitiativeProducer initiativeProducer;
+    private final IOBackEndRestConnector ioBackEndRestConnector;
+    private final GroupRestConnector groupRestConnector;
+    private final EmailNotificationService emailNotificationService;
+    private final IOTokenService ioTokenService;
 
-    @Autowired
-    private InitiativeProducer initiativeProducer;
-
-    @Autowired
-    private InitiativeAdditionalDTOsToIOServiceRequestDTOMapper initiativeAdditionalDTOsToIOServiceRequestDTOMapper;
-
-    @Autowired
-    IOBackEndRestConnector ioBackEndRestConnector;
-
-    @Autowired
-    GroupRestConnector groupRestConnector;
-
-    @Autowired
-    IOTokenService ioTokenService;
+    public InitiativeServiceImpl(
+            @Value("${app.initiative.conditions.notifyEmail}") boolean notifyEmail,
+            InitiativeRepository initiativeRepository,
+            InitiativeModelToDTOMapper initiativeModelToDTOMapper,
+            InitiativeAdditionalDTOsToIOServiceRequestDTOMapper initiativeAdditionalDTOsToIOServiceRequestDTOMapper,
+            InitiativeProducer initiativeProducer,
+            IOBackEndRestConnector ioBackEndRestConnector,
+            GroupRestConnector groupRestConnector,
+            EmailNotificationService emailNotificationService,
+            IOTokenService ioTokenService
+    ){
+        this.notifyEmail = notifyEmail;
+        this.initiativeRepository = initiativeRepository;
+        this.initiativeModelToDTOMapper = initiativeModelToDTOMapper;
+        this.initiativeProducer = initiativeProducer;
+        this.initiativeAdditionalDTOsToIOServiceRequestDTOMapper = initiativeAdditionalDTOsToIOServiceRequestDTOMapper;
+        this.ioBackEndRestConnector = ioBackEndRestConnector;
+        this.groupRestConnector = groupRestConnector;
+        this.emailNotificationService = emailNotificationService;
+        this.ioTokenService = ioTokenService;
+    }
 
     public List<Initiative> retrieveInitiativeSummary(String organizationId, String role) {
         List<Initiative> initiatives = initiativeRepository.retrieveInitiativeSummary(organizationId, true);
@@ -157,15 +170,16 @@ public class InitiativeServiceImpl implements InitiativeService {
                         HttpStatus.NOT_FOUND));
         //Check Initiative Status
         isInitiativeAllowedToBeEditableThenThrows(initiative);
-        initiative.setRewardRule(rewardAndTrxRules.getRewardRule());
         initiative.setTrxRule(rewardAndTrxRules.getTrxRule());
         initiative.setUpdateDate(LocalDateTime.now());
         initiative.setStatus(InitiativeConstants.Status.DRAFT);
+        initiative.setRewardRule(rewardAndTrxRules.getRewardRule());
         this.initiativeRepository.save(initiative);
     }
 
     @Override
-    public void updateInitiativeRefundRules(String organizationId, String initiativeId, Initiative refundRule, boolean changeInitiativeStatus){
+    @Transactional
+    public void updateInitiativeRefundRules(String organizationId, String organizationName, String initiativeId, Initiative refundRule, boolean changeInitiativeStatus){
         Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(organizationId, initiativeId, true)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
@@ -174,18 +188,22 @@ public class InitiativeServiceImpl implements InitiativeService {
         //Check Initiative Status
         isInitiativeAllowedToBeEditableThenThrows(initiative);
         initiative.setRefundRule(refundRule.getRefundRule());
-        log.info("[UPDATE_REFUND_RULE] - Initiative: {}. Refund rules successfully setted.", initiativeId);
+        log.info("[UPDATE_REFUND_RULE] - Initiative: {}. Refund rules successfully set.", initiativeId);
         initiative.setUpdateDate(LocalDateTime.now());
         initiative.setStatus(InitiativeConstants.Status.DRAFT);
         if (changeInitiativeStatus) {
             initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
-            log.info("[UPDATE_TO_IN_REVISION_STATUS] - Initiative: {}. Status successfully setted to IN_REVISION.", initiativeId);
+            log.info("[UPDATE_TO_IN_REVISION_STATUS] - Initiative: {}. Status successfully set to IN_REVISION.", initiativeId);
         }
         this.initiativeRepository.save(initiative);
+        if(changeInitiativeStatus && notifyEmail){
+            emailNotificationService.sendInitiativeInRevision(initiative, organizationName);
+        }
     }
 
     @Override
-    public void updateInitiativeApprovedStatus(String organizationId, String initiativeId){
+    @Transactional
+    public void updateInitiativeApprovedStatus(String organizationId, String organizationName, String initiativeId){
         Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(organizationId, initiativeId, true)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
@@ -196,10 +214,14 @@ public class InitiativeServiceImpl implements InitiativeService {
         initiative.setUpdateDate(LocalDateTime.now());
         this.initiativeRepository.save(initiative);
         log.info("[UPDATE_TO_APPROVED_STATUS] - Initiative: {}. Status successfully changed", initiative.getInitiativeId());
+        if(notifyEmail){
+            emailNotificationService.sendInitiativeApprovedAndRejected(initiative, organizationName);
+        }
     }
 
     @Override
-    public void updateInitiativeToCheckStatus(String organizationId, String initiativeId){
+    @Transactional
+    public void updateInitiativeToCheckStatus(String organizationId, String organizationName, String initiativeId){
         Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(organizationId, initiativeId, true)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
@@ -210,6 +232,9 @@ public class InitiativeServiceImpl implements InitiativeService {
         initiative.setUpdateDate(LocalDateTime.now());
         this.initiativeRepository.save(initiative);
         log.info("[UPDATE_TO_CHECK_STATUS] - Initiative: {}. Status successfully changed", initiative.getInitiativeId());
+        if(notifyEmail){
+            emailNotificationService.sendInitiativeApprovedAndRejected(initiative, organizationName);
+        }
     }
 
     @Override

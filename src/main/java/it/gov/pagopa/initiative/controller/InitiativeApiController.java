@@ -128,7 +128,8 @@ public class InitiativeApiController implements InitiativeApi {
     public ResponseEntity<Void> updateInitiativeRefundRule(String organizationId, String initiativeId, @RequestBody @Validated(ValidationOnGroup.class) InitiativeRefundRuleDTO initiativeRefundRuleDTO){
         log.info("[UPDATE_TO_IN_REVISION_STATUS]-[UPDATE_REFUND_RULE] - Initiative: {}. Start processing...", initiativeId);
         Initiative initiative = this.initiativeDTOsToModelMapper.toInitiative(initiativeRefundRuleDTO);
-        this.initiativeService.updateInitiativeRefundRules(organizationId, initiativeId, initiative, true);
+        String organizationName = initiativeRefundRuleDTO.getOrganizationName();
+        this.initiativeService.updateInitiativeRefundRules(organizationId, organizationName, initiativeId, initiative, true);
         return ResponseEntity.noContent().build();
     }
 
@@ -136,23 +137,24 @@ public class InitiativeApiController implements InitiativeApi {
     @Override
     public ResponseEntity<Void> updateInitiativeRefundRuleDraft(String organizationId, String initiativeId, @RequestBody InitiativeRefundRuleDTO initiativeRefundRuleDTO){
         Initiative initiative = this.initiativeDTOsToModelMapper.toInitiative(initiativeRefundRuleDTO);
-        this.initiativeService.updateInitiativeRefundRules(organizationId, initiativeId, initiative, false);
+        String organizationName = initiativeRefundRuleDTO.getOrganizationName();
+        this.initiativeService.updateInitiativeRefundRules(organizationId, organizationName, initiativeId, initiative, false);
         return ResponseEntity.noContent().build();
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Override
-    public ResponseEntity<Void> updateInitiativeApprovedStatus(String organizationId, String initiativeId){
+    public ResponseEntity<Void> updateInitiativeApprovedStatus(String organizationId, String initiativeId, @RequestBody InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO){
         log.info("[UPDATE_TO_APPROVED_STATUS] - Initiative: {}. Start processing...", initiativeId);
-        this.initiativeService.updateInitiativeApprovedStatus(organizationId, initiativeId);
+        this.initiativeService.updateInitiativeApprovedStatus(organizationId, initiativeOrganizationInfoDTO.getOrganizationName(), initiativeId);
         return ResponseEntity.noContent().build();
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Override
-    public ResponseEntity<Void> updateInitiativeToCheckStatus(String organizationId, String initiativeId ){
+    public ResponseEntity<Void> updateInitiativeToCheckStatus(String organizationId, String initiativeId, @RequestBody InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO){
         log.info("[UPDATE_TO_CHECK_STATUS] - Initiative: {}. Start processing...", initiativeId);
-        this.initiativeService.updateInitiativeToCheckStatus(organizationId, initiativeId);
+        this.initiativeService.updateInitiativeToCheckStatus(organizationId, initiativeOrganizationInfoDTO.getOrganizationName(), initiativeId);
         return ResponseEntity.noContent().build();
     }
 

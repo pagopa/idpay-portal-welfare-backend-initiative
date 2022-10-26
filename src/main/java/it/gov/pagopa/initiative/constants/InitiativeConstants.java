@@ -19,9 +19,14 @@ public class InitiativeConstants {
             public static final String [] INITIATIVE_ALLOWED_STATES_TO_BECOME_PUBLISHED_ARRAY = {Status.APPROVED};
         }
     }
+
     public static final class Role {
         public static final String ADMIN = "admin";
         public static final String OPE_BASE = "ope_base";
+    }
+
+    public static final class EmailTemplate {
+        public static final String EMAIL_INITIATIVE_STATUS = "Email_InitiativeStatus";
     }
 
     public static final class Exception extends AbstractConstant {
@@ -58,6 +63,10 @@ public class InitiativeConstants {
         }
         public static final class UnprocessableEntity { //422
             public static final String CODE = BASE_CODE + ".unprocessable.entity";
+        }
+        public static final class InternalServerError { //500 (5xx)
+            public static final String CODE = BASE_CODE + ".internal-server-error";
+            public static final String INTEGRATION_CODE = CODE + ".integration";
         }
     }
 }

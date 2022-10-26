@@ -14,15 +14,9 @@ spring:
         kafka-initiative-outcome:
           type: kafka
           environment:
-            spring:
-              cloud:
-                stream:
-                  kafka:
-                    binder:
-                      configuration:
-                        sasl:
-                          jaas:
-                            config: ${KAFKA_INITIATIVE_SASL_JAAS_CONFIG:}
+            spring.cloud.stream.kafka.binder:
+               configuration:
+                 sasl.jaas.config: ${KAFKA_INITIATIVE_SASL_JAAS_CONFIG:}
       kafka:
         binder:
           auto-create-topics: 'false'
@@ -33,12 +27,6 @@ spring:
             session.timeout.ms: ${KAFKA_CONFIG_INITIATIVE_SESSION_TIMEOUT_MS:60000}
             sasl.mechanism: ${KAFKA_INITIATIVE_SASL_MECHANISM}
             security.protocol: ${KAFKA_INITIATIVE_SECURITY_PROTOCOL}
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
 
 rest-client:
   backend-io:
@@ -53,11 +41,25 @@ rest-client:
     service:
       name: ms-group
       base-url: ${GROUP_MS_HOST:}/idpay
+  email-notification:
+    service:
+      name: ms-email-notification
+      base-url: ${EMAIL_NOTIFICATION_MS_HOST:}/idpay/email-notification
+      path: /notify
+  selc:
+    service:
+      base-url: ${SELC_BASE_URL:}/external/v1
+      name: selc-prod-users
+      subscriptionKey: ${SELC_EXTERNAL_API_KEY:}
+      selfCareUid: ${SELC_UID:idpay}
 feign:
   okhttp:
     enabled: true
   client:
     config:
+      default:
+        errorDecoder: it.gov.pagopa.initiative.connector.error.decoder.Custom5xxErrorDecoder
+        retryer: feign.Retryer.Default
       backend-io:
         loggerLevel: ${FEIGN_CLIENT_CONFIG_IO_LOG_LEVEL:basic}
       ms-group:
@@ -81,6 +83,7 @@ app:
     conditions:
       notifyIO: ${APP_INITIATIVE_CONDITIONS_NOTIFY_IO:true}
       notifyRE: ${APP_INITIATIVE_CONDITIONS_NOTIFY_RE:true}
+      notifyEmail: ${APP_INITIATIVE_CONDITIONS_NOTIFY_EMAIL:true}
 
 util:
   crypto:

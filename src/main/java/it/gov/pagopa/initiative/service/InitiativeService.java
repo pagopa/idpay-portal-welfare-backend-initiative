@@ -27,11 +27,11 @@ public interface InitiativeService {
 
     void updateTrxAndRewardRules(String organizationId, String initiativeId, Initiative rewardAndTrxRules);
 
-    void updateInitiativeRefundRules(String organizationId, String initiativeId, Initiative refundRule, boolean changeInitiativeStatus);
+    void updateInitiativeRefundRules(String organizationId, String organizationName, String initiativeId, Initiative refundRule, boolean changeInitiativeStatus);
 
-    void updateInitiativeApprovedStatus(String organizationId, String initiativeId);
+    void updateInitiativeApprovedStatus(String organizationId, String organizationName, String initiativeId);
 
-    void updateInitiativeToCheckStatus(String organizationId, String initiativeId);
+    void updateInitiativeToCheckStatus(String organizationId, String organizationName, String initiativeId);
 
     void logicallyDeleteInitiative(String organizationId, String initiativeId);
 
