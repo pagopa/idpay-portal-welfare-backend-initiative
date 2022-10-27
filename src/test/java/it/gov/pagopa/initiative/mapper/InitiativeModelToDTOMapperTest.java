@@ -1334,7 +1334,7 @@ class InitiativeModelToDTOMapperTest {
 
     private AccumulatedAmount createAccumulatedAmountValid(){
         AccumulatedAmount amount = new AccumulatedAmount();
-        amount.setAccomulatedType(AccumulatedAmount.AccumulatedTypeEnum.THRESHOLD_REACHED);
+        amount.setAccumulatedType(AccumulatedAmount.AccumulatedTypeEnum.THRESHOLD_REACHED);
         amount.setRefundThreshold(BigDecimal.valueOf(100000));
         return amount;
     }

@@ -47,9 +47,8 @@ public class InitiativeApiController implements InitiativeApi {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @Override
-    public ResponseEntity<InitiativeDTO> getInitiativeDetail(String organizationId, String initiativeId) {
-        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDTO(this.initiativeService.getInitiative(organizationId, initiativeId)));
+    public ResponseEntity<InitiativeDTO> getInitiativeDetail(String organizationId, String initiativeId, String role) {
+        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDTO(this.initiativeService.getInitiative(organizationId, initiativeId, role)));
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -89,8 +88,8 @@ public class InitiativeApiController implements InitiativeApi {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Override
-    public ResponseEntity<Void> updateInitiativeBeneficiary(String organizationId, String initiativeId, @RequestBody @Validated(ValidationOnGroup.class) InitiativeBeneficiaryRuleDTO beneficiaryRuleDto) {
-        if(Boolean.TRUE.equals(this.initiativeService.getInitiative(organizationId, initiativeId).getGeneral().getBeneficiaryKnown())){
+    public ResponseEntity<Void> updateInitiativeBeneficiary(String organizationId, String initiativeId, @RequestBody @Validated(ValidationOnGroup.class) InitiativeBeneficiaryRuleDTO beneficiaryRuleDto, String role) {
+        if(Boolean.TRUE.equals(this.initiativeService.getInitiative(organizationId, initiativeId, role).getGeneral().getBeneficiaryKnown())){
             throw new InitiativeException(
                     InitiativeConstants.Exception.BadRequest.CODE,
                     String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_PROPERTIES_NOT_VALID, initiativeId),
@@ -129,7 +128,8 @@ public class InitiativeApiController implements InitiativeApi {
     public ResponseEntity<Void> updateInitiativeRefundRule(String organizationId, String initiativeId, @RequestBody @Validated(ValidationOnGroup.class) InitiativeRefundRuleDTO initiativeRefundRuleDTO){
         log.info("[UPDATE_TO_IN_REVISION_STATUS]-[UPDATE_REFUND_RULE] - Initiative: {}. Start processing...", initiativeId);
         Initiative initiative = this.initiativeDTOsToModelMapper.toInitiative(initiativeRefundRuleDTO);
-        this.initiativeService.updateInitiativeRefundRules(organizationId, initiativeId, initiative, true);
+        String organizationName = initiativeRefundRuleDTO.getOrganizationName();
+        this.initiativeService.updateInitiativeRefundRules(organizationId, organizationName, initiativeId, initiative, true);
         return ResponseEntity.noContent().build();
     }
 
@@ -137,23 +137,24 @@ public class InitiativeApiController implements InitiativeApi {
     @Override
     public ResponseEntity<Void> updateInitiativeRefundRuleDraft(String organizationId, String initiativeId, @RequestBody InitiativeRefundRuleDTO initiativeRefundRuleDTO){
         Initiative initiative = this.initiativeDTOsToModelMapper.toInitiative(initiativeRefundRuleDTO);
-        this.initiativeService.updateInitiativeRefundRules(organizationId, initiativeId, initiative, false);
+        String organizationName = initiativeRefundRuleDTO.getOrganizationName();
+        this.initiativeService.updateInitiativeRefundRules(organizationId, organizationName, initiativeId, initiative, false);
         return ResponseEntity.noContent().build();
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Override
-    public ResponseEntity<Void> updateInitiativeApprovedStatus(String organizationId, String initiativeId){
+    public ResponseEntity<Void> updateInitiativeApprovedStatus(String organizationId, String initiativeId, @RequestBody InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO){
         log.info("[UPDATE_TO_APPROVED_STATUS] - Initiative: {}. Start processing...", initiativeId);
-        this.initiativeService.updateInitiativeApprovedStatus(organizationId, initiativeId);
+        this.initiativeService.updateInitiativeApprovedStatus(organizationId, initiativeOrganizationInfoDTO.getOrganizationName(), initiativeId);
         return ResponseEntity.noContent().build();
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Override
-    public ResponseEntity<Void> updateInitiativeToCheckStatus(String organizationId, String initiativeId ){
+    public ResponseEntity<Void> updateInitiativeToCheckStatus(String organizationId, String initiativeId, @RequestBody InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO){
         log.info("[UPDATE_TO_CHECK_STATUS] - Initiative: {}. Start processing...", initiativeId);
-        this.initiativeService.updateInitiativeToCheckStatus(organizationId, initiativeId);
+        this.initiativeService.updateInitiativeToCheckStatus(organizationId, initiativeOrganizationInfoDTO.getOrganizationName(), initiativeId);
         return ResponseEntity.noContent().build();
     }
 
@@ -173,10 +174,10 @@ public class InitiativeApiController implements InitiativeApi {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Override
-    public ResponseEntity<Void> updateInitiativePublishedStatus(String organizationId, String initiativeId, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO) {
+    public ResponseEntity<Void> updateInitiativePublishedStatus(String organizationId, String initiativeId, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO, String role) {
         //Retrieve Initiative
         log.info("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Start processing...", initiativeId);
-        Initiative initiative = this.initiativeService.getInitiative(organizationId, initiativeId);
+        Initiative initiative = this.initiativeService.getInitiative(organizationId, initiativeId, role);
         log.debug("Initiative retrieved");
 
         //Validation for current Status
@@ -198,13 +199,16 @@ public class InitiativeApiController implements InitiativeApi {
                 initiativeService.sendInitiativeInfoToRuleEngine(initiative);
             }
             //1. Only for the Initiatives to be provided to IO, the integration is carried out with the creation of the Initiative Service to IO BackEnd
-            //2. Sprint 9: In caso di beneficiaryKnown a true -> Invio al MS-Gruppi via API la richiesta di notifica della pubblicazione e, MS Gruppi la invia via coda al NotificationManager
             if(initiative.getAdditionalInfo().getServiceIO()) {
                 log.info("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Notification to IO BackEnd of the published Initiative", initiativeId);
                 initiative = initiativeService.sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(initiative, initiativeOrganizationInfoDTO);
                 initiativeService.updateInitiative(initiative);
                 //Invio al MS-Gruppi via API
                 //This integration necessarily takes place in succession to having created the service with IO in order not to send "orphan" resources (not associated with any Initiative known by IO).
+                //2. BeneficiaryKnown a true -> Invio al MS-Gruppi via API la richiesta di notifica della pubblicazione e, MS Gruppi la invia via coda al NotificationManager
+                if(null!= initiative.getGeneral() && initiative.getGeneral().getBeneficiaryKnown()){
+                    initiativeService.sendInitiativeInfoToNotificationManager(initiative);
+                }
             }
         } catch (Exception e) {
             //In case one of the previous Integrations ends badly, the Initiative is rolled back to the initial TEMP state

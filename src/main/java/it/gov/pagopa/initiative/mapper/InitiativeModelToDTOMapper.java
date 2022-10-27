@@ -190,8 +190,8 @@ public class InitiativeModelToDTOMapper {
             dto = RewardGroupsDTO.builder()
                     .type(rewardGroupsInput.getType())
                     .rewardGroups(rewardGroupsInput.getRewardGroups().stream().map(
-                            x -> RewardGroupsDTO.RewardGroupDTO.builder().from(x.getFrom()).to(x.getTo()).rewardValue(x.getRewardValue()).build()
-                    ).toList())
+                    x -> RewardGroupsDTO.RewardGroupDTO.builder().from(x.getFrom()).to(x.getTo()).rewardValue(x.getRewardValue()).build()
+            ).toList())
                     .build();
         }
         return dto;
@@ -281,7 +281,7 @@ public class InitiativeModelToDTOMapper {
         if(accomulatedAmount == null){
             return null;
         }
-        return AccumulatedAmountDTO.builder().accumulatedType(AccumulatedAmountDTO.AccumulatedTypeEnum.valueOf(accomulatedAmount.getAccomulatedType().name()))
+        return AccumulatedAmountDTO.builder().accumulatedType(AccumulatedAmountDTO.AccumulatedTypeEnum.valueOf(accomulatedAmount.getAccumulatedType().name()))
                 .refundThreshold(accomulatedAmount.getRefundThreshold()).build();
     }
 

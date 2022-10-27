@@ -1,7 +1,8 @@
 package it.gov.pagopa.initiative.service;
 
 
-import it.gov.pagopa.initiative.connector.io.service.IOBackEndRestConnector;
+import it.gov.pagopa.initiative.connector.group.GroupRestConnector;
+import it.gov.pagopa.initiative.connector.io_service.IOBackEndRestConnector;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.io.service.ServiceMetadataDTO;
@@ -34,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.TestPropertySource;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -47,6 +49,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@TestPropertySource(
+        locations = "classpath:application.yml",
+        properties = {
+                "app.initiative.conditions.notifyEmail=true"
+        })
 @WebMvcTest(value = {
         InitiativeService.class})
 @Slf4j
@@ -73,6 +80,7 @@ class InitiativeServiceTest {
     private static final String PRODUCT_DEPARTMENT_NAME = "productDepartmentName";
     private static final String SERVICE_ID = "serviceId";
     public static final String ANY_KEY_TOKEN_IO = "ANY_KEY_TOKEN_IO";
+    private static final String ROLE = "admin";
 
     @Autowired
     InitiativeService initiativeService;
@@ -91,6 +99,12 @@ class InitiativeServiceTest {
 
     @MockBean
     IOBackEndRestConnector ioBackEndRestConnector;
+
+    @MockBean
+    GroupRestConnector groupRestConnector;
+
+    @MockBean
+    EmailNotificationService emailNotificationService;
 
     @MockBean
     IOTokenService ioTokenService;
@@ -115,7 +129,7 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void givenRoleOpeBase_retrieveInitiativeSummary_ok() throws Exception {
+    void givenRoleOpeBase_statusInRevision_retrieveInitiativeSummary_ok() throws Exception {
         Initiative step2Initiative1 = createStep2Initiative();
         step2Initiative1.setStatus(InitiativeConstants.Status.IN_REVISION);
         Initiative step2Initiative2 = createStep2Initiative();
@@ -133,6 +147,48 @@ class InitiativeServiceTest {
         // you are expecting repo to be called once with correct param
         verify(initiativeRepository).retrieveInitiativeSummary(ORGANIZATION_ID, true); // same as: verify(initiativeRepository, times(1)).retrieveInitiativeSummary(anyString());
     }
+
+    @Test
+    void givenRoleOpeBase_statusApproved_retrieveInitiativeSummary_ok() throws Exception {
+        Initiative step2Initiative1 = createStep2Initiative();
+        step2Initiative1.setStatus(InitiativeConstants.Status.APPROVED);
+        Initiative step2Initiative2 = createStep2Initiative();
+        List<Initiative> initiativeList = Arrays.asList(step2Initiative1);
+
+        //Instruct the Repo Mock to return Dummy Initiatives
+        when(initiativeRepository.retrieveInitiativeSummary(ORGANIZATION_ID, true)).thenReturn(initiativeList);
+
+        //Try to call the Real Service (which is using the instructed Repo)
+        List<Initiative> initiatives = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, OPE_BASE);
+
+        //Check the equality of the results
+        assertEquals(initiativeList, initiatives);
+
+        // you are expecting repo to be called once with correct param
+        verify(initiativeRepository).retrieveInitiativeSummary(ORGANIZATION_ID, true); // same as: verify(initiativeRepository, times(1)).retrieveInitiativeSummary(anyString());
+    }
+
+    @Test
+    void givenRoleOpeBase_statusToCheck_retrieveInitiativeSummary_ok() throws Exception {
+        Initiative step2Initiative1 = createStep2Initiative();
+        step2Initiative1.setStatus(InitiativeConstants.Status.TO_CHECK);
+        Initiative step2Initiative2 = createStep2Initiative();
+        List<Initiative> initiativeList = Arrays.asList(step2Initiative1);
+
+        //Instruct the Repo Mock to return Dummy Initiatives
+        when(initiativeRepository.retrieveInitiativeSummary(ORGANIZATION_ID, true)).thenReturn(initiativeList);
+
+        //Try to call the Real Service (which is using the instructed Repo)
+        List<Initiative> initiatives = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, OPE_BASE);
+
+        //Check the equality of the results
+        assertEquals(initiativeList, initiatives);
+
+        // you are expecting repo to be called once with correct param
+        verify(initiativeRepository).retrieveInitiativeSummary(ORGANIZATION_ID, true); // same as: verify(initiativeRepository, times(1)).retrieveInitiativeSummary(anyString());
+    }
+
+
 
     @Test
     void retrieveInitiativeSummary_ko() {
@@ -216,7 +272,7 @@ class InitiativeServiceTest {
         when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.ofNullable(step2Initiative));
 
         //Try to call the Real Service (which is using the instructed Repo)
-        Initiative initiative = initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID);
+        Initiative initiative = initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
 
         //Check the equality of the results
         assertEquals(Optional.ofNullable(step2Initiative).get(), initiative);
@@ -228,18 +284,79 @@ class InitiativeServiceTest {
     @Test
     void getInitiative_ko() throws Exception {
         //Try to call the Real Service (which is using the instructed Repo)
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenThrow(new InitiativeException(
-                InitiativeConstants.Exception.NotFound.CODE,
-                "anyString()",
-                HttpStatus.NOT_FOUND
-        ));
+        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.empty());
         try {
-            Initiative initiative = initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID);
+            Initiative initiative = initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
         } catch (InitiativeException e) {
             log.info("InitiativeException: " + e.getCode());
             assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
             assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
         }
+    }
+
+    @Test
+    void getInitiative_roleBase_statusInRevision_ok() throws Exception {
+        Initiative step2Initiative = createStep2Initiative();
+        step2Initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
+        //Instruct the Repo Mock to return Dummy Initiatives
+        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.ofNullable(step2Initiative));
+
+        //Try to call the Real Service (which is using the instructed Repo)
+        Initiative initiative = initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, OPE_BASE);
+
+        //Check the equality of the results
+        assertEquals(Optional.ofNullable(step2Initiative).get(), initiative);
+
+        // you are expecting repo to be called once with correct param
+        verify(initiativeRepository).findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true); // same as: verify(initiativeRepository, times(1)).retrieveInitiativeSummary(anyString());
+    }
+
+    @Test
+    void getInitiative_roleBase_statusApproved_ok() throws Exception {
+        Initiative step2Initiative = createStep2Initiative();
+        step2Initiative.setStatus(InitiativeConstants.Status.APPROVED);
+        //Instruct the Repo Mock to return Dummy Initiatives
+        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.ofNullable(step2Initiative));
+
+        //Try to call the Real Service (which is using the instructed Repo)
+        Initiative initiative = initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, OPE_BASE);
+
+        //Check the equality of the results
+        assertEquals(Optional.ofNullable(step2Initiative).get(), initiative);
+
+        // you are expecting repo to be called once with correct param
+        verify(initiativeRepository).findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true); // same as: verify(initiativeRepository, times(1)).retrieveInitiativeSummary(anyString());
+    }
+
+    @Test
+    void getInitiative_roleBase_statusToCheck_ok() throws Exception {
+        Initiative step2Initiative = createStep2Initiative();
+        step2Initiative.setStatus(InitiativeConstants.Status.TO_CHECK);
+        //Instruct the Repo Mock to return Dummy Initiatives
+        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.ofNullable(step2Initiative));
+
+        //Try to call the Real Service (which is using the instructed Repo)
+        Initiative initiative = initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, OPE_BASE);
+
+        //Check the equality of the results
+        assertEquals(Optional.ofNullable(step2Initiative).get(), initiative);
+
+        // you are expecting repo to be called once with correct param
+        verify(initiativeRepository).findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true); // same as: verify(initiativeRepository, times(1)).retrieveInitiativeSummary(anyString());
+    }
+
+    @Test
+    void getInitiative_roleBase_statusNotValid_thenThrowException_ok() throws Exception {
+        Initiative step2Initiative = createStep2Initiative();
+        step2Initiative.setStatus(InitiativeConstants.Status.PUBLISHED);
+
+        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.ofNullable(step2Initiative));
+
+        Executable executable = () -> initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, OPE_BASE);
+
+        assertThrows(InitiativeException.class, executable);
+
+        verify(initiativeRepository).findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true); // same as: verify(initiativeRepository, times(1)).retrieveInitiativeSummary(anyString());
     }
 
     @Test
@@ -261,7 +378,7 @@ class InitiativeServiceTest {
 
     @Test
     void getInitiativeBeneficiaryView_ko() throws Exception {
-        //Try to call the Real Service (which is using the instructed Repo)
+        when(initiativeRepository.retrieveInitiativeBeneficiaryView(INITIATIVE_ID, true)).thenReturn(Optional.empty());
         try {
             Initiative initiative = initiativeService.getInitiativeBeneficiaryView(INITIATIVE_ID);
         } catch (InitiativeException e) {
@@ -286,11 +403,12 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void updateInitiativeGeneralInfo_ko() throws Exception {
+    void updateInitiativeGeneralInfo_thenThrowInitiativeException() throws Exception {
         Initiative fullInitiative = createStep2Initiative();
         //Try to call the Real Service (which is using the instructed Repo)
+        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.empty());
         try {
-            initiativeService.updateInitiativeGeneralInfo("Ente1", INITIATIVE_ID, fullInitiative);
+            initiativeService.updateInitiativeGeneralInfo(ORGANIZATION_ID, INITIATIVE_ID, fullInitiative);
         } catch (InitiativeException e) {
             log.info("InitiativeException: " + e.getCode());
             assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
@@ -313,9 +431,9 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void updateInitiativeAdditionalInfo_ko() throws Exception {
+    void updateInitiativeAdditionalInfo_thenThrowInitiativeException() throws Exception {
         Initiative fullInitiative = createStep1Initiative();
-        //Try to call the Real Service (which is using the instructed Repo)
+        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.empty());
         try {
             initiativeService.updateInitiativeAdditionalInfo(ORGANIZATION_ID, INITIATIVE_ID, fullInitiative);
         } catch (InitiativeException e) {
@@ -341,16 +459,11 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void updateInitiativeBeneficiary_ko() throws Exception {
+    void updateInitiativeBeneficiary_thenThrowInitiativeException() throws Exception {
         InitiativeBeneficiaryRule initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
 
         //Instruct the Repo Mock to return Dummy Initiatives
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenThrow(
-                new InitiativeException(
-                        InitiativeConstants.Exception.NotFound.CODE,
-                        String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID),
-                        HttpStatus.NOT_FOUND)
-        );
+        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.empty());
 
         //Try to call the Real Service (which is using the instructed Repo)
         try {
@@ -382,18 +495,13 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void updateInitiativeRewardAndTrxRules_ko() throws Exception {
+    void updateInitiativeRewardAndTrxRules_thenThrowInitiativeException() throws Exception {
         InitiativeRewardRule rewardRule = createRewardRule(false);
         InitiativeTrxConditions trxRuleCondition = createTrxRuleCondition();
         Initiative initiative = Initiative.builder().rewardRule(rewardRule).trxRule(trxRuleCondition).build();
 
         //Instruct the Repo Mock to return Dummy Initiatives
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenThrow(
-                new InitiativeException(
-                        InitiativeConstants.Exception.NotFound.CODE,
-                        String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID),
-                        HttpStatus.NOT_FOUND)
-        );
+        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.empty());
 
         //Try to call the Real Service (which is using the instructed Repo)
         try {
@@ -410,22 +518,17 @@ class InitiativeServiceTest {
     void updateRefundRules_ok(){
         Initiative initiative = createInitiativeOnlyRefundRule();
         when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.ofNullable(initiative));
-        initiativeService.updateInitiativeRefundRules(ORGANIZATION_ID, INITIATIVE_ID, initiative, false);
+        initiativeService.updateInitiativeRefundRules(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID, initiative, false);
         verify(initiativeRepository, times(1)).findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true);
     }
 
     @Test
-    void updateRefundRules_ko(){
+    void updateRefundRules_thenThrowInitiativeException(){
         Initiative initiative = createInitiativeOnlyRefundRule();
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenThrow(
-                new InitiativeException(
-                        InitiativeConstants.Exception.NotFound.CODE,
-                        String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID),
-                        HttpStatus.NOT_FOUND)
-        );
+        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.empty());
 
         try{
-            initiativeService.updateInitiativeRefundRules(ORGANIZATION_ID, INITIATIVE_ID, initiative, false);
+            initiativeService.updateInitiativeRefundRules(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID, initiative, false);
         }catch (InitiativeException e){
             log.info("InitiativeException: " + e.getCode());
             assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
@@ -441,7 +544,7 @@ class InitiativeServiceTest {
 
         when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.ofNullable(initiativeNotProcessable));
 
-        InitiativeException exception = assertThrows(InitiativeException.class, () -> initiativeService.updateInitiativeRefundRules(ORGANIZATION_ID, INITIATIVE_ID, initiative, true));
+        InitiativeException exception = assertThrows(InitiativeException.class, () -> initiativeService.updateInitiativeRefundRules(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID, initiative, true));
 
         assertEquals(HttpStatus.BAD_REQUEST, exception.getHttpStatus());
         assertEquals(InitiativeConstants.Exception.BadRequest.CODE, exception.getCode());
@@ -453,7 +556,7 @@ class InitiativeServiceTest {
         Initiative initiative = createStep4Initiative();
         initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
         when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.ofNullable(initiative));
-        initiativeService.updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID);
+        initiativeService.updateInitiativeApprovedStatus(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID);
         verify(initiativeRepository, times(1)).findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true);
     }
 
@@ -461,10 +564,17 @@ class InitiativeServiceTest {
     void updateInitiativeApprovedStatus_thenThrowInitiativeException(){
         Initiative initiative = createStep4Initiative();
         initiative.setStatus(InitiativeConstants.Status.TO_CHECK);
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
+
+        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenThrow(
+                new InitiativeException(
+                        InitiativeConstants.Exception.BadRequest.CODE,
+                        String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_IN_REVISION, INITIATIVE_ID),
+                        HttpStatus.BAD_REQUEST
+                )
+        );
 
         try{
-            initiativeService.updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID);
+            initiativeService.updateInitiativeApprovedStatus(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID);
         }catch (InitiativeException e){
             log.info("InitiativeException: " + e.getCode());
             assertEquals(HttpStatus.BAD_REQUEST, e.getHttpStatus());
@@ -476,15 +586,10 @@ class InitiativeServiceTest {
     @Test
     void updateInitiativeApprovedStatus_then400isRaisedForInitiativeException(){
         Initiative initiative = createStep4Initiative();
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenThrow(
-                new InitiativeException(
-                        InitiativeConstants.Exception.NotFound.CODE,
-                        String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID),
-                        HttpStatus.NOT_FOUND)
-        );
+        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.empty());
 
         try{
-            initiativeService.updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID);
+            initiativeService.updateInitiativeApprovedStatus(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID);
         }catch (InitiativeException e){
             log.info("InitiativeException: " + e.getCode());
             assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
@@ -605,7 +710,7 @@ class InitiativeServiceTest {
         when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.ofNullable(step4Initiative));
 
         //Try to call the Real Service (which is using the instructed Repo)
-        initiativeService.updateInitiativeToCheckStatus(ORGANIZATION_ID, INITIATIVE_ID);
+        initiativeService.updateInitiativeToCheckStatus(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID);
 
         // you are expecting repo to be called once with correct param
         verify(initiativeRepository, times(1)).findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true);
@@ -615,7 +720,6 @@ class InitiativeServiceTest {
         Initiative step4Initiative = createStep4Initiative();
         step4Initiative.setStatus(InitiativeConstants.Status.TO_CHECK);
 
-        //Instruct the Repo Mock to return Dummy Initiatives
         when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenThrow(
                 new InitiativeException(
                         InitiativeConstants.Exception.BadRequest.CODE,
@@ -625,7 +729,7 @@ class InitiativeServiceTest {
         );
 
         try{
-            initiativeService.updateInitiativeToCheckStatus(ORGANIZATION_ID, INITIATIVE_ID);
+            initiativeService.updateInitiativeToCheckStatus(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID);
         }catch (InitiativeException e){
             log.info("InitiativeException: " + e.getCode());
             assertEquals(HttpStatus.BAD_REQUEST, e.getHttpStatus());
@@ -636,15 +740,10 @@ class InitiativeServiceTest {
 
     @Test
     void updateInitiativeStatusToCheck_thenThrowExceptionAndStatusIsNotUpdated(){
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenThrow(
-                new InitiativeException(
-                        InitiativeConstants.Exception.NotFound.CODE,
-                        String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID),
-                        HttpStatus.NOT_FOUND)
-        );
+        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.empty());
 
         try{
-            initiativeService.updateInitiativeToCheckStatus(ORGANIZATION_ID, INITIATIVE_ID);
+            initiativeService.updateInitiativeToCheckStatus(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID);
         }catch (InitiativeException e){
             log.info("InitiativeException: " + e.getCode());
             assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
@@ -1203,7 +1302,7 @@ class InitiativeServiceTest {
 
     AccumulatedAmount createAccumulatedAmountValid(){
         AccumulatedAmount amount = new AccumulatedAmount();
-        amount.setAccomulatedType(AccumulatedAmount.AccumulatedTypeEnum.THRESHOLD_REACHED);
+        amount.setAccumulatedType(AccumulatedAmount.AccumulatedTypeEnum.THRESHOLD_REACHED);
         amount.setRefundThreshold(BigDecimal.valueOf(100000));
         return amount;
     }

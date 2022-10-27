@@ -24,8 +24,7 @@ public class AESUtil {
     private final int keySize;
     private final int iterationCount;
     private final int gcmTagLength;
-
-    private final Cipher cipher;
+    private String cipherInstance;
 
     public AESUtil(@Value("${util.crypto.aes.cipherInstance}") String cipherInstance,
                    @Value("${util.crypto.aes.encoding}") String encoding,
@@ -35,12 +34,7 @@ public class AESUtil {
                    @Value("${util.crypto.aes.secret-type.pbe.iterationCount}") int iterationCount,
                    @Value("${util.crypto.aes.mode.gcm.iv}") String iv,
                    @Value("${util.crypto.aes.mode.gcm.tLen}") int gcmTagLength) {
-        try {
-            cipher = Cipher.getInstance(cipherInstance);
-        }
-        catch (NoSuchPaddingException | NoSuchAlgorithmException e) {
-            throw fail(e);
-        }
+        this.cipherInstance = cipherInstance;
         this.encoding = encoding;
         this.pbeAlgorithm = pbeAlgorithm;
         this.salt = salt;
@@ -87,13 +81,14 @@ public class AESUtil {
     private byte[] doFinal(int encryptMode, SecretKey key, byte[] bytes) {
         try {
             GCMParameterSpec parameterSpec = new GCMParameterSpec(gcmTagLength * 8, iv.getBytes());
-            cipher.init(encryptMode, key, parameterSpec);
-
-//            SecureRandom SECURE_RANDOM = new SecureRandom();
-//            byte[] ivBytes = new byte[]{-15, -60, -48, 126, -41, -117, -68, -94, -88, -56, 39, 53, -56, -9, 71, -35};
-//            cipher.init(encryptMode, key, new IvParameterSpec(iv.getBytes()));
-//            cipher.init(encryptMode, key, new IvParameterSpec(ivBytes), SECURE_RANDOM);
-            return cipher.doFinal(bytes);
+            try {
+                Cipher cipher = Cipher.getInstance(this.cipherInstance);
+                cipher.init(encryptMode, key, parameterSpec);
+                return cipher.doFinal(bytes);
+            }
+            catch (NoSuchPaddingException | NoSuchAlgorithmException e) {
+                throw fail(e);
+            }
         }
         catch (InvalidKeyException
                | InvalidAlgorithmParameterException

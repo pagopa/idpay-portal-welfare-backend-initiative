@@ -40,7 +40,7 @@ public class AccumulatedAmount {
         }
     }
 
-    private AccumulatedTypeEnum accomulatedType;
+    private AccumulatedTypeEnum accumulatedType;
 
     private BigDecimal refundThreshold;
 }

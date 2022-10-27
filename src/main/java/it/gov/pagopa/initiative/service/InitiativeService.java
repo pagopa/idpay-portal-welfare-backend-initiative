@@ -15,7 +15,7 @@ public interface InitiativeService {
 
     Initiative insertInitiative(Initiative initiative);
 
-    Initiative getInitiative(String organizationId, String initiativeId);
+    Initiative getInitiative(String organizationId, String initiativeId, String role);
 
     Initiative getInitiativeBeneficiaryView(String initiativeId);
 
@@ -27,15 +27,17 @@ public interface InitiativeService {
 
     void updateTrxAndRewardRules(String organizationId, String initiativeId, Initiative rewardAndTrxRules);
 
-    void updateInitiativeRefundRules(String organizationId, String initiativeId, Initiative refundRule, boolean changeInitiativeStatus);
+    void updateInitiativeRefundRules(String organizationId, String organizationName, String initiativeId, Initiative refundRule, boolean changeInitiativeStatus);
 
-    void updateInitiativeApprovedStatus(String organizationId, String initiativeId);
+    void updateInitiativeApprovedStatus(String organizationId, String organizationName, String initiativeId);
 
-    void updateInitiativeToCheckStatus(String organizationId, String initiativeId);
+    void updateInitiativeToCheckStatus(String organizationId, String organizationName, String initiativeId);
 
     void logicallyDeleteInitiative(String organizationId, String initiativeId);
 
     void sendInitiativeInfoToRuleEngine(Initiative initiative);
+
+    void sendInitiativeInfoToNotificationManager(Initiative initiative);
 
     void isInitiativeAllowedToBeNextStatusThenThrows(Initiative initiative, String statusToBeUpdated);
 
