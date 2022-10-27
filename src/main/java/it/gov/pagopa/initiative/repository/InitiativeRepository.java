@@ -19,6 +19,7 @@ public interface InitiativeRepository extends MongoRepository<Initiative, String
     @Query(
             value="{initiativeId : ?0, enabled: ?1}",
             fields="{initiativeId : 1, " +
+                    "organizationId : 1, " +
                     "initiativeName : 1, " +
                     "status : 1, " +
                     "'additionalInfo.serviceId' : 1, " +
