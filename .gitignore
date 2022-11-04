@@ -1,3 +1,4 @@
+**/charts/*.tgz
 HELP.md
 !**/src/main/**/target/
 !**/src/test/**/target/
@@ -106,4 +107,5 @@ Desktop.ini
 ######################
 .eslintcache
 
-#TEST
+# Application resources
+/src/main/resources/application-local.yml

@@ -1,0 +1,103 @@
+spring:
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
+      database: ${MONGODB_DBNAME}
+  cloud:
+    stream:
+      bindings:
+        initiativeQueue-out-0:
+          binder: kafka-initiative-outcome
+          destination: ${KAFKA_INITIATIVE_OUTCOME_TOPIC:idpay-rule-update}
+          content-type: ${KAFKA_CONTENT_TYPE:application/json}
+      binders:
+        kafka-initiative-outcome:
+          type: kafka
+          environment:
+            spring.cloud.stream.kafka.binder:
+               configuration:
+                 sasl.jaas.config: ${KAFKA_INITIATIVE_SASL_JAAS_CONFIG:}
+      kafka:
+        binder:
+          auto-create-topics: 'false'
+          brokers: ${KAFKA_BINDER_BROKER_ENDPOINT_LIST}
+          configuration:
+            heartbeat.interval.ms: ${KAFKA_CONFIG_INITIATIVE_HEARTBEAT_INTERVAL_MS:30000}
+            request.timeout.ms: ${KAFKA_CONFIG_INITIATIVE_REQUEST_TIMEOUT_MS:60000}
+            session.timeout.ms: ${KAFKA_CONFIG_INITIATIVE_SESSION_TIMEOUT_MS:60000}
+            sasl.mechanism: ${KAFKA_INITIATIVE_SASL_MECHANISM}
+            security.protocol: ${KAFKA_INITIATIVE_SECURITY_PROTOCOL}
+
+rest-client:
+  backend-io:
+    service:
+      base-url: ${IO_BACKEND_SERVICE_BASE_URL:}/api/v1
+      name: backend-io
+      subscriptionKey: ${IO_BACKEND_SERVICE_SUBSCRIPTION_API_KEY:}
+      request:
+        departmentName: ${IO_BACKEND_SERVICE_DEPARTMENT_NAME:}
+        isVisible: ${IO_BACKEND_SERVICE_IS_VISIBLE:false}
+  group:
+    service:
+      name: ms-group
+      base-url: ${GROUP_MS_HOST:}/idpay
+  email-notification:
+    service:
+      name: ms-email-notification
+      base-url: ${EMAIL_NOTIFICATION_MS_HOST:}/idpay/email-notification
+      path: /notify
+  selc:
+    service:
+      base-url: ${SELC_BASE_URL:}/external/v1
+      name: selc-prod-users
+      subscriptionKey: ${SELC_EXTERNAL_API_KEY:}
+      selfCareUid: ${SELC_UID:idpay}
+feign:
+  okhttp:
+    enabled: true
+  client:
+    config:
+      default:
+        errorDecoder: it.gov.pagopa.initiative.connector.error.decoder.Custom5xxErrorDecoder
+        retryer: feign.Retryer.Default
+      backend-io:
+        loggerLevel: ${FEIGN_CLIENT_CONFIG_IO_LOG_LEVEL:basic}
+      ms-group:
+        loggerLevel: ${FEIGN_CLIENT_CONFIG_IO_LOG_LEVEL:basic}
+
+logging:
+  level:
+    root: ${LOG_LEVEL_ROOT:INFO}
+    it.gov.pagopa: ${LOG_LEVEL_PAGOPA:INFO}
+    it.gov.pagopa.initiative: ${LOG_LEVEL_INITIATIVE:INFO}
+    org.springframework.cloud: ${LOG_LEVEL_SPRING_CLOUD:WARN}
+    org.springframework.data: ${LOG_LEVEL_SPRING_DATA:INFO}
+    org.springframework.boot: ${LOG_LEVEL_SPRING_BOOT:INFO}
+    io.swagger: ${LOG_LEVEL_IO_SWAGGER:WARN}
+    javax.persistence: ${LOG_LEVEL_JAVAX_PERSISTENCE:INFO}
+    org.hibernate: ${LOG_LEVEL_ORG_HIBERNATE:INFO}
+    org.mongodb.driver: ${LOG_LEVEL_MONGODB_DRIVER:WARN}
+
+app:
+  initiative:
+    conditions:
+      notifyIO: ${APP_INITIATIVE_CONDITIONS_NOTIFY_IO:true}
+      notifyRE: ${APP_INITIATIVE_CONDITIONS_NOTIFY_RE:true}
+      notifyEmail: ${APP_INITIATIVE_CONDITIONS_NOTIFY_EMAIL:true}
+
+util:
+  crypto:
+    aes:
+      cipherInstance: ${UTIL_CRYPTO_AES_CIPHER_INSTANCE:AES/GCM/NoPadding}
+      encoding: ${UTIL_CRYPTO_AES_ENCODING:UTF-8}
+      secret-type:
+        pbe:
+          algorithm: ${UTIL_CRYPTO_AES_SECRET_TYPE_PBE_ALGORITHM:PBKDF2WithHmacSHA1}
+          salt: ${UTIL_CRYPTO_AES_SECRET_TYPE_PBE_SALT:}
+          keySize: ${UTIL_CRYPTO_AES_SECRET_TYPE_PBE_KEY_SIZE:256}
+          iterationCount: ${UTIL_CRYPTO_AES_SECRET_TYPE_PBE_ITERATION_COUNT:10000}
+          passphrase: ${UTIL_CRYPTO_AES_SECRET_TYPE_PBE_PASSPHRASE:}
+      mode:
+        gcm:
+          iv: ${UTIL_CRYPTO_AES_MODE_GCM_IV:}
+          tLen: ${UTIL_CRYPTO_AES_MODE_GCM_TAG_LEN:16}
