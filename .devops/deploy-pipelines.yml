@@ -10,13 +10,14 @@ parameters:
 trigger:
   branches:
     include:
-      - release-dev
-      - release-uat
-      - release-prod
+      - release-*
+      - main
   paths:
     include:
       - src/*
+      - helm/*
       - pom.xml
+      - Dockerfile
 
 pr: none
 
@@ -43,7 +44,7 @@ variables:
     containerRegistry: '$(DEV_CONTAINER_REGISTRY_NAME)'
     selfHostedAgentPool: $(DEV_AGENT_POOL)
     # postman environment secure file
-    postmanEnvFile: idpay_dev-initiative-portal.postman_environment.json
+    postmanEnvFile: idpay_dev.postman_environment.json
 
   ${{ elseif startsWith(variables['Build.SourceBranch'], 'refs/heads/release-uat') }}:
     environment: 'UAT'
@@ -52,7 +53,7 @@ variables:
     containerRegistry: '$(UAT_CONTAINER_REGISTRY_NAME)'
     selfHostedAgentPool: $(UAT_AGENT_POOL)
     # postman environment secure file
-    postmanEnvFile: idpay_dev-initiative-portal.postman_environment.json
+    postmanEnvFile: idpay_uat.postman_environment.json
 
   ${{ elseif startsWith(variables['Build.SourceBranch'], 'refs/heads/release-prod') }}:
     environment: 'PROD'
@@ -61,6 +62,14 @@ variables:
     containerRegistry: '$(PROD_CONTAINER_REGISTRY_NAME)'
     selfHostedAgentPool: $(PROD_AGENT_POOL)
 
+  ${{ elseif or(eq(variables['Build.SourceBranch'], 'refs/heads/main'),eq(variables['Build.SourceBranch'], 'refs/heads/release-prod')) }}:
+    environment: 'PROD'
+    dockerRegistryServiceConnection: '$(PROD_CONTAINER_REGISTRY_SERVICE_CONN)'
+    kubernetesServiceConnection: '$(PROD_KUBERNETES_SERVICE_CONN)'
+    containerRegistry: '$(PROD_CONTAINER_REGISTRY_NAME)'
+    selfHostedAgentPool: $(PROD_AGENT_POOL)
+    # postman environment secure file - not used in prod
+
   ${{ else }}:
     environment: 'DEV'
     dockerRegistryServiceConnection: '$(DEV_CONTAINER_REGISTRY_SERVICE_CONN)'
@@ -68,7 +77,7 @@ variables:
     containerRegistry: '$(DEV_CONTAINER_REGISTRY_NAME)'
     selfHostedAgentPool: $(DEV_AGENT_POOL)
     # postman environment secure file
-    postmanEnvFile: idpay_dev-initiative-portal.postman_environment.json
+    postmanEnvFile: idpay_dev.postman_environment.json
 
 stages:
   - stage: 'pom_version'
