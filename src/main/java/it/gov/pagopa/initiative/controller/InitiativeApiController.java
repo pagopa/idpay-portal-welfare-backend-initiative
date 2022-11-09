@@ -239,9 +239,9 @@ public class InitiativeApiController implements InitiativeApi {
     }
 
     @Override
-    public ResponseEntity<OnboardingDTO> getOnboardingStatus(String initiativeId, Pageable pageable,
+    public ResponseEntity<OnboardingDTO> getOnboardingStatus(String organizationId,String initiativeId, Pageable pageable,
         String beneficiary, LocalDateTime dateFrom, LocalDateTime dateTo, String state) {
-        return ResponseEntity.ok(this.initiativeService.getOnboardingStatusList(initiativeId,beneficiary,dateFrom,dateTo,state,pageable));
+        return ResponseEntity.ok(this.initiativeService.getOnboardingStatusList(organizationId,initiativeId,beneficiary,dateFrom,dateTo,state,pageable));
     }
 
 }
