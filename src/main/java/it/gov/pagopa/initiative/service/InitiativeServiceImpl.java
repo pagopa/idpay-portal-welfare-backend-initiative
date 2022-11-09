@@ -473,6 +473,7 @@ public class InitiativeServiceImpl implements InitiativeService {
   public OnboardingDTO getOnboardingStatusList(String initiativeId, String CF,
       LocalDateTime startDate, LocalDateTime endDate, String status, Pageable pageable) {
 
+    log.info("start get status onboarding, initiative: "+initiativeId);
     Initiative initiative = initiativeRepository.findByInitiativeIdAndEnabled(initiativeId, true)
         .orElseThrow(() -> new InitiativeException(
             InitiativeConstants.Exception.NotFound.CODE,
@@ -497,6 +498,7 @@ public class InitiativeServiceImpl implements InitiativeService {
       responseOnboardingDTO = onboardingRestConnector.getOnboarding(initiativeId, pageable,
           userId,
           startDate, endDate, status);
+      log.info("response onbording: "+responseOnboardingDTO);
     } catch (FeignException e) {
       throw new InitiativeException(
           InternalServerError.CODE,
