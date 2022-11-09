@@ -56,6 +56,7 @@ public class InitiativeApiController implements InitiativeApi {
     public ResponseEntity<InitiativeDTO> saveInitiativeServiceInfo(String organizationId, @RequestBody @Validated(ValidationOnGroup.class) InitiativeAdditionalDTO initiativeAdditionalDTO) {
         Initiative initiativeToSave = this.initiativeDTOsToModelMapper.toInitiative(initiativeAdditionalDTO);
         initiativeToSave.setOrganizationId(organizationId);
+        initiativeToSave.setOrganizationName(initiativeAdditionalDTO.getOrganizationName());
         initiativeToSave.setCreationDate(LocalDateTime.now());
         initiativeToSave.setUpdateDate(LocalDateTime.now());
         initiativeToSave.setEnabled(true);

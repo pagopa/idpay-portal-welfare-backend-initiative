@@ -83,7 +83,11 @@ public class InitiativeServiceImpl implements InitiativeService {
         if (StringUtils.isBlank(initiative.getStatus())) {
             initiative.setStatus(InitiativeConstants.Status.DRAFT);
         }
-        return initiativeRepository.insert(initiative);
+        Initiative initiativeReturned = initiativeRepository.insert(initiative);
+        if(notifyEmail){
+            emailNotificationService.sendInitiativeEnteCreated(initiative, initiative.getOrganizationName());
+        }
+        return initiativeReturned;
     }
 
     @Override
@@ -132,6 +136,7 @@ public class InitiativeServiceImpl implements InitiativeService {
         this.initiativeRepository.save(initiative);
     }
 
+    /*Primo salvataggio in Draft tramite Wizard*/
     @Override
     public void updateInitiativeAdditionalInfo(String organizationId, String initiativeId, Initiative initiativeAdditionalInfo){
         Initiative initiative = this.initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(organizationId, initiativeId, true)
@@ -144,6 +149,9 @@ public class InitiativeServiceImpl implements InitiativeService {
         initiative.setUpdateDate(LocalDateTime.now());
         initiative.setStatus(InitiativeConstants.Status.DRAFT);
         this.initiativeRepository.save(initiative);
+        if(notifyEmail){
+            emailNotificationService.sendInitiativeEnte(initiative, initiative.getOrganizationName());
+        }
     }
 
     @Override
@@ -197,7 +205,7 @@ public class InitiativeServiceImpl implements InitiativeService {
         }
         this.initiativeRepository.save(initiative);
         if(changeInitiativeStatus && notifyEmail){
-            emailNotificationService.sendInitiativeInRevision(initiative, organizationName);
+            emailNotificationService.sendInitiativeEntePagoPA(initiative, organizationName);
         }
     }
 
@@ -215,7 +223,7 @@ public class InitiativeServiceImpl implements InitiativeService {
         this.initiativeRepository.save(initiative);
         log.info("[UPDATE_TO_APPROVED_STATUS] - Initiative: {}. Status successfully changed", initiative.getInitiativeId());
         if(notifyEmail){
-            emailNotificationService.sendInitiativeApprovedAndRejected(initiative, organizationName);
+            emailNotificationService.sendInitiativeEnte(initiative, organizationName);
         }
     }
 
@@ -233,7 +241,7 @@ public class InitiativeServiceImpl implements InitiativeService {
         this.initiativeRepository.save(initiative);
         log.info("[UPDATE_TO_CHECK_STATUS] - Initiative: {}. Status successfully changed", initiative.getInitiativeId());
         if(notifyEmail){
-            emailNotificationService.sendInitiativeApprovedAndRejected(initiative, organizationName);
+            emailNotificationService.sendInitiativeEnte(initiative, organizationName);
         }
     }
 
@@ -261,6 +269,9 @@ public class InitiativeServiceImpl implements InitiativeService {
             initiative.setUpdateDate(LocalDateTime.now());
             this.initiativeRepository.save(initiative);
             log.info("[LOGICAL_INITIATIVE_ELIMINATION] - Initiative: {}. Successfully logical elimination.", initiative.getInitiativeId());
+        }
+        if(notifyEmail){
+            emailNotificationService.sendInitiativeEnte(initiative, initiative.getOrganizationName());
         }
     }
 
@@ -331,6 +342,9 @@ public class InitiativeServiceImpl implements InitiativeService {
         initiative.getAdditionalInfo().setSecondaryTokenIO(encryptedSecondaryToken);
         additionalInfo.setServiceId(serviceResponseDTO.getServiceId());
         initiative.setUpdateDate(LocalDateTime.now());
+        if(notifyEmail){
+            emailNotificationService.sendInitiativeEntePagoPA(initiative, initiative.getOrganizationName());
+        }
         return initiative;
     }
 

@@ -27,6 +27,7 @@ public class InitiativeConstants {
 
     public static final class EmailTemplate {
         public static final String EMAIL_INITIATIVE_STATUS = "Email_InitiativeStatus";
+        public static final String EMAIL_INITIATIVE_CREATED = "Email_InitiativeCreated";
     }
 
     public static final class Exception extends AbstractConstant {
