@@ -470,15 +470,17 @@ public class InitiativeServiceImpl implements InitiativeService {
   }
 
   @Override
-  public OnboardingDTO getOnboardingStatusList(String initiativeId, String CF,
+  public OnboardingDTO getOnboardingStatusList(String organizationId,String initiativeId, String CF,
       LocalDateTime startDate, LocalDateTime endDate, String status, Pageable pageable) {
 
     log.info("start get status onboarding, initiative: "+initiativeId);
-    Initiative initiative = initiativeRepository.findByInitiativeIdAndEnabled(initiativeId, true)
+    Initiative initiative = initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(
+            organizationId, initiativeId, true)
         .orElseThrow(() -> new InitiativeException(
             InitiativeConstants.Exception.NotFound.CODE,
             String.format(
-                 InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE,initiativeId),
+                InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE,
+                initiativeId),
             HttpStatus.NOT_FOUND));
     String userId = null;
     if (CF != null) {
