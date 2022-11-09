@@ -1,3 +1,5 @@
+api.key.encrypt: ${PDV_ENCRYPT_API_KEY:}
+api.key.decrypt: ${PDV_DECRYPT_API_KEY:}
 spring:
   data:
     mongodb:
@@ -37,6 +39,14 @@ rest-client:
       request:
         departmentName: ${IO_BACKEND_SERVICE_DEPARTMENT_NAME:}
         isVisible: ${IO_BACKEND_SERVICE_IS_VISIBLE:false}
+  onboarding:
+    serviceCode: idpay-onboarding
+  encryptpdv:
+    base-url: ${PDV_ENCRYPT_BASE_URL:}
+    cf: ${PDV_ENCRYPT_SERVICE_CODE:pdv-ms-tokenizer-encrypt}
+  decrypt:
+    baseUrl: ${PDV_DECRYPT_BASE_URL:}
+    cf: ${PDV_DECRYPT_SERVICE_CODE:pdv-ms-tokenizer}
   group:
     service:
       name: ms-group
