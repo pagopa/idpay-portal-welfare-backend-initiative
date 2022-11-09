@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 
 public class OnboardingDTO {
-  private List<StatusOnboardingDTO> statusOnboardingDTOS;
+  private List<StatusOnboardingDTO> content;
   private int pageNo;
   private int pageSize;
   private int totalElements;
