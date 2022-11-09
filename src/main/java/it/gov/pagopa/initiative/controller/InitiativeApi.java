@@ -23,6 +23,7 @@ import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -370,7 +371,7 @@ public interface InitiativeApi {
   ResponseEntity<OnboardingDTO> getOnboardingStatus(
       @PathVariable("organizationId") String organizationId,
       @PathVariable("initiativeId") String initiativeId,
-      @RequestParam(required = false) Pageable pageable,
+      @PageableDefault(size = 15) Pageable pageable,
       @RequestParam(required = false) String beneficiary,
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateFrom,
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTo,
