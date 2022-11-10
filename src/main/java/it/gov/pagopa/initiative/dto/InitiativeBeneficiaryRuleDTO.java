@@ -18,7 +18,7 @@ import java.util.List;
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
 //@Builder
-public class InitiativeBeneficiaryRuleDTO   {
+public class InitiativeBeneficiaryRuleDTO extends InitiativeOrganizationInfoDTO {
 
   @JsonProperty("selfDeclarationCriteria")
   @Schema(

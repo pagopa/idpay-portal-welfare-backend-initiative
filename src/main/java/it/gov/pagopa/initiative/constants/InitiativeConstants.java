@@ -39,12 +39,12 @@ public class InitiativeConstants {
             public static final String CODE = BASE_CODE + ".bad.request";
             public static final String INITIATIVE_CURRENT_STATUS_NOT_IN_REVISION = "Current initiative status is not IN_REVISION";
 
-            public static final String INITIATIVE_STATUS_NOT_IN_REVISION = "The initiative status is not IN_REVISION";
+            public static final String INITIATIVE_STATUS_NOT_IN_REVISION = "The status of initiative [%s] is not IN_REVISION";
             public static final String INITIATIVE_BY_INITIATIVE_ID_PROPERTIES_NOT_VALID = "Initiative %s properties are not valid for this request";
             public static final String INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_STATUS_NOT_VALID = "Initiative %s unprocessable for status not valid";
 
             public static final String INITIATIVE_CANNOT_BE_DELETED = "Initiative %s cannot be deleted";
-            public static final String PERMISSION_NOT_VALID= "The current permission %s is not valid";
+            public static final String PERMISSION_NOT_VALID= "Permission not valid for [%s]";
         }
         public static final class Publish {
             public static final String PUBLISH_CODE = BASE_CODE + ".published";

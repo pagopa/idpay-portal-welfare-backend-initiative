@@ -3,7 +3,11 @@ package it.gov.pagopa.initiative.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.validator.constraints.URL;
 
 import javax.validation.Valid;
@@ -18,10 +22,10 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
-@Builder
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class InitiativeAdditionalDTO   {
+public class InitiativeAdditionalDTO extends InitiativeOrganizationInfoDTO {
 
   private static final String VALID_LINK = "^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
   public enum ServiceScope{
