@@ -93,7 +93,43 @@
 									"//pm.collectionVariables.set('serviceName', pm.variables.replaceIn('{{$randomProduct}}'));\r",
 									"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 									"\r",
-									""
+									"function rawBody(orgNamePresent){\r",
+									"    let concatenation = \"\";\r",
+									"    if(orgNamePresent){\r",
+									"        concatenation = ', \"organizationName\": \"Comune di Milano\", \"organizationVat\": \"11122233344\", \"organizationUserId\": \"a0a00000-0aaa-00aa-0000-0000000a0000\", \"organizationUserRole\": \"admin\"';\r",
+									"    }\r",
+									"\r",
+									"    let rawBody = '{\"serviceIO\":true,\"serviceName\":\"{{serviceName}}\",\"serviceScope\":\"LOCAL\",\"description\":\"{{description}}\",\"privacyLink\":\"https:\\/\\/www.google.it\",\"tcLink\":\"Wrong_Link\",\"channels\":[{\"type\":\"{{channel_type}}\",\"contact\":\"{{channel_contact}}\"}]'+concatenation+' }';\r",
+									"    return rawBody;\r",
+									"}\r",
+									"\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(true)\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserRole\",\r",
+									"        value: \"admin\"\r",
+									"    });\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserId\",\r",
+									"        value: \"a0a00000-0aaa-00aa-0000-0000000a0000\"\r",
+									"    });\r",
+									"}\r",
+									"else{\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(false)\r",
+									"    }\r",
+									"}\r",
+									"pm.request.headers.add({\r",
+									"    key: \"Content-Type\",\r",
+									"    value: \"application/json\"\r",
+									"});\r",
+									"pm.variables.set('body', JSON.stringify(body));\r",
+									"pm.request.body.update(body);"
 								],
 								"type": "text/javascript"
 							}
@@ -129,15 +165,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"LinkErrato\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
 							"raw": "{{baseUrlInitiative}}/info",
 							"host": [
@@ -163,7 +190,45 @@
 									"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 									"\r",
 									"pm.collectionVariables.set('channel_type', 'web');\r",
-									"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+									"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomEmail}}'));\r",
+									"\r",
+									"function rawBody(orgNamePresent){\r",
+									"    let concatenation = \"\";\r",
+									"    if(orgNamePresent){\r",
+									"        concatenation = ', \"organizationName\": \"Comune di Milano\", \"organizationVat\": \"11122233344\", \"organizationUserId\": \"a0a00000-0aaa-00aa-0000-0000000a0000\", \"organizationUserRole\": \"admin\"';\r",
+									"    }\r",
+									"\r",
+									"    let rawBody = '{\"serviceIO\":true,\"serviceName\":\"{{serviceName}}\",\"serviceScope\":\"LOCAL\",\"description\":\"{{description}}\",\"privacyLink\":\"https:\\/\\/www.google.it\",\"tcLink\":\"https:\\/\\/www.google.com\",\"channels\":[{\"type\":\"{{channel_type}}\",\"contact\":\"{{channel_contact}}\"}]'+concatenation+' }';\r",
+									"    return rawBody;\r",
+									"}\r",
+									"\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(true)\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserRole\",\r",
+									"        value: \"admin\"\r",
+									"    });\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserId\",\r",
+									"        value: \"a0a00000-0aaa-00aa-0000-0000000a0000\"\r",
+									"    });\r",
+									"}\r",
+									"else{\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(false)\r",
+									"    }\r",
+									"}\r",
+									"pm.request.headers.add({\r",
+									"    key: \"Content-Type\",\r",
+									"    value: \"application/json\"\r",
+									"});\r",
+									"pm.variables.set('body', JSON.stringify(body));\r",
+									"pm.request.body.update(body);"
 								],
 								"type": "text/javascript"
 							}
@@ -202,15 +267,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
 							"raw": "{{baseUrlInitiative}}/info",
 							"host": [
@@ -242,7 +298,21 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									""
+									"let body;\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"rawBody = '{\"organizationName\":\"Comune di Milano\",\"organizationVat\":\"11122233344\",\"organizationUserId\":\"a0a00000-0aaa-00aa-0000-0000000a0000\",\"organizationUserRole\":\"admin\"}';\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"Content-Type\",\r",
+									"        value: \"application/json\"\r",
+									"    });\r",
+									"    pm.variables.set('body', JSON.stringify(body));\r",
+									"    pm.request.body.update(body);\r",
+									"}"
 								],
 								"type": "text/javascript"
 							}
@@ -291,7 +361,45 @@
 									"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 									"\r",
 									"pm.collectionVariables.set('channel_type', 'web');\r",
-									"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+									"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));\r",
+									"\r",
+									"function rawBody(orgNamePresent){\r",
+									"    let concatenation = \"\";\r",
+									"    if(orgNamePresent){\r",
+									"        concatenation = ', \"organizationName\": \"Comune di Milano\", \"organizationVat\": \"11122233344\", \"organizationUserId\": \"a0a00000-0aaa-00aa-0000-0000000a0000\", \"organizationUserRole\": \"admin\"';\r",
+									"    }\r",
+									"\r",
+									"    let rawBody = '{\"serviceIO\":true,\"serviceName\":\"{{serviceName}}\",\"serviceScope\":\"LOCAL\",\"description\":\"{{description}}\",\"privacyLink\":\"https:\\/\\/www.google.it\",\"tcLink\":\"https:\\/\\/www.google.com\",\"channels\":[{\"type\":\"{{channel_type}}\",\"contact\":\"{{channel_contact}}\"}]'+concatenation+' }';\r",
+									"    return rawBody;\r",
+									"}\r",
+									"\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(true)\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserRole\",\r",
+									"        value: \"admin\"\r",
+									"    });\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserId\",\r",
+									"        value: \"a0a00000-0aaa-00aa-0000-0000000a0000\"\r",
+									"    });\r",
+									"}\r",
+									"else{\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(false)\r",
+									"    }\r",
+									"}\r",
+									"pm.request.headers.add({\r",
+									"    key: \"Content-Type\",\r",
+									"    value: \"application/json\"\r",
+									"});\r",
+									"pm.variables.set('body', JSON.stringify(body));\r",
+									"pm.request.body.update(body);"
 								],
 								"type": "text/javascript"
 							}
@@ -330,15 +438,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
 							"raw": "{{baseUrlInitiative}}/info",
 							"host": [
@@ -370,7 +469,21 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									""
+									"let body;\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"rawBody = '{\"organizationName\":\"Comune di Milano\",\"organizationVat\":\"11122233344\",\"organizationUserId\":\"a0a00000-0aaa-00aa-0000-0000000a0000\",\"organizationUserRole\":\"admin\"}';\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"Content-Type\",\r",
+									"        value: \"application/json\"\r",
+									"    });\r",
+									"    pm.variables.set('body', JSON.stringify(body));\r",
+									"    pm.request.body.update(body);\r",
+									"}"
 								],
 								"type": "text/javascript"
 							}
@@ -426,7 +539,21 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									""
+									"let body;\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"rawBody = '{\"organizationName\":\"Comune di Milano\",\"organizationVat\":\"11122233344\",\"organizationUserId\":\"a0a00000-0aaa-00aa-0000-0000000a0000\",\"organizationUserRole\":\"admin\"}';\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"Content-Type\",\r",
+									"        value: \"application/json\"\r",
+									"    });\r",
+									"    pm.variables.set('body', JSON.stringify(body));\r",
+									"    pm.request.body.update(body);\r",
+									"}"
 								],
 								"type": "text/javascript"
 							}
@@ -496,7 +623,21 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									""
+									"let body;\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"rawBody = '{\"organizationName\":\"Comune di Milano\",\"organizationVat\":\"11122233344\",\"organizationUserId\":\"a0a00000-0aaa-00aa-0000-0000000a0000\",\"organizationUserRole\":\"admin\"}';\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"Content-Type\",\r",
+									"        value: \"application/json\"\r",
+									"    });\r",
+									"    pm.variables.set('body', JSON.stringify(body));\r",
+									"    pm.request.body.update(body);\r",
+									"}"
 								],
 								"type": "text/javascript"
 							}
@@ -545,8 +686,46 @@
 									"pm.collectionVariables.set('serviceName', pm.variables.replaceIn('{{$randomProduct}}'));\r",
 									"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 									"\r",
-									"pm.collectionVariables.set('channel_type', 'email');\r",
-									"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomEmail}}'));"
+									"pm.collectionVariables.set('channel_type', 'web');\r",
+									"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomEmail}}'));\r",
+									"\r",
+									"function rawBody(orgNamePresent){\r",
+									"    let concatenation = \"\";\r",
+									"    if(orgNamePresent){\r",
+									"        concatenation = ', \"organizationName\": \"Comune di Milano\", \"organizationVat\": \"11122233344\", \"organizationUserId\": \"a0a00000-0aaa-00aa-0000-0000000a0000\", \"organizationUserRole\": \"admin\"';\r",
+									"    }\r",
+									"\r",
+									"    let rawBody = '{\"serviceIO\":true,\"serviceName\":\"{{serviceName}}\",\"serviceScope\":\"LOCAL\",\"description\":\"{{description}}\",\"privacyLink\":\"https:\\/\\/www.google.it\",\"tcLink\":\"https:\\/\\/www.google.com\",\"channels\":[{\"type\":\"{{channel_type}}\",\"contact\":\"{{channel_contact}}\"}]'+concatenation+' }';\r",
+									"    return rawBody;\r",
+									"}\r",
+									"\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(true)\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserRole\",\r",
+									"        value: \"admin\"\r",
+									"    });\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserId\",\r",
+									"        value: \"a0a00000-0aaa-00aa-0000-0000000a0000\"\r",
+									"    });\r",
+									"}\r",
+									"else{\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(false)\r",
+									"    }\r",
+									"}\r",
+									"pm.request.headers.add({\r",
+									"    key: \"Content-Type\",\r",
+									"    value: \"application/json\"\r",
+									"});\r",
+									"pm.variables.set('body', JSON.stringify(body));\r",
+									"pm.request.body.update(body);"
 								],
 								"type": "text/javascript"
 							}
@@ -575,15 +754,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"serviceIO\": false,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
 							"raw": "{{baseUrlInitiative}}/:initiativeId/info",
 							"host": [
@@ -814,7 +984,46 @@
 									"pm.collectionVariables.set('rankingStartDate', today);\r",
 									"pm.collectionVariables.set('rankingEndDate', todayP1);\r",
 									"pm.collectionVariables.set('startDate', todayP2);\r",
-									"pm.collectionVariables.set('endDate', todayP3);"
+									"pm.collectionVariables.set('endDate', todayP3);\r",
+									"\r",
+									"\r",
+									"function rawBody(orgNamePresent){\r",
+									"    let concatenation = \"\";\r",
+									"    if(orgNamePresent){\r",
+									"        concatenation = ', \"organizationName\": \"Comune di Milano\", \"organizationVat\": \"11122233344\", \"organizationUserId\": \"a0a00000-0aaa-00aa-0000-0000000a0000\", \"organizationUserRole\": \"admin\"';\r",
+									"    }\r",
+									"\r",
+									"    let rawBody = '{ \"budget\": {{budget}}, \"beneficiaryType\": \"{{beneficiaryType}}\", \"beneficiaryKnown\": {{beneficiaryKnown}}, \"beneficiaryBudget\": {{beneficiaryBudget}}, \"rankingStartDate\": \"{{rankingStartDate}}\", \"rankingEndDate\": \"{{rankingEndDate}}\", \"startDate\": \"{{startDate}}\", \"endDate\": \"{{endDate}}\"'+concatenation+' }';\r",
+									"    return rawBody;\r",
+									"}\r",
+									"\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(true)\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserRole\",\r",
+									"        value: \"admin\"\r",
+									"    });\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserId\",\r",
+									"        value: \"a0a00000-0aaa-00aa-0000-0000000a0000\"\r",
+									"    });\r",
+									"}\r",
+									"else{\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(false)\r",
+									"    }\r",
+									"}\r",
+									"pm.request.headers.add({\r",
+									"    key: \"Content-Type\",\r",
+									"    value: \"application/json\"\r",
+									"});\r",
+									"pm.variables.set('body', JSON.stringify(body));\r",
+									"pm.request.body.update(body);"
 								],
 								"type": "text/javascript"
 							}
@@ -843,15 +1052,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"budget\": {{budget}},\n    \"beneficiaryType\": \"{{beneficiaryType}}\",\n    \"beneficiaryKnown\": {{beneficiaryKnown}},\n    \"beneficiaryBudget\": {{beneficiaryBudget}},\n    \"rankingStartDate\": \"{{rankingStartDate}}\",\n    \"rankingEndDate\": \"{{rankingEndDate}}\",\n    \"startDate\": \"{{startDate}}\",\n    \"endDate\": \"{{endDate}}\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
 							"raw": "{{baseUrlInitiative}}/:initiativeId/general",
 							"host": [
@@ -1183,7 +1383,46 @@
 									"pm.collectionVariables.set('aC2_code', 'BIRTHDATE');\r",
 									"pm.collectionVariables.set('aC2_field', 'year');\r",
 									"pm.collectionVariables.set('aC2_operator', conditionOneValue[random]);\r",
-									"pm.collectionVariables.set('aC2_value', aC3_value);"
+									"pm.collectionVariables.set('aC2_value', aC3_value);\r",
+									"\r",
+									"function rawBody(orgNamePresent){\r",
+									"    let concatenation = \"\";\r",
+									"    if(orgNamePresent){\r",
+									"        concatenation = ', \"organizationName\": \"Comune di Milano\", \"organizationVat\": \"11122233344\", \"organizationUserId\": \"a0a00000-0aaa-00aa-0000-0000000a0000\", \"organizationUserRole\": \"admin\"';\r",
+									"    }\r",
+									"\r",
+									"    let rawBody = '{ \"selfDeclarationCriteria\": [ { \"_type\": \"{{sDC_type_B}}\", \"description\": \"{{sDC_description_B}}\", \"value\": {{sDC_value_B}}, \"code\": \"{{sDC_code_B}}\" }, { \"_type\": \"{{sDC_type_M}}\", \"description\": \"{{sDC_description_M}}\", \"value\": [ \"{{sDC_value1_M}}\", \"{{sDC_value2_M}}\", \"{{sDC_value3_M}}\" ], \"code\": \"{{sDC_code_M}}\" } ], \"automatedCriteria\": [ { \"authority\": \"{{aC0_authority}}\", \"code\": \"{{aC0_code}}\", \"operator\": \"{{aC0_operator}}\", \"value\": \"{{aC0_value}}\", \"value2\": \"{{aC0_value2}}\" }, { \"authority\": \"{{aC1_authority}}\", \"code\": \"{{aC1_code}}\", \"field\": \"{{aC1_field}}\", \"operator\": \"{{aC1_operator}}\", \"value\": \"{{aC1_value}}\" }, { \"authority\": \"{{aC2_authority}}\", \"code\": \"{{aC2_code}}\", \"field\": \"{{aC2_field}}\", \"operator\": \"{{aC2_operator}}\", \"value\": \"{{aC2_value}}\" } ]'+concatenation+' }';\r",
+									"    return rawBody;\r",
+									"}\r",
+									"\r",
+									"\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(true)\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserRole\",\r",
+									"        value: \"admin\"\r",
+									"    });\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserId\",\r",
+									"        value: \"a0a00000-0aaa-00aa-0000-0000000a0000\"\r",
+									"    });\r",
+									"}\r",
+									"else{\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(false)\r",
+									"    }\r",
+									"}\r",
+									"pm.request.headers.add({\r",
+									"    key: \"Content-Type\",\r",
+									"    value: \"application/json\"\r",
+									"});\r",
+									"pm.variables.set('body', JSON.stringify(body));\r",
+									"pm.request.body.update(body);"
 								],
 								"type": "text/javascript"
 							}
@@ -1212,15 +1451,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"selfDeclarationCriteria\": [\n    {\n      \"_type\": \"{{sDC_type_B}}\",\n      \"description\": \"{{sDC_description_B}}\",\n      \"value\": {{sDC_value_B}},\n      \"code\": \"{{sDC_code_B}}\"\n    },\n    {\n      \"_type\": \"{{sDC_type_M}}\",\n      \"description\": \"{{sDC_description_M}}\",\n      \"value\": [\n        \"{{sDC_value1_M}}\",\n        \"{{sDC_value2_M}}\",\n        \"{{sDC_value3_M}}\"\n      ],\n      \"code\": \"{{sDC_code_M}}\"\n    }\n  ],\n  \"automatedCriteria\": [\n    {\n      \"authority\": \"{{aC0_authority}}\",\n      \"code\": \"{{aC0_code}}\",\n      \"operator\": \"{{aC0_operator}}\",\n      \"value\": \"{{aC0_value}}\",\n      \"value2\": \"{{aC0_value2}}\"\n    },\n    {\n      \"authority\": \"{{aC1_authority}}\",\n      \"code\": \"{{aC1_code}}\",\n      \"field\": \"{{aC1_field}}\",\n      \"operator\": \"{{aC1_operator}}\",\n      \"value\": \"{{aC1_value}}\"\n    },\n    {\n      \"authority\": \"{{aC2_authority}}\",\n      \"code\": \"{{aC2_code}}\",\n      \"field\": \"{{aC2_field}}\",\n      \"operator\": \"{{aC2_operator}}\",\n      \"value\": \"{{aC2_value}}\"\n    }\n  ]\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
 							"raw": "{{baseUrlInitiative}}/:initiativeId/beneficiary",
 							"host": [
@@ -1534,17 +1764,6 @@
 					"name": "STEP4-Update Initiative Trx-Reward rules",
 					"event": [
 						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status test 204\", function () {\r",
-									"    pm.response.to.have.status(204);\r",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
 							"listen": "prerequest",
 							"script": {
 								"exec": [
@@ -1555,9 +1774,9 @@
 									"\r",
 									"//pm.collectionVariables.set('rewardRuleType', 'rewardGroups');\r",
 									"pm.collectionVariables.set('rewardRuleType', 'rewardValue');\r",
-									"pm.collectionVariables.set('rewardRuleFrom', 0.25);\r",
-									"pm.collectionVariables.set('rewardRuleTo', 1);\r",
-									"pm.collectionVariables.set('rewardRuleValue', 100);\r",
+									"pm.collectionVariables.set('rewardRuleValue', 20);\r",
+									"//pm.collectionVariables.set('rewardRuleFrom', 0.25);\r",
+									"//pm.collectionVariables.set('rewardRuleTo', 1);\r",
 									"\r",
 									"pm.collectionVariables.set('trxDaysOfWeek', pm.variables.replaceIn('{{$randomWeekday}}').toString().toUpperCase());\r",
 									"pm.collectionVariables.set('trxDayEndTime', endTime[0]);\r",
@@ -1566,7 +1785,56 @@
 									"pm.collectionVariables.set('trxCountFrom', 3);\r",
 									"pm.collectionVariables.set('trxCountTo', 11);\r",
 									"pm.collectionVariables.set('trxRewardLimitFrequency', 'DAILY');\r",
-									"pm.collectionVariables.set('trxRewardLimitValue', 3);"
+									"pm.collectionVariables.set('trxRewardLimitValue', 3);\r",
+									"\r",
+									"function rawBody(orgNamePresent){\r",
+									"    let concatenation = \"\";\r",
+									"    if(orgNamePresent){\r",
+									"        concatenation = ', \"organizationName\": \"Comune di Milano\", \"organizationVat\": \"11122233344\", \"organizationUserId\": \"a0a00000-0aaa-00aa-0000-0000000a0000\", \"organizationUserRole\": \"admin\"';\r",
+									"    }\r",
+									"\r",
+									"    let rawBody = '{ \"rewardRule\": { \"_type\": \"{{rewardRuleType}}\", \"rewardValue\": {{rewardRuleValue}} }, \"trxRule\": { \"daysOfWeek\": [ { \"daysOfWeek\": [ \"{{trxDaysOfWeek}}\" ], \"intervals\": [ { \"startTime\": \"00:00:00.000\", \"endTime\": \"{{trxDayEndTime}}\" } ] } ], \"threshold\": { \"from\": {{trxThresholdFrom}}, \"fromIncluded\": true, \"to\": {{trxThresholdTo}}, \"toIncluded\": true }, \"mccFilter\": { \"allowedList\": true, \"values\": [ \"0742\", \"0743\", \"0744\" ] }, \"trxCount\": { \"from\": {{trxCountFrom}}, \"fromIncluded\": true, \"to\": {{trxCountTo}}, \"toIncluded\": true } } '+concatenation+' }';\r",
+									"    return rawBody;\r",
+									"}\r",
+									"\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(true)\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserRole\",\r",
+									"        value: \"admin\"\r",
+									"    });\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserId\",\r",
+									"        value: \"a0a00000-0aaa-00aa-0000-0000000a0000\"\r",
+									"    });\r",
+									"}\r",
+									"else{\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(false)\r",
+									"    }\r",
+									"}\r",
+									"pm.request.headers.add({\r",
+									"    key: \"Content-Type\",\r",
+									"    value: \"application/json\"\r",
+									"});\r",
+									"pm.variables.set('body', JSON.stringify(body));\r",
+									"pm.request.body.update(body);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status test 204\", function () {\r",
+									"    pm.response.to.have.status(204);\r",
+									"});"
 								],
 								"type": "text/javascript"
 							}
@@ -1584,15 +1852,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"rewardRule\": {\n    \"_type\": \"{{rewardRuleType}}\",\n    \"rewardValue\": {{rewardRuleValue}}\n  },\n  \"trxRule\": {\n    \"daysOfWeek\": [\n      {\n        \"daysOfWeek\": [\n          \"{{trxDaysOfWeek}}\"\n        ],\n        \"intervals\": [\n          {\n            \"startTime\": \"00:00:00.000\",\n            \"endTime\": \"{{trxDayEndTime}}\"\n          }\n        ]\n      }\n    ],\n    \"threshold\": {\n      \"from\": {{trxThresholdFrom}},\n      \"fromIncluded\": true,\n      \"to\": {{trxThresholdTo}},\n      \"toIncluded\": true\n    },\n    \"mccFilter\": {\n      \"allowedList\": true,\n      \"values\": [\n        \"0742\", \"0743\", \"0744\"\n      ]\n    },\n    \"trxCount\": {\n      \"from\": {{trxCountFrom}},\n      \"fromIncluded\": true,\n      \"to\": {{trxCountTo}},\n      \"toIncluded\": true\n    }\n  }\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
 							"raw": "{{baseUrlInitiative}}/:initiativeId/reward",
 							"host": [
@@ -1793,7 +2052,45 @@
 									"timeTypeRandomIndex = _.random(0, timeType.length-1);\r",
 									"\r",
 									"pm.collectionVariables.set('timeType', timeType[timeTypeRandomIndex]);\r",
-									"pm.collectionVariables.set('identificationCode', pm.variables.replaceIn('{{$randomLoremSentence}}'));"
+									"pm.collectionVariables.set('identificationCode', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
+									"\r",
+									"function rawBody(orgNamePresent){\r",
+									"    let concatenation = \"\";\r",
+									"    if(orgNamePresent){\r",
+									"        concatenation = ', \"organizationName\": \"Comune di Milano\", \"organizationVat\": \"11122233344\", \"organizationUserId\": \"a0a00000-0aaa-00aa-0000-0000000a0000\", \"organizationUserRole\": \"admin\"';\r",
+									"    }\r",
+									"\r",
+									"    let rawBody = '{\"timeParameter\":{\"timeType\":\"{{timeType}}\"},\"additionalInfo\":{\"identificationCode\":\"{{identificationCode}}\"}'+concatenation+' }';\r",
+									"    return rawBody;\r",
+									"}\r",
+									"\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(true)\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserRole\",\r",
+									"        value: \"admin\"\r",
+									"    });\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserId\",\r",
+									"        value: \"a0a00000-0aaa-00aa-0000-0000000a0000\"\r",
+									"    });\r",
+									"}\r",
+									"else{\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(false)\r",
+									"    }\r",
+									"}\r",
+									"pm.request.headers.add({\r",
+									"    key: \"Content-Type\",\r",
+									"    value: \"application/json\"\r",
+									"});\r",
+									"pm.variables.set('body', JSON.stringify(body));\r",
+									"pm.request.body.update(body);"
 								],
 								"type": "text/javascript"
 							}
@@ -1813,7 +2110,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"timeParameter\": {\n        \"timeType\": \"{{timeType}}\"\n    },\n    \"additionalInfo\": {\n        \"identificationCode\": \"{{identificationCode}}\"\n    }\n}",
+							"raw": "",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1864,7 +2161,21 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									""
+									"let body;\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"rawBody = '{\"organizationName\":\"Comune di Milano\",\"organizationVat\":\"11122233344\",\"organizationUserId\":\"a0a00000-0aaa-00aa-0000-0000000a0000\",\"organizationUserRole\":\"admin\"}';\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"Content-Type\",\r",
+									"        value: \"application/json\"\r",
+									"    });\r",
+									"    pm.variables.set('body', JSON.stringify(body));\r",
+									"    pm.request.body.update(body);\r",
+									"}"
 								],
 								"type": "text/javascript"
 							}
@@ -2059,7 +2370,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrlInitiative}}/summary",
+							"raw": "{{baseUrlInitiative}}/summary?role=ope_base",
 							"host": [
 								"{{baseUrlInitiative}}"
 							],
@@ -2069,8 +2380,7 @@
 							"query": [
 								{
 									"key": "role",
-									"value": "ope_base",
-									"disabled": true
+									"value": "ope_base"
 								}
 							]
 						},
@@ -2101,7 +2411,21 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									""
+									"let body;\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"rawBody = '{\"organizationName\":\"Comune di Milano\",\"organizationVat\":\"11122233344\",\"organizationUserId\":\"a0a00000-0aaa-00aa-0000-0000000a0000\",\"organizationUserRole\":\"admin\"}';\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"Content-Type\",\r",
+									"        value: \"application/json\"\r",
+									"    });\r",
+									"    pm.variables.set('body', JSON.stringify(body));\r",
+									"    pm.request.body.update(body);\r",
+									"}"
 								],
 								"type": "text/javascript"
 							}
@@ -2157,7 +2481,21 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									""
+									"let body;\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"rawBody = '{\"organizationName\":\"Comune di Milano\",\"organizationVat\":\"11122233344\",\"organizationUserId\":\"a0a00000-0aaa-00aa-0000-0000000a0000\",\"organizationUserRole\":\"admin\"}';\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"Content-Type\",\r",
+									"        value: \"application/json\"\r",
+									"    });\r",
+									"    pm.variables.set('body', JSON.stringify(body));\r",
+									"    pm.request.body.update(body);\r",
+									"}"
 								],
 								"type": "text/javascript"
 							}
@@ -2211,7 +2549,45 @@
 									"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 									"\r",
 									"pm.collectionVariables.set('channel_type', 'web');\r",
-									"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+									"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));\r",
+									"\r",
+									"function rawBody(orgNamePresent){\r",
+									"    let concatenation = \"\";\r",
+									"    if(orgNamePresent){\r",
+									"        concatenation = ', \"organizationName\": \"Comune di Milano\", \"organizationVat\": \"11122233344\", \"organizationUserId\": \"a0a00000-0aaa-00aa-0000-0000000a0000\", \"organizationUserRole\": \"admin\"';\r",
+									"    }\r",
+									"\r",
+									"    let rawBody = '{\"serviceIO\":true,\"serviceName\":\"{{serviceName}}\",\"serviceScope\":\"LOCAL\",\"description\":\"{{description}}\",\"privacyLink\":\"https:\\/\\/www.google.it\",\"tcLink\":\"https:\\/\\/www.google.com\",\"channels\":[{\"type\":\"{{channel_type}}\",\"contact\":\"{{channel_contact}}\"}]'+concatenation+' }';\r",
+									"    return rawBody;\r",
+									"}\r",
+									"\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(true)\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserRole\",\r",
+									"        value: \"admin\"\r",
+									"    });\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserId\",\r",
+									"        value: \"a0a00000-0aaa-00aa-0000-0000000a0000\"\r",
+									"    });\r",
+									"}\r",
+									"else{\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(false)\r",
+									"    }\r",
+									"}\r",
+									"pm.request.headers.add({\r",
+									"    key: \"Content-Type\",\r",
+									"    value: \"application/json\"\r",
+									"});\r",
+									"pm.variables.set('body', JSON.stringify(body));\r",
+									"pm.request.body.update(body);"
 								],
 								"type": "text/javascript"
 							}
@@ -2250,15 +2626,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
 							"raw": "{{baseUrlInitiative}}/info",
 							"host": [
@@ -2369,7 +2736,46 @@
 									"pm.collectionVariables.set('rankingStartDate', today);\r",
 									"pm.collectionVariables.set('rankingEndDate', todayP1);\r",
 									"pm.collectionVariables.set('startDate', todayP2);\r",
-									"pm.collectionVariables.set('endDate', todayP3);"
+									"pm.collectionVariables.set('endDate', todayP3);\r",
+									"\r",
+									"\r",
+									"function rawBody(orgNamePresent){\r",
+									"    let concatenation = \"\";\r",
+									"    if(orgNamePresent){\r",
+									"        concatenation = ', \"organizationName\": \"Comune di Milano\", \"organizationVat\": \"11122233344\", \"organizationUserId\": \"a0a00000-0aaa-00aa-0000-0000000a0000\", \"organizationUserRole\": \"admin\"';\r",
+									"    }\r",
+									"\r",
+									"    let rawBody = '{ \"budget\": {{budget}}, \"beneficiaryType\": \"{{beneficiaryType}}\", \"beneficiaryKnown\": {{beneficiaryKnown}}, \"beneficiaryBudget\": {{beneficiaryBudget}}, \"rankingStartDate\": \"{{rankingStartDate}}\", \"rankingEndDate\": \"{{rankingEndDate}}\", \"startDate\": \"{{startDate}}\", \"endDate\": \"{{endDate}}\"'+concatenation+' }';\r",
+									"    return rawBody;\r",
+									"}\r",
+									"\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(true)\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserRole\",\r",
+									"        value: \"admin\"\r",
+									"    });\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserId\",\r",
+									"        value: \"a0a00000-0aaa-00aa-0000-0000000a0000\"\r",
+									"    });\r",
+									"}\r",
+									"else{\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(false)\r",
+									"    }\r",
+									"}\r",
+									"pm.request.headers.add({\r",
+									"    key: \"Content-Type\",\r",
+									"    value: \"application/json\"\r",
+									"});\r",
+									"pm.variables.set('body', JSON.stringify(body));\r",
+									"pm.request.body.update(body);"
 								],
 								"type": "text/javascript"
 							}
@@ -2398,15 +2804,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"budget\": {{budget}},\n    \"beneficiaryType\": \"{{beneficiaryType}}\",\n    \"beneficiaryKnown\": {{beneficiaryKnown}},\n    \"beneficiaryBudget\": {{beneficiaryBudget}},\n    \"rankingStartDate\": \"{{rankingStartDate}}\",\n    \"rankingEndDate\": \"{{rankingEndDate}}\",\n    \"startDate\": \"{{startDate}}\",\n    \"endDate\": \"{{endDate}}\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
 							"raw": "{{baseUrlInitiative}}/:initiativeId/general",
 							"host": [
@@ -2477,7 +2874,46 @@
 									"pm.collectionVariables.set('aC2_code', 'BIRTHDATE');\r",
 									"pm.collectionVariables.set('aC2_field', 'year');\r",
 									"pm.collectionVariables.set('aC2_operator', conditionOneValue[random]);\r",
-									"pm.collectionVariables.set('aC2_value', aC3_value);"
+									"pm.collectionVariables.set('aC2_value', aC3_value);\r",
+									"\r",
+									"function rawBody(orgNamePresent){\r",
+									"    let concatenation = \"\";\r",
+									"    if(orgNamePresent){\r",
+									"        concatenation = ', \"organizationName\": \"Comune di Milano\", \"organizationVat\": \"11122233344\", \"organizationUserId\": \"a0a00000-0aaa-00aa-0000-0000000a0000\", \"organizationUserRole\": \"admin\"';\r",
+									"    }\r",
+									"\r",
+									"    let rawBody = '{ \"selfDeclarationCriteria\": [ { \"_type\": \"{{sDC_type_B}}\", \"description\": \"{{sDC_description_B}}\", \"value\": {{sDC_value_B}}, \"code\": \"{{sDC_code_B}}\" }, { \"_type\": \"{{sDC_type_M}}\", \"description\": \"{{sDC_description_M}}\", \"value\": [ \"{{sDC_value1_M}}\", \"{{sDC_value2_M}}\", \"{{sDC_value3_M}}\" ], \"code\": \"{{sDC_code_M}}\" } ], \"automatedCriteria\": [ { \"authority\": \"{{aC0_authority}}\", \"code\": \"{{aC0_code}}\", \"operator\": \"{{aC0_operator}}\", \"value\": \"{{aC0_value}}\", \"value2\": \"{{aC0_value2}}\" }, { \"authority\": \"{{aC1_authority}}\", \"code\": \"{{aC1_code}}\", \"field\": \"{{aC1_field}}\", \"operator\": \"{{aC1_operator}}\", \"value\": \"{{aC1_value}}\" }, { \"authority\": \"{{aC2_authority}}\", \"code\": \"{{aC2_code}}\", \"field\": \"{{aC2_field}}\", \"operator\": \"{{aC2_operator}}\", \"value\": \"{{aC2_value}}\" } ]'+concatenation+' }';\r",
+									"    return rawBody;\r",
+									"}\r",
+									"\r",
+									"\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(true)\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserRole\",\r",
+									"        value: \"admin\"\r",
+									"    });\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserId\",\r",
+									"        value: \"a0a00000-0aaa-00aa-0000-0000000a0000\"\r",
+									"    });\r",
+									"}\r",
+									"else{\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(false)\r",
+									"    }\r",
+									"}\r",
+									"pm.request.headers.add({\r",
+									"    key: \"Content-Type\",\r",
+									"    value: \"application/json\"\r",
+									"});\r",
+									"pm.variables.set('body', JSON.stringify(body));\r",
+									"pm.request.body.update(body);"
 								],
 								"type": "text/javascript"
 							}
@@ -2506,15 +2942,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"selfDeclarationCriteria\": [\n    {\n      \"_type\": \"{{sDC_type_B}}\",\n      \"description\": \"{{sDC_description_B}}\",\n      \"value\": {{sDC_value_B}},\n      \"code\": \"{{sDC_code_B}}\"\n    },\n    {\n      \"_type\": \"{{sDC_type_M}}\",\n      \"description\": \"{{sDC_description_M}}\",\n      \"value\": [\n        \"{{sDC_value1_M}}\",\n        \"{{sDC_value2_M}}\",\n        \"{{sDC_value3_M}}\"\n      ],\n      \"code\": \"{{sDC_code_M}}\"\n    }\n  ],\n  \"automatedCriteria\": [\n    {\n      \"authority\": \"{{aC0_authority}}\",\n      \"code\": \"{{aC0_code}}\",\n      \"operator\": \"{{aC0_operator}}\",\n      \"value\": \"{{aC0_value}}\",\n      \"value2\": \"{{aC0_value2}}\"\n    },\n    {\n      \"authority\": \"{{aC1_authority}}\",\n      \"code\": \"{{aC1_code}}\",\n      \"field\": \"{{aC1_field}}\",\n      \"operator\": \"{{aC1_operator}}\",\n      \"value\": \"{{aC1_value}}\"\n    },\n    {\n      \"authority\": \"{{aC2_authority}}\",\n      \"code\": \"{{aC2_code}}\",\n      \"field\": \"{{aC2_field}}\",\n      \"operator\": \"{{aC2_operator}}\",\n      \"value\": \"{{aC2_value}}\"\n    }\n  ]\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
 							"raw": "{{baseUrlInitiative}}/:initiativeId/beneficiary",
 							"host": [
@@ -2561,9 +2988,9 @@
 									"\r",
 									"//pm.collectionVariables.set('rewardRuleType', 'rewardGroups');\r",
 									"pm.collectionVariables.set('rewardRuleType', 'rewardValue');\r",
-									"pm.collectionVariables.set('rewardRuleFrom', 0.25);\r",
-									"pm.collectionVariables.set('rewardRuleTo', 1);\r",
-									"pm.collectionVariables.set('rewardRuleValue', 100);\r",
+									"pm.collectionVariables.set('rewardRuleValue', 20);\r",
+									"//pm.collectionVariables.set('rewardRuleFrom', 0.25);\r",
+									"//pm.collectionVariables.set('rewardRuleTo', 1);\r",
 									"\r",
 									"pm.collectionVariables.set('trxDaysOfWeek', pm.variables.replaceIn('{{$randomWeekday}}').toString().toUpperCase());\r",
 									"pm.collectionVariables.set('trxDayEndTime', endTime[0]);\r",
@@ -2572,7 +2999,45 @@
 									"pm.collectionVariables.set('trxCountFrom', 3);\r",
 									"pm.collectionVariables.set('trxCountTo', 11);\r",
 									"pm.collectionVariables.set('trxRewardLimitFrequency', 'DAILY');\r",
-									"pm.collectionVariables.set('trxRewardLimitValue', 3);"
+									"pm.collectionVariables.set('trxRewardLimitValue', 3);\r",
+									"\r",
+									"function rawBody(orgNamePresent){\r",
+									"    let concatenation = \"\";\r",
+									"    if(orgNamePresent){\r",
+									"        concatenation = ', \"organizationName\": \"Comune di Milano\", \"organizationVat\": \"11122233344\", \"organizationUserId\": \"a0a00000-0aaa-00aa-0000-0000000a0000\", \"organizationUserRole\": \"admin\"';\r",
+									"    }\r",
+									"\r",
+									"    let rawBody = '{ \"rewardRule\": { \"_type\": \"{{rewardRuleType}}\", \"rewardValue\": {{rewardRuleValue}} }, \"trxRule\": { \"daysOfWeek\": [ { \"daysOfWeek\": [ \"{{trxDaysOfWeek}}\" ], \"intervals\": [ { \"startTime\": \"00:00:00.000\", \"endTime\": \"{{trxDayEndTime}}\" } ] } ], \"threshold\": { \"from\": {{trxThresholdFrom}}, \"fromIncluded\": true, \"to\": {{trxThresholdTo}}, \"toIncluded\": true }, \"mccFilter\": { \"allowedList\": true, \"values\": [ \"0742\", \"0743\", \"0744\" ] }, \"trxCount\": { \"from\": {{trxCountFrom}}, \"fromIncluded\": true, \"to\": {{trxCountTo}}, \"toIncluded\": true } } '+concatenation+' }';\r",
+									"    return rawBody;\r",
+									"}\r",
+									"\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(true)\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserRole\",\r",
+									"        value: \"admin\"\r",
+									"    });\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserId\",\r",
+									"        value: \"a0a00000-0aaa-00aa-0000-0000000a0000\"\r",
+									"    });\r",
+									"}\r",
+									"else{\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(false)\r",
+									"    }\r",
+									"}\r",
+									"pm.request.headers.add({\r",
+									"    key: \"Content-Type\",\r",
+									"    value: \"application/json\"\r",
+									"});\r",
+									"pm.variables.set('body', JSON.stringify(body));\r",
+									"pm.request.body.update(body);"
 								],
 								"type": "text/javascript"
 							}
@@ -2590,15 +3055,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"rewardRule\": {\n    \"_type\": \"{{rewardRuleType}}\",\n    \"rewardValue\": {{rewardRuleValue}}\n  },\n  \"trxRule\": {\n    \"daysOfWeek\": [\n      {\n        \"daysOfWeek\": [\n          \"{{trxDaysOfWeek}}\"\n        ],\n        \"intervals\": [\n          {\n            \"startTime\": \"00:00:00.000\",\n            \"endTime\": \"{{trxDayEndTime}}\"\n          }\n        ]\n      }\n    ],\n    \"threshold\": {\n      \"from\": {{trxThresholdFrom}},\n      \"fromIncluded\": true,\n      \"to\": {{trxThresholdTo}},\n      \"toIncluded\": true\n    },\n    \"mccFilter\": {\n      \"allowedList\": true,\n      \"values\": [\n        \"0742\", \"0743\", \"0744\"\n      ]\n    },\n    \"trxCount\": {\n      \"from\": {{trxCountFrom}},\n      \"fromIncluded\": true,\n      \"to\": {{trxCountTo}},\n      \"toIncluded\": true\n    }\n  }\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
 							"raw": "{{baseUrlInitiative}}/:initiativeId/reward",
 							"host": [
@@ -2641,7 +3097,45 @@
 									"timeTypeRandomIndex = _.random(0, timeType.length-1);\r",
 									"\r",
 									"pm.collectionVariables.set('timeType', timeType[timeTypeRandomIndex]);\r",
-									"pm.collectionVariables.set('identificationCode', pm.variables.replaceIn('{{$randomLoremSentence}}'));"
+									"pm.collectionVariables.set('identificationCode', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
+									"\r",
+									"function rawBody(orgNamePresent){\r",
+									"    let concatenation = \"\";\r",
+									"    if(orgNamePresent){\r",
+									"        concatenation = ', \"organizationName\": \"Comune di Milano\", \"organizationVat\": \"11122233344\", \"organizationUserId\": \"a0a00000-0aaa-00aa-0000-0000000a0000\", \"organizationUserRole\": \"admin\"';\r",
+									"    }\r",
+									"\r",
+									"    let rawBody = '{\"timeParameter\":{\"timeType\":\"{{timeType}}\"},\"additionalInfo\":{\"identificationCode\":\"{{identificationCode}}\"}'+concatenation+' }';\r",
+									"    return rawBody;\r",
+									"}\r",
+									"\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(true)\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserRole\",\r",
+									"        value: \"admin\"\r",
+									"    });\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserId\",\r",
+									"        value: \"a0a00000-0aaa-00aa-0000-0000000a0000\"\r",
+									"    });\r",
+									"}\r",
+									"else{\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(false)\r",
+									"    }\r",
+									"}\r",
+									"pm.request.headers.add({\r",
+									"    key: \"Content-Type\",\r",
+									"    value: \"application/json\"\r",
+									"});\r",
+									"pm.variables.set('body', JSON.stringify(body));\r",
+									"pm.request.body.update(body);"
 								],
 								"type": "text/javascript"
 							}
@@ -2659,15 +3153,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"timeParameter\": {\n        \"timeType\": \"{{timeType}}\"\n    },\n    \"additionalInfo\": {\n        \"identificationCode\": \"{{identificationCode}}\"\n    }\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
 							"raw": "{{baseUrlInitiative}}/:initiativeId/refund",
 							"host": [
@@ -2711,7 +3196,21 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									""
+									"let body;\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"rawBody = '{\"organizationName\":\"Comune di Milano\",\"organizationVat\":\"11122233344\",\"organizationUserId\":\"a0a00000-0aaa-00aa-0000-0000000a0000\",\"organizationUserRole\":\"admin\"}';\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"Content-Type\",\r",
+									"        value: \"application/json\"\r",
+									"    });\r",
+									"    pm.variables.set('body', JSON.stringify(body));\r",
+									"    pm.request.body.update(body);\r",
+									"}"
 								],
 								"type": "text/javascript"
 							}
@@ -2851,7 +3350,46 @@
 									"pm.collectionVariables.set('rankingStartDate', today);\r",
 									"pm.collectionVariables.set('rankingEndDate', todayP1);\r",
 									"pm.collectionVariables.set('startDate', todayP2);\r",
-									"pm.collectionVariables.set('endDate', todayP3);"
+									"pm.collectionVariables.set('endDate', todayP3);\r",
+									"\r",
+									"\r",
+									"function rawBody(orgNamePresent){\r",
+									"    let concatenation = \"\";\r",
+									"    if(orgNamePresent){\r",
+									"        concatenation = ', \"organizationName\": \"Comune di Milano\", \"organizationVat\": \"11122233344\", \"organizationUserId\": \"a0a00000-0aaa-00aa-0000-0000000a0000\", \"organizationUserRole\": \"admin\"';\r",
+									"    }\r",
+									"\r",
+									"    let rawBody = '{ \"budget\": {{budget}}, \"beneficiaryType\": \"{{beneficiaryType}}\", \"beneficiaryKnown\": {{beneficiaryKnown}}, \"beneficiaryBudget\": {{beneficiaryBudget}}, \"rankingStartDate\": \"{{rankingStartDate}}\", \"rankingEndDate\": \"{{rankingEndDate}}\", \"startDate\": \"{{startDate}}\", \"endDate\": \"{{endDate}}\"'+concatenation+' }';\r",
+									"    return rawBody;\r",
+									"}\r",
+									"\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(true)\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserRole\",\r",
+									"        value: \"admin\"\r",
+									"    });\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserId\",\r",
+									"        value: \"a0a00000-0aaa-00aa-0000-0000000a0000\"\r",
+									"    });\r",
+									"}\r",
+									"else{\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(false)\r",
+									"    }\r",
+									"}\r",
+									"pm.request.headers.add({\r",
+									"    key: \"Content-Type\",\r",
+									"    value: \"application/json\"\r",
+									"});\r",
+									"pm.variables.set('body', JSON.stringify(body));\r",
+									"pm.request.body.update(body);"
 								],
 								"type": "text/javascript"
 							}
@@ -2880,15 +3418,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"budget\": {{budget}},\n    \"beneficiaryType\": \"{{beneficiaryType}}\",\n    \"beneficiaryKnown\": {{beneficiaryKnown}},\n    \"beneficiaryBudget\": {{beneficiaryBudget}},\n    \"rankingStartDate\": \"{{rankingStartDate}}\",\n    \"rankingEndDate\": \"{{rankingEndDate}}\",\n    \"startDate\": \"{{startDate}}\",\n    \"endDate\": \"{{endDate}}\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
 							"raw": "{{baseUrlInitiative}}/:initiativeId/general",
 							"host": [
@@ -2959,7 +3488,46 @@
 									"pm.collectionVariables.set('aC2_code', 'BIRTHDATE');\r",
 									"pm.collectionVariables.set('aC2_field', 'year');\r",
 									"pm.collectionVariables.set('aC2_operator', conditionOneValue[random]);\r",
-									"pm.collectionVariables.set('aC2_value', aC3_value);"
+									"pm.collectionVariables.set('aC2_value', aC3_value);\r",
+									"\r",
+									"function rawBody(orgNamePresent){\r",
+									"    let concatenation = \"\";\r",
+									"    if(orgNamePresent){\r",
+									"        concatenation = ', \"organizationName\": \"Comune di Milano\", \"organizationVat\": \"11122233344\", \"organizationUserId\": \"a0a00000-0aaa-00aa-0000-0000000a0000\", \"organizationUserRole\": \"admin\"';\r",
+									"    }\r",
+									"\r",
+									"    let rawBody = '{ \"selfDeclarationCriteria\": [ { \"_type\": \"{{sDC_type_B}}\", \"description\": \"{{sDC_description_B}}\", \"value\": {{sDC_value_B}}, \"code\": \"{{sDC_code_B}}\" }, { \"_type\": \"{{sDC_type_M}}\", \"description\": \"{{sDC_description_M}}\", \"value\": [ \"{{sDC_value1_M}}\", \"{{sDC_value2_M}}\", \"{{sDC_value3_M}}\" ], \"code\": \"{{sDC_code_M}}\" } ], \"automatedCriteria\": [ { \"authority\": \"{{aC0_authority}}\", \"code\": \"{{aC0_code}}\", \"operator\": \"{{aC0_operator}}\", \"value\": \"{{aC0_value}}\", \"value2\": \"{{aC0_value2}}\" }, { \"authority\": \"{{aC1_authority}}\", \"code\": \"{{aC1_code}}\", \"field\": \"{{aC1_field}}\", \"operator\": \"{{aC1_operator}}\", \"value\": \"{{aC1_value}}\" }, { \"authority\": \"{{aC2_authority}}\", \"code\": \"{{aC2_code}}\", \"field\": \"{{aC2_field}}\", \"operator\": \"{{aC2_operator}}\", \"value\": \"{{aC2_value}}\" } ]'+concatenation+' }';\r",
+									"    return rawBody;\r",
+									"}\r",
+									"\r",
+									"\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(true)\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserRole\",\r",
+									"        value: \"admin\"\r",
+									"    });\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserId\",\r",
+									"        value: \"a0a00000-0aaa-00aa-0000-0000000a0000\"\r",
+									"    });\r",
+									"}\r",
+									"else{\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(false)\r",
+									"    }\r",
+									"}\r",
+									"pm.request.headers.add({\r",
+									"    key: \"Content-Type\",\r",
+									"    value: \"application/json\"\r",
+									"});\r",
+									"pm.variables.set('body', JSON.stringify(body));\r",
+									"pm.request.body.update(body);"
 								],
 								"type": "text/javascript"
 							}
@@ -2988,15 +3556,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"selfDeclarationCriteria\": [\n    {\n      \"_type\": \"{{sDC_type_B}}\",\n      \"description\": \"{{sDC_description_B}}\",\n      \"value\": {{sDC_value_B}},\n      \"code\": \"{{sDC_code_B}}\"\n    },\n    {\n      \"_type\": \"{{sDC_type_M}}\",\n      \"description\": \"{{sDC_description_M}}\",\n      \"value\": [\n        \"{{sDC_value1_M}}\",\n        \"{{sDC_value2_M}}\",\n        \"{{sDC_value3_M}}\"\n      ],\n      \"code\": \"{{sDC_code_M}}\"\n    }\n  ],\n  \"automatedCriteria\": [\n    {\n      \"authority\": \"{{aC0_authority}}\",\n      \"code\": \"{{aC0_code}}\",\n      \"operator\": \"{{aC0_operator}}\",\n      \"value\": \"{{aC0_value}}\",\n      \"value2\": \"{{aC0_value2}}\"\n    },\n    {\n      \"authority\": \"{{aC1_authority}}\",\n      \"code\": \"{{aC1_code}}\",\n      \"field\": \"{{aC1_field}}\",\n      \"operator\": \"{{aC1_operator}}\",\n      \"value\": \"{{aC1_value}}\"\n    },\n    {\n      \"authority\": \"{{aC2_authority}}\",\n      \"code\": \"{{aC2_code}}\",\n      \"field\": \"{{aC2_field}}\",\n      \"operator\": \"{{aC2_operator}}\",\n      \"value\": \"{{aC2_value}}\"\n    }\n  ]\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
 							"raw": "{{baseUrlInitiative}}/:initiativeId/beneficiary",
 							"host": [
@@ -3043,9 +3602,9 @@
 									"\r",
 									"//pm.collectionVariables.set('rewardRuleType', 'rewardGroups');\r",
 									"pm.collectionVariables.set('rewardRuleType', 'rewardValue');\r",
-									"pm.collectionVariables.set('rewardRuleFrom', 0.25);\r",
-									"pm.collectionVariables.set('rewardRuleTo', 1);\r",
-									"pm.collectionVariables.set('rewardRuleValue', 100);\r",
+									"pm.collectionVariables.set('rewardRuleValue', 20);\r",
+									"//pm.collectionVariables.set('rewardRuleFrom', 0.25);\r",
+									"//pm.collectionVariables.set('rewardRuleTo', 1);\r",
 									"\r",
 									"pm.collectionVariables.set('trxDaysOfWeek', pm.variables.replaceIn('{{$randomWeekday}}').toString().toUpperCase());\r",
 									"pm.collectionVariables.set('trxDayEndTime', endTime[0]);\r",
@@ -3054,7 +3613,45 @@
 									"pm.collectionVariables.set('trxCountFrom', 3);\r",
 									"pm.collectionVariables.set('trxCountTo', 11);\r",
 									"pm.collectionVariables.set('trxRewardLimitFrequency', 'DAILY');\r",
-									"pm.collectionVariables.set('trxRewardLimitValue', 3);"
+									"pm.collectionVariables.set('trxRewardLimitValue', 3);\r",
+									"\r",
+									"function rawBody(orgNamePresent){\r",
+									"    let concatenation = \"\";\r",
+									"    if(orgNamePresent){\r",
+									"        concatenation = ', \"organizationName\": \"Comune di Milano\", \"organizationVat\": \"11122233344\", \"organizationUserId\": \"a0a00000-0aaa-00aa-0000-0000000a0000\", \"organizationUserRole\": \"admin\"';\r",
+									"    }\r",
+									"\r",
+									"    let rawBody = '{ \"rewardRule\": { \"_type\": \"{{rewardRuleType}}\", \"rewardValue\": {{rewardRuleValue}} }, \"trxRule\": { \"daysOfWeek\": [ { \"daysOfWeek\": [ \"{{trxDaysOfWeek}}\" ], \"intervals\": [ { \"startTime\": \"00:00:00.000\", \"endTime\": \"{{trxDayEndTime}}\" } ] } ], \"threshold\": { \"from\": {{trxThresholdFrom}}, \"fromIncluded\": true, \"to\": {{trxThresholdTo}}, \"toIncluded\": true }, \"mccFilter\": { \"allowedList\": true, \"values\": [ \"0742\", \"0743\", \"0744\" ] }, \"trxCount\": { \"from\": {{trxCountFrom}}, \"fromIncluded\": true, \"to\": {{trxCountTo}}, \"toIncluded\": true } } '+concatenation+' }';\r",
+									"    return rawBody;\r",
+									"}\r",
+									"\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(true)\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserRole\",\r",
+									"        value: \"admin\"\r",
+									"    });\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserId\",\r",
+									"        value: \"a0a00000-0aaa-00aa-0000-0000000a0000\"\r",
+									"    });\r",
+									"}\r",
+									"else{\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(false)\r",
+									"    }\r",
+									"}\r",
+									"pm.request.headers.add({\r",
+									"    key: \"Content-Type\",\r",
+									"    value: \"application/json\"\r",
+									"});\r",
+									"pm.variables.set('body', JSON.stringify(body));\r",
+									"pm.request.body.update(body);"
 								],
 								"type": "text/javascript"
 							}
@@ -3072,15 +3669,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"rewardRule\": {\n    \"_type\": \"{{rewardRuleType}}\",\n    \"rewardValue\": {{rewardRuleValue}}\n  },\n  \"trxRule\": {\n    \"daysOfWeek\": [\n      {\n        \"daysOfWeek\": [\n          \"{{trxDaysOfWeek}}\"\n        ],\n        \"intervals\": [\n          {\n            \"startTime\": \"00:00:00.000\",\n            \"endTime\": \"{{trxDayEndTime}}\"\n          }\n        ]\n      }\n    ],\n    \"threshold\": {\n      \"from\": {{trxThresholdFrom}},\n      \"fromIncluded\": true,\n      \"to\": {{trxThresholdTo}},\n      \"toIncluded\": true\n    },\n    \"mccFilter\": {\n      \"allowedList\": true,\n      \"values\": [\n        \"0742\", \"0743\", \"0744\"\n      ]\n    },\n    \"trxCount\": {\n      \"from\": {{trxCountFrom}},\n      \"fromIncluded\": true,\n      \"to\": {{trxCountTo}},\n      \"toIncluded\": true\n    }\n  }\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
 							"raw": "{{baseUrlInitiative}}/:initiativeId/reward",
 							"host": [
@@ -3123,7 +3711,45 @@
 									"timeTypeRandomIndex = _.random(0, timeType.length-1);\r",
 									"\r",
 									"pm.collectionVariables.set('timeType', timeType[timeTypeRandomIndex]);\r",
-									"pm.collectionVariables.set('identificationCode', pm.variables.replaceIn('{{$randomLoremSentence}}'));"
+									"pm.collectionVariables.set('identificationCode', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
+									"\r",
+									"function rawBody(orgNamePresent){\r",
+									"    let concatenation = \"\";\r",
+									"    if(orgNamePresent){\r",
+									"        concatenation = ', \"organizationName\": \"Comune di Milano\", \"organizationVat\": \"11122233344\", \"organizationUserId\": \"a0a00000-0aaa-00aa-0000-0000000a0000\", \"organizationUserRole\": \"admin\"';\r",
+									"    }\r",
+									"\r",
+									"    let rawBody = '{\"timeParameter\":{\"timeType\":\"{{timeType}}\"},\"additionalInfo\":{\"identificationCode\":\"{{identificationCode}}\"}'+concatenation+' }';\r",
+									"    return rawBody;\r",
+									"}\r",
+									"\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(true)\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserRole\",\r",
+									"        value: \"admin\"\r",
+									"    });\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserId\",\r",
+									"        value: \"a0a00000-0aaa-00aa-0000-0000000a0000\"\r",
+									"    });\r",
+									"}\r",
+									"else{\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(false)\r",
+									"    }\r",
+									"}\r",
+									"pm.request.headers.add({\r",
+									"    key: \"Content-Type\",\r",
+									"    value: \"application/json\"\r",
+									"});\r",
+									"pm.variables.set('body', JSON.stringify(body));\r",
+									"pm.request.body.update(body);"
 								],
 								"type": "text/javascript"
 							}
@@ -3141,15 +3767,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"timeParameter\": {\n        \"timeType\": \"{{timeType}}\"\n    },\n    \"additionalInfo\": {\n        \"identificationCode\": \"{{identificationCode}}\"\n    }\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
 							"raw": "{{baseUrlInitiative}}/:initiativeId/refund",
 							"host": [
@@ -3193,7 +3810,21 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									""
+									"let body;\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"rawBody = '{\"organizationName\":\"Comune di Milano\",\"organizationVat\":\"11122233344\",\"organizationUserId\":\"a0a00000-0aaa-00aa-0000-0000000a0000\",\"organizationUserRole\":\"admin\"}';\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"Content-Type\",\r",
+									"        value: \"application/json\"\r",
+									"    });\r",
+									"    pm.variables.set('body', JSON.stringify(body));\r",
+									"    pm.request.body.update(body);\r",
+									"}"
 								],
 								"type": "text/javascript"
 							}
@@ -3249,7 +3880,21 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									""
+									"let body;\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"rawBody = '{\"organizationName\":\"Comune di Milano\",\"organizationVat\":\"11122233344\",\"organizationUserId\":\"a0a00000-0aaa-00aa-0000-0000000a0000\",\"organizationUserRole\":\"admin\"}';\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"Content-Type\",\r",
+									"        value: \"application/json\"\r",
+									"    });\r",
+									"    pm.variables.set('body', JSON.stringify(body));\r",
+									"    pm.request.body.update(body);\r",
+									"}"
 								],
 								"type": "text/javascript"
 							}
@@ -3292,7 +3937,7 @@
 			"name": "4th.Wizard Initiative Creation UseCase-With Ranking",
 			"item": [
 				{
-					"name": "STEP1-Insert Initiative (Service Info)",
+					"name": "STEP1-Insert Initiative (Service Info) after TO_CHECK revision",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -3303,7 +3948,45 @@
 									"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 									"\r",
 									"pm.collectionVariables.set('channel_type', 'web');\r",
-									"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+									"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));\r",
+									"\r",
+									"function rawBody(orgNamePresent){\r",
+									"    let concatenation = \"\";\r",
+									"    if(orgNamePresent){\r",
+									"        concatenation = ', \"organizationName\": \"Comune di Milano\", \"organizationVat\": \"11122233344\", \"organizationUserId\": \"a0a00000-0aaa-00aa-0000-0000000a0000\", \"organizationUserRole\": \"admin\"';\r",
+									"    }\r",
+									"\r",
+									"    let rawBody = '{\"serviceIO\":true,\"serviceName\":\"{{serviceName}}\",\"serviceScope\":\"LOCAL\",\"description\":\"{{description}}\",\"privacyLink\":\"https:\\/\\/www.google.it\",\"tcLink\":\"https:\\/\\/www.google.com\",\"channels\":[{\"type\":\"{{channel_type}}\",\"contact\":\"{{channel_contact}}\"}]'+concatenation+' }';\r",
+									"    return rawBody;\r",
+									"}\r",
+									"\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(true)\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserRole\",\r",
+									"        value: \"admin\"\r",
+									"    });\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserId\",\r",
+									"        value: \"a0a00000-0aaa-00aa-0000-0000000a0000\"\r",
+									"    });\r",
+									"}\r",
+									"else{\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(false)\r",
+									"    }\r",
+									"}\r",
+									"pm.request.headers.add({\r",
+									"    key: \"Content-Type\",\r",
+									"    value: \"application/json\"\r",
+									"});\r",
+									"pm.variables.set('body', JSON.stringify(body));\r",
+									"pm.request.body.update(body);"
 								],
 								"type": "text/javascript"
 							}
@@ -3342,15 +4025,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
 							"raw": "{{baseUrlInitiative}}/info",
 							"host": [
@@ -3461,7 +4135,46 @@
 									"pm.collectionVariables.set('rankingStartDate', today);\r",
 									"pm.collectionVariables.set('rankingEndDate', todayP1);\r",
 									"pm.collectionVariables.set('startDate', todayP2);\r",
-									"pm.collectionVariables.set('endDate', todayP3);"
+									"pm.collectionVariables.set('endDate', todayP3);\r",
+									"\r",
+									"\r",
+									"function rawBody(orgNamePresent){\r",
+									"    let concatenation = \"\";\r",
+									"    if(orgNamePresent){\r",
+									"        concatenation = ', \"organizationName\": \"Comune di Milano\", \"organizationVat\": \"11122233344\", \"organizationUserId\": \"a0a00000-0aaa-00aa-0000-0000000a0000\", \"organizationUserRole\": \"admin\"';\r",
+									"    }\r",
+									"\r",
+									"    let rawBody = '{ \"budget\": {{budget}}, \"beneficiaryType\": \"{{beneficiaryType}}\", \"beneficiaryKnown\": {{beneficiaryKnown}}, \"beneficiaryBudget\": {{beneficiaryBudget}}, \"rankingStartDate\": \"{{rankingStartDate}}\", \"rankingEndDate\": \"{{rankingEndDate}}\", \"startDate\": \"{{startDate}}\", \"endDate\": \"{{endDate}}\"'+concatenation+' }';\r",
+									"    return rawBody;\r",
+									"}\r",
+									"\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(true)\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserRole\",\r",
+									"        value: \"admin\"\r",
+									"    });\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserId\",\r",
+									"        value: \"a0a00000-0aaa-00aa-0000-0000000a0000\"\r",
+									"    });\r",
+									"}\r",
+									"else{\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(false)\r",
+									"    }\r",
+									"}\r",
+									"pm.request.headers.add({\r",
+									"    key: \"Content-Type\",\r",
+									"    value: \"application/json\"\r",
+									"});\r",
+									"pm.variables.set('body', JSON.stringify(body));\r",
+									"pm.request.body.update(body);"
 								],
 								"type": "text/javascript"
 							}
@@ -3490,15 +4203,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"budget\": {{budget}},\n    \"beneficiaryType\": \"{{beneficiaryType}}\",\n    \"beneficiaryKnown\": {{beneficiaryKnown}},\n    \"beneficiaryBudget\": {{beneficiaryBudget}},\n    \"rankingStartDate\": \"{{rankingStartDate}}\",\n    \"rankingEndDate\": \"{{rankingEndDate}}\",\n    \"startDate\": \"{{startDate}}\",\n    \"endDate\": \"{{endDate}}\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
 							"raw": "{{baseUrlInitiative}}/:initiativeId/general",
 							"host": [
@@ -3569,7 +4273,46 @@
 									"pm.collectionVariables.set('aC2_code', 'BIRTHDATE');\r",
 									"pm.collectionVariables.set('aC2_field', 'year');\r",
 									"pm.collectionVariables.set('aC2_operator', conditionOneValue[random]);\r",
-									"pm.collectionVariables.set('aC2_value', aC3_value);"
+									"pm.collectionVariables.set('aC2_value', aC3_value);\r",
+									"\r",
+									"function rawBody(orgNamePresent){\r",
+									"    let concatenation = \"\";\r",
+									"    if(orgNamePresent){\r",
+									"        concatenation = ', \"organizationName\": \"Comune di Milano\", \"organizationVat\": \"11122233344\", \"organizationUserId\": \"a0a00000-0aaa-00aa-0000-0000000a0000\", \"organizationUserRole\": \"admin\"';\r",
+									"    }\r",
+									"\r",
+									"    let rawBody = '{ \"selfDeclarationCriteria\": [ { \"_type\": \"{{sDC_type_B}}\", \"description\": \"{{sDC_description_B}}\", \"value\": {{sDC_value_B}}, \"code\": \"{{sDC_code_B}}\" }, { \"_type\": \"{{sDC_type_M}}\", \"description\": \"{{sDC_description_M}}\", \"value\": [ \"{{sDC_value1_M}}\", \"{{sDC_value2_M}}\", \"{{sDC_value3_M}}\" ], \"code\": \"{{sDC_code_M}}\" } ], \"automatedCriteria\": [ { \"authority\": \"{{aC0_authority}}\", \"code\": \"{{aC0_code}}\", \"operator\": \"{{aC0_operator}}\", \"value\": \"{{aC0_value}}\", \"value2\": \"{{aC0_value2}}\" }, { \"authority\": \"{{aC1_authority}}\", \"code\": \"{{aC1_code}}\", \"field\": \"{{aC1_field}}\", \"operator\": \"{{aC1_operator}}\", \"value\": \"{{aC1_value}}\" }, { \"authority\": \"{{aC2_authority}}\", \"code\": \"{{aC2_code}}\", \"field\": \"{{aC2_field}}\", \"operator\": \"{{aC2_operator}}\", \"value\": \"{{aC2_value}}\" } ]'+concatenation+' }';\r",
+									"    return rawBody;\r",
+									"}\r",
+									"\r",
+									"\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(true)\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserRole\",\r",
+									"        value: \"admin\"\r",
+									"    });\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserId\",\r",
+									"        value: \"a0a00000-0aaa-00aa-0000-0000000a0000\"\r",
+									"    });\r",
+									"}\r",
+									"else{\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(false)\r",
+									"    }\r",
+									"}\r",
+									"pm.request.headers.add({\r",
+									"    key: \"Content-Type\",\r",
+									"    value: \"application/json\"\r",
+									"});\r",
+									"pm.variables.set('body', JSON.stringify(body));\r",
+									"pm.request.body.update(body);"
 								],
 								"type": "text/javascript"
 							}
@@ -3598,15 +4341,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"selfDeclarationCriteria\": [\n    {\n      \"_type\": \"{{sDC_type_B}}\",\n      \"description\": \"{{sDC_description_B}}\",\n      \"value\": {{sDC_value_B}},\n      \"code\": \"{{sDC_code_B}}\"\n    },\n    {\n      \"_type\": \"{{sDC_type_M}}\",\n      \"description\": \"{{sDC_description_M}}\",\n      \"value\": [\n        \"{{sDC_value1_M}}\",\n        \"{{sDC_value2_M}}\",\n        \"{{sDC_value3_M}}\"\n      ],\n      \"code\": \"{{sDC_code_M}}\"\n    }\n  ],\n  \"automatedCriteria\": [\n    {\n      \"authority\": \"{{aC0_authority}}\",\n      \"code\": \"{{aC0_code}}\",\n      \"operator\": \"{{aC0_operator}}\",\n      \"value\": \"{{aC0_value}}\",\n      \"value2\": \"{{aC0_value2}}\"\n    },\n    {\n      \"authority\": \"{{aC1_authority}}\",\n      \"code\": \"{{aC1_code}}\",\n      \"field\": \"{{aC1_field}}\",\n      \"operator\": \"{{aC1_operator}}\",\n      \"value\": \"{{aC1_value}}\"\n    },\n    {\n      \"authority\": \"{{aC2_authority}}\",\n      \"code\": \"{{aC2_code}}\",\n      \"field\": \"{{aC2_field}}\",\n      \"operator\": \"{{aC2_operator}}\",\n      \"value\": \"{{aC2_value}}\"\n    }\n  ]\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
 							"raw": "{{baseUrlInitiative}}/:initiativeId/beneficiary",
 							"host": [
@@ -3653,9 +4387,9 @@
 									"\r",
 									"//pm.collectionVariables.set('rewardRuleType', 'rewardGroups');\r",
 									"pm.collectionVariables.set('rewardRuleType', 'rewardValue');\r",
-									"pm.collectionVariables.set('rewardRuleFrom', 0.25);\r",
-									"pm.collectionVariables.set('rewardRuleTo', 1);\r",
-									"pm.collectionVariables.set('rewardRuleValue', 100);\r",
+									"pm.collectionVariables.set('rewardRuleValue', 20);\r",
+									"//pm.collectionVariables.set('rewardRuleFrom', 0.25);\r",
+									"//pm.collectionVariables.set('rewardRuleTo', 1);\r",
 									"\r",
 									"pm.collectionVariables.set('trxDaysOfWeek', pm.variables.replaceIn('{{$randomWeekday}}').toString().toUpperCase());\r",
 									"pm.collectionVariables.set('trxDayEndTime', endTime[0]);\r",
@@ -3664,7 +4398,45 @@
 									"pm.collectionVariables.set('trxCountFrom', 3);\r",
 									"pm.collectionVariables.set('trxCountTo', 11);\r",
 									"pm.collectionVariables.set('trxRewardLimitFrequency', 'DAILY');\r",
-									"pm.collectionVariables.set('trxRewardLimitValue', 3);"
+									"pm.collectionVariables.set('trxRewardLimitValue', 3);\r",
+									"\r",
+									"function rawBody(orgNamePresent){\r",
+									"    let concatenation = \"\";\r",
+									"    if(orgNamePresent){\r",
+									"        concatenation = ', \"organizationName\": \"Comune di Milano\", \"organizationVat\": \"11122233344\", \"organizationUserId\": \"a0a00000-0aaa-00aa-0000-0000000a0000\", \"organizationUserRole\": \"admin\"';\r",
+									"    }\r",
+									"\r",
+									"    let rawBody = '{ \"rewardRule\": { \"_type\": \"{{rewardRuleType}}\", \"rewardValue\": {{rewardRuleValue}} }, \"trxRule\": { \"daysOfWeek\": [ { \"daysOfWeek\": [ \"{{trxDaysOfWeek}}\" ], \"intervals\": [ { \"startTime\": \"00:00:00.000\", \"endTime\": \"{{trxDayEndTime}}\" } ] } ], \"threshold\": { \"from\": {{trxThresholdFrom}}, \"fromIncluded\": true, \"to\": {{trxThresholdTo}}, \"toIncluded\": true }, \"mccFilter\": { \"allowedList\": true, \"values\": [ \"0742\", \"0743\", \"0744\" ] }, \"trxCount\": { \"from\": {{trxCountFrom}}, \"fromIncluded\": true, \"to\": {{trxCountTo}}, \"toIncluded\": true } } '+concatenation+' }';\r",
+									"    return rawBody;\r",
+									"}\r",
+									"\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(true)\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserRole\",\r",
+									"        value: \"admin\"\r",
+									"    });\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserId\",\r",
+									"        value: \"a0a00000-0aaa-00aa-0000-0000000a0000\"\r",
+									"    });\r",
+									"}\r",
+									"else{\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(false)\r",
+									"    }\r",
+									"}\r",
+									"pm.request.headers.add({\r",
+									"    key: \"Content-Type\",\r",
+									"    value: \"application/json\"\r",
+									"});\r",
+									"pm.variables.set('body', JSON.stringify(body));\r",
+									"pm.request.body.update(body);"
 								],
 								"type": "text/javascript"
 							}
@@ -3682,15 +4454,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"rewardRule\": {\n    \"_type\": \"{{rewardRuleType}}\",\n    \"rewardValue\": {{rewardRuleValue}}\n  },\n  \"trxRule\": {\n    \"daysOfWeek\": [\n      {\n        \"daysOfWeek\": [\n          \"{{trxDaysOfWeek}}\"\n        ],\n        \"intervals\": [\n          {\n            \"startTime\": \"00:00:00.000\",\n            \"endTime\": \"{{trxDayEndTime}}\"\n          }\n        ]\n      }\n    ],\n    \"threshold\": {\n      \"from\": {{trxThresholdFrom}},\n      \"fromIncluded\": true,\n      \"to\": {{trxThresholdTo}},\n      \"toIncluded\": true\n    },\n    \"mccFilter\": {\n      \"allowedList\": true,\n      \"values\": [\n        \"0742\", \"0743\", \"0744\"\n      ]\n    },\n    \"trxCount\": {\n      \"from\": {{trxCountFrom}},\n      \"fromIncluded\": true,\n      \"to\": {{trxCountTo}},\n      \"toIncluded\": true\n    }\n  }\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
 							"raw": "{{baseUrlInitiative}}/:initiativeId/reward",
 							"host": [
@@ -3733,7 +4496,45 @@
 									"timeTypeRandomIndex = _.random(0, timeType.length-1);\r",
 									"\r",
 									"pm.collectionVariables.set('timeType', timeType[timeTypeRandomIndex]);\r",
-									"pm.collectionVariables.set('identificationCode', pm.variables.replaceIn('{{$randomLoremSentence}}'));"
+									"pm.collectionVariables.set('identificationCode', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
+									"\r",
+									"function rawBody(orgNamePresent){\r",
+									"    let concatenation = \"\";\r",
+									"    if(orgNamePresent){\r",
+									"        concatenation = ', \"organizationName\": \"Comune di Milano\", \"organizationVat\": \"11122233344\", \"organizationUserId\": \"a0a00000-0aaa-00aa-0000-0000000a0000\", \"organizationUserRole\": \"admin\"';\r",
+									"    }\r",
+									"\r",
+									"    let rawBody = '{\"timeParameter\":{\"timeType\":\"{{timeType}}\"},\"additionalInfo\":{\"identificationCode\":\"{{identificationCode}}\"}'+concatenation+' }';\r",
+									"    return rawBody;\r",
+									"}\r",
+									"\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(true)\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserRole\",\r",
+									"        value: \"admin\"\r",
+									"    });\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserId\",\r",
+									"        value: \"a0a00000-0aaa-00aa-0000-0000000a0000\"\r",
+									"    });\r",
+									"}\r",
+									"else{\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(false)\r",
+									"    }\r",
+									"}\r",
+									"pm.request.headers.add({\r",
+									"    key: \"Content-Type\",\r",
+									"    value: \"application/json\"\r",
+									"});\r",
+									"pm.variables.set('body', JSON.stringify(body));\r",
+									"pm.request.body.update(body);"
 								],
 								"type": "text/javascript"
 							}
@@ -3751,15 +4552,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"timeParameter\": {\n        \"timeType\": \"{{timeType}}\"\n    },\n    \"additionalInfo\": {\n        \"identificationCode\": \"{{identificationCode}}\"\n    }\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
 							"raw": "{{baseUrlInitiative}}/:initiativeId/refund",
 							"host": [
@@ -3803,7 +4595,21 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									""
+									"let body;\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"rawBody = '{\"organizationName\":\"Comune di Milano\",\"organizationVat\":\"11122233344\",\"organizationUserId\":\"a0a00000-0aaa-00aa-0000-0000000a0000\",\"organizationUserRole\":\"admin\"}';\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"Content-Type\",\r",
+									"        value: \"application/json\"\r",
+									"    });\r",
+									"    pm.variables.set('body', JSON.stringify(body));\r",
+									"    pm.request.body.update(body);\r",
+									"}"
 								],
 								"type": "text/javascript"
 							}
@@ -3859,7 +4665,21 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									""
+									"let body;\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"rawBody = '{\"organizationName\":\"Comune di Milano\",\"organizationVat\":\"11122233344\",\"organizationUserId\":\"a0a00000-0aaa-00aa-0000-0000000a0000\",\"organizationUserRole\":\"admin\"}';\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"Content-Type\",\r",
+									"        value: \"application/json\"\r",
+									"    });\r",
+									"    pm.variables.set('body', JSON.stringify(body));\r",
+									"    pm.request.body.update(body);\r",
+									"}"
 								],
 								"type": "text/javascript"
 							}
@@ -3903,7 +4723,7 @@
 			"name": "5th.Wizard Initiative Creation deliver to IO UseCase-With Ranking",
 			"item": [
 				{
-					"name": "STEP1-Insert Initiative (Service Info)",
+					"name": "STEP1-Insert Initiative (Service Info) after TO_CHECK revision",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -3914,7 +4734,45 @@
 									"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 									"\r",
 									"pm.collectionVariables.set('channel_type', 'web');\r",
-									"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+									"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));\r",
+									"\r",
+									"function rawBody(orgNamePresent){\r",
+									"    let concatenation = \"\";\r",
+									"    if(orgNamePresent){\r",
+									"        concatenation = ', \"organizationName\": \"Comune di Milano\", \"organizationVat\": \"11122233344\", \"organizationUserId\": \"a0a00000-0aaa-00aa-0000-0000000a0000\", \"organizationUserRole\": \"admin\"';\r",
+									"    }\r",
+									"\r",
+									"    let rawBody = '{\"serviceIO\":true,\"serviceName\":\"{{serviceName}}\",\"serviceScope\":\"LOCAL\",\"description\":\"{{description}}\",\"privacyLink\":\"https:\\/\\/www.google.it\",\"tcLink\":\"https:\\/\\/www.google.com\",\"channels\":[{\"type\":\"{{channel_type}}\",\"contact\":\"{{channel_contact}}\"}]'+concatenation+' }';\r",
+									"    return rawBody;\r",
+									"}\r",
+									"\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(true)\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserRole\",\r",
+									"        value: \"admin\"\r",
+									"    });\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserId\",\r",
+									"        value: \"a0a00000-0aaa-00aa-0000-0000000a0000\"\r",
+									"    });\r",
+									"}\r",
+									"else{\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(false)\r",
+									"    }\r",
+									"}\r",
+									"pm.request.headers.add({\r",
+									"    key: \"Content-Type\",\r",
+									"    value: \"application/json\"\r",
+									"});\r",
+									"pm.variables.set('body', JSON.stringify(body));\r",
+									"pm.request.body.update(body);"
 								],
 								"type": "text/javascript"
 							}
@@ -3953,15 +4811,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
 							"raw": "{{baseUrlInitiative}}/info",
 							"host": [
@@ -4018,7 +4867,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+							"raw": "{\n    \"serviceIO\": false,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4072,7 +4921,46 @@
 									"pm.collectionVariables.set('rankingStartDate', today);\r",
 									"pm.collectionVariables.set('rankingEndDate', todayP1);\r",
 									"pm.collectionVariables.set('startDate', todayP2);\r",
-									"pm.collectionVariables.set('endDate', todayP3);"
+									"pm.collectionVariables.set('endDate', todayP3);\r",
+									"\r",
+									"\r",
+									"function rawBody(orgNamePresent){\r",
+									"    let concatenation = \"\";\r",
+									"    if(orgNamePresent){\r",
+									"        concatenation = ', \"organizationName\": \"Comune di Milano\", \"organizationVat\": \"11122233344\", \"organizationUserId\": \"a0a00000-0aaa-00aa-0000-0000000a0000\", \"organizationUserRole\": \"admin\"';\r",
+									"    }\r",
+									"\r",
+									"    let rawBody = '{ \"budget\": {{budget}}, \"beneficiaryType\": \"{{beneficiaryType}}\", \"beneficiaryKnown\": {{beneficiaryKnown}}, \"beneficiaryBudget\": {{beneficiaryBudget}}, \"rankingStartDate\": \"{{rankingStartDate}}\", \"rankingEndDate\": \"{{rankingEndDate}}\", \"startDate\": \"{{startDate}}\", \"endDate\": \"{{endDate}}\"'+concatenation+' }';\r",
+									"    return rawBody;\r",
+									"}\r",
+									"\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(true)\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserRole\",\r",
+									"        value: \"admin\"\r",
+									"    });\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserId\",\r",
+									"        value: \"a0a00000-0aaa-00aa-0000-0000000a0000\"\r",
+									"    });\r",
+									"}\r",
+									"else{\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(false)\r",
+									"    }\r",
+									"}\r",
+									"pm.request.headers.add({\r",
+									"    key: \"Content-Type\",\r",
+									"    value: \"application/json\"\r",
+									"});\r",
+									"pm.variables.set('body', JSON.stringify(body));\r",
+									"pm.request.body.update(body);"
 								],
 								"type": "text/javascript"
 							}
@@ -4101,15 +4989,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"budget\": {{budget}},\n    \"beneficiaryType\": \"{{beneficiaryType}}\",\n    \"beneficiaryKnown\": {{beneficiaryKnown}},\n    \"beneficiaryBudget\": {{beneficiaryBudget}},\n    \"rankingStartDate\": \"{{rankingStartDate}}\",\n    \"rankingEndDate\": \"{{rankingEndDate}}\",\n    \"startDate\": \"{{startDate}}\",\n    \"endDate\": \"{{endDate}}\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
 							"raw": "{{baseUrlInitiative}}/:initiativeId/general",
 							"host": [
@@ -4180,7 +5059,46 @@
 									"pm.collectionVariables.set('aC2_code', 'BIRTHDATE');\r",
 									"pm.collectionVariables.set('aC2_field', 'year');\r",
 									"pm.collectionVariables.set('aC2_operator', conditionOneValue[random]);\r",
-									"pm.collectionVariables.set('aC2_value', aC3_value);"
+									"pm.collectionVariables.set('aC2_value', aC3_value);\r",
+									"\r",
+									"function rawBody(orgNamePresent){\r",
+									"    let concatenation = \"\";\r",
+									"    if(orgNamePresent){\r",
+									"        concatenation = ', \"organizationName\": \"Comune di Milano\", \"organizationVat\": \"11122233344\", \"organizationUserId\": \"a0a00000-0aaa-00aa-0000-0000000a0000\", \"organizationUserRole\": \"admin\"';\r",
+									"    }\r",
+									"\r",
+									"    let rawBody = '{ \"selfDeclarationCriteria\": [ { \"_type\": \"{{sDC_type_B}}\", \"description\": \"{{sDC_description_B}}\", \"value\": {{sDC_value_B}}, \"code\": \"{{sDC_code_B}}\" }, { \"_type\": \"{{sDC_type_M}}\", \"description\": \"{{sDC_description_M}}\", \"value\": [ \"{{sDC_value1_M}}\", \"{{sDC_value2_M}}\", \"{{sDC_value3_M}}\" ], \"code\": \"{{sDC_code_M}}\" } ], \"automatedCriteria\": [ { \"authority\": \"{{aC0_authority}}\", \"code\": \"{{aC0_code}}\", \"operator\": \"{{aC0_operator}}\", \"value\": \"{{aC0_value}}\", \"value2\": \"{{aC0_value2}}\" }, { \"authority\": \"{{aC1_authority}}\", \"code\": \"{{aC1_code}}\", \"field\": \"{{aC1_field}}\", \"operator\": \"{{aC1_operator}}\", \"value\": \"{{aC1_value}}\" }, { \"authority\": \"{{aC2_authority}}\", \"code\": \"{{aC2_code}}\", \"field\": \"{{aC2_field}}\", \"operator\": \"{{aC2_operator}}\", \"value\": \"{{aC2_value}}\" } ]'+concatenation+' }';\r",
+									"    return rawBody;\r",
+									"}\r",
+									"\r",
+									"\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(true)\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserRole\",\r",
+									"        value: \"admin\"\r",
+									"    });\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserId\",\r",
+									"        value: \"a0a00000-0aaa-00aa-0000-0000000a0000\"\r",
+									"    });\r",
+									"}\r",
+									"else{\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(false)\r",
+									"    }\r",
+									"}\r",
+									"pm.request.headers.add({\r",
+									"    key: \"Content-Type\",\r",
+									"    value: \"application/json\"\r",
+									"});\r",
+									"pm.variables.set('body', JSON.stringify(body));\r",
+									"pm.request.body.update(body);"
 								],
 								"type": "text/javascript"
 							}
@@ -4209,15 +5127,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"selfDeclarationCriteria\": [\n    {\n      \"_type\": \"{{sDC_type_B}}\",\n      \"description\": \"{{sDC_description_B}}\",\n      \"value\": {{sDC_value_B}},\n      \"code\": \"{{sDC_code_B}}\"\n    },\n    {\n      \"_type\": \"{{sDC_type_M}}\",\n      \"description\": \"{{sDC_description_M}}\",\n      \"value\": [\n        \"{{sDC_value1_M}}\",\n        \"{{sDC_value2_M}}\",\n        \"{{sDC_value3_M}}\"\n      ],\n      \"code\": \"{{sDC_code_M}}\"\n    }\n  ],\n  \"automatedCriteria\": [\n    {\n      \"authority\": \"{{aC0_authority}}\",\n      \"code\": \"{{aC0_code}}\",\n      \"operator\": \"{{aC0_operator}}\",\n      \"value\": \"{{aC0_value}}\",\n      \"value2\": \"{{aC0_value2}}\"\n    },\n    {\n      \"authority\": \"{{aC1_authority}}\",\n      \"code\": \"{{aC1_code}}\",\n      \"field\": \"{{aC1_field}}\",\n      \"operator\": \"{{aC1_operator}}\",\n      \"value\": \"{{aC1_value}}\"\n    },\n    {\n      \"authority\": \"{{aC2_authority}}\",\n      \"code\": \"{{aC2_code}}\",\n      \"field\": \"{{aC2_field}}\",\n      \"operator\": \"{{aC2_operator}}\",\n      \"value\": \"{{aC2_value}}\"\n    }\n  ]\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
 							"raw": "{{baseUrlInitiative}}/:initiativeId/beneficiary",
 							"host": [
@@ -4264,9 +5173,9 @@
 									"\r",
 									"//pm.collectionVariables.set('rewardRuleType', 'rewardGroups');\r",
 									"pm.collectionVariables.set('rewardRuleType', 'rewardValue');\r",
-									"pm.collectionVariables.set('rewardRuleFrom', 0.25);\r",
-									"pm.collectionVariables.set('rewardRuleTo', 1);\r",
-									"pm.collectionVariables.set('rewardRuleValue', 100);\r",
+									"pm.collectionVariables.set('rewardRuleValue', 20);\r",
+									"//pm.collectionVariables.set('rewardRuleFrom', 0.25);\r",
+									"//pm.collectionVariables.set('rewardRuleTo', 1);\r",
 									"\r",
 									"pm.collectionVariables.set('trxDaysOfWeek', pm.variables.replaceIn('{{$randomWeekday}}').toString().toUpperCase());\r",
 									"pm.collectionVariables.set('trxDayEndTime', endTime[0]);\r",
@@ -4275,7 +5184,45 @@
 									"pm.collectionVariables.set('trxCountFrom', 3);\r",
 									"pm.collectionVariables.set('trxCountTo', 11);\r",
 									"pm.collectionVariables.set('trxRewardLimitFrequency', 'DAILY');\r",
-									"pm.collectionVariables.set('trxRewardLimitValue', 3);"
+									"pm.collectionVariables.set('trxRewardLimitValue', 3);\r",
+									"\r",
+									"function rawBody(orgNamePresent){\r",
+									"    let concatenation = \"\";\r",
+									"    if(orgNamePresent){\r",
+									"        concatenation = ', \"organizationName\": \"Comune di Milano\", \"organizationVat\": \"11122233344\", \"organizationUserId\": \"a0a00000-0aaa-00aa-0000-0000000a0000\", \"organizationUserRole\": \"admin\"';\r",
+									"    }\r",
+									"\r",
+									"    let rawBody = '{ \"rewardRule\": { \"_type\": \"{{rewardRuleType}}\", \"rewardValue\": {{rewardRuleValue}} }, \"trxRule\": { \"daysOfWeek\": [ { \"daysOfWeek\": [ \"{{trxDaysOfWeek}}\" ], \"intervals\": [ { \"startTime\": \"00:00:00.000\", \"endTime\": \"{{trxDayEndTime}}\" } ] } ], \"threshold\": { \"from\": {{trxThresholdFrom}}, \"fromIncluded\": true, \"to\": {{trxThresholdTo}}, \"toIncluded\": true }, \"mccFilter\": { \"allowedList\": true, \"values\": [ \"0742\", \"0743\", \"0744\" ] }, \"trxCount\": { \"from\": {{trxCountFrom}}, \"fromIncluded\": true, \"to\": {{trxCountTo}}, \"toIncluded\": true } } '+concatenation+' }';\r",
+									"    return rawBody;\r",
+									"}\r",
+									"\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(true)\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserRole\",\r",
+									"        value: \"admin\"\r",
+									"    });\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserId\",\r",
+									"        value: \"a0a00000-0aaa-00aa-0000-0000000a0000\"\r",
+									"    });\r",
+									"}\r",
+									"else{\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(false)\r",
+									"    }\r",
+									"}\r",
+									"pm.request.headers.add({\r",
+									"    key: \"Content-Type\",\r",
+									"    value: \"application/json\"\r",
+									"});\r",
+									"pm.variables.set('body', JSON.stringify(body));\r",
+									"pm.request.body.update(body);"
 								],
 								"type": "text/javascript"
 							}
@@ -4293,15 +5240,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"rewardRule\": {\n    \"_type\": \"{{rewardRuleType}}\",\n    \"rewardValue\": {{rewardRuleValue}}\n  },\n  \"trxRule\": {\n    \"daysOfWeek\": [\n      {\n        \"daysOfWeek\": [\n          \"{{trxDaysOfWeek}}\"\n        ],\n        \"intervals\": [\n          {\n            \"startTime\": \"00:00:00.000\",\n            \"endTime\": \"{{trxDayEndTime}}\"\n          }\n        ]\n      }\n    ],\n    \"threshold\": {\n      \"from\": {{trxThresholdFrom}},\n      \"fromIncluded\": true,\n      \"to\": {{trxThresholdTo}},\n      \"toIncluded\": true\n    },\n    \"mccFilter\": {\n      \"allowedList\": true,\n      \"values\": [\n        \"0742\", \"0743\", \"0744\"\n      ]\n    },\n    \"trxCount\": {\n      \"from\": {{trxCountFrom}},\n      \"fromIncluded\": true,\n      \"to\": {{trxCountTo}},\n      \"toIncluded\": true\n    }\n  }\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
 							"raw": "{{baseUrlInitiative}}/:initiativeId/reward",
 							"host": [
@@ -4344,7 +5282,45 @@
 									"timeTypeRandomIndex = _.random(0, timeType.length-1);\r",
 									"\r",
 									"pm.collectionVariables.set('timeType', timeType[timeTypeRandomIndex]);\r",
-									"pm.collectionVariables.set('identificationCode', pm.variables.replaceIn('{{$randomLoremSentence}}'));"
+									"pm.collectionVariables.set('identificationCode', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
+									"\r",
+									"function rawBody(orgNamePresent){\r",
+									"    let concatenation = \"\";\r",
+									"    if(orgNamePresent){\r",
+									"        concatenation = ', \"organizationName\": \"Comune di Milano\", \"organizationVat\": \"11122233344\", \"organizationUserId\": \"a0a00000-0aaa-00aa-0000-0000000a0000\", \"organizationUserRole\": \"admin\"';\r",
+									"    }\r",
+									"\r",
+									"    let rawBody = '{\"timeParameter\":{\"timeType\":\"{{timeType}}\"},\"additionalInfo\":{\"identificationCode\":\"{{identificationCode}}\"}'+concatenation+' }';\r",
+									"    return rawBody;\r",
+									"}\r",
+									"\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(true)\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserRole\",\r",
+									"        value: \"admin\"\r",
+									"    });\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"organizationUserId\",\r",
+									"        value: \"a0a00000-0aaa-00aa-0000-0000000a0000\"\r",
+									"    });\r",
+									"}\r",
+									"else{\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody(false)\r",
+									"    }\r",
+									"}\r",
+									"pm.request.headers.add({\r",
+									"    key: \"Content-Type\",\r",
+									"    value: \"application/json\"\r",
+									"});\r",
+									"pm.variables.set('body', JSON.stringify(body));\r",
+									"pm.request.body.update(body);"
 								],
 								"type": "text/javascript"
 							}
@@ -4362,15 +5338,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"timeParameter\": {\n        \"timeType\": \"{{timeType}}\"\n    },\n    \"additionalInfo\": {\n        \"identificationCode\": \"{{identificationCode}}\"\n    }\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
 							"raw": "{{baseUrlInitiative}}/:initiativeId/refund",
 							"host": [
@@ -4485,7 +5452,21 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									""
+									"let body;\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"rawBody = '{\"organizationName\":\"Comune di Milano\",\"organizationVat\":\"11122233344\",\"organizationUserId\":\"a0a00000-0aaa-00aa-0000-0000000a0000\",\"organizationUserRole\":\"admin\"}';\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"Content-Type\",\r",
+									"        value: \"application/json\"\r",
+									"    });\r",
+									"    pm.variables.set('body', JSON.stringify(body));\r",
+									"    pm.request.body.update(body);\r",
+									"}"
 								],
 								"type": "text/javascript"
 							}
@@ -4547,7 +5528,21 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									""
+									"let body;\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"rawBody = '{\"organizationName\":\"Comune di Milano\",\"organizationVat\":\"11122233344\",\"organizationUserId\":\"a0a00000-0aaa-00aa-0000-0000000a0000\",\"organizationUserRole\":\"ope_base\"}';\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"Content-Type\",\r",
+									"        value: \"application/json\"\r",
+									"    });\r",
+									"    pm.variables.set('body', JSON.stringify(body));\r",
+									"    pm.request.body.update(body);\r",
+									"}"
 								],
 								"type": "text/javascript"
 							}
@@ -4671,6 +5666,29 @@
 									"pm.test(\"Status test 204\", function () {\r",
 									"    pm.response.to.have.status(204);\r",
 									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let body;\r",
+									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
+									"rawBody = '{\"organizationName\":\"Comune di Milano\",\"organizationVat\":\"11122233344\",\"organizationUserId\":\"a0a00000-0aaa-00aa-0000-0000000a0000\",\"organizationUserRole\":\"admin\"}';\r",
+									"if(baseUrlInitiative.includes('localhost')){\r",
+									"    body = {\r",
+									"        mode: 'raw',\r",
+									"        raw: rawBody\r",
+									"    }\r",
+									"    pm.request.headers.add({\r",
+									"        key: \"Content-Type\",\r",
+									"        value: \"application/json\"\r",
+									"    });\r",
+									"    pm.variables.set('body', JSON.stringify(body));\r",
+									"    pm.request.body.update(body);\r",
+									"}"
 								],
 								"type": "text/javascript"
 							}

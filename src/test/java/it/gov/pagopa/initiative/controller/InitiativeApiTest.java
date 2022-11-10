@@ -63,7 +63,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 @TestPropertySource(
         locations = "classpath:application.yml",
         properties = {
-                "app.initiative.conditions.notifyRE=true"
+                "app.initiative.conditions.notifyRE=true",
+                "app.initiative.conditions.notifyIO=true",
+                "app.initiative.conditions.notifyInternal=true"
         })
 @WebMvcTest(value = {
         InitiativeApi.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
@@ -243,7 +245,7 @@ class InitiativeApiTest {
         InitiativeAdditionalDTO initiativeAdditionalDTO = createStep1InitiativeAdditionalDTO();
 
         // Instruct the Service to insert a Dummy Initiative
-        when(initiativeService.insertInitiative(step1Initiative)).thenReturn(step1Initiative);
+        when(initiativeService.insertInitiative(step1Initiative, ORGANIZATION_ID, ORGANIZATION_NAME, ROLE)).thenReturn(step1Initiative);
 
         when(initiativeDTOsToModelMapper.toInitiative(initiativeAdditionalDTO)).thenReturn(step1Initiative);
 
@@ -269,7 +271,7 @@ class InitiativeApiTest {
         when(initiativeDTOsToModelMapper.toInitiative(initiativeGeneralDTO)).thenReturn(step1Initiative);
 
         //doNothing only for Void method
-        doNothing().when(initiativeService).updateInitiativeGeneralInfo(ORGANIZATION_ID, INITIATIVE_ID, step1Initiative);
+        doNothing().when(initiativeService).updateInitiativeGeneralInfo(ORGANIZATION_ID, INITIATIVE_ID, step1Initiative, ROLE);
 
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_GENERAL_INFO_URL, ORGANIZATION_ID, INITIATIVE_ID))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -293,7 +295,7 @@ class InitiativeApiTest {
         when(initiativeDTOsToModelMapper.toInitiative(initiativeAdditionalDTO)).thenReturn(step1Initiative);
 
         //doNothing only for Void method
-        doNothing().when(initiativeService).updateInitiativeAdditionalInfo(ORGANIZATION_ID, INITIATIVE_ID, step1Initiative);
+        doNothing().when(initiativeService).updateInitiativeAdditionalInfo(ORGANIZATION_ID, INITIATIVE_ID, step1Initiative, ROLE);
 
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_ADDITIONAL_INFO_URL, ORGANIZATION_ID, INITIATIVE_ID))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -313,6 +315,8 @@ class InitiativeApiTest {
         //create Dummy Initiative
         Initiative step2Initiative = createStep2Initiative(beneficiaryKnown);
         InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
+        initiativeBeneficiaryRuleDTO.setOrganizationName(ORGANIZATION_NAME);
+        initiativeBeneficiaryRuleDTO.setOrganizationUserRole(ROLE);
 
         // Instruct the Service to insert a Dummy Initiative
         when(initiativeDTOsToModelMapper.toBeneficiaryRule(initiativeBeneficiaryRuleDTO)).thenReturn(initiativeBeneficiaryRule);
@@ -321,7 +325,7 @@ class InitiativeApiTest {
         when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step2Initiative);
 
         //doNothing only for Void method
-        doNothing().when(initiativeService).updateInitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule);
+        doNothing().when(initiativeService).updateInitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule, ROLE);
 
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_BENEFICIARY_RULES_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -341,6 +345,8 @@ class InitiativeApiTest {
         //create Dummy Initiative
         Initiative step2Initiative = createStep2Initiative(beneficiaryKnown);
         InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
+        initiativeBeneficiaryRuleDTO.setOrganizationName(ORGANIZATION_NAME);
+        initiativeBeneficiaryRuleDTO.setOrganizationUserRole(ROLE);
 
         // Instruct the Service to insert a Dummy Initiative
         when(initiativeDTOsToModelMapper.toBeneficiaryRule(initiativeBeneficiaryRuleDTO)).thenReturn(initiativeBeneficiaryRule);
@@ -349,7 +355,7 @@ class InitiativeApiTest {
         when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step2Initiative);
 
         //doNothing only for Void method
-        doNothing().when(initiativeService).updateInitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule);
+        doNothing().when(initiativeService).updateInitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule, ROLE);
 
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_BENEFICIARY_RULES_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -370,7 +376,7 @@ class InitiativeApiTest {
 
         when(initiativeDTOsToModelMapper.toInitiative(refundRuleDTO)).thenReturn(initiative);
 
-        doNothing().when(initiativeService).updateInitiativeRefundRules(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID, initiative, true);
+        doNothing().when(initiativeService).updateInitiativeRefundRules(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID, ROLE, initiative, true);
 
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_REFUND_RULES_INFO_URL, ORGANIZATION_ID, INITIATIVE_ID))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -397,7 +403,7 @@ class InitiativeApiTest {
                 CODE,
                 String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_STATUS_NOT_VALID, initiative.getInitiativeId()),
                 HttpStatus.BAD_REQUEST))
-                .when(initiativeService).updateInitiativeRefundRules(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID, initiative, true);
+                .when(initiativeService).updateInitiativeRefundRules(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID, ROLE, initiative, true);
 
         mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_REFUND_RULES_INFO_URL, ORGANIZATION_ID, INITIATIVE_ID))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -418,7 +424,7 @@ class InitiativeApiTest {
 
         when(initiativeDTOsToModelMapper.toInitiative(refundRuleDTO)).thenReturn(initiative);
 
-        doNothing().when(initiativeService).updateInitiativeRefundRules(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID, initiative, false);
+        doNothing().when(initiativeService).updateInitiativeRefundRules(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID, ROLE, initiative, false);
 
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_REFUND_RULES_INFO_URL + "/draft", ORGANIZATION_ID, INITIATIVE_ID))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -444,7 +450,7 @@ class InitiativeApiTest {
 
         //doNothing only for Void method
         InitiativeBeneficiaryRule initiativeBeneficiaryRule2 = initiativeDTOsToModelMapper.toBeneficiaryRule(initiativeBeneficiaryRuleDTO);
-        doNothing().when(initiativeService).updateInitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule2);
+        doNothing().when(initiativeService).updateInitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule2, ROLE);
 
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_BENEFICIARY_RULES_DRAFT_URL + "/draft", ORGANIZATION_ID, INITIATIVE_ID))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -457,11 +463,16 @@ class InitiativeApiTest {
 
     @Test
     void updateInitiativeStatusApproved_statusNoContent() throws Exception {
+        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = new InitiativeOrganizationInfoDTO();
+        initiativeOrganizationInfoDTO.setOrganizationName(ORGANIZATION_NAME);
+        initiativeOrganizationInfoDTO.setOrganizationUserRole(ROLE);
+
         //doNothing only for Void method
-        doNothing().when(initiativeService).updateInitiativeApprovedStatus(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID);
+        doNothing().when(initiativeService).updateInitiativeApprovedStatus(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID, ROLE);
 
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_STATUS_APPROVED_URL, ORGANIZATION_ID, INITIATIVE_ID))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(initiativeOrganizationInfoDTO))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
                 .andDo(print())
@@ -470,10 +481,15 @@ class InitiativeApiTest {
 
     @Test
     void updateInitiativeToCheckStatus_statusNoContent() throws Exception {
-        doNothing().when(initiativeService).updateInitiativeToCheckStatus(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID);
+        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = new InitiativeOrganizationInfoDTO();
+        initiativeOrganizationInfoDTO.setOrganizationName(ORGANIZATION_NAME);
+        initiativeOrganizationInfoDTO.setOrganizationUserRole(ROLE);
+
+        doNothing().when(initiativeService).updateInitiativeToCheckStatus(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID, ROLE);
 
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_CHECK_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(initiativeOrganizationInfoDTO))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
                 .andDo(print())
@@ -523,21 +539,21 @@ class InitiativeApiTest {
 
     @Test
     void PUT_updateInitiativeStatusToCheck_whenStatusIsNotInRevision() throws Exception {
-        Initiative initiative = createStep5Initiative();
-        initiative.setOrganizationId(ORGANIZATION_ID);
-        initiative.setInitiativeId(INITIATIVE_ID);
-        initiative.setStatus(InitiativeConstants.Status.DRAFT);
+        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = new InitiativeOrganizationInfoDTO();
+        initiativeOrganizationInfoDTO.setOrganizationName(ORGANIZATION_NAME);
+        initiativeOrganizationInfoDTO.setOrganizationUserRole(ROLE);
 
         doThrow(
                 new InitiativeException(
                         InitiativeConstants.Exception.BadRequest.CODE,
-                        String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_IN_REVISION),
+                        String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_IN_REVISION, INITIATIVE_ID),
                         HttpStatus.BAD_REQUEST)
-        ).when(initiativeService).updateInitiativeToCheckStatus(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID);
+        ).when(initiativeService).updateInitiativeToCheckStatus(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID, ROLE);
 
         MvcResult res =
-                mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_CHECK_STATUS_URL, initiative.getOrganizationId(), initiative.getInitiativeId()))
+                mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_CHECK_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID))
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .content(objectMapper.writeValueAsString(initiativeOrganizationInfoDTO))
                                 .accept(MediaType.APPLICATION_JSON))
                         .andExpect(MockMvcResultMatchers.status().isBadRequest())
                         .andDo(print())
@@ -546,18 +562,22 @@ class InitiativeApiTest {
         ErrorDTO error = objectMapper.readValue(res.getResponse().getContentAsString(), ErrorDTO.class);
         assertEquals(HttpStatus.BAD_REQUEST.value(), res.getResponse().getStatus());
         assertEquals(CODE, error.getCode());
-        assertTrue(error.getMessage().contains(InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_IN_REVISION));
+        assertTrue(error.getMessage().contains(InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_IN_REVISION.formatted(INITIATIVE_ID)));
     }
 
     @Test
     void DEL_logicallyDeleteInitiative_whenCurrentDeletedIsFalse_thenBecomeTrue() throws Exception{
+        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = new InitiativeOrganizationInfoDTO();
+        initiativeOrganizationInfoDTO.setOrganizationName(ORGANIZATION_NAME);
+        initiativeOrganizationInfoDTO.setOrganizationUserRole(ROLE);
+
         Initiative initiative = createStep5Initiative();
         initiative.setEnabled(true);
-
 
         MvcResult res =
                 mvc.perform(MockMvcRequestBuilders.delete(BASE_URL + String.format(LOGICALLY_DELETE_INITIATIVE_URL, initiative.getOrganizationId(), initiative.getInitiativeId()))
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .content(objectMapper.writeValueAsString(initiativeOrganizationInfoDTO))
                                 .accept(MediaType.APPLICATION_JSON))
                         .andExpect(MockMvcResultMatchers.status().isNoContent())
                         .andDo(print())
@@ -589,8 +609,7 @@ class InitiativeApiTest {
         InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = InitiativeOrganizationInfoDTO.builder()
                 .organizationName(ORGANIZATION_NAME)
                 .organizationVat(ORGANIZATION_VAT)
-                .organizationUserId(ORGANIZATION_USER_ID)
-                .organizationUserRole(ORGANIZATION_USER_ROLE)
+                .organizationUserRole(ROLE)
                 .build();
 
         //create Dummy Initiative
@@ -604,7 +623,7 @@ class InitiativeApiTest {
         // Expecting same instance
         assertThat("Reason of result", initiative, is(sameInstance(step5Initiative)));
 
-        doNothing().when(initiativeService).isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED);
+        doNothing().when(initiativeService).isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED, ROLE);
 
         doNothing().when(initiativeService).updateInitiative(any(Initiative.class));
 
@@ -627,8 +646,7 @@ class InitiativeApiTest {
         InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = InitiativeOrganizationInfoDTO.builder()
                 .organizationName(ORGANIZATION_NAME)
                 .organizationVat(ORGANIZATION_VAT)
-                .organizationUserId(ORGANIZATION_USER_ID)
-                .organizationUserRole(ORGANIZATION_USER_ROLE)
+                .organizationUserRole(ROLE)
                 .build();
 
         //create Dummy Initiative
@@ -644,7 +662,7 @@ class InitiativeApiTest {
         // Expecting same instance
         assertThat("Reason of result", initiative, is(sameInstance(step5Initiative)));
 
-        doNothing().when(initiativeService).isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED);
+        doNothing().when(initiativeService).isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED, ROLE);
 
         doNothing().when(initiativeService).updateInitiative(any(Initiative.class));
 
@@ -664,8 +682,7 @@ class InitiativeApiTest {
         InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = InitiativeOrganizationInfoDTO.builder()
                 .organizationName(ORGANIZATION_NAME)
                 .organizationVat(ORGANIZATION_VAT)
-                .organizationUserId(ORGANIZATION_USER_ID)
-                .organizationUserRole(ORGANIZATION_USER_ROLE)
+                .organizationUserRole(ROLE)
                 .build();
 
         //create Dummy Initiative
@@ -679,7 +696,7 @@ class InitiativeApiTest {
         // Expecting same instance
         assertThat("Reason of result", initiative, is(sameInstance(step5Initiative)));
 
-        doNothing().when(initiativeService).isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED);
+        doNothing().when(initiativeService).isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED, ROLE);
 
         // Instruct the Service to insert a Dummy Initiative
         when(initiativeModelToDTOMapper.toInitiativeDTO(initiative)).thenReturn(step5InitiativeDTO);
@@ -717,7 +734,7 @@ class InitiativeApiTest {
         // Expecting same instance
         assertThat("Reason of result", initiative, is(sameInstance(step5Initiative)));
 
-        doNothing().when(initiativeService).isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED);
+        doNothing().when(initiativeService).isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED, ROLE);
 
         // Instruct the Service to insert a Dummy Initiative
         when(initiativeModelToDTOMapper.toInitiativeDTO(initiative)).thenReturn(step5InitiativeDTO);
@@ -749,8 +766,7 @@ class InitiativeApiTest {
         InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = new InitiativeOrganizationInfoDTO();
         initiativeOrganizationInfoDTO.setOrganizationName(ORGANIZATION_NAME);
         initiativeOrganizationInfoDTO.setOrganizationVat(ORGANIZATION_VAT);
-        initiativeOrganizationInfoDTO.setOrganizationUserId(ORGANIZATION_USER_ID);
-        initiativeOrganizationInfoDTO.setOrganizationUserRole(ORGANIZATION_USER_ROLE);
+        initiativeOrganizationInfoDTO.setOrganizationUserRole(ROLE);
         return initiativeOrganizationInfoDTO;
     }
 
@@ -1025,6 +1041,10 @@ class InitiativeApiTest {
 
     private InitiativeRefundRuleDTO createRefundRuleDTOValidWithTimeParameter(){
         InitiativeRefundRuleDTO refundRuleDTO = new InitiativeRefundRuleDTO();
+
+        refundRuleDTO.setOrganizationName(ORGANIZATION_NAME);
+        refundRuleDTO.setOrganizationUserRole(ROLE);
+
         refundRuleDTO.setAccumulatedAmount(null);
         refundRuleDTO.setTimeParameter(createTimeParameterDTO_Valid());
         refundRuleDTO.setAdditionalInfo(createAdditionalInfoDTOValid());
@@ -1033,6 +1053,10 @@ class InitiativeApiTest {
 
     private InitiativeRefundRuleDTO createRefundRuleDTOValidWithAccumulatedAmount(){
         InitiativeRefundRuleDTO refundRuleDTO = new InitiativeRefundRuleDTO();
+
+        refundRuleDTO.setOrganizationName(ORGANIZATION_NAME);
+        refundRuleDTO.setOrganizationUserRole(ROLE);
+
         refundRuleDTO.setAccumulatedAmount(createAccumulatedAmountDTOValid());
         refundRuleDTO.setTimeParameter(null);
         refundRuleDTO.setAdditionalInfo(createAdditionalInfoDTOValid());
