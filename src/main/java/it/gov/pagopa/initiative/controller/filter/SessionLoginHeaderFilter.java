@@ -16,8 +16,10 @@ public class SessionLoginHeaderFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         Map<String, String> user = new HashMap<>();
-        user.put("organizationUserId", ((HttpServletRequest) request).getHeader("organizationUserId"));
-        user.put("organizationUserRole", ((HttpServletRequest) request).getHeader("organizationUserRole"));
+        user.put("organizationUserId", ((HttpServletRequest) request).getHeader("organization_user_id"));
+        user.put("organizationUserRole", ((HttpServletRequest) request).getHeader("organization_user_role")); //Not implemented yet by Policy APIM
+        user.put("organizationUserName", ((HttpServletRequest) request).getHeader("organization_user_name")); //Not implemented yet by Policy APIM
+        user.put("organizationUserFamilyName", ((HttpServletRequest) request).getHeader("organization_user_family_name")); //Not implemented yet by Policy APIM
         ThreadLocal<Map<String, String>> myThreadLocal = loginThreadLocal.getMyThreadLocal();
         myThreadLocal.set(user);
         chain.doFilter(request, response);
