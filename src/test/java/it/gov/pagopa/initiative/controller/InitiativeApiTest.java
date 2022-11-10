@@ -762,6 +762,16 @@ class InitiativeApiTest {
         assertTrue(error.getMessage().contains(InitiativeConstants.Exception.Publish.BadRequest.INTEGRATION_FAILED));
     }
 
+    @Test
+    void getOnbordingList() throws Exception {
+        mvc.perform(
+                        MockMvcRequestBuilders.get(BASE_URL + String.format(GET_INITIATIVE_ACTIVE_URL, ORGANIZATION_ID, INITIATIVE_ID+"/onboardings"))
+                                .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andDo(print())
+                .andReturn();
+    }
+
     private InitiativeOrganizationInfoDTO createInitiativeOrganizationInfoDTO(){
         InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = new InitiativeOrganizationInfoDTO();
         initiativeOrganizationInfoDTO.setOrganizationName(ORGANIZATION_NAME);

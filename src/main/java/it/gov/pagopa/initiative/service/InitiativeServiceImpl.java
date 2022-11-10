@@ -363,10 +363,10 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             new CFDTO(CF));
         userId = encryptedCfDTO.getToken();
       } catch (Exception e) {
-        throw new InitiativeException(
-            InternalServerError.CODE,
-            e.getMessage(),
-            HttpStatus.INTERNAL_SERVER_ERROR);
+          throw new InitiativeException(
+                  InternalServerError.CODE,
+                  e.getMessage(),
+                  HttpStatus.INTERNAL_SERVER_ERROR);
       }
     }
     ResponseOnboardingDTO responseOnboardingDTO = new ResponseOnboardingDTO();
@@ -375,7 +375,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
           userId,
           startDate, endDate, status);
       log.info("response onbording: "+responseOnboardingDTO);
-    } catch (FeignException e) {
+    } catch (Exception e) {
       throw new InitiativeException(
           InternalServerError.CODE,
           e.getMessage(),
@@ -390,7 +390,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             onboardingStatusCitizenDTO.getStatus(), onboardingStatusCitizenDTO.getStatusDate());
         statusOnboardingDTOS.add(statusOnboardingDTO);
 
-      } catch (FeignException e) {
+      } catch (Exception e) {
         throw new InitiativeException(
             InternalServerError.CODE,
             e.getMessage(),

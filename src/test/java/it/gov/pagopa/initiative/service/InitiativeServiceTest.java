@@ -1,9 +1,14 @@
 package it.gov.pagopa.initiative.service;
 
 
+import it.gov.pagopa.initiative.connector.decrypt.DecryptRestConnector;
+import it.gov.pagopa.initiative.connector.encrypt.EncryptRestConnector;
 import it.gov.pagopa.initiative.connector.group.GroupRestConnector;
 import it.gov.pagopa.initiative.connector.io_service.IOBackEndRestConnector;
+import it.gov.pagopa.initiative.connector.onboarding.OnboardingRestConnector;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
+import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.InternalServerError;
+import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.NotFound;
 import it.gov.pagopa.initiative.controller.filter.LoginThreadLocal;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.io.service.ServiceMetadataDTO;
@@ -28,10 +33,12 @@ import it.gov.pagopa.initiative.model.rule.reward.InitiativeRewardRule;
 import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
 import it.gov.pagopa.initiative.model.rule.trx.*;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
+import java.time.LocalDateTime;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -82,6 +89,11 @@ class InitiativeServiceTest {
     private static final String SERVICE_ID = "serviceId";
     public static final String ANY_KEY_TOKEN_IO = "ANY_KEY_TOKEN_IO";
     private static final String ROLE = "ROLE";
+    private static final String CF = "CF";
+    private static final String USER_ID = "USER_ID";
+    private static final String STATUS = "ONBOARDING_OK";
+    private static final LocalDateTime STARTDATE = LocalDateTime.now();
+    private static final LocalDateTime ENDDATE = LocalDateTime.now();
 
     @Autowired
     InitiativeService initiativeService;
@@ -103,6 +115,15 @@ class InitiativeServiceTest {
 
     @MockBean
     GroupRestConnector groupRestConnector;
+
+    @MockBean
+    OnboardingRestConnector onboardingRestConnector;
+
+    @MockBean
+    EncryptRestConnector encryptRestConnector;
+
+    @MockBean
+    DecryptRestConnector decryptRestConnector;
 
     @MockBean
     EmailNotificationService emailNotificationService;
@@ -827,6 +848,85 @@ class InitiativeServiceTest {
 
         //Expecting connector to be called once with correct param
         verify(ioBackEndRestConnector, times(1)).createService(serviceRequestDTOexpected);
+    }
+
+    @Test
+    void getOnboardingStatusList_ok() {
+        Initiative initiative = this.createFullInitiative();
+        OnboardingStatusCitizenDTO onboardingStatusCitizenDTO = new OnboardingStatusCitizenDTO(USER_ID,STATUS,LocalDateTime.now().toString());
+        List<OnboardingStatusCitizenDTO> onboardingStatusCitizenDTOS = new ArrayList<>();
+        onboardingStatusCitizenDTOS.add(onboardingStatusCitizenDTO);
+        ResponseOnboardingDTO onboardingDTO = new ResponseOnboardingDTO(onboardingStatusCitizenDTOS,1,1,1,1);
+        DecryptCfDTO decryptCfDTO = new DecryptCfDTO(CF);
+        EncryptedCfDTO encryptedCfDTO = new EncryptedCfDTO(USER_ID);
+        Mockito.when(encryptRestConnector.upsertToken(Mockito.any())).thenReturn(encryptedCfDTO);
+        Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID,INITIATIVE_ID,true)).thenReturn(Optional.of(initiative));
+        Mockito.when(onboardingRestConnector.getOnboarding(INITIATIVE_ID,null,USER_ID,STARTDATE,ENDDATE,STATUS)).thenReturn(onboardingDTO);
+        Mockito.when(decryptRestConnector.getPiiByToken(USER_ID)).thenReturn(decryptCfDTO);
+        OnboardingDTO onboardingDTO1 = initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID,CF, STARTDATE,ENDDATE,STATUS,null);
+        assertEquals(onboardingDTO1.getContent().get(0).getBeneficiary(), CF);
+        assertEquals(onboardingDTO1.getContent().get(0).getBeneficiaryState(), STATUS);
+
+    }
+
+    @Test
+    void getOnboardingStatusList_ko_encrypt() {
+        Initiative initiative = this.createFullInitiative();
+        OnboardingStatusCitizenDTO onboardingStatusCitizenDTO = new OnboardingStatusCitizenDTO(USER_ID,STATUS,LocalDateTime.now().toString());
+        EncryptedCfDTO encryptedCfDTO = new EncryptedCfDTO(USER_ID);
+        Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID,INITIATIVE_ID,true)).thenReturn(Optional.of(initiative));
+        Mockito.doThrow(new InitiativeException(InternalServerError.CODE, "",HttpStatus.INTERNAL_SERVER_ERROR)).when(encryptRestConnector).upsertToken(Mockito.any());
+        try{
+            OnboardingDTO onboardingDTO1 = initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID,CF, STARTDATE,ENDDATE,STATUS,null);
+            Assertions.fail();
+        }catch(InitiativeException e){
+            assertEquals(e.getCode(), InternalServerError.CODE);
+        }
+    }
+
+    @Test
+    void getOnboardingStatusList_ko_decrypt() {
+        Initiative initiative = this.createFullInitiative();
+        OnboardingStatusCitizenDTO onboardingStatusCitizenDTO = new OnboardingStatusCitizenDTO(USER_ID,STATUS,LocalDateTime.now().toString());
+        List<OnboardingStatusCitizenDTO> onboardingStatusCitizenDTOS = new ArrayList<>();
+        onboardingStatusCitizenDTOS.add(onboardingStatusCitizenDTO);
+        ResponseOnboardingDTO onboardingDTO = new ResponseOnboardingDTO(onboardingStatusCitizenDTOS,1,1,1,1);
+        EncryptedCfDTO encryptedCfDTO = new EncryptedCfDTO(USER_ID);
+        Mockito.when(encryptRestConnector.upsertToken(Mockito.any())).thenReturn(encryptedCfDTO);
+        Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID,INITIATIVE_ID,true)).thenReturn(Optional.of(initiative));
+        Mockito.when(onboardingRestConnector.getOnboarding(INITIATIVE_ID,null,USER_ID,STARTDATE,ENDDATE,STATUS)).thenReturn(onboardingDTO);
+        Mockito.doThrow(new InitiativeException(InternalServerError.CODE, "",HttpStatus.INTERNAL_SERVER_ERROR)).when(decryptRestConnector).getPiiByToken(Mockito.anyString());
+        try{
+            OnboardingDTO onboardingDTO1 = initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID,CF, STARTDATE,ENDDATE,STATUS,null);
+            Assertions.fail();
+        }catch(InitiativeException e){
+            assertEquals(e.getCode(), InternalServerError.CODE);
+        }
+    }
+
+    @Test
+    void getOnboardingStatusList_ko_onboarding() {
+        Initiative initiative = this.createFullInitiative();
+        EncryptedCfDTO encryptedCfDTO = new EncryptedCfDTO(USER_ID);
+        Mockito.when(encryptRestConnector.upsertToken(Mockito.any())).thenReturn(encryptedCfDTO);
+        Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID,INITIATIVE_ID,true)).thenReturn(Optional.of(initiative));
+        Mockito.doThrow(new InitiativeException(InternalServerError.CODE, "",HttpStatus.INTERNAL_SERVER_ERROR)).when(onboardingRestConnector).getOnboarding(INITIATIVE_ID,null,USER_ID,STARTDATE,ENDDATE,STATUS);
+        try{
+            OnboardingDTO onboardingDTO1 = initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID,CF, STARTDATE,ENDDATE,STATUS,null);
+            Assertions.fail();
+        }catch(InitiativeException e){
+            assertEquals(e.getCode(), InternalServerError.CODE);
+        }
+    }
+
+    @Test
+    void getOnboardingStatusList_initiative_not_found() {
+        try{
+            OnboardingDTO onboardingDTO1 = initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID,CF, STARTDATE,ENDDATE,STATUS,null);
+            Assertions.fail();
+        }catch(InitiativeException e){
+            assertEquals(e.getCode(), NotFound.CODE);
+        }
     }
 
     private ServiceResponseErrorDTO createServiceResponseErrorDTO(int httpStatus) {
