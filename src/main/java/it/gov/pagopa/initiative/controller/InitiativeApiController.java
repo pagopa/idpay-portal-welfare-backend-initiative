@@ -57,7 +57,7 @@ public class InitiativeApiController implements InitiativeApi {
 
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<InitiativeDTO> getInitiativeDetail(String organizationId, String initiativeId, String role) {
-        log.info("[{}][GET_INITIATIVE_DETAIL] - Initiative: {}. Start processing...", initiativeId, role);
+        log.info("[{}][GET_INITIATIVE_DETAIL] - Initiative: {}. Start processing...", role, initiativeId);
         return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDTO(this.initiativeService.getInitiative(organizationId, initiativeId, role)));
     }
 
@@ -150,8 +150,7 @@ public class InitiativeApiController implements InitiativeApi {
         String role = initiativeRefundRuleDTO.getOrganizationUserRole();
         log.info("[{}][UPDATE_REFUND_RULE]-[UPDATE_TO_IN_REVISION_STATUS] - Initiative: {}. Start processing...", role, initiativeId);
         Initiative initiative = this.initiativeDTOsToModelMapper.toInitiative(initiativeRefundRuleDTO);
-        String organizationName = initiativeRefundRuleDTO.getOrganizationName();
-        this.initiativeService.updateInitiativeRefundRules(organizationId, organizationName, initiativeId, role, initiative, true);
+        this.initiativeService.updateInitiativeRefundRules(organizationId, initiativeId, role, initiative, true);
         return ResponseEntity.noContent().build();
     }
 
@@ -161,8 +160,7 @@ public class InitiativeApiController implements InitiativeApi {
         String role = initiativeRefundRuleDTO.getOrganizationUserRole();
         log.info("[{}][API-DRAFT]-[UPDATE_REFUND_RULE]-[UPDATE_TO_DRAFT_STATUS] - Initiative: {}. Start processing...", role, initiativeId);
         Initiative initiative = this.initiativeDTOsToModelMapper.toInitiative(initiativeRefundRuleDTO);
-        String organizationName = initiativeRefundRuleDTO.getOrganizationName();
-        this.initiativeService.updateInitiativeRefundRules(organizationId, organizationName, initiativeId, role, initiative, false);
+        this.initiativeService.updateInitiativeRefundRules(organizationId, initiativeId, role, initiative, false);
         return ResponseEntity.noContent().build();
     }
 
@@ -171,7 +169,7 @@ public class InitiativeApiController implements InitiativeApi {
     public ResponseEntity<Void> updateInitiativeApprovedStatus(String organizationId, String initiativeId, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO){
         String role = initiativeOrganizationInfoDTO.getOrganizationUserRole();
         log.info("[{}][UPDATE_TO_APPROVED_STATUS] - Initiative: {}. Start processing...", role, initiativeId);
-        this.initiativeService.updateInitiativeApprovedStatus(organizationId, initiativeOrganizationInfoDTO.getOrganizationName(), initiativeId, role);
+        this.initiativeService.updateInitiativeApprovedStatus(organizationId, initiativeId, role);
         return ResponseEntity.noContent().build();
     }
 
@@ -180,7 +178,7 @@ public class InitiativeApiController implements InitiativeApi {
     public ResponseEntity<Void> updateInitiativeToCheckStatus(String organizationId, String initiativeId, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO){
         String role = initiativeOrganizationInfoDTO.getOrganizationUserRole();
         log.info("[{}][UPDATE_TO_CHECK_STATUS] - Initiative: {}. Start processing...", role, initiativeId);
-        this.initiativeService.updateInitiativeToCheckStatus(organizationId, initiativeOrganizationInfoDTO.getOrganizationName(), initiativeId, role);
+        this.initiativeService.updateInitiativeToCheckStatus(organizationId, initiativeId, role);
         return ResponseEntity.noContent().build();
     }
 

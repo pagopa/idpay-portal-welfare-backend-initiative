@@ -5,10 +5,10 @@ import it.gov.pagopa.initiative.dto.OnboardingDTO;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeAdditional;
 import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
-import java.time.LocalDateTime;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -31,11 +31,11 @@ public interface InitiativeService {
 
     void updateTrxAndRewardRules(String organizationId, String initiativeId, Initiative rewardAndTrxRules, String role);
 
-    void updateInitiativeRefundRules(String organizationId, String organizationName, String initiativeId, String role, Initiative refundRule, boolean changeInitiativeStatus);
+    void updateInitiativeRefundRules(String organizationId, String initiativeId, String role, Initiative refundRule, boolean changeInitiativeStatus);
 
-    void updateInitiativeApprovedStatus(String organizationId, String organizationName, String initiativeId, String role);
+    void updateInitiativeApprovedStatus(String organizationId, String initiativeId, String role);
 
-    void updateInitiativeToCheckStatus(String organizationId, String organizationName, String initiativeId, String role);
+    void updateInitiativeToCheckStatus(String organizationId, String initiativeId, String role);
 
     void logicallyDeleteInitiative(String organizationId, String initiativeId, String role);
 
