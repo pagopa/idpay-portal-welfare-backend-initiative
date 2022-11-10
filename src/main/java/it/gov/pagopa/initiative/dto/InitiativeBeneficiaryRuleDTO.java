@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -15,9 +16,9 @@ import java.util.List;
  */
 @Data
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-//@Builder
+@SuperBuilder
 public class InitiativeBeneficiaryRuleDTO extends InitiativeOrganizationInfoDTO {
 
   @JsonProperty("selfDeclarationCriteria")

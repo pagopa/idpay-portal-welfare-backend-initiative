@@ -17,7 +17,7 @@ import javax.validation.constraints.NotNull;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @SuperBuilder
 public class InitiativeRewardAndTrxRulesDTO extends InitiativeOrganizationInfoDTO {
