@@ -59,7 +59,6 @@ class InitiativeAdditionalDTOsToIOServiceRequestDTOMapperTest {
         InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = InitiativeOrganizationInfoDTO.builder()
                 .organizationName("")
                 .organizationVat(ORGANIZATION_VAT)
-                .organizationUserId(ORGANIZATION_USER_ID)
                 .organizationUserRole(ORGANIZATION_USER_ROLE)
                 .build();
 
@@ -76,7 +75,6 @@ class InitiativeAdditionalDTOsToIOServiceRequestDTOMapperTest {
         InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = InitiativeOrganizationInfoDTO.builder()
                 .organizationName(ORGANIZATION_NAME)
                 .organizationVat(ORGANIZATION_VAT)
-                .organizationUserId(ORGANIZATION_USER_ID)
                 .organizationUserRole(ORGANIZATION_USER_ROLE)
                 .build();
 
