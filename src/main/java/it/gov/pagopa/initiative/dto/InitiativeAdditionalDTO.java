@@ -22,10 +22,10 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 @SuperBuilder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class InitiativeAdditionalDTO extends InitiativeOrganizationInfoDTO   {
+public class InitiativeAdditionalDTO extends InitiativeOrganizationInfoDTO {
 
   private static final String VALID_LINK = "^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
   public enum ServiceScope{
