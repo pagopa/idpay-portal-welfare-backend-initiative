@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @FeignClient(
     name = "${rest-client.onboarding.serviceCode}",
-    url = "${onboarding.uri}")
+    url = "${rest-client.onboarding.uri}")
 public interface OnboardingRestClient {
 
   @GetMapping(
