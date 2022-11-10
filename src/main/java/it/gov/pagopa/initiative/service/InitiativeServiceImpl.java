@@ -1,10 +1,23 @@
 package it.gov.pagopa.initiative.service;
 
+import feign.FeignException;
+import it.gov.pagopa.initiative.connector.decrypt.DecryptRestConnector;
+import it.gov.pagopa.initiative.connector.encrypt.EncryptRestConnector;
 import it.gov.pagopa.initiative.connector.group.GroupRestConnector;
 import it.gov.pagopa.initiative.connector.io_service.IOBackEndRestConnector;
+import it.gov.pagopa.initiative.connector.onboarding.OnboardingRestConnector;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.controller.filter.LoginThreadLocal;
+import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.InternalServerError;
+import it.gov.pagopa.initiative.controller.filter.LoginThreadLocal;
+import it.gov.pagopa.initiative.dto.CFDTO;
+import it.gov.pagopa.initiative.dto.DecryptCfDTO;
+import it.gov.pagopa.initiative.dto.EncryptedCfDTO;
 import it.gov.pagopa.initiative.dto.InitiativeOrganizationInfoDTO;
+import it.gov.pagopa.initiative.dto.OnboardingDTO;
+import it.gov.pagopa.initiative.dto.OnboardingStatusCitizenDTO;
+import it.gov.pagopa.initiative.dto.ResponseOnboardingDTO;
+import it.gov.pagopa.initiative.dto.StatusOnboardingDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceResponseDTO;
 import it.gov.pagopa.initiative.event.InitiativeProducer;
@@ -18,6 +31,7 @@ import it.gov.pagopa.initiative.repository.InitiativeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.ArrayList;
 
 
 @Service
@@ -38,6 +53,9 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     private final InitiativeProducer initiativeProducer;
     private final IOBackEndRestConnector ioBackEndRestConnector;
     private final GroupRestConnector groupRestConnector;
+    private final OnboardingRestConnector onboardingRestConnector;
+    private final EncryptRestConnector encryptRestConnector;
+    private final DecryptRestConnector decryptRestConnector;
     private final EmailNotificationService emailNotificationService;
     private final IOTokenService ioTokenService;
     private final InitiativeValidationService initiativeValidationService;
@@ -51,6 +69,9 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             InitiativeProducer initiativeProducer,
             IOBackEndRestConnector ioBackEndRestConnector,
             GroupRestConnector groupRestConnector,
+            OnboardingRestConnector onboardingRestConnector,
+            EncryptRestConnector encryptRestConnector,
+            DecryptRestConnector decryptRestConnector,
             EmailNotificationService emailNotificationService,
             IOTokenService ioTokenService,
             InitiativeValidationService initiativeValidationService,
@@ -63,6 +84,9 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         this.initiativeAdditionalDTOsToIOServiceRequestDTOMapper = initiativeAdditionalDTOsToIOServiceRequestDTOMapper;
         this.ioBackEndRestConnector = ioBackEndRestConnector;
         this.groupRestConnector = groupRestConnector;
+        this.onboardingRestConnector = onboardingRestConnector;
+        this.encryptRestConnector = encryptRestConnector;
+        this.decryptRestConnector = decryptRestConnector;
         this.emailNotificationService = emailNotificationService;
         this.ioTokenService = ioTokenService;
         this.initiativeValidationService = initiativeValidationService;
@@ -318,4 +342,63 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                         HttpStatus.NOT_FOUND));
         return initiative.getAdditionalInfo();
     }
+
+  @Override
+  public OnboardingDTO getOnboardingStatusList(String organizationId,String initiativeId, String CF,
+      LocalDateTime startDate, LocalDateTime endDate, String status, Pageable pageable) {
+
+    log.info("start get status onboarding, initiative: "+initiativeId);
+    Initiative initiative = initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(
+            organizationId, initiativeId, true)
+        .orElseThrow(() -> new InitiativeException(
+            InitiativeConstants.Exception.NotFound.CODE,
+            String.format(
+                InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE,
+                initiativeId),
+            HttpStatus.NOT_FOUND));
+    String userId = null;
+    if (CF != null) {
+      try {
+        EncryptedCfDTO encryptedCfDTO = encryptRestConnector.upsertToken(
+            new CFDTO(CF));
+        userId = encryptedCfDTO.getToken();
+      } catch (Exception e) {
+        throw new InitiativeException(
+            InternalServerError.CODE,
+            e.getMessage(),
+            HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+    }
+    ResponseOnboardingDTO responseOnboardingDTO = new ResponseOnboardingDTO();
+    try {
+      responseOnboardingDTO = onboardingRestConnector.getOnboarding(initiativeId, pageable,
+          userId,
+          startDate, endDate, status);
+      log.info("response onbording: "+responseOnboardingDTO);
+    } catch (FeignException e) {
+      throw new InitiativeException(
+          InternalServerError.CODE,
+          e.getMessage(),
+          HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    List<StatusOnboardingDTO> statusOnboardingDTOS = new ArrayList<>();
+    for (OnboardingStatusCitizenDTO onboardingStatusCitizenDTO : responseOnboardingDTO.getOnboardingStatusCitizenDTOList()) {
+      try {
+        DecryptCfDTO decryptedCfDTO = decryptRestConnector.getPiiByToken(
+            onboardingStatusCitizenDTO.getUserId());
+        StatusOnboardingDTO statusOnboardingDTO = new StatusOnboardingDTO(decryptedCfDTO.getPii(),
+            onboardingStatusCitizenDTO.getStatus(), onboardingStatusCitizenDTO.getStatusDate());
+        statusOnboardingDTOS.add(statusOnboardingDTO);
+
+      } catch (FeignException e) {
+        throw new InitiativeException(
+            InternalServerError.CODE,
+            e.getMessage(),
+            HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+    }
+    return new OnboardingDTO(statusOnboardingDTOS, responseOnboardingDTO.getPageNo(),
+        responseOnboardingDTO.getPageSize(), responseOnboardingDTO.getTotalElements(),
+        responseOnboardingDTO.getTotalPages());
+  }
 }

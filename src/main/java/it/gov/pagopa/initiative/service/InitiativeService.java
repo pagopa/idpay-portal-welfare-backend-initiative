@@ -1,9 +1,12 @@
 package it.gov.pagopa.initiative.service;
 
 import it.gov.pagopa.initiative.dto.InitiativeOrganizationInfoDTO;
+import it.gov.pagopa.initiative.dto.OnboardingDTO;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeAdditional;
 import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
+import java.time.LocalDateTime;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -49,4 +52,5 @@ public interface InitiativeService {
     Initiative getInitiativeIdFromServiceId(String serviceId);
 
     InitiativeAdditional getPrimaryAndSecondaryTokenIO(String initiativeId);
+    OnboardingDTO getOnboardingStatusList(String organizationId,String initiativeId, String CF, LocalDateTime startDate, LocalDateTime endDate, String status, Pageable pageable);
 }
