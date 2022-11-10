@@ -4,7 +4,7 @@ import it.gov.pagopa.initiative.model.Initiative;
 
 public interface EmailNotificationService extends NotificationService{
 
-    void sendInitiativeInRevision(Initiative initiative, String organizationName);
-    void sendInitiativeApprovedAndRejected(Initiative initiative, String organizationName);
+    void sendInitiativeToCurrentOrganizationAndPagoPA(Initiative initiative, String templateName);
+    void sendInitiativeToCurrentOrganization(Initiative initiative, String templateName);
 
 }

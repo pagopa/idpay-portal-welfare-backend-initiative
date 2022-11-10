@@ -584,7 +584,7 @@ class InitiativeServiceTest {
     void updateRefundRules_ok(){
         Initiative initiative = createInitiativeOnlyRefundRule();
         when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(initiative);
-        initiativeService.updateInitiativeRefundRules(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID, ROLE, initiative, false);
+        initiativeService.updateInitiativeRefundRules(ORGANIZATION_ID, INITIATIVE_ID, ROLE, initiative, false);
         verify(initiativeValidationService, times(1)).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
     }
 
@@ -600,7 +600,7 @@ class InitiativeServiceTest {
                 .when(initiativeValidationService).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
 
         //prepare Executable with invocation of the method on your system under test
-        Executable executable = () -> initiativeService.updateInitiativeRefundRules(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID, ROLE, initiative, false);
+        Executable executable = () -> initiativeService.updateInitiativeRefundRules(ORGANIZATION_ID, INITIATIVE_ID, ROLE, initiative, false);
         InitiativeException exception = Assertions.assertThrows(InitiativeException.class, executable);
         assertEquals(InitiativeConstants.Exception.NotFound.CODE, exception.getCode());
         assertEquals(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE.formatted(INITIATIVE_ID), exception.getMessage());
@@ -617,7 +617,7 @@ class InitiativeServiceTest {
                 HttpStatus.NOT_FOUND))
                 .when(initiativeValidationService).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
 
-        InitiativeException exception = assertThrows(InitiativeException.class, () -> initiativeService.updateInitiativeRefundRules(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID, ROLE, initiative, true));
+        InitiativeException exception = assertThrows(InitiativeException.class, () -> initiativeService.updateInitiativeRefundRules(ORGANIZATION_ID, INITIATIVE_ID, ROLE, initiative, true));
 
         assertEquals(HttpStatus.NOT_FOUND, exception.getHttpStatus());
         assertEquals(InitiativeConstants.Exception.NotFound.CODE, exception.getCode());
@@ -632,7 +632,7 @@ class InitiativeServiceTest {
         //Instruct the initiativeValidationService Mock to return Dummy Initiatives
         when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(initiative);
         //Try to call the Real Service (which is using the instructed Repo)
-        initiativeService.updateInitiativeApprovedStatus(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID, ROLE);
+        initiativeService.updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
         // you are expecting initiativeValidationService to be called once with correct param
         verify(initiativeValidationService, times(1)).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
     }
@@ -650,7 +650,7 @@ class InitiativeServiceTest {
                 .when(initiativeValidationService).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
 
         //prepare Executable with invocation of the method on your system under test
-        Executable executable = () -> initiativeService.updateInitiativeApprovedStatus(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID, ROLE);
+        Executable executable = () -> initiativeService.updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
         InitiativeException exception = Assertions.assertThrows(InitiativeException.class, executable);
         assertEquals(InitiativeConstants.Exception.NotFound.CODE, exception.getCode());
         assertEquals(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE.formatted(INITIATIVE_ID), exception.getMessage());
@@ -665,7 +665,7 @@ class InitiativeServiceTest {
         when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(initiative);
 
         //prepare Executable with invocation of the method on your system under test
-        Executable executable = () -> initiativeService.updateInitiativeApprovedStatus(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID, ROLE);
+        Executable executable = () -> initiativeService.updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
         InitiativeException exception = Assertions.assertThrows(InitiativeException.class, executable);
         assertEquals(InitiativeConstants.Exception.BadRequest.CODE, exception.getCode());
         assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_IN_REVISION.formatted(INITIATIVE_ID), exception.getMessage());
@@ -711,7 +711,7 @@ class InitiativeServiceTest {
         //Instruct the initiativeValidationService Mock to return Dummy Initiatives
         when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step4Initiative);
         //Try to call the Real Service (which is using the instructed Repo)
-        initiativeService.updateInitiativeToCheckStatus(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID, ROLE);
+        initiativeService.updateInitiativeToCheckStatus(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
         // you are expecting initiativeValidationService to be called once with correct param
         verify(initiativeValidationService, times(1)).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
     }
@@ -728,7 +728,7 @@ class InitiativeServiceTest {
                 .when(initiativeValidationService).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
 
         //prepare Executable with invocation of the method on your system under test
-        Executable executable = () -> initiativeService.updateInitiativeToCheckStatus(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID, ROLE);
+        Executable executable = () -> initiativeService.updateInitiativeToCheckStatus(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
         InitiativeException exception = Assertions.assertThrows(InitiativeException.class, executable);
         assertEquals(InitiativeConstants.Exception.NotFound.CODE, exception.getCode());
         assertEquals(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE.formatted(INITIATIVE_ID), exception.getMessage());
