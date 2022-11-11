@@ -44,8 +44,10 @@ public class EmailNotificationServiceImpl implements EmailNotificationService {
         UserResource institutionProductCurrentUser = getInstitutionProductCurrentUser(initiative.getOrganizationId());
         Map<String, String> templateValues = getMap(initiative, institutionProductCurrentUser);
         emailNotificationRestConnector.notifyInitiativeToEmailNotification(initiative, templateName, templateValues, SUBJECT_CHANGE_STATE, null, RECIPIENTS_CHANGE_STATE_IN_REVISION);
-        emailNotificationRestConnector.notifyInitiativeToEmailNotification(initiative, templateName,
-                templateValues, SUBJECT_CHANGE_STATE, null, String.join(COMMA_DELIMITER, institutionProductUsersEmailsByRole, institutionProductCurrentUser.getEmail()));
+        if(institutionProductCurrentUser!=null) {
+            emailNotificationRestConnector.notifyInitiativeToEmailNotification(initiative, templateName,
+                    templateValues, SUBJECT_CHANGE_STATE, null, String.join(COMMA_DELIMITER, institutionProductUsersEmailsByRole, institutionProductCurrentUser.getEmail()));
+        }
     }
 
     @Override
