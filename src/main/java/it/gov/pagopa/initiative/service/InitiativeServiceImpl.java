@@ -152,9 +152,9 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         initiative.setAdditionalInfo(initiativeAdditionalInfo.getAdditionalInfo());
         initiative.setStatus(InitiativeConstants.Status.DRAFT);
         this.initiativeRepository.save(initiative);
-        if(notifyEmail){
-            emailNotificationService.sendInitiativeToCurrentOrganization(initiative, EMAIL_INITIATIVE_STATUS);
-        }
+//        if(notifyEmail){
+//            emailNotificationService.sendInitiativeToCurrentOrganization(initiative, EMAIL_INITIATIVE_STATUS);
+//        }
     }
 
     @Override

@@ -52,9 +52,11 @@ public class EmailNotificationServiceImpl implements EmailNotificationService {
     public void sendInitiativeToCurrentOrganization(Initiative initiative, String templateName) {
         String institutionProductUsersEmailsByRole = getInstitutionProductUsersEmailsByRole(initiative.getOrganizationId(), InitiativeConstants.Role.ADMIN);
         UserResource institutionProductCurrentUser = getInstitutionProductCurrentUser(initiative.getOrganizationId());
-        Map<String, String> templateValues = getMap(initiative, institutionProductCurrentUser);
-        emailNotificationRestConnector.notifyInitiativeToEmailNotification(initiative, templateName,
-                templateValues, SUBJECT_CHANGE_STATE, null, String.join(COMMA_DELIMITER, institutionProductUsersEmailsByRole, institutionProductCurrentUser.getEmail()));
+        if (institutionProductCurrentUser != null) {
+            Map<String, String> templateValues = getMap(initiative, institutionProductCurrentUser);
+            emailNotificationRestConnector.notifyInitiativeToEmailNotification(initiative, templateName,
+                    templateValues, SUBJECT_CHANGE_STATE, null, String.join(COMMA_DELIMITER, institutionProductUsersEmailsByRole, institutionProductCurrentUser.getEmail()));
+        }
     }
 
     @NotNull
