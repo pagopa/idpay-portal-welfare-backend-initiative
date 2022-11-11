@@ -1,11 +1,14 @@
 package it.gov.pagopa.initiative.controller.filter;
 
+import lombok.extern.slf4j.Slf4j;
+
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 public class SessionLoginHeaderFilter implements Filter {
     private final LoginThreadLocal loginThreadLocal;
 
@@ -22,8 +25,10 @@ public class SessionLoginHeaderFilter implements Filter {
         user.put("organizationUserFamilyName", ((HttpServletRequest) request).getHeader("organization_user_family_name")); //Not implemented yet by Policy APIM
         ThreadLocal<Map<String, String>> myThreadLocal = loginThreadLocal.getMyThreadLocal();
         myThreadLocal.set(user);
+        log.info("[FILTER] Set into myThreadLocal organizationUserId: {}", myThreadLocal.get().get("organizationUserId"));
         chain.doFilter(request, response);
         myThreadLocal.remove();
+        log.info("[FILTER] myThreadLocal.remove()");
     }
 
     // For Body Request

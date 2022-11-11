@@ -81,9 +81,11 @@ public class EmailNotificationServiceImpl implements EmailNotificationService {
 
     private UserResource getInstitutionProductCurrentUser(String organizationId) {
         String organizationUserId = loginThreadLocal.getMyThreadLocal().get().get("organizationUserId");
+        log.info("[EMAIL-NOTIFICATION] organizationUserId: {}", organizationUserId);
         UserResource userResource = null;
         try {
             List<UserResource> users = this.selcRestConnector.getInstitutionProductUsers(organizationId);
+            log.info("[EMAIL-NOTIFICATION] users SELC: {}", users);
             userResource = users.stream().filter(user -> user.getId().toString().equals(organizationUserId)).findFirst().orElseThrow(() -> new IntegrationException(HttpStatus.INTERNAL_SERVER_ERROR));
         } catch (Exception e) {
             log.error("[SELC] - Error retrieving product users for organization: " + organizationId, e);
