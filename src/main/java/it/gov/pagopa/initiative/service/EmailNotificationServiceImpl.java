@@ -67,8 +67,10 @@ public class EmailNotificationServiceImpl implements EmailNotificationService {
         templateValues.put("initiativeName", initiative.getInitiativeName());
         templateValues.put("orgName", initiative.getOrganizationName());
         templateValues.put("status", initiative.getStatus());
-        templateValues.put("requesterName", userResource.getName());
-        templateValues.put("requesterSurname", userResource.getSurname());
+        if(userResource!=null) {
+            templateValues.put("requesterName", userResource.getName());
+            templateValues.put("requesterSurname", userResource.getSurname());
+        }
         return templateValues;
     }
 
