@@ -1,6 +1,5 @@
 package it.gov.pagopa.initiative.service;
 
-import feign.FeignException;
 import it.gov.pagopa.initiative.connector.decrypt.DecryptRestConnector;
 import it.gov.pagopa.initiative.connector.encrypt.EncryptRestConnector;
 import it.gov.pagopa.initiative.connector.group.GroupRestConnector;
@@ -144,7 +143,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         this.initiativeRepository.save(initiative);
     }
 
-    /*Primo salvataggio in Draft tramite Wizard*/
+
     @Override
     public void updateInitiativeAdditionalInfo(String organizationId, String initiativeId, Initiative initiativeAdditionalInfo, String role){
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
