@@ -103,5 +103,5 @@ public class InitiativeGeneralDTO extends InitiativeOrganizationInfoDTO {
     @JsonProperty("descriptionLanguageMap")
     @Valid
     @NotEmpty(groups = ValidationOnGroup.class)
-    private Map<String, String> descriptionLanguageMap;
+    private Map<String, String> descriptionMap;
 }

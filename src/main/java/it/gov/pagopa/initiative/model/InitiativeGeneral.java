@@ -25,7 +25,7 @@ public class InitiativeGeneral {
     private LocalDate rankingStartDate;
     private LocalDate rankingEndDate;
     private Boolean rankingEnabled;
-    private Map<String, String> descriptionLanguage;
+    private Map<String, String> descriptionMap;
 
     /**
      * Gets or Sets beneficiaryType
