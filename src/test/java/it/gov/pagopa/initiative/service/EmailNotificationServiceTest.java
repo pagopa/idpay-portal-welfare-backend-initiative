@@ -2,6 +2,7 @@ package it.gov.pagopa.initiative.service;
 
 import it.gov.pagopa.initiative.connector.email_notification.EmailNotificationRestConnector;
 import it.gov.pagopa.initiative.connector.selc.SelcRestConnector;
+import it.gov.pagopa.initiative.controller.filter.LoginThreadLocal;
 import it.gov.pagopa.initiative.dto.selc.UserResource;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeAdditional;
@@ -27,6 +28,7 @@ import static org.mockito.Mockito.*;
 @ContextConfiguration(classes = {EmailNotificationServiceImpl.class})
 @ExtendWith(SpringExtension.class)
 class EmailNotificationServiceTest {
+    private static final String TEMPLATE_NAME = "templateName";
     @MockBean
     private EmailNotificationRestConnector emailNotificationRestConnector;
 
@@ -36,8 +38,11 @@ class EmailNotificationServiceTest {
     @MockBean
     private SelcRestConnector selcRestConnector;
 
+    @MockBean
+    private LoginThreadLocal loginThreadLocal;
+
     /**
-     * Method under test: {@link EmailNotificationServiceImpl#sendInitiativeEntePagoPA(Initiative, String)}
+     * Method under test: {@link EmailNotificationService#sendInitiativeToCurrentOrganizationAndPagoPA(Initiative, String)}
      */
     @Test
     void testSendInitiativeEntePagoPA() {
@@ -62,14 +67,14 @@ class EmailNotificationServiceTest {
         initiative.setStatus("Status");
         initiative.setTrxRule(new InitiativeTrxConditions());
         initiative.setUpdateDate(LocalDateTime.of(1, 1, 1, 1, 1));
-        emailNotificationServiceImpl.sendInitiativeEntePagoPA(initiative, "Organization Name");
+        emailNotificationServiceImpl.sendInitiativeToCurrentOrganizationAndPagoPA(initiative, TEMPLATE_NAME);
         verify(emailNotificationRestConnector, atLeast(1)).notifyInitiativeToEmailNotification((Initiative) any(),
                 (String) any(), (Map<String, String>) any(), (String) any(), (String) any(), (String) any());
         verify(selcRestConnector).getInstitutionProductUsers((String) any());
     }
 
     /**
-     * Method under test: {@link EmailNotificationServiceImpl#sendInitiativeEntePagoPA(Initiative, String)}
+     * Method under test: {@link EmailNotificationService#sendInitiativeToCurrentOrganizationAndPagoPA(Initiative, String)}
      */
     @Test
     void testSendInitiativeEntePagoPA2() {
@@ -94,14 +99,14 @@ class EmailNotificationServiceTest {
         initiative.setStatus("Status");
         initiative.setTrxRule(new InitiativeTrxConditions());
         initiative.setUpdateDate(LocalDateTime.of(1, 1, 1, 1, 1));
-        emailNotificationServiceImpl.sendInitiativeEntePagoPA(initiative, "Organization Name");
+        emailNotificationServiceImpl.sendInitiativeToCurrentOrganizationAndPagoPA(initiative, TEMPLATE_NAME);
         verify(emailNotificationRestConnector, atLeast(1)).notifyInitiativeToEmailNotification((Initiative) any(),
                 (String) any(), (Map<String, String>) any(), (String) any(), (String) any(), (String) any());
         verify(selcRestConnector).getInstitutionProductUsers((String) any());
     }
 
     /**
-     * Method under test: {@link EmailNotificationServiceImpl#sendInitiativeEntePagoPA(Initiative, String)}
+     * Method under test: {@link EmailNotificationService#sendInitiativeToCurrentOrganizationAndPagoPA(Initiative, String)}
      */
     @Test
     void testSendInitiativeEntePagoPA3() {
@@ -136,14 +141,14 @@ class EmailNotificationServiceTest {
         initiative.setStatus("Status");
         initiative.setTrxRule(new InitiativeTrxConditions());
         initiative.setUpdateDate(LocalDateTime.of(1, 1, 1, 1, 1));
-        emailNotificationServiceImpl.sendInitiativeEntePagoPA(initiative, "Organization Name");
+        emailNotificationServiceImpl.sendInitiativeToCurrentOrganizationAndPagoPA(initiative, TEMPLATE_NAME);
         verify(emailNotificationRestConnector, atLeast(1)).notifyInitiativeToEmailNotification((Initiative) any(),
                 (String) any(), (Map<String, String>) any(), (String) any(), (String) any(), (String) any());
         verify(selcRestConnector).getInstitutionProductUsers((String) any());
     }
 
     /**
-     * Method under test: {@link EmailNotificationServiceImpl#sendInitiativeEntePagoPA(Initiative, String)}
+     * Method under test: {@link EmailNotificationService#sendInitiativeToCurrentOrganizationAndPagoPA(Initiative, String)}
      */
     @Test
     void testSendInitiativeEntePagoPA4() {
@@ -186,14 +191,14 @@ class EmailNotificationServiceTest {
         initiative.setStatus("Status");
         initiative.setTrxRule(new InitiativeTrxConditions());
         initiative.setUpdateDate(LocalDateTime.of(1, 1, 1, 1, 1));
-        emailNotificationServiceImpl.sendInitiativeEntePagoPA(initiative, "Organization Name");
+        emailNotificationServiceImpl.sendInitiativeToCurrentOrganizationAndPagoPA(initiative, TEMPLATE_NAME);
         verify(emailNotificationRestConnector, atLeast(1)).notifyInitiativeToEmailNotification((Initiative) any(),
                 (String) any(), (Map<String, String>) any(), (String) any(), (String) any(), (String) any());
         verify(selcRestConnector).getInstitutionProductUsers((String) any());
     }
 
     /**
-     * Method under test: {@link EmailNotificationServiceImpl#sendInitiativeEnte(Initiative, String)}
+     * Method under test: {@link EmailNotificationService#sendInitiativeToCurrentOrganization(Initiative, String)}
      */
     @Test
     void testSendInitiativeEnte() {
@@ -218,14 +223,14 @@ class EmailNotificationServiceTest {
         initiative.setStatus("Status");
         initiative.setTrxRule(new InitiativeTrxConditions());
         initiative.setUpdateDate(LocalDateTime.of(1, 1, 1, 1, 1));
-        emailNotificationServiceImpl.sendInitiativeEnte(initiative, "Organization Name");
+        emailNotificationServiceImpl.sendInitiativeToCurrentOrganization(initiative, TEMPLATE_NAME);
         verify(emailNotificationRestConnector).notifyInitiativeToEmailNotification((Initiative) any(), (String) any(),
                 (Map<String, String>) any(), (String) any(), (String) any(), (String) any());
         verify(selcRestConnector).getInstitutionProductUsers((String) any());
     }
 
     /**
-     * Method under test: {@link EmailNotificationServiceImpl#sendInitiativeEnte(Initiative, String)}
+     * Method under test: {@link EmailNotificationService#sendInitiativeToCurrentOrganization(Initiative, String)}
      */
     @Test
     void testSendInitiativeEnte2() {
@@ -250,14 +255,14 @@ class EmailNotificationServiceTest {
         initiative.setStatus("Status");
         initiative.setTrxRule(new InitiativeTrxConditions());
         initiative.setUpdateDate(LocalDateTime.of(1, 1, 1, 1, 1));
-        emailNotificationServiceImpl.sendInitiativeEnte(initiative, "Organization Name");
+        emailNotificationServiceImpl.sendInitiativeToCurrentOrganization(initiative, TEMPLATE_NAME);
         verify(emailNotificationRestConnector).notifyInitiativeToEmailNotification((Initiative) any(), (String) any(),
                 (Map<String, String>) any(), (String) any(), (String) any(), (String) any());
         verify(selcRestConnector).getInstitutionProductUsers((String) any());
     }
 
     /**
-     * Method under test: {@link EmailNotificationServiceImpl#sendInitiativeEnte(Initiative, String)}
+     * Method under test: {@link EmailNotificationService#sendInitiativeToCurrentOrganization(Initiative, String)}
      */
     @Test
     void testSendInitiativeEnte3() {
@@ -292,14 +297,14 @@ class EmailNotificationServiceTest {
         initiative.setStatus("Status");
         initiative.setTrxRule(new InitiativeTrxConditions());
         initiative.setUpdateDate(LocalDateTime.of(1, 1, 1, 1, 1));
-        emailNotificationServiceImpl.sendInitiativeEnte(initiative, "Organization Name");
+        emailNotificationServiceImpl.sendInitiativeToCurrentOrganization(initiative, TEMPLATE_NAME);
         verify(emailNotificationRestConnector).notifyInitiativeToEmailNotification((Initiative) any(), (String) any(),
                 (Map<String, String>) any(), (String) any(), (String) any(), (String) any());
         verify(selcRestConnector).getInstitutionProductUsers((String) any());
     }
 
     /**
-     * Method under test: {@link EmailNotificationServiceImpl#sendInitiativeEnte(Initiative, String)}
+     * Method under test: {@link EmailNotificationService#sendInitiativeToCurrentOrganization(Initiative, String)}
      */
     @Test
     void testSendInitiativeEnte4() {
@@ -342,163 +347,7 @@ class EmailNotificationServiceTest {
         initiative.setStatus("Status");
         initiative.setTrxRule(new InitiativeTrxConditions());
         initiative.setUpdateDate(LocalDateTime.of(1, 1, 1, 1, 1));
-        emailNotificationServiceImpl.sendInitiativeEnte(initiative, "Organization Name");
-        verify(emailNotificationRestConnector).notifyInitiativeToEmailNotification((Initiative) any(), (String) any(),
-                (Map<String, String>) any(), (String) any(), (String) any(), (String) any());
-        verify(selcRestConnector).getInstitutionProductUsers((String) any());
-    }
-
-    /**
-     * Method under test: {@link EmailNotificationServiceImpl#sendInitiativeEnteCreated(Initiative, String)}
-     */
-    @Test
-    void testSendInitiativeEnteCreated() {
-        doNothing().when(emailNotificationRestConnector)
-                .notifyInitiativeToEmailNotification((Initiative) any(), (String) any(), (Map<String, String>) any(),
-                        (String) any(), (String) any(), (String) any());
-        when(selcRestConnector.getInstitutionProductUsers((String) any())).thenReturn(new ArrayList<>());
-
-        Initiative initiative = new Initiative();
-        initiative.setAdditionalInfo(new InitiativeAdditional());
-        initiative.setBeneficiaryRule(new InitiativeBeneficiaryRule());
-        initiative.setCreationDate(LocalDateTime.of(1, 1, 1, 1, 1));
-        initiative.setEnabled(true);
-        initiative.setGeneral(new InitiativeGeneral());
-        initiative.setInitiativeId("42");
-        initiative.setInitiativeName("Initiative Name");
-        initiative.setOrganizationId("42");
-        initiative.setOrganizationName("Organization Name");
-        initiative.setPdndToken("ABC123");
-        initiative.setRefundRule(new InitiativeRefundRule());
-        initiative.setRewardRule(new RewardGroups());
-        initiative.setStatus("Status");
-        initiative.setTrxRule(new InitiativeTrxConditions());
-        initiative.setUpdateDate(LocalDateTime.of(1, 1, 1, 1, 1));
-        emailNotificationServiceImpl.sendInitiativeEnteCreated(initiative, "Organization Name");
-        verify(emailNotificationRestConnector).notifyInitiativeToEmailNotification((Initiative) any(), (String) any(),
-                (Map<String, String>) any(), (String) any(), (String) any(), (String) any());
-        verify(selcRestConnector).getInstitutionProductUsers((String) any());
-    }
-
-    /**
-     * Method under test: {@link EmailNotificationServiceImpl#sendInitiativeEnteCreated(Initiative, String)}
-     */
-    @Test
-    void testSendInitiativeEnteCreated2() {
-        doNothing().when(emailNotificationRestConnector)
-                .notifyInitiativeToEmailNotification((Initiative) any(), (String) any(), (Map<String, String>) any(),
-                        (String) any(), (String) any(), (String) any());
-        when(selcRestConnector.getInstitutionProductUsers((String) any())).thenThrow(new IllegalStateException());
-
-        Initiative initiative = new Initiative();
-        initiative.setAdditionalInfo(new InitiativeAdditional());
-        initiative.setBeneficiaryRule(new InitiativeBeneficiaryRule());
-        initiative.setCreationDate(LocalDateTime.of(1, 1, 1, 1, 1));
-        initiative.setEnabled(true);
-        initiative.setGeneral(new InitiativeGeneral());
-        initiative.setInitiativeId("42");
-        initiative.setInitiativeName("Initiative Name");
-        initiative.setOrganizationId("42");
-        initiative.setOrganizationName("Organization Name");
-        initiative.setPdndToken("ABC123");
-        initiative.setRefundRule(new InitiativeRefundRule());
-        initiative.setRewardRule(new RewardGroups());
-        initiative.setStatus("Status");
-        initiative.setTrxRule(new InitiativeTrxConditions());
-        initiative.setUpdateDate(LocalDateTime.of(1, 1, 1, 1, 1));
-        emailNotificationServiceImpl.sendInitiativeEnteCreated(initiative, "Organization Name");
-        verify(emailNotificationRestConnector).notifyInitiativeToEmailNotification((Initiative) any(), (String) any(),
-                (Map<String, String>) any(), (String) any(), (String) any(), (String) any());
-        verify(selcRestConnector).getInstitutionProductUsers((String) any());
-    }
-
-    /**
-     * Method under test: {@link EmailNotificationServiceImpl#sendInitiativeEnteCreated(Initiative, String)}
-     */
-    @Test
-    void testSendInitiativeEnteCreated3() {
-        doNothing().when(emailNotificationRestConnector)
-                .notifyInitiativeToEmailNotification((Initiative) any(), (String) any(), (Map<String, String>) any(),
-                        (String) any(), (String) any(), (String) any());
-
-        UserResource userResource = new UserResource();
-        userResource.setEmail("jane.doe@example.org");
-        userResource.setId(UUID.randomUUID());
-        userResource.setName("initiativeName");
-        userResource.setRoles(new ArrayList<>());
-        userResource.setSurname("Doe");
-
-        ArrayList<UserResource> userResourceList = new ArrayList<>();
-        userResourceList.add(userResource);
-        when(selcRestConnector.getInstitutionProductUsers((String) any())).thenReturn(userResourceList);
-
-        Initiative initiative = new Initiative();
-        initiative.setAdditionalInfo(new InitiativeAdditional());
-        initiative.setBeneficiaryRule(new InitiativeBeneficiaryRule());
-        initiative.setCreationDate(LocalDateTime.of(1, 1, 1, 1, 1));
-        initiative.setEnabled(true);
-        initiative.setGeneral(new InitiativeGeneral());
-        initiative.setInitiativeId("42");
-        initiative.setInitiativeName("Initiative Name");
-        initiative.setOrganizationId("42");
-        initiative.setOrganizationName("Organization Name");
-        initiative.setPdndToken("ABC123");
-        initiative.setRefundRule(new InitiativeRefundRule());
-        initiative.setRewardRule(new RewardGroups());
-        initiative.setStatus("Status");
-        initiative.setTrxRule(new InitiativeTrxConditions());
-        initiative.setUpdateDate(LocalDateTime.of(1, 1, 1, 1, 1));
-        emailNotificationServiceImpl.sendInitiativeEnteCreated(initiative, "Organization Name");
-        verify(emailNotificationRestConnector).notifyInitiativeToEmailNotification((Initiative) any(), (String) any(),
-                (Map<String, String>) any(), (String) any(), (String) any(), (String) any());
-        verify(selcRestConnector).getInstitutionProductUsers((String) any());
-    }
-
-    /**
-     * Method under test: {@link EmailNotificationServiceImpl#sendInitiativeEnteCreated(Initiative, String)}
-     */
-    @Test
-    void testSendInitiativeEnteCreated4() {
-        doNothing().when(emailNotificationRestConnector)
-                .notifyInitiativeToEmailNotification((Initiative) any(), (String) any(), (Map<String, String>) any(),
-                        (String) any(), (String) any(), (String) any());
-
-        UserResource userResource = new UserResource();
-        userResource.setEmail("jane.doe@example.org");
-        userResource.setId(UUID.randomUUID());
-        userResource.setName("initiativeName");
-        userResource.setRoles(new ArrayList<>());
-        userResource.setSurname("Doe");
-
-        UserResource userResource1 = new UserResource();
-        userResource1.setEmail("jane.doe@example.org");
-        userResource1.setId(UUID.randomUUID());
-        userResource1.setName("initiativeName");
-        userResource1.setRoles(new ArrayList<>());
-        userResource1.setSurname("Doe");
-
-        ArrayList<UserResource> userResourceList = new ArrayList<>();
-        userResourceList.add(userResource1);
-        userResourceList.add(userResource);
-        when(selcRestConnector.getInstitutionProductUsers((String) any())).thenReturn(userResourceList);
-
-        Initiative initiative = new Initiative();
-        initiative.setAdditionalInfo(new InitiativeAdditional());
-        initiative.setBeneficiaryRule(new InitiativeBeneficiaryRule());
-        initiative.setCreationDate(LocalDateTime.of(1, 1, 1, 1, 1));
-        initiative.setEnabled(true);
-        initiative.setGeneral(new InitiativeGeneral());
-        initiative.setInitiativeId("42");
-        initiative.setInitiativeName("Initiative Name");
-        initiative.setOrganizationId("42");
-        initiative.setOrganizationName("Organization Name");
-        initiative.setPdndToken("ABC123");
-        initiative.setRefundRule(new InitiativeRefundRule());
-        initiative.setRewardRule(new RewardGroups());
-        initiative.setStatus("Status");
-        initiative.setTrxRule(new InitiativeTrxConditions());
-        initiative.setUpdateDate(LocalDateTime.of(1, 1, 1, 1, 1));
-        emailNotificationServiceImpl.sendInitiativeEnteCreated(initiative, "Organization Name");
+        emailNotificationServiceImpl.sendInitiativeToCurrentOrganization(initiative, TEMPLATE_NAME);
         verify(emailNotificationRestConnector).notifyInitiativeToEmailNotification((Initiative) any(), (String) any(),
                 (Map<String, String>) any(), (String) any(), (String) any(), (String) any());
         verify(selcRestConnector).getInstitutionProductUsers((String) any());

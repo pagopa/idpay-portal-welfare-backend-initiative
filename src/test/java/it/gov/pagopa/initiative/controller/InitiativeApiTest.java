@@ -376,7 +376,7 @@ class InitiativeApiTest {
 
         when(initiativeDTOsToModelMapper.toInitiative(refundRuleDTO)).thenReturn(initiative);
 
-        doNothing().when(initiativeService).updateInitiativeRefundRules(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID, ROLE, initiative, true);
+        doNothing().when(initiativeService).updateInitiativeRefundRules(ORGANIZATION_ID, INITIATIVE_ID, ROLE, initiative, true);
 
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_REFUND_RULES_INFO_URL, ORGANIZATION_ID, INITIATIVE_ID))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -403,7 +403,7 @@ class InitiativeApiTest {
                 CODE,
                 String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_STATUS_NOT_VALID, initiative.getInitiativeId()),
                 HttpStatus.BAD_REQUEST))
-                .when(initiativeService).updateInitiativeRefundRules(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID, ROLE, initiative, true);
+                .when(initiativeService).updateInitiativeRefundRules(ORGANIZATION_ID, INITIATIVE_ID, ROLE, initiative, true);
 
         mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_REFUND_RULES_INFO_URL, ORGANIZATION_ID, INITIATIVE_ID))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -424,7 +424,7 @@ class InitiativeApiTest {
 
         when(initiativeDTOsToModelMapper.toInitiative(refundRuleDTO)).thenReturn(initiative);
 
-        doNothing().when(initiativeService).updateInitiativeRefundRules(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID, ROLE, initiative, false);
+        doNothing().when(initiativeService).updateInitiativeRefundRules(ORGANIZATION_ID, INITIATIVE_ID, ROLE, initiative, false);
 
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_REFUND_RULES_INFO_URL + "/draft", ORGANIZATION_ID, INITIATIVE_ID))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -468,7 +468,7 @@ class InitiativeApiTest {
         initiativeOrganizationInfoDTO.setOrganizationUserRole(ROLE);
 
         //doNothing only for Void method
-        doNothing().when(initiativeService).updateInitiativeApprovedStatus(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID, ROLE);
+        doNothing().when(initiativeService).updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
 
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_STATUS_APPROVED_URL, ORGANIZATION_ID, INITIATIVE_ID))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -485,7 +485,7 @@ class InitiativeApiTest {
         initiativeOrganizationInfoDTO.setOrganizationName(ORGANIZATION_NAME);
         initiativeOrganizationInfoDTO.setOrganizationUserRole(ROLE);
 
-        doNothing().when(initiativeService).updateInitiativeToCheckStatus(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID, ROLE);
+        doNothing().when(initiativeService).updateInitiativeToCheckStatus(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
 
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_CHECK_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -548,7 +548,7 @@ class InitiativeApiTest {
                         InitiativeConstants.Exception.BadRequest.CODE,
                         String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_IN_REVISION, INITIATIVE_ID),
                         HttpStatus.BAD_REQUEST)
-        ).when(initiativeService).updateInitiativeToCheckStatus(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID, ROLE);
+        ).when(initiativeService).updateInitiativeToCheckStatus(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
 
         MvcResult res =
                 mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_CHECK_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID))
@@ -760,6 +760,16 @@ class InitiativeApiTest {
         assertEquals(HttpStatus.BAD_REQUEST.value(), res.getResponse().getStatus());
         assertEquals(InitiativeConstants.Exception.Publish.BadRequest.CODE, error.getCode());
         assertTrue(error.getMessage().contains(InitiativeConstants.Exception.Publish.BadRequest.INTEGRATION_FAILED));
+    }
+
+    @Test
+    void getOnbordingList() throws Exception {
+        mvc.perform(
+                        MockMvcRequestBuilders.get(BASE_URL + String.format(GET_INITIATIVE_ACTIVE_URL, ORGANIZATION_ID, INITIATIVE_ID+"/onboardings"))
+                                .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andDo(print())
+                .andReturn();
     }
 
     private InitiativeOrganizationInfoDTO createInitiativeOrganizationInfoDTO(){

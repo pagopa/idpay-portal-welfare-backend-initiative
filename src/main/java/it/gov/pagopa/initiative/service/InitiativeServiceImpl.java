@@ -7,17 +7,9 @@ import it.gov.pagopa.initiative.connector.group.GroupRestConnector;
 import it.gov.pagopa.initiative.connector.io_service.IOBackEndRestConnector;
 import it.gov.pagopa.initiative.connector.onboarding.OnboardingRestConnector;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
-import it.gov.pagopa.initiative.controller.filter.LoginThreadLocal;
 import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.InternalServerError;
 import it.gov.pagopa.initiative.controller.filter.LoginThreadLocal;
-import it.gov.pagopa.initiative.dto.CFDTO;
-import it.gov.pagopa.initiative.dto.DecryptCfDTO;
-import it.gov.pagopa.initiative.dto.EncryptedCfDTO;
-import it.gov.pagopa.initiative.dto.InitiativeOrganizationInfoDTO;
-import it.gov.pagopa.initiative.dto.OnboardingDTO;
-import it.gov.pagopa.initiative.dto.OnboardingStatusCitizenDTO;
-import it.gov.pagopa.initiative.dto.ResponseOnboardingDTO;
-import it.gov.pagopa.initiative.dto.StatusOnboardingDTO;
+import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceResponseDTO;
 import it.gov.pagopa.initiative.event.InitiativeProducer;
@@ -37,9 +29,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.ArrayList;
+
+import static it.gov.pagopa.initiative.constants.InitiativeConstants.EmailTemplate.EMAIL_INITIATIVE_CREATED;
+import static it.gov.pagopa.initiative.constants.InitiativeConstants.EmailTemplate.EMAIL_INITIATIVE_STATUS;
 
 
 @Service
@@ -118,7 +113,11 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         if (StringUtils.isBlank(initiative.getStatus())) {
             initiative.setStatus(InitiativeConstants.Status.DRAFT);
         }
-        return initiativeRepository.insert(initiative);
+        Initiative initiativeReturned = initiativeRepository.insert(initiative);
+        if(notifyEmail){
+            emailNotificationService.sendInitiativeToCurrentOrganization(initiative, EMAIL_INITIATIVE_CREATED);
+        }
+        return initiativeReturned;
     }
 
     @Override
@@ -145,6 +144,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         this.initiativeRepository.save(initiative);
     }
 
+    /*Primo salvataggio in Draft tramite Wizard*/
     @Override
     public void updateInitiativeAdditionalInfo(String organizationId, String initiativeId, Initiative initiativeAdditionalInfo, String role){
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
@@ -152,6 +152,9 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         initiative.setAdditionalInfo(initiativeAdditionalInfo.getAdditionalInfo());
         initiative.setStatus(InitiativeConstants.Status.DRAFT);
         this.initiativeRepository.save(initiative);
+//        if(notifyEmail){
+//            emailNotificationService.sendInitiativeToCurrentOrganization(initiative, EMAIL_INITIATIVE_STATUS);
+//        }
     }
 
     @Override
@@ -178,7 +181,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
     @Override
     @Transactional
-    public void updateInitiativeRefundRules(String organizationId, String organizationName, String initiativeId, String role, Initiative refundRule, boolean changeInitiativeStatus){
+    public void updateInitiativeRefundRules(String organizationId, String initiativeId, String role, Initiative refundRule, boolean changeInitiativeStatus){
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
         //Check Initiative Status
         isInitiativeAllowedToBeEditableThenThrows(initiative);
@@ -192,13 +195,13 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         }
         this.initiativeRepository.save(initiative);
         if(changeInitiativeStatus && notifyEmail){
-            emailNotificationService.sendInitiativeInRevision(initiative, organizationName);
+            emailNotificationService.sendInitiativeToCurrentOrganizationAndPagoPA(initiative, EMAIL_INITIATIVE_STATUS);
         }
     }
 
     @Override
     @Transactional
-    public void updateInitiativeApprovedStatus(String organizationId, String organizationName, String initiativeId, String role){
+    public void updateInitiativeApprovedStatus(String organizationId, String initiativeId, String role){
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
         isInitiativeStatusNotInRevisionThenThrow(initiative, InitiativeConstants.Status.APPROVED);
         initiative.setStatus(InitiativeConstants.Status.APPROVED);
@@ -206,13 +209,13 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         this.initiativeRepository.save(initiative);
         log.info("[UPDATE_TO_APPROVED_STATUS] - Initiative: {}. Status successfully changed", initiative.getInitiativeId());
         if(notifyEmail){
-            emailNotificationService.sendInitiativeApprovedAndRejected(initiative, organizationName);
+            emailNotificationService.sendInitiativeToCurrentOrganization(initiative, EMAIL_INITIATIVE_STATUS);
         }
     }
 
     @Override
     @Transactional
-    public void updateInitiativeToCheckStatus(String organizationId, String organizationName, String initiativeId, String role){
+    public void updateInitiativeToCheckStatus(String organizationId, String initiativeId, String role){
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
         isInitiativeStatusNotInRevisionThenThrow(initiative, InitiativeConstants.Status.TO_CHECK);
         initiative.setStatus(InitiativeConstants.Status.TO_CHECK);
@@ -220,7 +223,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         this.initiativeRepository.save(initiative);
         log.info("[UPDATE_TO_CHECK_STATUS] - Initiative: {}. Status successfully changed", initiative.getInitiativeId());
         if(notifyEmail){
-            emailNotificationService.sendInitiativeApprovedAndRejected(initiative, organizationName);
+            emailNotificationService.sendInitiativeToCurrentOrganization(initiative, EMAIL_INITIATIVE_STATUS);
         }
     }
 
@@ -244,6 +247,9 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             initiative.setUpdateDate(LocalDateTime.now());
             this.initiativeRepository.save(initiative);
             log.info("[LOGICAL_DELETE_INITIATIVE] - Initiative: {}. Successfully logical elimination.", initiative.getInitiativeId());
+        }
+        if(notifyEmail){
+            emailNotificationService.sendInitiativeToCurrentOrganization(initiative, EMAIL_INITIATIVE_STATUS);
         }
     }
 
@@ -321,6 +327,9 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         initiative.getAdditionalInfo().setSecondaryTokenIO(encryptedSecondaryToken);
         additionalInfo.setServiceId(serviceResponseDTO.getServiceId());
         initiative.setUpdateDate(LocalDateTime.now());
+        if(notifyEmail){
+            emailNotificationService.sendInitiativeToCurrentOrganizationAndPagoPA(initiative, EMAIL_INITIATIVE_STATUS);
+        }
         return initiative;
     }
 
@@ -363,10 +372,10 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             new CFDTO(CF));
         userId = encryptedCfDTO.getToken();
       } catch (Exception e) {
-        throw new InitiativeException(
-            InternalServerError.CODE,
-            e.getMessage(),
-            HttpStatus.INTERNAL_SERVER_ERROR);
+          throw new InitiativeException(
+                  InternalServerError.CODE,
+                  e.getMessage(),
+                  HttpStatus.INTERNAL_SERVER_ERROR);
       }
     }
     ResponseOnboardingDTO responseOnboardingDTO = new ResponseOnboardingDTO();
@@ -375,7 +384,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
           userId,
           startDate, endDate, status);
       log.info("response onbording: "+responseOnboardingDTO);
-    } catch (FeignException e) {
+    } catch (Exception e) {
       throw new InitiativeException(
           InternalServerError.CODE,
           e.getMessage(),
@@ -390,7 +399,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             onboardingStatusCitizenDTO.getStatus(), onboardingStatusCitizenDTO.getStatusDate());
         statusOnboardingDTOS.add(statusOnboardingDTO);
 
-      } catch (FeignException e) {
+      } catch (Exception e) {
         throw new InitiativeException(
             InternalServerError.CODE,
             e.getMessage(),
