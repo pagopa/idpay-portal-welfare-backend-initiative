@@ -100,7 +100,7 @@ public class InitiativeGeneralDTO extends InitiativeOrganizationInfoDTO {
     @NotNull(groups = ValidationOnGroup.class)
     private Boolean rankingEnabled;
 
-    @JsonProperty("descriptionLanguageMap")
+    @JsonProperty("descriptionMap")
     @Valid
     @NotEmpty(groups = ValidationOnGroup.class)
     private Map<String, String> descriptionMap;
