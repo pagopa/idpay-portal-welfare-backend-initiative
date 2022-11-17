@@ -21,7 +21,7 @@ public class AuditorAwareImpl implements AuditorAware<String> {
 
         switch (method){
             case "POST", "PUT", "DELETE":
-                String organizationUserId = request.getHeader("organization_user_id");
+                String organizationUserId = request.getHeader("organization-user-id");
                 return Optional.ofNullable(organizationUserId);
             default:
                 return Optional.of(UNDEFINED);

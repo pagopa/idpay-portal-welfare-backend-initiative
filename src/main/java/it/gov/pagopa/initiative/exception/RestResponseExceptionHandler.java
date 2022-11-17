@@ -64,12 +64,4 @@ public class RestResponseExceptionHandler {
                 new ErrorDTO(InitiativeConstants.Exception.Publish.BadRequest.CODE, InitiativeConstants.Exception.Publish.BadRequest.INTEGRATION_FAILED), ex.getHttpStatus());
     }
 
-    @ExceptionHandler({FeignException.class})
-    public ResponseEntity<ErrorDTO> handleFeignException(FeignException ex) {
-        log.warn(ex.getMessage());
-        return new ResponseEntity<>(
-                new ErrorDTO(InitiativeConstants.Exception.InternalServerError.INTEGRATION_CODE, ex.getMessage()),
-                HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
 }

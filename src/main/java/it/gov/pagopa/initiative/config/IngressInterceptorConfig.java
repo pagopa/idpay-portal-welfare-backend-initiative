@@ -1,7 +1,6 @@
 package it.gov.pagopa.initiative.config;
 
-import it.gov.pagopa.initiative.controller.filter.LoginThreadLocal;
-import it.gov.pagopa.initiative.controller.filter.SessionLoginHeaderFilter;
+import it.gov.pagopa.initiative.controller.filter.HeaderFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,10 +9,9 @@ import org.springframework.context.annotation.Configuration;
 public class IngressInterceptorConfig {
 
     @Bean
-    public FilterRegistrationBean<SessionLoginHeaderFilter> sessionLoginHeaderFilterRegistrationBean(LoginThreadLocal loginThreadLocal) {
-        FilterRegistrationBean<SessionLoginHeaderFilter> registrationBean
-                = new FilterRegistrationBean<>();
-        registrationBean.setFilter(new SessionLoginHeaderFilter(loginThreadLocal));
+    public FilterRegistrationBean<HeaderFilter> sessionLoginHeaderFilterRegistrationBean() {
+        FilterRegistrationBean<HeaderFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(new HeaderFilter());
         registrationBean.addUrlPatterns("/*");
         return registrationBean;
     }

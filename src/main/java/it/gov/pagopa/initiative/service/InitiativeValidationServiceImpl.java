@@ -4,10 +4,12 @@ import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.exception.InitiativeException;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class InitiativeValidationServiceImpl implements InitiativeValidationService {
 
     private final InitiativeRepository initiativeRepository;
@@ -42,6 +44,7 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
 
     @Override
     public void checkPermissionBeforeInsert(String role) {
+        log.debug("[CHECK PERMISSION] role: {}", role);
         if (InitiativeConstants.Role.OPE_BASE.equals(role)){
             throw new InitiativeException(
                         InitiativeConstants.Exception.BadRequest.CODE,
