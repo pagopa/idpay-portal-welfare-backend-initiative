@@ -79,7 +79,9 @@ public class InitiativeModelToDTOMapper {
                 .endDate(general.getEndDate())
                 .startDate(general.getStartDate())
                 .rankingEndDate(general.getRankingEndDate())
-                .rankingStartDate(general.getRankingStartDate()).build();
+                .rankingStartDate(general.getRankingStartDate())
+                .rankingEnabled(general.getRankingEnabled())
+                .descriptionMap(general.getDescriptionMap()).build();
     }
 
     private InitiativeAdditionalDTO toInitiativeAdditionalDTO(InitiativeAdditional additional) {
