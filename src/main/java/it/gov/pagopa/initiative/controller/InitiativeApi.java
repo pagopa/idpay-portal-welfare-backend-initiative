@@ -15,12 +15,14 @@ import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface InitiativeApi {
 
@@ -316,6 +318,24 @@ public interface InitiativeApi {
       @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId,
       @Parameter(in = ParameterIn.DEFAULT, schema = @Schema()) @RequestBody InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO,
       @RequestParam(required = false) String role);
+
+  @Operation(summary = "Add logo to initiative", description = "", security = {
+          @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "204", description = "No Content"),
+          @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+          @ApiResponse(responseCode = "401", description = "Authentication failed", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+          @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+          @ApiResponse(responseCode = "404", description = "The requested ID was not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+          @ApiResponse(responseCode = "429", description = "Too many Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+          @ApiResponse(responseCode = "500", description = "Server ERROR", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))})
+  @PutMapping(value = "/idpay/organization/{organizationId}/initiative/{initiativeId}/logo",
+          produces = {"application/json"},
+          consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+  ResponseEntity<Void> addLogo(
+          @PathVariable("organizationId") String organizationId,
+          @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId,
+          @Parameter(in = ParameterIn.DEFAULT, schema = @Schema()) @RequestPart("logo") MultipartFile logo);
 
   @Operation(summary = "Return the initiative ID by the service ID", description = "", security = {
       @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})

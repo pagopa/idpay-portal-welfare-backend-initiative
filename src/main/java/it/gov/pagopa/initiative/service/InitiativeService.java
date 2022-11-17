@@ -5,6 +5,7 @@ import it.gov.pagopa.initiative.dto.OnboardingDTO;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeAdditional;
 import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
+import java.io.InputStream;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +47,7 @@ public interface InitiativeService {
     void isInitiativeAllowedToBeNextStatusThenThrows(Initiative initiative, String statusToBeUpdated, String role);
 
     void updateInitiative(Initiative initiative);
+    void storeInitiativeLogo(String organizationId, String initiativeId, InputStream logo, String contentType, String fileName);
 
     Initiative sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(Initiative initiative, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO);
 

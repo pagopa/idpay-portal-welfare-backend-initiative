@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @Slf4j
@@ -251,6 +252,13 @@ public class InitiativeApiController implements InitiativeApi {
             throw new IntegrationException(HttpStatus.BAD_REQUEST);
         }
         return ResponseEntity.noContent().build();
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Override
+    public ResponseEntity<Void> addLogo(String organizationId, String initiativeId,
+            MultipartFile logo) {
+        return null;
     }
 
     @ResponseStatus(HttpStatus.OK)
