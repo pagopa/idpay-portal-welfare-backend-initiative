@@ -13,12 +13,11 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import javax.validation.constraints.Future;
-import javax.validation.constraints.FutureOrPresent;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
+import javax.validation.Valid;
+import javax.validation.constraints.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Map;
 
 /**
  * InitiativeGeneralDTO
@@ -34,68 +33,71 @@ import java.time.LocalDate;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class InitiativeGeneralDTO extends InitiativeOrganizationInfoDTO {
 
-  @JsonProperty("budget")
-  @Min(value = 1, message = "budget should have an amount of at least 1", groups = ValidationOnGroup.class)
-  @NotNull(groups = ValidationOnGroup.class)
-  private BigDecimal budget;
+    @JsonProperty("budget")
+    @Min(value = 1, message = "budget should have an amount of at least 1", groups = ValidationOnGroup.class)
+    @NotNull(groups = ValidationOnGroup.class)
+    private BigDecimal budget;
 
-  /**
-   * Gets or Sets beneficiaryType
-   */
-  public enum BeneficiaryTypeEnum {
-    PF("PF"),
-    PG("PG");
+    /**
+     * Gets or Sets beneficiaryType
+     */
+    public enum BeneficiaryTypeEnum {
+        PF("PF"), PG("PG");
 
-    private final String value;
+        private final String value;
 
-    BeneficiaryTypeEnum(String value) {
-      this.value = value;
-    }
-
-    @Override
-    @JsonValue
-    public String toString() {
-      return String.valueOf(value);
-    }
-
-    @JsonCreator
-    public static BeneficiaryTypeEnum fromValue(String text) {
-      for (BeneficiaryTypeEnum b : BeneficiaryTypeEnum.values()) {
-        if (String.valueOf(b.value).equals(text)) {
-          return b;
+        BeneficiaryTypeEnum(String value) {
+            this.value = value;
         }
-      }
-      return null;
+
+        @Override
+        @JsonValue
+        public String toString() {
+            return String.valueOf(value);
+        }
+
+        @JsonCreator
+        public static BeneficiaryTypeEnum fromValue(String text) {
+            for (BeneficiaryTypeEnum b : BeneficiaryTypeEnum.values()) {
+                if (String.valueOf(b.value).equals(text)) {
+                    return b;
+                }
+            }
+            return null;
+        }
     }
-  }
 
-  @JsonProperty("beneficiaryType")
-  @NotNull(groups = ValidationOnGroup.class)
-  private BeneficiaryTypeEnum beneficiaryType;
+    @JsonProperty("beneficiaryType")
+    @NotNull(groups = ValidationOnGroup.class)
+    private BeneficiaryTypeEnum beneficiaryType;
 
-  @JsonProperty("beneficiaryKnown")
-  @NotNull(groups = ValidationOnGroup.class)
-  private Boolean beneficiaryKnown;
+    @JsonProperty("beneficiaryKnown")
+    @NotNull(groups = ValidationOnGroup.class)
+    private Boolean beneficiaryKnown;
 
-  @JsonProperty("beneficiaryBudget")
-  @Min(value = 1, message = "Beneficiary budget should have an amount of at least 1", groups = ValidationOnGroup.class)
-  @NotNull(groups = ValidationOnGroup.class)
-  private BigDecimal beneficiaryBudget;
+    @JsonProperty("beneficiaryBudget")
+    @Min(value = 1, message = "Beneficiary budget should have an amount of at least 1", groups = ValidationOnGroup.class)
+    @NotNull(groups = ValidationOnGroup.class)
+    private BigDecimal beneficiaryBudget;
 
-  @JsonProperty("startDate")
-  @NotNull(groups = ValidationOnGroup.class)
-  private LocalDate startDate;
+    @JsonProperty("startDate")
+    @NotNull(groups = ValidationOnGroup.class)
+    private LocalDate startDate;
 
-  @JsonProperty("endDate")
-  @NotNull(groups = ValidationOnGroup.class)
-  private LocalDate endDate;
+    @JsonProperty("endDate")
+    @NotNull(groups = ValidationOnGroup.class)
+    private LocalDate endDate;
 
-  @JsonProperty("rankingStartDate")
-  @FutureOrPresent(groups = ValidationOnGroup.class)
-  private LocalDate rankingStartDate;
+    @JsonProperty("rankingStartDate")
+    @FutureOrPresent(groups = ValidationOnGroup.class)
+    private LocalDate rankingStartDate;
 
-  @JsonProperty("rankingEndDate")
-  @Future(groups = ValidationOnGroup.class)
-  private LocalDate rankingEndDate;
+    @JsonProperty("rankingEndDate")
+    @Future(groups = ValidationOnGroup.class)
+    private LocalDate rankingEndDate;
 
+    @JsonProperty("descriptionMap")
+    @Valid
+    @NotEmpty(groups = ValidationOnGroup.class)
+    private Map<String, String> descriptionMap;
 }
