@@ -8,7 +8,9 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
+@Service
 public class AzureBlobClient implements FileStorageConnector {
 
     private final String initiativeLogoContainerReference;
@@ -16,7 +18,7 @@ public class AzureBlobClient implements FileStorageConnector {
 
 
     AzureBlobClient(@Value("${blobStorage.connectionString}") String storageConnectionString,
-            @Value("${blobStorage.institutions.logo.containerReference}") String institutionsLogoContainerReference)
+            @Value("${blobStorage.initiative.logo.containerReference}") String institutionsLogoContainerReference)
             throws URISyntaxException, InvalidKeyException {
         final CloudStorageAccount storageAccount = CloudStorageAccount.parse(
                 storageConnectionString);

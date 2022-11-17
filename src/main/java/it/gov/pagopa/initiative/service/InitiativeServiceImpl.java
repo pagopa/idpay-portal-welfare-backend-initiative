@@ -58,7 +58,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     private final IOTokenService ioTokenService;
     private final InitiativeValidationService initiativeValidationService;
     private final LoginThreadLocal loginThreadLocal;
-    public static final String LOGO_PATH_TEMPLATE = "initiative/%s/logo.%s";
+    public static final String LOGO_PATH_TEMPLATE = "/%s/%s/logo.%s";
 
     public InitiativeServiceImpl(
             @Value("${app.initiative.conditions.notifyEmail}") boolean notifyEmail,
@@ -333,14 +333,18 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                                 initiativeId),
                         HttpStatus.NOT_FOUND));
 
-
-        String fileExtension = Files.getFileExtension(fileName);
         try {
-            fileStorageConnector.uploadInitiativeLogo(logo, String.format(LOGO_PATH_TEMPLATE, initiativeId, fileExtension), contentType);
-
+            String fileExtension = Files.getFileExtension(fileName);
+            fileStorageConnector.uploadInitiativeLogo(logo, String.format(LOGO_PATH_TEMPLATE, organizationId,initiativeId, fileExtension), contentType);
+            initiative.getAdditionalInfo().setLogoFileName(fileName);
+            LocalDateTime localDateTime = LocalDateTime.now();
+            initiative.getAdditionalInfo().setLogoUploadDate(localDateTime);
+            initiative.setUpdateDate(localDateTime);
+            initiativeRepository.save(initiative);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
 
     }
 

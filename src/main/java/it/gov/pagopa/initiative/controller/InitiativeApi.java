@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
 import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
+import java.io.IOException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -335,7 +336,8 @@ public interface InitiativeApi {
   ResponseEntity<Void> addLogo(
           @PathVariable("organizationId") String organizationId,
           @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId,
-          @Parameter(in = ParameterIn.DEFAULT, schema = @Schema()) @RequestPart("logo") MultipartFile logo);
+          @Parameter(in = ParameterIn.DEFAULT, schema = @Schema()) @RequestPart("logo") MultipartFile logo)
+          throws IOException;
 
   @Operation(summary = "Return the initiative ID by the service ID", description = "", security = {
       @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
