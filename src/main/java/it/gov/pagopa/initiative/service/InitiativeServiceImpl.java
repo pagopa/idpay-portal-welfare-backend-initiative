@@ -1,8 +1,10 @@
 package it.gov.pagopa.initiative.service;
 
+import com.google.common.io.Files;
 import feign.FeignException;
 import it.gov.pagopa.initiative.connector.decrypt.DecryptRestConnector;
 import it.gov.pagopa.initiative.connector.encrypt.EncryptRestConnector;
+import it.gov.pagopa.initiative.connector.file_storage.FileStorageConnector;
 import it.gov.pagopa.initiative.connector.group.GroupRestConnector;
 import it.gov.pagopa.initiative.connector.io_service.IOBackEndRestConnector;
 import it.gov.pagopa.initiative.connector.onboarding.OnboardingRestConnector;
@@ -19,6 +21,7 @@ import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeAdditional;
 import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
+import java.io.InputStream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +33,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.springframework.util.Assert;
+import org.springframework.util.InvalidMimeTypeException;
 
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Email.*;
 
@@ -48,6 +53,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     private final OnboardingRestConnector onboardingRestConnector;
     private final EncryptRestConnector encryptRestConnector;
     private final DecryptRestConnector decryptRestConnector;
+    private final FileStorageConnector fileStorageConnector;
     private final EmailNotificationService emailNotificationService;
     private final IOTokenService ioTokenService;
     private final InitiativeValidationService initiativeValidationService;
@@ -63,6 +69,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             OnboardingRestConnector onboardingRestConnector,
             EncryptRestConnector encryptRestConnector,
             DecryptRestConnector decryptRestConnector,
+            FileStorageConnector fileStorageConnector,
             EmailNotificationService emailNotificationService,
             IOTokenService ioTokenService,
             InitiativeValidationService initiativeValidationService
@@ -77,6 +84,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         this.onboardingRestConnector = onboardingRestConnector;
         this.encryptRestConnector = encryptRestConnector;
         this.decryptRestConnector = decryptRestConnector;
+        this.fileStorageConnector = fileStorageConnector;
         this.emailNotificationService = emailNotificationService;
         this.ioTokenService = ioTokenService;
         this.initiativeValidationService = initiativeValidationService;
@@ -311,6 +319,38 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     public void updateInitiative(Initiative initiative) {
         initiativeRepository.save(initiative);
         log.debug("Initiative {} updated", initiative.getInitiativeId());
+    }
+
+    @Override
+    public LogoDTO storeInitiativeLogo(String organizationId, String initiativeId, InputStream logo,
+            String contentType, String fileName) {
+
+        Initiative initiative = initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(
+                        organizationId, initiativeId, true)
+                .orElseThrow(() -> new InitiativeException(
+                        InitiativeConstants.Exception.NotFound.CODE,
+                        String.format(
+                                InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE,
+                                initiativeId),
+                        HttpStatus.NOT_FOUND));
+
+        try {
+            String fileExtension = Files.getFileExtension(fileName);
+            if(fileExtension!="png"){
+                log.info("eccezione estensione: "+fileExtension);
+            }
+            fileStorageConnector.uploadInitiativeLogo(logo, String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE, organizationId, initiativeId, InitiativeConstants.Logo.LOGO_NAME), contentType);
+            initiative.getAdditionalInfo().setLogoFileName(fileName);
+            LocalDateTime localDateTime = LocalDateTime.now();
+            initiative.getAdditionalInfo().setLogoUploadDate(localDateTime);
+            initiative.setUpdateDate(localDateTime);
+            initiativeRepository.save(initiative);
+            return new LogoDTO(fileName,Initiative.getLogoURL(organizationId,initiativeId), localDateTime);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+
     }
 
     @Override

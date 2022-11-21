@@ -9,6 +9,7 @@ import it.gov.pagopa.initiative.mapper.InitiativeDTOsToModelMapper;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.service.InitiativeService;
+import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @Slf4j
@@ -251,6 +253,13 @@ public class InitiativeApiController implements InitiativeApi {
             throw new IntegrationException(HttpStatus.BAD_REQUEST);
         }
         return ResponseEntity.noContent().build();
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Override
+    public ResponseEntity<LogoDTO> addLogo(String organizationId, String initiativeId,
+            MultipartFile logo) throws IOException {
+        return ResponseEntity.ok(initiativeService.storeInitiativeLogo(organizationId,initiativeId,logo.getInputStream(),logo.getContentType(),logo.getOriginalFilename()));
     }
 
     @ResponseStatus(HttpStatus.OK)

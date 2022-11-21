@@ -41,6 +41,9 @@ public class InitiativeModelToDTOMapper {
         initiativeDto.setPdndToken(initiative.getPdndToken());
         initiativeDto.setGeneral(this.toInitiativeGeneralDTO(initiative.getGeneral()));
         initiativeDto.setAdditionalInfo(this.toInitiativeAdditionalDTO(initiative.getAdditionalInfo()));
+        if(initiativeDto.getAdditionalInfo() != null && initiativeDto.getAdditionalInfo().getLogoFileName() != null){
+            initiativeDto.getAdditionalInfo().setLogoURL(Initiative.getLogoURL(initiative.getOrganizationId(), initiative.getInitiativeId()));
+        }
         initiativeDto.setBeneficiaryRule(this.toInitiativeBeneficiaryRuleDTO(initiative.getBeneficiaryRule()));
         initiativeDto.setRewardRule(this.toRewardRuleDTO(initiative.getRewardRule()));
         initiativeDto.setTrxRule(this.toTrxRuleDTO(initiative.getTrxRule()));
@@ -96,6 +99,8 @@ public class InitiativeModelToDTOMapper {
                 .privacyLink(additional.getPrivacyLink())
                 .tcLink(additional.getTcLink())
                 .channels(toChannelsDTO(additional.getChannels()))
+                .logoFileName(additional.getLogoFileName())
+                .logoUploadDate(additional.getLogoUploadDate())
                 .build();
     }
 

@@ -20,6 +20,12 @@ public class InitiativeConstants {
         }
     }
 
+    public static final class Logo {
+        public static final String LOGO_PATH_TEMPLATE = "logos/%s/%s/%s";
+        public static final String LOGO_NAME = "logo.png";
+        public static final String URL_LOGO = "https://idpaydinitiativestorage.blob.core.windows.net/logo/";
+    }
+
     public static final class Role {
         public static final String ADMIN = "admin";
         public static final String OPE_BASE = "ope_base";
