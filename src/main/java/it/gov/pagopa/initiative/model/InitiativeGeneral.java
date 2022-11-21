@@ -24,7 +24,6 @@ public class InitiativeGeneral {
     private LocalDate endDate;
     private LocalDate rankingStartDate;
     private LocalDate rankingEndDate;
-    private Boolean rankingEnabled;
     private Map<String, String> descriptionMap;
 
     /**

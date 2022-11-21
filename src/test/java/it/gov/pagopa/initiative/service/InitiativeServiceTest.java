@@ -3,6 +3,7 @@ package it.gov.pagopa.initiative.service;
 
 import it.gov.pagopa.initiative.connector.decrypt.DecryptRestConnector;
 import it.gov.pagopa.initiative.connector.encrypt.EncryptRestConnector;
+import it.gov.pagopa.initiative.connector.file_storage.FileStorageConnector;
 import it.gov.pagopa.initiative.connector.group.GroupRestConnector;
 import it.gov.pagopa.initiative.connector.io_service.IOBackEndRestConnector;
 import it.gov.pagopa.initiative.connector.onboarding.OnboardingRestConnector;
@@ -115,6 +116,9 @@ class InitiativeServiceTest {
 
     @MockBean
     GroupRestConnector groupRestConnector;
+
+    @MockBean
+    FileStorageConnector fileStorageConnector;
 
     @MockBean
     OnboardingRestConnector onboardingRestConnector;

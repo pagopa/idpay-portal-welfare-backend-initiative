@@ -34,6 +34,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.springframework.util.Assert;
+import org.springframework.util.InvalidMimeTypeException;
 
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.EmailTemplate.EMAIL_INITIATIVE_CREATED;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.EmailTemplate.EMAIL_INITIATIVE_STATUS;
@@ -58,7 +60,6 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     private final IOTokenService ioTokenService;
     private final InitiativeValidationService initiativeValidationService;
     private final LoginThreadLocal loginThreadLocal;
-    public static final String LOGO_PATH_TEMPLATE = "/%s/%s/logo.%s";
 
     public InitiativeServiceImpl(
             @Value("${app.initiative.conditions.notifyEmail}") boolean notifyEmail,
@@ -321,7 +322,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     }
 
     @Override
-    public void storeInitiativeLogo(String organizationId, String initiativeId, InputStream logo,
+    public LogoDTO storeInitiativeLogo(String organizationId, String initiativeId, InputStream logo,
             String contentType, String fileName) {
 
         Initiative initiative = initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(
@@ -335,12 +336,16 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
         try {
             String fileExtension = Files.getFileExtension(fileName);
-            fileStorageConnector.uploadInitiativeLogo(logo, String.format(LOGO_PATH_TEMPLATE, organizationId,initiativeId, fileExtension), contentType);
+            if(fileExtension!="png"){
+                log.info("eccezione estensione: "+fileExtension);
+            }
+            fileStorageConnector.uploadInitiativeLogo(logo, String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE, organizationId, initiativeId, InitiativeConstants.Logo.LOGO_NAME), contentType);
             initiative.getAdditionalInfo().setLogoFileName(fileName);
             LocalDateTime localDateTime = LocalDateTime.now();
             initiative.getAdditionalInfo().setLogoUploadDate(localDateTime);
             initiative.setUpdateDate(localDateTime);
             initiativeRepository.save(initiative);
+            return new LogoDTO(fileName,Initiative.getLogoURL(organizationId,initiativeId), localDateTime);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

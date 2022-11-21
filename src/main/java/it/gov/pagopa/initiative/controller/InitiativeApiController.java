@@ -257,10 +257,9 @@ public class InitiativeApiController implements InitiativeApi {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Override
-    public ResponseEntity<Void> addLogo(String organizationId, String initiativeId,
+    public ResponseEntity<LogoDTO> addLogo(String organizationId, String initiativeId,
             MultipartFile logo) throws IOException {
-        initiativeService.storeInitiativeLogo(organizationId,initiativeId,logo.getInputStream(),logo.getContentType(),logo.getOriginalFilename());
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(initiativeService.storeInitiativeLogo(organizationId,initiativeId,logo.getInputStream(),logo.getContentType(),logo.getOriginalFilename()));
     }
 
     @ResponseStatus(HttpStatus.OK)

@@ -55,7 +55,6 @@ public class InitiativeDTOsToModelMapper {
                 .startDate(generalDTO.getStartDate())
                 .rankingEndDate(generalDTO.getRankingEndDate())
                 .rankingStartDate(generalDTO.getRankingStartDate())
-                .rankingEnabled(generalDTO.getRankingEnabled())
                 .descriptionMap(generalDTO.getDescriptionMap()).build();
     }
 

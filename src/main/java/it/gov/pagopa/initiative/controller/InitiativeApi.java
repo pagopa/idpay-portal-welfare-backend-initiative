@@ -323,7 +323,7 @@ public interface InitiativeApi {
   @Operation(summary = "Add logo to initiative", description = "", security = {
           @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
   @ApiResponses(value = {
-          @ApiResponse(responseCode = "204", description = "No Content"),
+          @ApiResponse(responseCode = "200", description = "No Content"),
           @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
           @ApiResponse(responseCode = "401", description = "Authentication failed", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
           @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
@@ -333,7 +333,7 @@ public interface InitiativeApi {
   @PutMapping(value = "/idpay/organization/{organizationId}/initiative/{initiativeId}/logo",
           produces = {"application/json"},
           consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-  ResponseEntity<Void> addLogo(
+  ResponseEntity<LogoDTO> addLogo(
           @PathVariable("organizationId") String organizationId,
           @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId,
           @Parameter(in = ParameterIn.DEFAULT, schema = @Schema()) @RequestPart("logo") MultipartFile logo)

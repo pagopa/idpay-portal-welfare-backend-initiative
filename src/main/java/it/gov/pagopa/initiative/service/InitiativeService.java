@@ -1,6 +1,7 @@
 package it.gov.pagopa.initiative.service;
 
 import it.gov.pagopa.initiative.dto.InitiativeOrganizationInfoDTO;
+import it.gov.pagopa.initiative.dto.LogoDTO;
 import it.gov.pagopa.initiative.dto.OnboardingDTO;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeAdditional;
@@ -47,7 +48,7 @@ public interface InitiativeService {
     void isInitiativeAllowedToBeNextStatusThenThrows(Initiative initiative, String statusToBeUpdated, String role);
 
     void updateInitiative(Initiative initiative);
-    void storeInitiativeLogo(String organizationId, String initiativeId, InputStream logo, String contentType, String fileName);
+    LogoDTO storeInitiativeLogo(String organizationId, String initiativeId, InputStream logo, String contentType, String fileName);
 
     Initiative sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(Initiative initiative, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO);
 
