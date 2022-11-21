@@ -21,7 +21,9 @@ import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeAdditional;
 import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
+import it.gov.pagopa.initiative.utils.InitiativeUtils;
 import java.io.InputStream;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,6 +59,8 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     private final EmailNotificationService emailNotificationService;
     private final IOTokenService ioTokenService;
     private final InitiativeValidationService initiativeValidationService;
+    private final Set<String> allowedInitiativeLogoMimeTypes;
+    private final Set<String> allowedInitiativeLogoExtensions;
 
     public InitiativeServiceImpl(
             @Value("${app.initiative.conditions.notifyEmail}") boolean notifyEmail,
@@ -70,6 +74,8 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             EncryptRestConnector encryptRestConnector,
             DecryptRestConnector decryptRestConnector,
             FileStorageConnector fileStorageConnector,
+            @Value("${app.initiative.logo.allowed-mime-types}") String[] allowedInitiativeLogoMimeTypes,
+            @Value("${app.initiative.logo.allowed-extensions}") String[] allowedInitiativeLogoExtensions,
             EmailNotificationService emailNotificationService,
             IOTokenService ioTokenService,
             InitiativeValidationService initiativeValidationService
@@ -85,6 +91,8 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         this.encryptRestConnector = encryptRestConnector;
         this.decryptRestConnector = decryptRestConnector;
         this.fileStorageConnector = fileStorageConnector;
+        this.allowedInitiativeLogoMimeTypes = Set.of(allowedInitiativeLogoMimeTypes);
+        this.allowedInitiativeLogoExtensions = Set.of(allowedInitiativeLogoExtensions);
         this.emailNotificationService = emailNotificationService;
         this.ioTokenService = ioTokenService;
         this.initiativeValidationService = initiativeValidationService;
@@ -345,7 +353,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             initiative.getAdditionalInfo().setLogoUploadDate(localDateTime);
             initiative.setUpdateDate(localDateTime);
             initiativeRepository.save(initiative);
-            return new LogoDTO(fileName,Initiative.getLogoURL(organizationId,initiativeId), localDateTime);
+            return new LogoDTO(fileName, new InitiativeUtils().createLogoUrl(organizationId,initiativeId),localDateTime);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -453,4 +461,19 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         responseOnboardingDTO.getPageSize(), responseOnboardingDTO.getTotalElements(),
         responseOnboardingDTO.getTotalPages());
   }
+
+    private void validate(String contentType, String fileName) {
+        Assert.notNull(fileName, "file name cannot be null");
+
+        if (!allowedInitiativeLogoMimeTypes.contains(contentType)) {
+            throw new InvalidMimeTypeException(contentType, String.format("allowed only %s",
+                    allowedInitiativeLogoMimeTypes));
+        }
+
+        String fileExtension = Files.getFileExtension(fileName);
+        if (!allowedInitiativeLogoExtensions.contains(fileExtension)) {
+            throw new IllegalArgumentException(String.format("Invalid file extension \"%s\": allowed only %s", fileExtension,
+                    allowedInitiativeLogoExtensions));
+        }
+    }
 }

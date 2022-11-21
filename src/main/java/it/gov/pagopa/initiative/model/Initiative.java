@@ -42,7 +42,4 @@ public class Initiative {
     private InitiativeRefundRule refundRule;
     private Boolean enabled;
 
-    public static final String getLogoURL(String organizationId, String initiativeId){
-        return InitiativeConstants.Logo.URL_LOGO+String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE, organizationId,initiativeId, InitiativeConstants.Logo.LOGO_NAME);
-    }
 }

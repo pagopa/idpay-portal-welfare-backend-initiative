@@ -1,5 +1,6 @@
 package it.gov.pagopa.initiative.mapper;
 
+import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.rule.refund.AccumulatedAmountDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
@@ -18,16 +19,16 @@ import it.gov.pagopa.initiative.model.rule.reward.InitiativeRewardRule;
 import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
 import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
 import it.gov.pagopa.initiative.model.rule.trx.*;
+import it.gov.pagopa.initiative.utils.InitiativeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-
 import java.util.Collections;
 import java.util.List;
 
+
 @Component
 public class InitiativeModelToDTOMapper {
-
     public InitiativeDTO toInitiativeDTO(Initiative initiative) {
         if (initiative == null) {
             return null;
@@ -42,7 +43,8 @@ public class InitiativeModelToDTOMapper {
         initiativeDto.setGeneral(this.toInitiativeGeneralDTO(initiative.getGeneral()));
         initiativeDto.setAdditionalInfo(this.toInitiativeAdditionalDTO(initiative.getAdditionalInfo()));
         if(initiativeDto.getAdditionalInfo() != null && initiativeDto.getAdditionalInfo().getLogoFileName() != null){
-            initiativeDto.getAdditionalInfo().setLogoURL(Initiative.getLogoURL(initiative.getOrganizationId(), initiative.getInitiativeId()));
+            initiativeDto.getAdditionalInfo().setLogoURL(new InitiativeUtils().createLogoUrl(initiative.getOrganizationId(),
+                    initiative.getInitiativeId()));
         }
         initiativeDto.setBeneficiaryRule(this.toInitiativeBeneficiaryRuleDTO(initiative.getBeneficiaryRule()));
         initiativeDto.setRewardRule(this.toRewardRuleDTO(initiative.getRewardRule()));

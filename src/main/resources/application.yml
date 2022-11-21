@@ -5,6 +5,7 @@ spring.servlet.multipart.resolve-lazily: true
 spring.servlet.multipart.file-size-threshold: ${MULTIPART_MAX_FILE_SIZE:1MB}
 blobStorage.connectionString: ${BLOB_STORAGE_CONNECTION_STRING}
 blobStorage.initiative.logo.containerReference: ${BLOB_STORAGE_CONTAINER_REFERENCE}
+
 spring:
   data:
     mongodb:
@@ -96,6 +97,10 @@ logging:
 
 app:
   initiative:
+    logo:
+      allowed-mime-types: ${INSTITUTION_LOGO_ALLOWED_MIME_TYPES:image/png}
+      allowed-extensions: ${INSTITUTION_LOGO_ALLOWED_EXTENSIONS:png}
+      url: ${INITIATIVE_LOGO_URL}
     conditions:
       notifyIO: ${APP_INITIATIVE_CONDITIONS_NOTIFY_IO:true}
       notifyRE: ${APP_INITIATIVE_CONDITIONS_NOTIFY_RE:true}
