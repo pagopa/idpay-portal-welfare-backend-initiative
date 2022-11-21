@@ -30,7 +30,7 @@ public interface InitiativeRepository extends MongoRepository<Initiative, String
 
     @Query(
             value = "{'additionalInfo.serviceId' : ?0}",
-            fields = "{initiativeId : 1}"
+            fields = "{initiativeId : 1, general.descriptionMap : 1}"
     )
     Optional<Initiative> retrieveServiceId(String serviceId);
 }
