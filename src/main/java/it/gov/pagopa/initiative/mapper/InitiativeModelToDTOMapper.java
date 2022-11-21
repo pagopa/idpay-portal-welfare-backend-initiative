@@ -79,7 +79,7 @@ public class InitiativeModelToDTOMapper {
         }
         return InitiativeGeneralDTO.builder().beneficiaryBudget(general.getBeneficiaryBudget())
                 .beneficiaryKnown(general.getBeneficiaryKnown())
-                .beneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.valueOf(general.getBeneficiaryType().name()))
+                .beneficiaryType(general.getBeneficiaryType()!=null?InitiativeGeneralDTO.BeneficiaryTypeEnum.valueOf(general.getBeneficiaryType().name()):null)
                 .budget(general.getBudget())
                 .endDate(general.getEndDate())
                 .startDate(general.getStartDate())
