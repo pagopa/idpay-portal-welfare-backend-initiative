@@ -1,6 +1,7 @@
 package it.gov.pagopa.initiative.service;
 
 import com.google.common.io.Files;
+import feign.FeignException;
 import it.gov.pagopa.initiative.connector.decrypt.DecryptRestConnector;
 import it.gov.pagopa.initiative.connector.encrypt.EncryptRestConnector;
 import it.gov.pagopa.initiative.connector.file_storage.FileStorageConnector;
@@ -9,7 +10,6 @@ import it.gov.pagopa.initiative.connector.io_service.IOBackEndRestConnector;
 import it.gov.pagopa.initiative.connector.onboarding.OnboardingRestConnector;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.InternalServerError;
-import it.gov.pagopa.initiative.controller.filter.LoginThreadLocal;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceResponseDTO;
@@ -28,7 +28,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -37,8 +36,7 @@ import java.util.List;
 import org.springframework.util.Assert;
 import org.springframework.util.InvalidMimeTypeException;
 
-import static it.gov.pagopa.initiative.constants.InitiativeConstants.EmailTemplate.EMAIL_INITIATIVE_CREATED;
-import static it.gov.pagopa.initiative.constants.InitiativeConstants.EmailTemplate.EMAIL_INITIATIVE_STATUS;
+import static it.gov.pagopa.initiative.constants.InitiativeConstants.Email.*;
 
 
 @Service
@@ -59,7 +57,6 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     private final EmailNotificationService emailNotificationService;
     private final IOTokenService ioTokenService;
     private final InitiativeValidationService initiativeValidationService;
-    private final LoginThreadLocal loginThreadLocal;
 
     public InitiativeServiceImpl(
             @Value("${app.initiative.conditions.notifyEmail}") boolean notifyEmail,
@@ -75,8 +72,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             FileStorageConnector fileStorageConnector,
             EmailNotificationService emailNotificationService,
             IOTokenService ioTokenService,
-            InitiativeValidationService initiativeValidationService,
-            LoginThreadLocal LoginThreadLocal
+            InitiativeValidationService initiativeValidationService
     ){
         this.notifyEmail = notifyEmail;
         this.initiativeRepository = initiativeRepository;
@@ -92,7 +88,6 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         this.emailNotificationService = emailNotificationService;
         this.ioTokenService = ioTokenService;
         this.initiativeValidationService = initiativeValidationService;
-        loginThreadLocal = LoginThreadLocal;
     }
 
     public List<Initiative> retrieveInitiativeSummary(String organizationId, String role) {
@@ -122,7 +117,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         }
         Initiative initiativeReturned = initiativeRepository.insert(initiative);
         if(notifyEmail){
-            emailNotificationService.sendInitiativeToCurrentOrganization(initiative, EMAIL_INITIATIVE_CREATED);
+            emailNotificationService.sendInitiativeToCurrentOrganization(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_CREATED, SUBJECT_INITIATIVE_CREATED);
         }
         return initiativeReturned;
     }
@@ -151,7 +146,6 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         this.initiativeRepository.save(initiative);
     }
 
-
     @Override
     public void updateInitiativeAdditionalInfo(String organizationId, String initiativeId, Initiative initiativeAdditionalInfo, String role){
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
@@ -159,9 +153,6 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         initiative.setAdditionalInfo(initiativeAdditionalInfo.getAdditionalInfo());
         initiative.setStatus(InitiativeConstants.Status.DRAFT);
         this.initiativeRepository.save(initiative);
-//        if(notifyEmail){
-//            emailNotificationService.sendInitiativeToCurrentOrganization(initiative, EMAIL_INITIATIVE_STATUS);
-//        }
     }
 
     @Override
@@ -180,21 +171,18 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         //Check Initiative Status
         isInitiativeAllowedToBeEditableThenThrows(initiative);
         initiative.setTrxRule(rewardAndTrxRules.getTrxRule());
-        initiative.setUpdateDate(LocalDateTime.now());
         initiative.setStatus(InitiativeConstants.Status.DRAFT);
         initiative.setRewardRule(rewardAndTrxRules.getRewardRule());
         this.initiativeRepository.save(initiative);
     }
 
     @Override
-    @Transactional
     public void updateInitiativeRefundRules(String organizationId, String initiativeId, String role, Initiative refundRule, boolean changeInitiativeStatus){
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
         //Check Initiative Status
         isInitiativeAllowedToBeEditableThenThrows(initiative);
         initiative.setRefundRule(refundRule.getRefundRule());
         log.info("[UPDATE_REFUND_RULE] - Initiative: {}. Refund rules successfully set.", initiativeId);
-        initiative.setUpdateDate(LocalDateTime.now());
         initiative.setStatus(InitiativeConstants.Status.DRAFT);
         if (changeInitiativeStatus) {
             initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
@@ -202,35 +190,44 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         }
         this.initiativeRepository.save(initiative);
         if(changeInitiativeStatus && notifyEmail){
-            emailNotificationService.sendInitiativeToCurrentOrganizationAndPagoPA(initiative, EMAIL_INITIATIVE_STATUS);
+            try {
+                emailNotificationService.sendInitiativeToCurrentOrganization(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
+                emailNotificationService.sendInitiativeToPagoPA(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
+            } catch (FeignException e) {
+                log.error("[UPDATE_REFUND_RULE]-[EMAIL-NOTIFICATION] Message: {}", e.getMessage());
+            }
         }
     }
 
     @Override
-    @Transactional
     public void updateInitiativeApprovedStatus(String organizationId, String initiativeId, String role){
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
         isInitiativeStatusNotInRevisionThenThrow(initiative, InitiativeConstants.Status.APPROVED);
         initiative.setStatus(InitiativeConstants.Status.APPROVED);
-        initiative.setUpdateDate(LocalDateTime.now());
         this.initiativeRepository.save(initiative);
         log.info("[UPDATE_TO_APPROVED_STATUS] - Initiative: {}. Status successfully changed", initiative.getInitiativeId());
         if(notifyEmail){
-            emailNotificationService.sendInitiativeToCurrentOrganization(initiative, EMAIL_INITIATIVE_STATUS);
+            try {
+                emailNotificationService.sendInitiativeToCurrentOrganization(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
+            } catch (FeignException e) {
+                log.error("[UPDATE_TO_APPROVED_STATUS]-[EMAIL-NOTIFICATION] Message: {}", e.getMessage());
+            }
         }
     }
 
     @Override
-    @Transactional
     public void updateInitiativeToCheckStatus(String organizationId, String initiativeId, String role){
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
         isInitiativeStatusNotInRevisionThenThrow(initiative, InitiativeConstants.Status.TO_CHECK);
         initiative.setStatus(InitiativeConstants.Status.TO_CHECK);
-        initiative.setUpdateDate(LocalDateTime.now());
         this.initiativeRepository.save(initiative);
         log.info("[UPDATE_TO_CHECK_STATUS] - Initiative: {}. Status successfully changed", initiative.getInitiativeId());
         if(notifyEmail){
-            emailNotificationService.sendInitiativeToCurrentOrganization(initiative, EMAIL_INITIATIVE_STATUS);
+            try {
+                emailNotificationService.sendInitiativeToCurrentOrganization(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
+            } catch (FeignException e) {
+                log.error("[UPDATE_TO_CHECK_STATUS]-[EMAIL-NOTIFICATION] Message: {}", e.getMessage());
+            }
         }
     }
 
@@ -251,12 +248,15 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             );
         }else{
             initiative.setEnabled(false);
-            initiative.setUpdateDate(LocalDateTime.now());
             this.initiativeRepository.save(initiative);
             log.info("[LOGICAL_DELETE_INITIATIVE] - Initiative: {}. Successfully logical elimination.", initiative.getInitiativeId());
         }
         if(notifyEmail){
-            emailNotificationService.sendInitiativeToCurrentOrganization(initiative, EMAIL_INITIATIVE_STATUS);
+            try {
+                emailNotificationService.sendInitiativeToPagoPA(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
+            } catch (FeignException e) {
+                log.error("[LOGICAL_DELETE_INITIATIVE]-[EMAIL-NOTIFICATION] Message: {}", e.getMessage());
+            }
         }
     }
 
@@ -365,9 +365,13 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         initiative.getAdditionalInfo().setPrimaryTokenIO(encryptedPrimaryToken);
         initiative.getAdditionalInfo().setSecondaryTokenIO(encryptedSecondaryToken);
         additionalInfo.setServiceId(serviceResponseDTO.getServiceId());
-        initiative.setUpdateDate(LocalDateTime.now());
         if(notifyEmail){
-            emailNotificationService.sendInitiativeToCurrentOrganizationAndPagoPA(initiative, EMAIL_INITIATIVE_STATUS);
+            try {
+                emailNotificationService.sendInitiativeToCurrentOrganization(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
+                emailNotificationService.sendInitiativeToPagoPA(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
+            } catch (FeignException e) {
+                log.error("[UPDATE_TO_PUBLISHED_STATUS]-[EMAIL-NOTIFICATION] Message: {}", e.getMessage());
+            }
         }
         return initiative;
     }

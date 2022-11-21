@@ -96,10 +96,6 @@ public class InitiativeGeneralDTO extends InitiativeOrganizationInfoDTO {
     @Future(groups = ValidationOnGroup.class)
     private LocalDate rankingEndDate;
 
-    @JsonProperty("rankingEnabled")
-    @NotNull(groups = ValidationOnGroup.class)
-    private Boolean rankingEnabled;
-
     @JsonProperty("descriptionMap")
     @Valid
     @NotEmpty(groups = ValidationOnGroup.class)
