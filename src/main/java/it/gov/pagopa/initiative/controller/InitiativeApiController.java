@@ -259,6 +259,7 @@ public class InitiativeApiController implements InitiativeApi {
     @Override
     public ResponseEntity<LogoDTO> addLogo(String organizationId, String initiativeId,
             MultipartFile logo) throws IOException {
+        log.info("[ADD_LOGO_TO_INITIATIVE] - Initiative: {}. Start processing...", initiativeId);
         return ResponseEntity.ok(initiativeService.storeInitiativeLogo(organizationId,initiativeId,logo.getInputStream(),logo.getContentType(),logo.getOriginalFilename()));
     }
 

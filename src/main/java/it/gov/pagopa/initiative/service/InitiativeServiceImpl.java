@@ -344,9 +344,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
         try {
             String fileExtension = Files.getFileExtension(fileName);
-            if(fileExtension!="png"){
-                log.info("eccezione estensione: "+fileExtension);
-            }
+            this.validate(contentType,fileName);
             fileStorageConnector.uploadInitiativeLogo(logo, String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE, organizationId, initiativeId, InitiativeConstants.Logo.LOGO_NAME), contentType);
             initiative.getAdditionalInfo().setLogoFileName(fileName);
             LocalDateTime localDateTime = LocalDateTime.now();
