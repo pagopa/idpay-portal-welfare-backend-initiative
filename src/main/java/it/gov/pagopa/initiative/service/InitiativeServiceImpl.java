@@ -26,6 +26,7 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.Base64;
+import java.util.Locale;
 import java.util.Set;
 import javax.swing.text.Utilities;
 import lombok.extern.slf4j.Slf4j;
@@ -155,7 +156,12 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     @Override
     public void updateInitiativeGeneralInfo(String organizationId, String initiativeId, Initiative initiativeInfoModel, String role) {
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
-        //Check Initiative Status
+        if (initiativeInfoModel.getGeneral().getDescriptionMap().get(Locale.ITALIAN.getLanguage()) == null) {
+            throw new InitiativeException(
+                    InitiativeConstants.Exception.BadRequest.CODE,
+                    InitiativeConstants.Exception.BadRequest.INITIATIVE_DESCRIPTION_LANGUAGE_MESSAGE,
+                    HttpStatus.BAD_REQUEST);
+        }
         isInitiativeAllowedToBeEditableThenThrows(initiative);
         initiative.setGeneral(initiativeInfoModel.getGeneral());
         initiative.setStatus(InitiativeConstants.Status.DRAFT);
@@ -351,7 +357,6 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                         HttpStatus.NOT_FOUND));
 
         try {
-            String fileExtension = Files.getFileExtension(fileName).toLowerCase();
             this.validate(contentType,fileName);
             fileStorageConnector.uploadInitiativeLogo(logo, String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE, organizationId, initiativeId, InitiativeConstants.Logo.LOGO_NAME), contentType);
             initiative.getAdditionalInfo().setLogoFileName(fileName);
@@ -483,7 +488,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                     allowedInitiativeLogoMimeTypes));
         }
 
-        String fileExtension = Files.getFileExtension(fileName);
+        String fileExtension = Files.getFileExtension(fileName).toLowerCase();
         if (!allowedInitiativeLogoExtensions.contains(fileExtension)) {
             throw new IllegalArgumentException(String.format("Invalid file extension \"%s\": allowed only %s", fileExtension,
                     allowedInitiativeLogoExtensions));
