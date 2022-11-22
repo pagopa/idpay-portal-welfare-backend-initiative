@@ -14,7 +14,11 @@ public class InitiativeUtils {
         if(logoUrl==null){
             logoUrl="https://idpaydinitiativestorage.blob.core.windows.net/logo/";
         }
-        return this.logoUrl+String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE, organizationId,initiativeId, InitiativeConstants.Logo.LOGO_NAME);
+        return this.logoUrl+this.getPathLogo(organizationId,initiativeId);
+    }
+
+    public String getPathLogo(String organizationId, String initiativeId){
+        return String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE, organizationId,initiativeId, InitiativeConstants.Logo.LOGO_NAME);
     }
 
 
