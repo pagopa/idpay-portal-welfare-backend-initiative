@@ -351,7 +351,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                         HttpStatus.NOT_FOUND));
 
         try {
-            String fileExtension = Files.getFileExtension(fileName);
+            String fileExtension = Files.getFileExtension(fileName).toLowerCase();
             this.validate(contentType,fileName);
             fileStorageConnector.uploadInitiativeLogo(logo, String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE, organizationId, initiativeId, InitiativeConstants.Logo.LOGO_NAME), contentType);
             initiative.getAdditionalInfo().setLogoFileName(fileName);
@@ -359,7 +359,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             initiative.getAdditionalInfo().setLogoUploadDate(localDateTime);
             initiative.setUpdateDate(localDateTime);
             initiativeRepository.save(initiative);
-            return new LogoDTO(fileName, new InitiativeUtils().createLogoUrl(organizationId,initiativeId),localDateTime);
+            return new LogoDTO(fileName, initiativeUtils.createLogoUrl(organizationId,initiativeId),localDateTime);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

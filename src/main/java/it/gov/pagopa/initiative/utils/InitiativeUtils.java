@@ -11,9 +11,6 @@ public class InitiativeUtils {
     private String logoUrl;
 
     public String createLogoUrl(String organizationId, String initiativeId){
-        if(logoUrl==null){
-            logoUrl="https://idpaydinitiativestorage.blob.core.windows.net/logo/";
-        }
         return this.logoUrl+this.getPathLogo(organizationId,initiativeId);
     }
 
