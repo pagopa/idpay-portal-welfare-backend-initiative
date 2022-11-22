@@ -4,6 +4,8 @@ import com.microsoft.azure.storage.CloudStorageAccount;
 import com.microsoft.azure.storage.blob.CloudBlobClient;
 import com.microsoft.azure.storage.blob.CloudBlobContainer;
 import com.microsoft.azure.storage.blob.CloudBlockBlob;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
@@ -28,10 +30,20 @@ public class AzureBlobClient implements FileStorageConnector {
 
     @Override
     public void uploadInitiativeLogo(InputStream file, String fileName, String contentType) throws Exception {
-            final CloudBlobContainer blobContainer = blobClient.getContainerReference(
+
+        final CloudBlobContainer blobContainer = blobClient.getContainerReference(
                     initiativeLogoContainerReference);
             final CloudBlockBlob blob = blobContainer.getBlockBlobReference(fileName);
             blob.getProperties().setContentType(contentType);
             blob.upload(file, file.available());
+    }
+    @Override
+    public ByteArrayOutputStream downloadInitiativeLogo(String fileName) throws Exception {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        final CloudBlobContainer blobContainer = blobClient.getContainerReference(
+                initiativeLogoContainerReference);
+        final CloudBlockBlob blob = blobContainer.getBlockBlobReference(fileName);
+        blob.download(byteArrayOutputStream);
+        return byteArrayOutputStream;
     }
 }

@@ -22,8 +22,12 @@ import it.gov.pagopa.initiative.model.InitiativeAdditional;
 import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
 import it.gov.pagopa.initiative.utils.InitiativeUtils;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.Base64;
 import java.util.Set;
+import javax.swing.text.Utilities;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.util.Assert;
+import org.springframework.util.Base64Utils;
 import org.springframework.util.InvalidMimeTypeException;
 
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Email.*;
@@ -61,6 +66,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     private final InitiativeValidationService initiativeValidationService;
     private final Set<String> allowedInitiativeLogoMimeTypes;
     private final Set<String> allowedInitiativeLogoExtensions;
+    private final InitiativeUtils initiativeUtils;
 
     public InitiativeServiceImpl(
             @Value("${app.initiative.conditions.notifyEmail}") boolean notifyEmail,
@@ -78,7 +84,8 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             @Value("${app.initiative.logo.allowed-extensions}") String[] allowedInitiativeLogoExtensions,
             EmailNotificationService emailNotificationService,
             IOTokenService ioTokenService,
-            InitiativeValidationService initiativeValidationService
+            InitiativeValidationService initiativeValidationService,
+            InitiativeUtils initiativeUtils
     ){
         this.notifyEmail = notifyEmail;
         this.initiativeRepository = initiativeRepository;
@@ -96,6 +103,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         this.emailNotificationService = emailNotificationService;
         this.ioTokenService = ioTokenService;
         this.initiativeValidationService = initiativeValidationService;
+        this.initiativeUtils = initiativeUtils;
     }
 
     public List<Initiative> retrieveInitiativeSummary(String organizationId, String role) {
@@ -364,6 +372,13 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         InitiativeAdditional additionalInfo = initiative.getAdditionalInfo();
         ServiceRequestDTO serviceRequestDTO = initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(additionalInfo, initiativeOrganizationInfoDTO);
         ServiceResponseDTO serviceResponseDTO = ioBackEndRestConnector.createService(serviceRequestDTO);
+
+        try{
+            ByteArrayOutputStream byteArrayOutputStream = fileStorageConnector.downloadInitiativeLogo(initiativeUtils.getPathLogo(initiative.getOrganizationId(),initiative.getInitiativeId()));
+            ioBackEndRestConnector.sendLogoIo(serviceResponseDTO.getServiceId(),serviceResponseDTO.getPrimaryKey(), LogoIODTO.builder().logo(new String (Base64.getEncoder().encode(byteArrayOutputStream.toByteArray()))).build());
+        }catch(Exception e){
+            log.error("[UPLOAD_LOGO] - Initiative: {}. Error: "+e.getMessage(), initiative.getInitiativeId());
+        }
         log.debug("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Start ServiceIO Keys encryption...", initiative.getInitiativeId());
         String encryptedPrimaryToken = ioTokenService.encrypt(serviceResponseDTO.getPrimaryKey());
         String encryptedSecondaryToken = ioTokenService.encrypt(serviceResponseDTO.getSecondaryKey());
