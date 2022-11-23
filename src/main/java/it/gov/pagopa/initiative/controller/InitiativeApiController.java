@@ -67,7 +67,7 @@ public class InitiativeApiController implements InitiativeApi {
     @Override
     public ResponseEntity<InitiativeDTO> saveInitiativeServiceInfo(String organizationId, InitiativeAdditionalDTO initiativeAdditionalDTO) {
         String role = initiativeAdditionalDTO.getOrganizationUserRole();
-        log.info("[{}][SAVE_GENERAL_INFO]-[FIRST_CREATION_TO_DRAFT_STATUS] - Initiative: Start processing...", role);
+        log.info("[{}][SAVE_ADDITIONAL_INFO]-[FIRST_CREATION_TO_DRAFT_STATUS] - Initiative: Start processing...", role);
         Initiative initiativeToSave = this.initiativeDTOsToModelMapper.toInitiative(initiativeAdditionalDTO);
         Initiative insertedInitiative = initiativeService.insertInitiative(initiativeToSave, organizationId, initiativeAdditionalDTO.getOrganizationName(), role);
         return new ResponseEntity<>(this.initiativeModelToDTOMapper.toDtoOnlyId(insertedInitiative), HttpStatus.CREATED);
@@ -86,7 +86,7 @@ public class InitiativeApiController implements InitiativeApi {
     @Override
     public ResponseEntity<Void> updateInitiativeAdditionalInfo(String organizationId, String initiativeId, InitiativeAdditionalDTO initiativeAdditionalDTO) {
         String role = initiativeAdditionalDTO.getOrganizationUserRole();
-        log.info("[{}][UPDATE_GENERAL_INFO]-[UPDATE_TO_DRAFT_STATUS] - Initiative: {}. Start processing...", role, initiativeId);
+        log.info("[{}][UPDATE_ADDITIONAL_INFO]-[UPDATE_TO_DRAFT_STATUS] - Initiative: {}. Start processing...", role, initiativeId);
         this.initiativeService.updateInitiativeAdditionalInfo(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toInitiative(initiativeAdditionalDTO), role);
         return ResponseEntity.noContent().build();
     }
@@ -112,7 +112,7 @@ public class InitiativeApiController implements InitiativeApi {
                     String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_PROPERTIES_NOT_VALID, initiativeId),
                     HttpStatus.BAD_REQUEST);
         }
-        this.initiativeService.updateInitiativeBeneficiary(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toBeneficiaryRule(beneficiaryRuleDto), role);
+        this.initiativeService.updateStep3InitiativeBeneficiary(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toBeneficiaryRule(beneficiaryRuleDto), role);
         return ResponseEntity.noContent().build();
     }
 
@@ -121,7 +121,7 @@ public class InitiativeApiController implements InitiativeApi {
     public ResponseEntity<Void> updateInitiativeBeneficiaryDraft(String organizationId, String initiativeId, InitiativeBeneficiaryRuleDTO beneficiaryRuleDto) {
         String role = beneficiaryRuleDto.getOrganizationUserRole();
         log.info("[{}][API-DRAFT]-[UPDATE_BENEFICIARY_RULE]-[UPDATE_TO_DRAFT_STATUS] - Initiative: {}. Start processing...", role, initiativeId);
-        this.initiativeService.updateInitiativeBeneficiary(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toBeneficiaryRule(beneficiaryRuleDto), role);
+        this.initiativeService.updateStep3InitiativeBeneficiary(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toBeneficiaryRule(beneficiaryRuleDto), role);
         return ResponseEntity.noContent().build();
     }
 

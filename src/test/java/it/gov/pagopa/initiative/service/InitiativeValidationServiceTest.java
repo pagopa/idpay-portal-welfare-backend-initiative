@@ -46,7 +46,7 @@ class InitiativeValidationServiceTest {
 
     @Test
     void givenAdminRole_whenInitiativeStatusIsValid_thenOk() {
-        Initiative step2Initiative = createStep2Initiative();
+        Initiative step2Initiative = createStep2Initiative(false, true);
 
         //Instruct the Repo Mock to return Dummy Initiatives
         when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.ofNullable(step2Initiative));
@@ -76,7 +76,7 @@ class InitiativeValidationServiceTest {
 
     @Test
     void givenOpeBaseRole_whenInitiativeStatusIsValid_thenOk() {
-        Initiative step2Initiative = createStep2Initiative();
+        Initiative step2Initiative = createStep2Initiative(false, true);
         step2Initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
         //Instruct the Repo Mock to return Dummy Initiatives
         when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.ofNullable(step2Initiative));
@@ -114,7 +114,7 @@ class InitiativeValidationServiceTest {
 
     @Test
     void givenOpeBase_whenInitiativeUnprocessableForStatusNotValid_then400isRaisedForInitiativeException() {
-        Initiative step2Initiative = createStep2Initiative();
+        Initiative step2Initiative = createStep2Initiative(false, true);
 
         //Instruct the Repo Mock to return Dummy Initiatives
         when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.ofNullable(step2Initiative));
@@ -126,34 +126,41 @@ class InitiativeValidationServiceTest {
         assertEquals(String.format(InitiativeConstants.Exception.BadRequest.PERMISSION_NOT_VALID, OPE_BASE_ROLE), exception.getMessage());
     }
 
+    @Test
+    void testCheckPermissionBeforeInsert() {
+        assertThrows(InitiativeException.class,
+                () -> initiativeValidationService.checkPermissionBeforeInsert("ope_base"));
+    }
+
+    @Test
+    void testCheckAutomatedCriteriaOrderDirectionWithRanking() {
+        Initiative step3Initiative = createStep3Initiative(false, true);
+//        List<AutomatedCriteria> automatedCriteriaList = new ArrayList<>();
+        List<AutomatedCriteria> automatedCriteriaList = step3Initiative.getBeneficiaryRule().getAutomatedCriteria();
+        InitiativeException exception = assertThrows(InitiativeException.class, () -> initiativeValidationService.checkAutomatedCriteriaOrderDirectionWithRanking(step3Initiative, automatedCriteriaList));
+    }
+
+    @Test
+    void testCheckAutomatedCriteriaOrderDirectionWithRanking2() {
+        Initiative step3Initiative = createStep3Initiative_EQ(false, true);
+//        List<AutomatedCriteria> automatedCriteriaList = new ArrayList<>();
+        List<AutomatedCriteria> automatedCriteriaList = step3Initiative.getBeneficiaryRule().getAutomatedCriteria();
+        InitiativeException exception = assertThrows(InitiativeException.class, () -> initiativeValidationService.checkAutomatedCriteriaOrderDirectionWithRanking(step3Initiative, automatedCriteriaList));
+    }
+
     /*
-     * Step 1
+     * ############### Step 1 ###############
      */
 
-    Initiative createStep1Initiative () {
+    private Initiative createStep1Initiative () {
         Initiative initiative = new Initiative();
         initiative.setInitiativeId(INITIATIVE_ID);
-        initiative.setInitiativeName(INITIATIVE_NAME);
+        initiative.setInitiativeName("initiativeName1");
         initiative.setOrganizationId(ORGANIZATION_ID);
         initiative.setStatus("DRAFT");
         initiative.setPdndToken("pdndToken1");
         initiative.setAdditionalInfo(createInitiativeAdditional());
-//        initiative.setBeneficiaryRule(createInitiativeBeneficiaryRule());
-//        initiative.setLegal(createInitiativeLegal());
         return initiative;
-    }
-
-    private InitiativeGeneral createInitiativeGeneral(boolean beneficiaryKnown) {
-        InitiativeGeneral initiativeGeneral = new InitiativeGeneral();
-        initiativeGeneral.setBeneficiaryBudget(new BigDecimal(10));
-        initiativeGeneral.setBeneficiaryKnown(true);
-        initiativeGeneral.setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF);
-        initiativeGeneral.setBudget(new BigDecimal(1000000000));
-        initiativeGeneral.setEndDate(LocalDate.of(2022, 9, 8));
-        initiativeGeneral.setStartDate(LocalDate.of(2022, 8, 8));
-        initiativeGeneral.setRankingStartDate(LocalDate.of(2022, 9, 18));
-        initiativeGeneral.setRankingEndDate(LocalDate.of(2022, 8, 18));
-        return initiativeGeneral;
     }
 
     private InitiativeAdditional createInitiativeAdditional() {
@@ -163,8 +170,8 @@ class InitiativeValidationServiceTest {
         initiativeAdditional.setServiceName("serviceName");
         initiativeAdditional.setServiceScope(InitiativeAdditional.ServiceScope.LOCAL);
         initiativeAdditional.setDescription("Description");
-        initiativeAdditional.setPrivacyLink("privacyLink");
-        initiativeAdditional.setTcLink("tcLink");
+        initiativeAdditional.setPrivacyLink("https://www.google.it");
+        initiativeAdditional.setTcLink("https://www.google.it");
         Channel channel = new Channel();
         channel.setType(Channel.TypeEnum.EMAIL);
         channel.setContact("contact");
@@ -175,10 +182,9 @@ class InitiativeValidationServiceTest {
     }
 
     InitiativeDTO createStep1InitiativeDTO () {
-        InitiativeDTO initiativeDTO = new InitiativeDTO();
-        initiativeDTO = initiativeDTO.builder()
+        return InitiativeDTO.builder()
                 .initiativeId(INITIATIVE_ID)
-                .initiativeName(INITIATIVE_NAME)
+                .initiativeName("initiativeName1")
                 .organizationId(ORGANIZATION_ID)
                 .status("DRAFT")
                 .autocertificationCheck(true)
@@ -186,10 +192,66 @@ class InitiativeValidationServiceTest {
                 .pdndCheck(true)
                 .pdndToken("pdndToken1")
                 .additionalInfo(createInitiativeAdditionalDTO()).build();
+    }
+
+    InitiativeAdditionalDTO createStep1InitiativeAdditionalDTO() {
+        InitiativeAdditionalDTO initiativeAdditionalDTO = createInitiativeAdditionalDTO();
+        return initiativeAdditionalDTO;
+    }
+
+    private InitiativeAdditionalDTO createInitiativeAdditionalDTO() {
+        InitiativeAdditionalDTO initiativeAdditionalDTO = new InitiativeAdditionalDTO();
+        initiativeAdditionalDTO.setServiceIO(true);
+        initiativeAdditionalDTO.setServiceId("serviceId");
+        initiativeAdditionalDTO.setServiceName("serviceName");
+        initiativeAdditionalDTO.setServiceScope(InitiativeAdditionalDTO.ServiceScope.LOCAL);
+        initiativeAdditionalDTO.setDescription("Description");
+        initiativeAdditionalDTO.setPrivacyLink("https://www.google.it");
+        initiativeAdditionalDTO.setTcLink("https://www.google.it");
+        ChannelDTO channelDTO = new ChannelDTO();
+        channelDTO.setType(ChannelDTO.TypeEnum.EMAIL);
+        channelDTO.setContact("contact");
+        List<ChannelDTO> channelDTOS = new ArrayList<>();
+        channelDTOS.add(channelDTO);
+        initiativeAdditionalDTO.setChannels(channelDTOS);
+        return initiativeAdditionalDTO;
+    }
+
+    /*
+     * ############### Step 2 ###############
+     */
+
+    private Initiative createStep2Initiative (Boolean beneficiaryKnown, Boolean rankingEnabled) {
+        Initiative initiative = createStep1Initiative();
+        initiative.setGeneral(createInitiativeGeneral(beneficiaryKnown, rankingEnabled));
+        return initiative;
+    }
+
+    private InitiativeGeneral createInitiativeGeneral(Boolean beneficiaryKnown, Boolean rankingEnabled) {
+        InitiativeGeneral initiativeGeneral = new InitiativeGeneral();
+        initiativeGeneral.setBeneficiaryBudget(new BigDecimal(10));
+        initiativeGeneral.setBeneficiaryKnown(beneficiaryKnown);
+        initiativeGeneral.setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF);
+        initiativeGeneral.setBudget(new BigDecimal(1000000000));
+        LocalDate rankingStartDate = LocalDate.now();
+        LocalDate rankingEndDate = rankingStartDate.plusDays(1);
+        LocalDate startDate = rankingEndDate.plusDays(1);
+        LocalDate endDate = startDate.plusDays(1);
+        initiativeGeneral.setRankingStartDate(rankingStartDate);
+        initiativeGeneral.setRankingEndDate(rankingEndDate);
+        initiativeGeneral.setStartDate(startDate);
+        initiativeGeneral.setEndDate(endDate);
+        initiativeGeneral.setRankingEnabled(rankingEnabled);
+        return initiativeGeneral;
+    }
+
+    private InitiativeDTO createStep2InitiativeDTO (Boolean beneficiaryKnown, Boolean rankingEnabled) {
+        InitiativeDTO initiativeDTO = createStep1InitiativeDTO();
+        initiativeDTO.setGeneral(createInitiativeGeneralDTO(beneficiaryKnown, rankingEnabled));
         return initiativeDTO;
     }
 
-    private InitiativeGeneralDTO createInitiativeGeneralDTO(boolean beneficiaryKnown) {
+    private InitiativeGeneralDTO createInitiativeGeneralDTO(Boolean beneficiaryKnown, Boolean rankingEnabled) {
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(beneficiaryKnown);
@@ -203,35 +265,23 @@ class InitiativeValidationServiceTest {
         initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
         initiativeGeneralDTO.setStartDate(startDate);
         initiativeGeneralDTO.setEndDate(endDate);
+        initiativeGeneralDTO.setRankingEnabled(rankingEnabled);
         return initiativeGeneralDTO;
     }
 
-    private InitiativeAdditionalDTO createInitiativeAdditionalDTO() {
-        InitiativeAdditionalDTO initiativeAdditionalDTO = new InitiativeAdditionalDTO();
-        initiativeAdditionalDTO.setServiceIO(true);
-        initiativeAdditionalDTO.setServiceId(SERVICE_ID);
-        initiativeAdditionalDTO.setServiceName("serviceName");
-        initiativeAdditionalDTO.setServiceScope(InitiativeAdditionalDTO.ServiceScope.LOCAL);
-        initiativeAdditionalDTO.setDescription("description");
-        initiativeAdditionalDTO.setPrivacyLink("privacy.url.it");;
-        initiativeAdditionalDTO.setTcLink("tos.url.it");
-        ChannelDTO channelDTO = new ChannelDTO();
-        channelDTO.setType(ChannelDTO.TypeEnum.WEB);
-        channelDTO.setContact("support.url.it");
-        List<ChannelDTO> channelDTOS = new ArrayList<>();
-        channelDTOS.add(channelDTO);
-        initiativeAdditionalDTO.setChannels(channelDTOS);
-        return initiativeAdditionalDTO;
-    }
-
     /*
-     * Step 2
+     * ############### Step 3 ###############
      */
 
-    Initiative createStep2Initiative () {
-        Initiative initiative = createStep1Initiative();
-        InitiativeBeneficiaryRule initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
-        initiative.setBeneficiaryRule(initiativeBeneficiaryRule);
+    private Initiative createStep3Initiative (Boolean beneficiaryKnown, Boolean rankingEnabled) {
+        Initiative initiative = createStep2Initiative(beneficiaryKnown, rankingEnabled);
+        initiative.setBeneficiaryRule(createInitiativeBeneficiaryRule());
+        return initiative;
+    }
+
+    private Initiative createStep3Initiative_EQ (Boolean beneficiaryKnown, Boolean rankingEnabled) {
+        Initiative initiative = createStep2Initiative(beneficiaryKnown, rankingEnabled);
+        initiative.setBeneficiaryRule(createInitiativeBeneficiaryRule_EQ());
         return initiative;
     }
 
@@ -255,8 +305,8 @@ class InitiativeValidationServiceTest {
         iSelfDeclarationCriteriaList.add(selfCriteriaMulti);
         initiativeBeneficiaryRule.setSelfDeclarationCriteria(iSelfDeclarationCriteriaList);
         AutomatedCriteria automatedCriteria = new AutomatedCriteria();
-        automatedCriteria.setAuthority("Authority_ISEE");
-        automatedCriteria.setCode("Code_ISEE");
+        automatedCriteria.setAuthority("INPS");
+        automatedCriteria.setCode("ISEE");
         automatedCriteria.setField("true");
         automatedCriteria.setOperator(FilterOperatorEnumModel.EQ);
         automatedCriteria.setValue("value");
@@ -266,10 +316,43 @@ class InitiativeValidationServiceTest {
         return initiativeBeneficiaryRule;
     }
 
-    InitiativeDTO createStep2InitiativeDTO () {
-        InitiativeDTO initiativeDTO = createStep1InitiativeDTO();
-        InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
-        initiativeDTO.setBeneficiaryRule(initiativeBeneficiaryRuleDTO);
+    private InitiativeBeneficiaryRule createInitiativeBeneficiaryRule_EQ() {
+        InitiativeBeneficiaryRule initiativeBeneficiaryRule = new InitiativeBeneficiaryRule();
+        SelfCriteriaBool selfCriteriaBool = new SelfCriteriaBool();
+        selfCriteriaBool.set_type(TypeBoolEnum.BOOLEAN);
+        selfCriteriaBool.setCode("B001");
+        selfCriteriaBool.setDescription("Desc_bool");
+        selfCriteriaBool.setValue(true);
+        SelfCriteriaMulti selfCriteriaMulti = new SelfCriteriaMulti();
+        selfCriteriaMulti.set_type(TypeMultiEnum.MULTI);
+        selfCriteriaMulti.setCode("B001");
+        selfCriteriaMulti.setDescription("Desc_Multi");
+        List<String> values = new ArrayList<>();
+        values.add("valore1");
+        values.add("valore2");
+        selfCriteriaMulti.setValue(values);
+        List<ISelfDeclarationCriteria> iSelfDeclarationCriteriaList = new ArrayList<>();
+        iSelfDeclarationCriteriaList.add(selfCriteriaBool);
+        iSelfDeclarationCriteriaList.add(selfCriteriaMulti);
+        initiativeBeneficiaryRule.setSelfDeclarationCriteria(iSelfDeclarationCriteriaList);
+        AutomatedCriteria automatedCriteria = new AutomatedCriteria();
+        automatedCriteria.setAuthority("INPS");
+        automatedCriteria.setCode("ISEE");
+        automatedCriteria.setField("true");
+        automatedCriteria.setOperator(FilterOperatorEnumModel.EQ);
+        automatedCriteria.setValue("value");
+        automatedCriteria.setOrderDirection(AutomatedCriteria.OrderDirection.ASC);
+        List<AutomatedCriteria> automatedCriteriaList = new ArrayList<>();
+        automatedCriteriaList.add(automatedCriteria);
+        initiativeBeneficiaryRule.setAutomatedCriteria(automatedCriteriaList);
+        return initiativeBeneficiaryRule;
+    }
+
+    private InitiativeDTO createStep3InitiativeDTO (Boolean beneficiaryKnown, Boolean rankingEnabled) {
+        InitiativeDTO initiativeDTO = createStep2InitiativeDTO(beneficiaryKnown, rankingEnabled);
+        if(beneficiaryKnown) {
+            initiativeDTO.setBeneficiaryRule(createInitiativeBeneficiaryRuleDTO());
+        }
         return initiativeDTO;
     }
 
@@ -303,4 +386,5 @@ class InitiativeValidationServiceTest {
         initiativeBeneficiaryRuleDTO.setAutomatedCriteria(automatedCriteriaList);
         return initiativeBeneficiaryRuleDTO;
     }
+
 }
