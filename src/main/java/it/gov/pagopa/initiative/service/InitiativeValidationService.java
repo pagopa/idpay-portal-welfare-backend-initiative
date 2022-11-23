@@ -1,5 +1,6 @@
 package it.gov.pagopa.initiative.service;
 
+import it.gov.pagopa.initiative.dto.InitiativeDTO;
 import it.gov.pagopa.initiative.model.AutomatedCriteria;
 import it.gov.pagopa.initiative.model.Initiative;
 
@@ -12,4 +13,6 @@ public interface InitiativeValidationService {
     void checkPermissionBeforeInsert(String role);
 
     void checkAutomatedCriteriaOrderDirectionWithRanking(Initiative initiative, List<AutomatedCriteria> initiativeBeneficiaryRuleModel);
+
+    void validateAllWizardSteps(InitiativeDTO initiativeDTO);
 }
