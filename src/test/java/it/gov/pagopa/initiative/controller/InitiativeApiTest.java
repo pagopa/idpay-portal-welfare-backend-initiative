@@ -23,7 +23,6 @@ import it.gov.pagopa.initiative.model.rule.refund.AdditionalInfo;
 import it.gov.pagopa.initiative.model.rule.refund.InitiativeRefundRule;
 import it.gov.pagopa.initiative.model.rule.refund.TimeParameter;
 import it.gov.pagopa.initiative.service.InitiativeService;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.KafkaException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +66,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
         })
 @WebMvcTest(value = {
         InitiativeApi.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
-@Slf4j
 class InitiativeApiTest {
 
     public static final String INITIATIVE_ID = "Id1";

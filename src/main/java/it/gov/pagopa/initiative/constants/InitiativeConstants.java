@@ -63,6 +63,7 @@ public class InitiativeConstants {
             public static final String INITIATIVE_CANNOT_BE_DELETED = "Initiative %s cannot be deleted";
             public static final String PERMISSION_NOT_VALID= "Permission not valid for [%s]";
             public static final String INITIATIVE_DESCRIPTION_LANGUAGE_MESSAGE = "Italian language is required for initiative description";
+            public static final String WIZARD_VALIDATION = "Error on Validation caused by: %s";
         }
         public static final class Publish {
             public static final String PUBLISH_CODE = BASE_CODE + ".published";

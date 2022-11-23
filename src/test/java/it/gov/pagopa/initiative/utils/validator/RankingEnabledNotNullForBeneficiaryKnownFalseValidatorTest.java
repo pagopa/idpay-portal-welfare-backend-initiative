@@ -12,6 +12,9 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,6 +32,7 @@ class RankingEnabledNotNullForBeneficiaryKnownFalseValidatorTest {
 
     @Autowired
     private Validator validator;
+    private Map<String, String> language = new HashMap<>();
 
     @Test
     void whenAllValidationAreValid_InitiativeGeneralDTO_thenValidationArePassed() {
@@ -49,6 +53,7 @@ class RankingEnabledNotNullForBeneficiaryKnownFalseValidatorTest {
     }
 
     private InitiativeGeneralDTO createInitiativeGeneralDTO_ok(Boolean beneficiaryKnown) {
+        language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(beneficiaryKnown);
@@ -63,10 +68,12 @@ class RankingEnabledNotNullForBeneficiaryKnownFalseValidatorTest {
         initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
         initiativeGeneralDTO.setStartDate(startDate);
         initiativeGeneralDTO.setEndDate(endDate);
+        initiativeGeneralDTO.setDescriptionMap(language);
         return initiativeGeneralDTO;
     }
 
     private InitiativeGeneralDTO createInitiativeGeneralDTO_ko(Boolean beneficiaryKnown) {
+        language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(beneficiaryKnown);
@@ -80,6 +87,7 @@ class RankingEnabledNotNullForBeneficiaryKnownFalseValidatorTest {
         initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
         initiativeGeneralDTO.setStartDate(startDate);
         initiativeGeneralDTO.setEndDate(endDate);
+        initiativeGeneralDTO.setDescriptionMap(language);
         return initiativeGeneralDTO;
     }
 }

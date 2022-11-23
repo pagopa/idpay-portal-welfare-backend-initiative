@@ -270,6 +270,8 @@ class InitiativeValidationServiceTest {
     }
 
     private InitiativeGeneral createInitiativeGeneral(Boolean beneficiaryKnown, Boolean rankingEnabled) {
+        Map<String, String> language = new HashMap<>();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneral initiativeGeneral = new InitiativeGeneral();
         initiativeGeneral.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneral.setBeneficiaryKnown(beneficiaryKnown);
@@ -284,6 +286,7 @@ class InitiativeValidationServiceTest {
         initiativeGeneral.setStartDate(startDate);
         initiativeGeneral.setEndDate(endDate);
         initiativeGeneral.setRankingEnabled(rankingEnabled);
+        initiativeGeneral.setDescriptionMap(language);
         return initiativeGeneral;
     }
 
@@ -294,6 +297,8 @@ class InitiativeValidationServiceTest {
     }
 
     private InitiativeGeneralDTO createInitiativeGeneralDTO(Boolean beneficiaryKnown, Boolean rankingEnabled) {
+        Map<String, String> language = new HashMap<>();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(beneficiaryKnown);
@@ -308,6 +313,7 @@ class InitiativeValidationServiceTest {
         initiativeGeneralDTO.setStartDate(startDate);
         initiativeGeneralDTO.setEndDate(endDate);
         initiativeGeneralDTO.setRankingEnabled(rankingEnabled);
+        initiativeGeneralDTO.setDescriptionMap(language);
         return initiativeGeneralDTO;
     }
 

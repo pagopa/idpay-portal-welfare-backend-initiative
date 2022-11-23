@@ -20,7 +20,6 @@ import it.gov.pagopa.initiative.model.rule.reward.InitiativeRewardRule;
 import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
 import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
 import it.gov.pagopa.initiative.model.rule.trx.*;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,16 +29,12 @@ import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @WebMvcTest(value = {
         InitiativeDTOsToModelMapper.class})
-@Slf4j
 class InitiativeDTOsToModelMapperTest {
     @Autowired
     InitiativeDTOsToModelMapper initiativeDTOsToModelMapper;
@@ -283,6 +278,8 @@ class InitiativeDTOsToModelMapperTest {
     }
 
     private InitiativeGeneral createInitiativeGeneral() {
+        Map<String, String> language = new HashMap<>();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneral initiativeGeneral = new InitiativeGeneral();
         initiativeGeneral.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneral.setBeneficiaryKnown(true);
@@ -296,6 +293,7 @@ class InitiativeDTOsToModelMapperTest {
         initiativeGeneral.setRankingEndDate(rankingEndDate);
         initiativeGeneral.setStartDate(startDate);
         initiativeGeneral.setEndDate(endDate);
+        initiativeGeneral.setDescriptionMap(language);
         return initiativeGeneral;
     }
 
@@ -370,6 +368,8 @@ class InitiativeDTOsToModelMapperTest {
     }
 
     private InitiativeGeneralDTO createInitiativeGeneralDTO() {
+        Map<String, String> language = new HashMap<>();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(true);
@@ -383,6 +383,7 @@ class InitiativeDTOsToModelMapperTest {
         initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
         initiativeGeneralDTO.setStartDate(startDate);
         initiativeGeneralDTO.setEndDate(endDate);
+        initiativeGeneralDTO.setDescriptionMap(language);
         return initiativeGeneralDTO;
     }
 

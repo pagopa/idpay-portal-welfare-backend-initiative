@@ -2,7 +2,6 @@ package it.gov.pagopa.initiative.utils.validator;
 
 import it.gov.pagopa.initiative.dto.AutomatedCriteriaDTO;
 import it.gov.pagopa.initiative.dto.FilterOperatorEnum;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +15,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Slf4j
 class SecondValueGreaterThanFirstWithBTWValidatorTest {
 
     private Validator validator;

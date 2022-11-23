@@ -16,10 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Future;
-import javax.validation.constraints.FutureOrPresent;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Map;
@@ -120,6 +117,6 @@ public class InitiativeGeneralDTO extends InitiativeOrganizationInfoDTO {
 
     @JsonProperty("descriptionMap")
     @Valid
-//    @NotEmpty(groups = ValidationOnGroup.class)
+    @NotEmpty(groups = ValidationOnGroup.class)
     private Map<String, String> descriptionMap;
 }

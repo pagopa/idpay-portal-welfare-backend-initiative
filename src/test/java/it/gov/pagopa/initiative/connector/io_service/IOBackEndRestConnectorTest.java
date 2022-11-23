@@ -3,7 +3,6 @@ package it.gov.pagopa.initiative.connector.io_service;
 import it.gov.pagopa.initiative.dto.io.service.ServiceMetadataDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceResponseDTO;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -24,7 +23,6 @@ import static org.mockito.Mockito.times;
                 "rest-client.backend-io.service.name=backend-io",
                 "rest-client.backend-io.service.subscriptionKey=subscriptionKey"
         })
-@Slf4j
 @WebMvcTest(value = IOBackEndRestConnector.class)
 //@RestClientTest(components = IOBackEndFeignRestClient.class)
 //@Import(RestConnectorConfig.class)

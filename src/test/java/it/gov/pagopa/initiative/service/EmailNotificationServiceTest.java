@@ -201,6 +201,8 @@ class EmailNotificationServiceTest {
     }
 
     private InitiativeGeneral createInitiativeGeneral(boolean beneficiaryKnown) {
+        Map<String, String> language = new HashMap<>();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneral initiativeGeneral = new InitiativeGeneral();
         initiativeGeneral.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneral.setBeneficiaryKnown(true);
@@ -210,6 +212,7 @@ class EmailNotificationServiceTest {
         initiativeGeneral.setStartDate(LocalDate.of(2022, 8, 8));
         initiativeGeneral.setRankingStartDate(LocalDate.of(2022, 9, 18));
         initiativeGeneral.setRankingEndDate(LocalDate.of(2022, 8, 18));
+        initiativeGeneral.setDescriptionMap(language);
         return initiativeGeneral;
     }
 
@@ -247,6 +250,8 @@ class EmailNotificationServiceTest {
     }
 
     private InitiativeGeneralDTO createInitiativeGeneralDTO(boolean beneficiaryKnown) {
+        Map<String, String> language = new HashMap<>();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(beneficiaryKnown);
@@ -260,6 +265,7 @@ class EmailNotificationServiceTest {
         initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
         initiativeGeneralDTO.setStartDate(startDate);
         initiativeGeneralDTO.setEndDate(endDate);
+        initiativeGeneralDTO.setDescriptionMap(language);
         return initiativeGeneralDTO;
     }
 

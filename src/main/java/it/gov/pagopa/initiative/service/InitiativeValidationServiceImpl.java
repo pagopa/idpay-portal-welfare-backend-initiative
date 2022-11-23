@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 public class InitiativeValidationServiceImpl implements InitiativeValidationService {
 
     private static final String ISEE = "ISEE";
+    private static final String STRING_FORMAT_VIOLATION = "[%s - %s]";
     private final InitiativeRepository initiativeRepository;
     private final Validator validator;
 
@@ -119,17 +120,17 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
                 !violationsReward.isEmpty() ||
                 !violationsTrx.isEmpty()){
             Set<String> s = Stream.of(
-                    violationsAdditional.stream().map(violation -> String.format("[%s - %s]", violation.getPropertyPath(), violation.getMessage())).collect(Collectors.toSet()),
-                            violationsGeneral.stream().map(violation -> String.format("[%s - %s]", violation.getPropertyPath(), violation.getMessage())).collect(Collectors.toSet()),
-                            violationsBeneficiry.stream().map(violation -> String.format("[%s - %s]", violation.getPropertyPath(), violation.getMessage())).collect(Collectors.toSet()),
-                            violationsReward.stream().map(violation -> String.format("[%s - %s]", violation.getPropertyPath(), violation.getMessage())).collect(Collectors.toSet()),
-                            violationsTrx.stream().map(violation -> String.format("[%s - %s]", violation.getPropertyPath(), violation.getMessage())).collect(Collectors.toSet())
+                    violationsAdditional.stream().map(violation -> String.format(STRING_FORMAT_VIOLATION, violation.getPropertyPath(), violation.getMessage())).collect(Collectors.toSet()),
+                            violationsGeneral.stream().map(violation -> String.format(STRING_FORMAT_VIOLATION, violation.getPropertyPath(), violation.getMessage())).collect(Collectors.toSet()),
+                            violationsBeneficiry.stream().map(violation -> String.format(STRING_FORMAT_VIOLATION, violation.getPropertyPath(), violation.getMessage())).collect(Collectors.toSet()),
+                            violationsReward.stream().map(violation -> String.format(STRING_FORMAT_VIOLATION, violation.getPropertyPath(), violation.getMessage())).collect(Collectors.toSet()),
+                            violationsTrx.stream().map(violation -> String.format(STRING_FORMAT_VIOLATION, violation.getPropertyPath(), violation.getMessage())).collect(Collectors.toSet())
                     )
                     .flatMap(Set::stream)
                     .filter(StringUtils::isNotBlank)
                     .collect(Collectors.toSet());
             String violations = s.toString();
-            throw new InitiativeException(InitiativeConstants.Exception.BadRequest.CODE, "VALIDATION: " + violations, HttpStatus.BAD_REQUEST);
+            throw new InitiativeException(InitiativeConstants.Exception.BadRequest.CODE, String.format(InitiativeConstants.Exception.BadRequest.WIZARD_VALIDATION, violations), HttpStatus.BAD_REQUEST);
         }
     }
 
