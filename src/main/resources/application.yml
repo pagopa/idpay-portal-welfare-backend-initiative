@@ -101,6 +101,8 @@ app:
       allowed-mime-types: ${INSTITUTION_LOGO_ALLOWED_MIME_TYPES:image/png}
       allowed-extensions: ${INSTITUTION_LOGO_ALLOWED_EXTENSIONS:png}
       url: ${INITIATIVE_LOGO_URL}
+    ranking:
+      gracePeriod: ${RANKING_GRACE_PERIOD:10}
     conditions:
       notifyIO: ${APP_INITIATIVE_CONDITIONS_NOTIFY_IO:true}
       notifyRE: ${APP_INITIATIVE_CONDITIONS_NOTIFY_RE:true}

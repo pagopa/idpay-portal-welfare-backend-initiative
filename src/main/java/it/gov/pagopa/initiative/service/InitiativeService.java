@@ -29,7 +29,7 @@ public interface InitiativeService {
 
     void updateInitiativeAdditionalInfo(String organizationId, String initiativeId, Initiative initiativeAdditionalInfo, String role);
 
-    void updateInitiativeBeneficiary(String organizationId, String initiativeId, InitiativeBeneficiaryRule toBeneficiaryRuleModel, String role);
+    void updateStep3InitiativeBeneficiary(String organizationId, String initiativeId, InitiativeBeneficiaryRule toBeneficiaryRuleModel, String role);
 
     void updateTrxAndRewardRules(String organizationId, String initiativeId, Initiative rewardAndTrxRules, String role);
 

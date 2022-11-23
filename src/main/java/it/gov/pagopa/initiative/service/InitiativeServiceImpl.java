@@ -17,6 +17,7 @@ import it.gov.pagopa.initiative.event.InitiativeProducer;
 import it.gov.pagopa.initiative.exception.InitiativeException;
 import it.gov.pagopa.initiative.mapper.InitiativeAdditionalDTOsToIOServiceRequestDTOMapper;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
+import it.gov.pagopa.initiative.model.AutomatedCriteria;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeAdditional;
 import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
@@ -178,8 +179,10 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     }
 
     @Override
-    public void updateInitiativeBeneficiary(String organizationId, String initiativeId, InitiativeBeneficiaryRule initiativeBeneficiaryRuleModel, String role){
+    public void updateStep3InitiativeBeneficiary(String organizationId, String initiativeId, InitiativeBeneficiaryRule initiativeBeneficiaryRuleModel, String role){
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
+        List<AutomatedCriteria> automatedCriteriaList = initiativeBeneficiaryRuleModel.getAutomatedCriteria();
+        initiativeValidationService.checkAutomatedCriteriaOrderDirectionWithRanking(initiative, automatedCriteriaList);
         //Check Initiative Status
         isInitiativeAllowedToBeEditableThenThrows(initiative);
         initiative.setBeneficiaryRule(initiativeBeneficiaryRuleModel);

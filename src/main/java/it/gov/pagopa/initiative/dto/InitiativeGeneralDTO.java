@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import it.gov.pagopa.initiative.utils.constraint.BeneficiaryBudgetValue;
 import it.gov.pagopa.initiative.utils.constraint.RankingAndSpendingDatesDoubleUseCaseValue;
+import it.gov.pagopa.initiative.utils.constraint.initiative.general.RankingEnabledNotNullForBeneficiaryKnownFalseConstraint;
+import it.gov.pagopa.initiative.utils.constraint.initiative.general.RankingGracePeriodConstraint;
 import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,7 +16,10 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import javax.validation.Valid;
-import javax.validation.constraints.*;
+import javax.validation.constraints.Future;
+import javax.validation.constraints.FutureOrPresent;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Map;
@@ -30,6 +35,8 @@ import java.util.Map;
 @SuperBuilder
 @BeneficiaryBudgetValue(budget1 = "beneficiaryBudget", budget2 = "budget", groups = ValidationOnGroup.class)
 @RankingAndSpendingDatesDoubleUseCaseValue(date1 = "rankingStartDate", date2 = "rankingEndDate", date3 = "startDate", date4 = "endDate", groups = ValidationOnGroup.class)
+@RankingGracePeriodConstraint(groups = ValidationOnGroup.class)
+@RankingEnabledNotNullForBeneficiaryKnownFalseConstraint(groups = ValidationOnGroup.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class InitiativeGeneralDTO extends InitiativeOrganizationInfoDTO {
 
@@ -80,24 +87,39 @@ public class InitiativeGeneralDTO extends InitiativeOrganizationInfoDTO {
     @NotNull(groups = ValidationOnGroup.class)
     private BigDecimal beneficiaryBudget;
 
+    /**
+     * Start of period of spending funds in an initiative
+     */
     @JsonProperty("startDate")
     @NotNull(groups = ValidationOnGroup.class)
     private LocalDate startDate;
 
+    /**
+     * End of period of spending funds in an initiative
+     */
     @JsonProperty("endDate")
     @NotNull(groups = ValidationOnGroup.class)
     private LocalDate endDate;
 
+    /**
+     * Start of period of participation/adhesion in an initiative
+     */
     @JsonProperty("rankingStartDate")
     @FutureOrPresent(groups = ValidationOnGroup.class)
     private LocalDate rankingStartDate;
 
+    /**
+     * End of period of participation/adhesion in an initiative
+     */
     @JsonProperty("rankingEndDate")
     @Future(groups = ValidationOnGroup.class)
     private LocalDate rankingEndDate;
 
+    @JsonProperty("rankingEnabled")
+    private Boolean rankingEnabled;
+
     @JsonProperty("descriptionMap")
     @Valid
-    @NotEmpty(groups = ValidationOnGroup.class)
+//    @NotEmpty(groups = ValidationOnGroup.class)
     private Map<String, String> descriptionMap;
 }

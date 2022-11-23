@@ -19,6 +19,7 @@ import it.gov.pagopa.initiative.model.rule.reward.InitiativeRewardRule;
 import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
 import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
 import it.gov.pagopa.initiative.model.rule.trx.*;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -55,6 +56,7 @@ public class InitiativeDTOsToModelMapper {
                 .startDate(generalDTO.getStartDate())
                 .rankingEndDate(generalDTO.getRankingEndDate())
                 .rankingStartDate(generalDTO.getRankingStartDate())
+                .rankingEnabled(generalDTO.getRankingEnabled())
                 .descriptionMap(generalDTO.getDescriptionMap()).build();
     }
 
@@ -95,14 +97,17 @@ public class InitiativeDTOsToModelMapper {
         if (CollectionUtils.isEmpty(beneficiaryRuleDto.getAutomatedCriteria())) {
             beneficiaryRule.setAutomatedCriteria(Collections.emptyList());
         } else {
-            beneficiaryRule.setAutomatedCriteria(beneficiaryRuleDto.getAutomatedCriteria().stream().map(dto ->
+            beneficiaryRule.setAutomatedCriteria(beneficiaryRuleDto.getAutomatedCriteria().stream().map(automatedCriteriaDTO ->
                     AutomatedCriteria.builder()
-                            .code(dto.getCode())
-                            .field(dto.getField())
-                            .operator(FilterOperatorEnumModel.valueOf(dto.getOperator().name()))
-                            .authority(dto.getAuthority())//TODO definire modalità di recupero authority
-                            .value(dto.getValue())
-                            .value2(dto.getValue2())
+                            .code(automatedCriteriaDTO.getCode())
+                            .field(automatedCriteriaDTO.getField())
+                            .operator(FilterOperatorEnumModel.valueOf(automatedCriteriaDTO.getOperator().name()))
+                            .authority(automatedCriteriaDTO.getAuthority())//TODO definire modalità di recupero authority
+                            .value(automatedCriteriaDTO.getValue())
+                            .value2(automatedCriteriaDTO.getValue2())
+                            .orderDirection(automatedCriteriaDTO.getOrderDirection() != null
+                                    ? AutomatedCriteria.OrderDirection.valueOf(automatedCriteriaDTO.getOrderDirection().name())
+                                    : null)
                             .build()
             ).toList());
         }
