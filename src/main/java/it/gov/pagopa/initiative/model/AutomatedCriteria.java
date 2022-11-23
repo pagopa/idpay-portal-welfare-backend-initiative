@@ -1,11 +1,7 @@
 package it.gov.pagopa.initiative.model;
 
 import lombok.*;
-import org.springframework.data.domain.Sort;
 import org.springframework.lang.Nullable;
-
-import java.util.Locale;
-import java.util.Optional;
 
 @Data
 @AllArgsConstructor

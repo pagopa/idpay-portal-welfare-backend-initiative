@@ -1,9 +1,9 @@
 package it.gov.pagopa.initiative.connector.decrypt;
 
 
+import it.gov.pagopa.initiative.dto.DecryptCfDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import it.gov.pagopa.initiative.dto.DecryptCfDTO;
 
 @Service
 public class DecryptRestConnectorImpl implements DecryptRestConnector{

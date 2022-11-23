@@ -1,6 +1,5 @@
 package it.gov.pagopa.initiative.exception;
 
-import feign.FeignException;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.ErrorDTO;
 import lombok.extern.slf4j.Slf4j;

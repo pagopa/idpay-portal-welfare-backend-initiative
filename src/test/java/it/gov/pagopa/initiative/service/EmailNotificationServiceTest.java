@@ -5,27 +5,15 @@ import feign.Request;
 import feign.RequestTemplate;
 import it.gov.pagopa.initiative.connector.email_notification.EmailNotificationRestConnector;
 import it.gov.pagopa.initiative.connector.selc.SelcRestConnector;
-import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.*;
-import it.gov.pagopa.initiative.dto.email_notification.EmailMessageDTO;
 import it.gov.pagopa.initiative.dto.selc.UserResource;
-import it.gov.pagopa.initiative.exception.InitiativeException;
-import it.gov.pagopa.initiative.model.*;
 import it.gov.pagopa.initiative.model.TypeBoolEnum;
 import it.gov.pagopa.initiative.model.TypeMultiEnum;
-import it.gov.pagopa.initiative.model.rule.refund.InitiativeRefundRule;
-import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
-import it.gov.pagopa.initiative.model.rule.trx.InitiativeTrxConditions;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import it.gov.pagopa.initiative.model.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.function.Executable;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -34,10 +22,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 @ContextConfiguration(classes = {EmailNotificationServiceImpl.class})

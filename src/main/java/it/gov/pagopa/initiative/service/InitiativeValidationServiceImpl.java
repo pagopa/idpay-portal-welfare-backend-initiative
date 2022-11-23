@@ -23,12 +23,9 @@ import org.springframework.validation.annotation.Validated;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.toMap;
 
 @Service
 @Slf4j

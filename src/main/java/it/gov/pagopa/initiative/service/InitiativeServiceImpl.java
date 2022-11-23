@@ -23,26 +23,19 @@ import it.gov.pagopa.initiative.model.InitiativeAdditional;
 import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
 import it.gov.pagopa.initiative.utils.InitiativeUtils;
-
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.util.Base64;
-import java.util.Locale;
-import java.util.Set;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import org.springframework.util.Assert;
 import org.springframework.util.InvalidMimeTypeException;
+
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.time.LocalDateTime;
+import java.util.*;
 
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Email.*;
 
