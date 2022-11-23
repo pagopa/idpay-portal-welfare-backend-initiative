@@ -352,7 +352,7 @@ public interface InitiativeApi {
       @ApiResponse(responseCode = "500", description = "Server ERROR", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))})
   @GetMapping(value = "/idpay/initiative",
       produces = {"application/json"})
-  ResponseEntity<InitiativeDataDTO> getInitiativeIdFromServiceId(@RequestHeader(value = "Accept-Language", defaultValue = "it_IT") String acceptLanguage,
+  ResponseEntity<InitiativeDataDTO> getInitiativeIdFromServiceId(@RequestHeader(value = "Accept-Language", defaultValue = "it_IT") Locale acceptLanguage,
       @RequestParam(required = true) String serviceId);
 
   @Operation(summary = "Return primary and secondary token of the specified initiative", description = "", security = {

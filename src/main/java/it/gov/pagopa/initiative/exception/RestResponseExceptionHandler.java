@@ -65,9 +65,9 @@ public class RestResponseExceptionHandler {
     }
 
     @ExceptionHandler({Exception.class})
-    public ResponseEntity<ErrorDTO> handleIntegrationException(Exception ex) {
-        log.warn(ex.getMessage());
+    public ResponseEntity<ErrorDTO> handleGenericException(Exception ex) {
+        log.error(ex.getMessage());
         return new ResponseEntity<>(
-                new ErrorDTO(InitiativeConstants.Exception.BadRequest.CODE, ex.getLocalizedMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+                new ErrorDTO(InitiativeConstants.Exception.GeneralError.CODE, ex.getLocalizedMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

@@ -267,11 +267,16 @@ public class InitiativeApiController implements InitiativeApi {
 
     @ResponseStatus(HttpStatus.OK)
     @Override
-    public ResponseEntity<InitiativeDataDTO> getInitiativeIdFromServiceId(String acceptLanguage, String serviceId) {
+    public ResponseEntity<InitiativeDataDTO> getInitiativeIdFromServiceId(Locale acceptLanguage, String serviceId) {
         log.info("[GET_INITIATIVE_ID_FROM_SERVICE_ID] - Start searching the initiativeId for serviceId {}", serviceId);
-        //check if valid locale
-        Locale inputLocale = LocaleUtils.toLocale(acceptLanguage);
-        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDataDTO(this.initiativeService.getInitiativeIdFromServiceId(serviceId), inputLocale));
+        //check if valid locale, if not the utility throw an exception
+        if(!LocaleUtils.isAvailableLocale(acceptLanguage)){
+            throw new InitiativeException(
+                    InitiativeConstants.Exception.BadRequest.CODE,
+                    String.format(InitiativeConstants.Exception.BadRequest.INVALID_LOCALE_FORMAT, acceptLanguage),
+                    HttpStatus.BAD_REQUEST);
+        }
+        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDataDTO(this.initiativeService.getInitiativeIdFromServiceId(serviceId), acceptLanguage));
     }
 
     @ResponseStatus(HttpStatus.OK)

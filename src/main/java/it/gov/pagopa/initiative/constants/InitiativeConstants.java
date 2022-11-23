@@ -45,6 +45,11 @@ public class InitiativeConstants {
             public static final String ACCUMULATED_AMOUNT_TYPE = "Something wrong with the accumulated refund type selected";
             public static final String SOMETHING_WRONG_WITH_THE_REFUND_TYPE = "Something wrong with the refund type";
         }
+
+        public static final class GeneralError { //500
+            public static final String CODE = BASE_CODE + ".general.error";
+        }
+
         public static final class BadRequest { //400
             public static final String CODE = BASE_CODE + ".bad.request";
             public static final String INITIATIVE_BENEFICIARY_RANKING_ENABLED_AUTOMATED_CRITERIA_ORDER_OPERATION_ISEE_EQ_OP_NOT_VALID = "Automated criteria not valid. OrderDirection not feasible. When Ranking enabled, It must be used ISEE only with non 'Equals' operator";
@@ -53,6 +58,7 @@ public class InitiativeConstants {
             public static final String INITIATIVE_STATUS_NOT_IN_REVISION = "The status of initiative [%s] is not IN_REVISION";
             public static final String INITIATIVE_BY_INITIATIVE_ID_PROPERTIES_NOT_VALID = "Initiative %s properties are not valid for this request";
             public static final String INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_STATUS_NOT_VALID = "Initiative %s unprocessable for status not valid";
+            public static final String INVALID_LOCALE_FORMAT = "Invalid locale format: %s";
 
             public static final String INITIATIVE_CANNOT_BE_DELETED = "Initiative %s cannot be deleted";
             public static final String PERMISSION_NOT_VALID= "Permission not valid for [%s]";

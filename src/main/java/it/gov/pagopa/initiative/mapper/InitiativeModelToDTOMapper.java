@@ -38,7 +38,6 @@ public class InitiativeModelToDTOMapper {
         }
         String description = StringUtils.EMPTY;
         if (initiative.getGeneral() != null && initiative.getGeneral().getDescriptionMap() != null) {
-            //String[] language = StringUtils.split(acceptLanguage, "_", 1);
             //if no description for the given accepted language, try the default to italian
             description = StringUtils.defaultString(
                     initiative.getGeneral().getDescriptionMap().get(acceptLanguage.getLanguage()),
