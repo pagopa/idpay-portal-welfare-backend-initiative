@@ -64,4 +64,10 @@ public class RestResponseExceptionHandler {
                 new ErrorDTO(InitiativeConstants.Exception.Publish.BadRequest.CODE, InitiativeConstants.Exception.Publish.BadRequest.INTEGRATION_FAILED), ex.getHttpStatus());
     }
 
+    @ExceptionHandler({Exception.class})
+    public ResponseEntity<ErrorDTO> handleIntegrationException(Exception ex) {
+        log.warn(ex.getMessage());
+        return new ResponseEntity<>(
+                new ErrorDTO(InitiativeConstants.Exception.BadRequest.CODE, ex.getLocalizedMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

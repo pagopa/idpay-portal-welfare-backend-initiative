@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
+
 import org.springframework.web.multipart.MultipartFile;
 
 public interface InitiativeApi {
@@ -350,7 +352,7 @@ public interface InitiativeApi {
       @ApiResponse(responseCode = "500", description = "Server ERROR", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))})
   @GetMapping(value = "/idpay/initiative",
       produces = {"application/json"})
-  ResponseEntity<InitiativeDTO> getInitiativeIdFromServiceId(
+  ResponseEntity<InitiativeDataDTO> getInitiativeIdFromServiceId(@RequestHeader(value = "Accept-Language", defaultValue = "it_IT") String acceptLanguage,
       @RequestParam(required = true) String serviceId);
 
   @Operation(summary = "Return primary and secondary token of the specified initiative", description = "", security = {
