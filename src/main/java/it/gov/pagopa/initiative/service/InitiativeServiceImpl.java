@@ -1,8 +1,10 @@
 package it.gov.pagopa.initiative.service;
 
+import com.google.common.io.Files;
 import feign.FeignException;
 import it.gov.pagopa.initiative.connector.decrypt.DecryptRestConnector;
 import it.gov.pagopa.initiative.connector.encrypt.EncryptRestConnector;
+import it.gov.pagopa.initiative.connector.file_storage.FileStorageConnector;
 import it.gov.pagopa.initiative.connector.group.GroupRestConnector;
 import it.gov.pagopa.initiative.connector.io_service.IOBackEndRestConnector;
 import it.gov.pagopa.initiative.connector.onboarding.OnboardingRestConnector;
@@ -20,6 +22,14 @@ import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeAdditional;
 import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
+import it.gov.pagopa.initiative.utils.InitiativeUtils;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.util.Base64;
+import java.util.Locale;
+import java.util.Set;
+import javax.swing.text.Utilities;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +41,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.springframework.util.Assert;
+import org.springframework.util.Base64Utils;
+import org.springframework.util.InvalidMimeTypeException;
 
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Email.*;
 
@@ -49,9 +62,13 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     private final OnboardingRestConnector onboardingRestConnector;
     private final EncryptRestConnector encryptRestConnector;
     private final DecryptRestConnector decryptRestConnector;
+    private final FileStorageConnector fileStorageConnector;
     private final EmailNotificationService emailNotificationService;
     private final IOTokenService ioTokenService;
     private final InitiativeValidationService initiativeValidationService;
+    private final Set<String> allowedInitiativeLogoMimeTypes;
+    private final Set<String> allowedInitiativeLogoExtensions;
+    private final InitiativeUtils initiativeUtils;
 
     public InitiativeServiceImpl(
             @Value("${app.initiative.conditions.notifyEmail}") boolean notifyEmail,
@@ -64,9 +81,13 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             OnboardingRestConnector onboardingRestConnector,
             EncryptRestConnector encryptRestConnector,
             DecryptRestConnector decryptRestConnector,
+            FileStorageConnector fileStorageConnector,
+            @Value("${app.initiative.logo.allowed-mime-types}") String[] allowedInitiativeLogoMimeTypes,
+            @Value("${app.initiative.logo.allowed-extensions}") String[] allowedInitiativeLogoExtensions,
             EmailNotificationService emailNotificationService,
             IOTokenService ioTokenService,
-            InitiativeValidationService initiativeValidationService
+            InitiativeValidationService initiativeValidationService,
+            InitiativeUtils initiativeUtils
     ){
         this.notifyEmail = notifyEmail;
         this.initiativeRepository = initiativeRepository;
@@ -78,9 +99,13 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         this.onboardingRestConnector = onboardingRestConnector;
         this.encryptRestConnector = encryptRestConnector;
         this.decryptRestConnector = decryptRestConnector;
+        this.fileStorageConnector = fileStorageConnector;
+        this.allowedInitiativeLogoMimeTypes = Set.of(allowedInitiativeLogoMimeTypes);
+        this.allowedInitiativeLogoExtensions = Set.of(allowedInitiativeLogoExtensions);
         this.emailNotificationService = emailNotificationService;
         this.ioTokenService = ioTokenService;
         this.initiativeValidationService = initiativeValidationService;
+        this.initiativeUtils = initiativeUtils;
     }
 
     public List<Initiative> retrieveInitiativeSummary(String organizationId, String role) {
@@ -132,7 +157,12 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     @Override
     public void updateInitiativeGeneralInfo(String organizationId, String initiativeId, Initiative initiativeInfoModel, String role) {
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
-        //Check Initiative Status
+        if (initiativeInfoModel.getGeneral().getDescriptionMap().get(Locale.ITALIAN.getLanguage()) == null) {
+            throw new InitiativeException(
+                    InitiativeConstants.Exception.BadRequest.CODE,
+                    InitiativeConstants.Exception.BadRequest.INITIATIVE_DESCRIPTION_LANGUAGE_MESSAGE,
+                    HttpStatus.BAD_REQUEST);
+        }
         isInitiativeAllowedToBeEditableThenThrows(initiative);
         initiative.setGeneral(initiativeInfoModel.getGeneral());
         initiative.setStatus(InitiativeConstants.Status.DRAFT);
@@ -317,10 +347,46 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     }
 
     @Override
+    public LogoDTO storeInitiativeLogo(String organizationId, String initiativeId, InputStream logo,
+            String contentType, String fileName) {
+
+        Initiative initiative = initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(
+                        organizationId, initiativeId, true)
+                .orElseThrow(() -> new InitiativeException(
+                        InitiativeConstants.Exception.NotFound.CODE,
+                        String.format(
+                                InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE,
+                                initiativeId),
+                        HttpStatus.NOT_FOUND));
+
+        try {
+            this.validate(contentType,fileName);
+            fileStorageConnector.uploadInitiativeLogo(logo, String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE, organizationId, initiativeId, InitiativeConstants.Logo.LOGO_NAME), contentType);
+            initiative.getAdditionalInfo().setLogoFileName(fileName);
+            LocalDateTime localDateTime = LocalDateTime.now();
+            initiative.getAdditionalInfo().setLogoUploadDate(localDateTime);
+            initiative.setUpdateDate(localDateTime);
+            initiativeRepository.save(initiative);
+            return new LogoDTO(fileName, initiativeUtils.createLogoUrl(organizationId,initiativeId),localDateTime);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+
+    }
+
+    @Override
     public Initiative sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(Initiative initiative, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO) {
         InitiativeAdditional additionalInfo = initiative.getAdditionalInfo();
         ServiceRequestDTO serviceRequestDTO = initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(additionalInfo, initiativeOrganizationInfoDTO);
         ServiceResponseDTO serviceResponseDTO = ioBackEndRestConnector.createService(serviceRequestDTO);
+
+        try{
+            ByteArrayOutputStream byteArrayOutputStream = fileStorageConnector.downloadInitiativeLogo(initiativeUtils.getPathLogo(initiative.getOrganizationId(),initiative.getInitiativeId()));
+            ioBackEndRestConnector.sendLogoIo(serviceResponseDTO.getServiceId(),serviceResponseDTO.getPrimaryKey(), LogoIODTO.builder().logo(new String (Base64.getEncoder().encode(byteArrayOutputStream.toByteArray()))).build());
+        }catch(Exception e){
+            log.error("[UPLOAD_LOGO] - Initiative: {}. Error: "+e.getMessage(), initiative.getInitiativeId());
+        }
         log.debug("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Start ServiceIO Keys encryption...", initiative.getInitiativeId());
         String encryptedPrimaryToken = ioTokenService.encrypt(serviceResponseDTO.getPrimaryKey());
         String encryptedSecondaryToken = ioTokenService.encrypt(serviceResponseDTO.getSecondaryKey());
@@ -416,4 +482,19 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         responseOnboardingDTO.getPageSize(), responseOnboardingDTO.getTotalElements(),
         responseOnboardingDTO.getTotalPages());
   }
+
+    private void validate(String contentType, String fileName) {
+        Assert.notNull(fileName, "file name cannot be null");
+
+        if (!allowedInitiativeLogoMimeTypes.contains(contentType)) {
+            throw new InvalidMimeTypeException(contentType, String.format("allowed only %s",
+                    allowedInitiativeLogoMimeTypes));
+        }
+
+        String fileExtension = Files.getFileExtension(fileName).toLowerCase();
+        if (!allowedInitiativeLogoExtensions.contains(fileExtension)) {
+            throw new IllegalArgumentException(String.format("Invalid file extension \"%s\": allowed only %s", fileExtension,
+                    allowedInitiativeLogoExtensions));
+        }
+    }
 }

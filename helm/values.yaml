@@ -79,6 +79,8 @@ microservice-chart:
     LOG_LEVEL_INITIATIVE: INFO
     FEIGN_CLIENT_CONFIG_IO_LOG_LEVEL: basic
     SELC_UID: idpay
+    BLOB_STORAGE_CONTAINER_REFERENCE: logo
+    INITIATIVE_LOGO_URL: "https://idpaydinitiativestorage.blob.core.windows.net/logo/"
     RANKING_GRACE_PERIOD: "10"
 
   envConfigMapExternals:
@@ -109,6 +111,8 @@ microservice-chart:
     UTIL_CRYPTO_AES_MODE_GCM_IV: notification-token-iv
     PDV_ENCRYPT_API_KEY: pdv-api-key
     PDV_DECRYPT_API_KEY: pdv-api-key
+    BLOB_STORAGE_CONNECTION_STRING: initiative-storage-connection-string
+
 
   # nodeSelector: {}
 

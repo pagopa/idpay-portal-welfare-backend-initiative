@@ -3,6 +3,7 @@ package it.gov.pagopa.initiative.service;
 
 import it.gov.pagopa.initiative.connector.decrypt.DecryptRestConnector;
 import it.gov.pagopa.initiative.connector.encrypt.EncryptRestConnector;
+import it.gov.pagopa.initiative.connector.file_storage.FileStorageConnector;
 import it.gov.pagopa.initiative.connector.group.GroupRestConnector;
 import it.gov.pagopa.initiative.connector.io_service.IOBackEndRestConnector;
 import it.gov.pagopa.initiative.connector.onboarding.OnboardingRestConnector;
@@ -32,6 +33,7 @@ import it.gov.pagopa.initiative.model.rule.reward.InitiativeRewardRule;
 import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
 import it.gov.pagopa.initiative.model.rule.trx.*;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
+import it.gov.pagopa.initiative.utils.InitiativeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -116,6 +118,9 @@ class InitiativeServiceTest {
     GroupRestConnector groupRestConnector;
 
     @MockBean
+    FileStorageConnector fileStorageConnector;
+
+    @MockBean
     OnboardingRestConnector onboardingRestConnector;
 
     @MockBean
@@ -132,6 +137,9 @@ class InitiativeServiceTest {
 
     @MockBean
     InitiativeValidationService initiativeValidationService;
+
+    @MockBean
+    InitiativeUtils initiativeUtils;
 
     @Test
     void givenRoleAdmin_retrieveInitiativeSummary_ok() throws Exception {
@@ -425,13 +433,12 @@ class InitiativeServiceTest {
     @Test
     void updateInitiativeGeneralInfo_ok() throws Exception {
         Initiative step2Initiative = createStep2Initiative();
-
+        InitiativeGeneral initiativeGeneral = createInitiativeGeneral(true);
+        step2Initiative.setGeneral(initiativeGeneral);
         //Instruct the initiativeValidationService Mock to return Dummy Initiatives
         when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step2Initiative);
-
         //Try to call the Real Service (which is using the instructed Repo)
         initiativeService.updateInitiativeGeneralInfo(ORGANIZATION_ID, INITIATIVE_ID, step2Initiative, ROLE);
-
         // you are expecting initiativeValidationService to be called once with correct param
         verify(initiativeValidationService, times(1)).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
     }
@@ -439,6 +446,8 @@ class InitiativeServiceTest {
     @Test
     void updateInitiativeGeneralInfo_FakeInPUBLISHED_thenUnprocessableState() throws Exception {
         Initiative step2Initiative = createStep2Initiative();
+        InitiativeGeneral initiativeGeneral = createInitiativeGeneral(true);
+        step2Initiative.setGeneral(initiativeGeneral);
         step2Initiative.setStatus(InitiativeConstants.Status.PUBLISHED);
 
         //Instruct the initiativeValidationService Mock to return Dummy Initiatives
@@ -1010,6 +1019,8 @@ class InitiativeServiceTest {
     }
 
     private InitiativeGeneral createInitiativeGeneral(boolean beneficiaryKnown) {
+        Map<String, String> language = new HashMap<>();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneral initiativeGeneral = new InitiativeGeneral();
         initiativeGeneral.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneral.setBeneficiaryKnown(true);
@@ -1019,6 +1030,7 @@ class InitiativeServiceTest {
         initiativeGeneral.setStartDate(LocalDate.of(2022, 8, 8));
         initiativeGeneral.setRankingStartDate(LocalDate.of(2022, 9, 18));
         initiativeGeneral.setRankingEndDate(LocalDate.of(2022, 8, 18));
+        initiativeGeneral.setDescriptionMap(language);
         return initiativeGeneral;
     }
 
