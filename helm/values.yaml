@@ -79,6 +79,7 @@ microservice-chart:
     LOG_LEVEL_INITIATIVE: INFO
     FEIGN_CLIENT_CONFIG_IO_LOG_LEVEL: basic
     SELC_UID: idpay
+    RANKING_GRACE_PERIOD: "10"
 
   envConfigMapExternals:
     idpay-common:

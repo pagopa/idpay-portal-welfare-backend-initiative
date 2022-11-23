@@ -80,6 +80,7 @@ public class InitiativeModelToDTOMapper {
                 .startDate(general.getStartDate())
                 .rankingEndDate(general.getRankingEndDate())
                 .rankingStartDate(general.getRankingStartDate())
+                .rankingEnabled(general.getRankingEnabled())
                 .descriptionMap(general.getDescriptionMap()).build();
     }
 
@@ -121,14 +122,17 @@ public class InitiativeModelToDTOMapper {
             beneficiaryRuleDto.setAutomatedCriteria(Collections.emptyList());
         } else {
 
-            beneficiaryRuleDto.setAutomatedCriteria(beneficiaryRule.getAutomatedCriteria().stream().map(x ->
+            beneficiaryRuleDto.setAutomatedCriteria(beneficiaryRule.getAutomatedCriteria().stream().map(modelAC ->
                     AutomatedCriteriaDTO.builder()
-                            .code(x.getCode())
-                            .field(x.getField())
-                            .operator(FilterOperatorEnum.valueOf(x.getOperator().name()))
-                            .authority(x.getAuthority())//TODO definire modalità di recupero authority
-                            .value(x.getValue())
-                            .value2(x.getValue2())
+                            .code(modelAC.getCode())
+                            .field(modelAC.getField())
+                            .operator(FilterOperatorEnum.valueOf(modelAC.getOperator().name()))
+                            .authority(modelAC.getAuthority())//TODO definire modalità di recupero authority
+                            .value(modelAC.getValue())
+                            .value2(modelAC.getValue2())
+                            .orderDirection(modelAC.getOrderDirection() != null
+                                    ? AutomatedCriteriaDTO.OrderDirection.valueOf(modelAC.getOrderDirection().name())
+                                    : null)
                             .build()
             ).toList());
         }
@@ -164,16 +168,20 @@ public class InitiativeModelToDTOMapper {
         if (CollectionUtils.isEmpty(initiatives)) {
             return Collections.emptyList();
         }
-        return initiatives.stream().map(x -> InitiativeSummaryDTO.builder()
-                .initiativeId(x.getInitiativeId())
-                .initiativeName(StringUtils.isNotBlank(x.getInitiativeName()) ?
-                        x.getInitiativeName() :
-                        x.getAdditionalInfo() != null ?
-                                x.getAdditionalInfo().getServiceName()
+        return initiatives.stream().map(initiativeModel -> InitiativeSummaryDTO.builder()
+                .initiativeId(initiativeModel.getInitiativeId())
+                .initiativeName(StringUtils.isNotBlank(initiativeModel.getInitiativeName()) ?
+                        initiativeModel.getInitiativeName() :
+                        initiativeModel.getAdditionalInfo() != null ?
+                                initiativeModel.getAdditionalInfo().getServiceName()
                                 : StringUtils.EMPTY)
-                .status(x.getStatus())
-                .creationDate(x.getCreationDate())
-                .updateDate(x.getUpdateDate())
+                .status(initiativeModel.getStatus())
+                .creationDate(initiativeModel.getCreationDate())
+                .updateDate(initiativeModel.getUpdateDate())
+                .rankingEnabled(initiativeModel.getGeneral() !=null
+                        ? initiativeModel.getGeneral().getRankingEnabled() != null
+                            ? initiativeModel.getGeneral().getRankingEnabled() : null
+                        : null)
                 .build()).toList();
     }
 

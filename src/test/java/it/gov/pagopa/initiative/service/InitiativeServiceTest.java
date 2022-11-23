@@ -514,8 +514,12 @@ class InitiativeServiceTest {
         //Instruct the initiativeValidationService Mock to return Dummy Initiatives
         when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step2Initiative);
 
+        List<AutomatedCriteria> automatedCriteriaList = new ArrayList<>();
+        //Instruct the initiativeValidationService Mock to do nothing for checkAutomatedCriteriaOrderDirectionWithRanking
+        doNothing().when(initiativeValidationService).checkAutomatedCriteriaOrderDirectionWithRanking(step2Initiative,automatedCriteriaList);
+
         //Try to call the Real Service (which is using the instructed Repo)
-        initiativeService.updateInitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule, ROLE);
+        initiativeService.updateStep3InitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule, ROLE);
 
         // you are expecting initiativeValidationService to be called once with correct param
         verify(initiativeValidationService, times(1)).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
@@ -533,7 +537,7 @@ class InitiativeServiceTest {
                 .when(initiativeValidationService).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
 
         //prepare Executable with invocation of the method on your system under test
-        Executable executable = () -> initiativeService.updateInitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule, ROLE);
+        Executable executable = () -> initiativeService.updateStep3InitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule, ROLE);
         InitiativeException exception = Assertions.assertThrows(InitiativeException.class, executable);
         assertEquals(InitiativeConstants.Exception.NotFound.CODE, exception.getCode());
         assertEquals(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE.formatted(INITIATIVE_ID), exception.getMessage());

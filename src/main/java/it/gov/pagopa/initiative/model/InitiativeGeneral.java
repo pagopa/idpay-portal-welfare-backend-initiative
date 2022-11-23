@@ -20,10 +20,23 @@ public class InitiativeGeneral {
     private BeneficiaryTypeEnum beneficiaryType;
     private Boolean beneficiaryKnown;
     private BigDecimal beneficiaryBudget;
+    /**
+     * Start of period of spending funds in an initiative
+     */
     private LocalDate startDate;
+    /**
+     * End of period of spending funds in an initiative
+     */
     private LocalDate endDate;
+    /**
+     * Start of period of participation/adhesion in an initiative
+     */
     private LocalDate rankingStartDate;
+    /**
+     * End of period of participation/adhesion in an initiative
+     */
     private LocalDate rankingEndDate;
+    private Boolean rankingEnabled;
     private Map<String, String> descriptionMap;
 
     /**
