@@ -56,4 +56,6 @@ public interface InitiativeService {
 
     InitiativeAdditional getPrimaryAndSecondaryTokenIO(String initiativeId);
     OnboardingDTO getOnboardingStatusList(String organizationId,String initiativeId, String CF, LocalDateTime startDate, LocalDateTime endDate, String status, Pageable pageable);
+
+    void validate(String contentType, String fileName);
 }

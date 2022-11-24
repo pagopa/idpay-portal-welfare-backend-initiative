@@ -36,6 +36,7 @@ import it.gov.pagopa.initiative.repository.InitiativeRepository;
 import it.gov.pagopa.initiative.utils.InitiativeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mockito;
@@ -44,7 +45,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.print.DocFlavor;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -477,6 +484,37 @@ class InitiativeServiceTest {
         assertEquals(InitiativeConstants.Exception.NotFound.CODE, exception.getCode());
         assertEquals(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE.formatted(INITIATIVE_ID), exception.getMessage());
     }
+
+    @Test
+    void storeInitiativeLogo_ok() throws Exception {
+        InputStream logo = new ByteArrayInputStream("logo.png".getBytes());
+        Initiative initiative = this.createFullInitiative();
+        InitiativeGeneral general = createInitiativeGeneral(true);
+        initiative.setGeneral(general);
+        Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID,INITIATIVE_ID,true)).thenReturn(Optional.of(initiative));
+        Mockito.doNothing().when(fileStorageConnector).uploadInitiativeLogo(Mockito.any(), Mockito.anyString(),
+                Mockito.anyString());
+        /*Mockito.doNothing().when(initiativeRepository).save(Mockito.any());
+*/      /*Mockito.doNothing().when(initiativeService).validate(Mockito.anyString(), Mockito.anyString());
+        */LogoDTO logoDTO = initiativeService.storeInitiativeLogo(ORGANIZATION_ID, INITIATIVE_ID, logo, "${app" +
+                        ".initiative.logo.allowed-mime-types}",
+                "logo.${app.initiative.logo.allowed-extensions}");
+
+        assertEquals(logoDTO.getLogoFileName(), "logo.${app.initiative.logo.allowed-extensions}");
+    }
+
+    /*@Test
+    void storeInitiativeLogo_ko() throws Exception {
+        Initiative initiative = this.createFullInitiative();
+        Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID,INITIATIVE_ID,true)).thenReturn(Optional.of(initiative));
+        Mockito.doThrow(new InitiativeException(InternalServerError.CODE, "",HttpStatus.INTERNAL_SERVER_ERROR)).when(onboardingRestConnector).getOnboarding(INITIATIVE_ID,null,USER_ID,STARTDATE,ENDDATE,STATUS);
+        try{
+            OnboardingDTO onboardingDTO1 = initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID,CF, STARTDATE,ENDDATE,STATUS,null);
+            Assertions.fail();
+        }catch(InitiativeException e){
+            assertEquals(e.getCode(), InternalServerError.CODE);
+        }
+    }*/
 
     @Test
     void updateInitiativeAdditionalInfo_ok() throws Exception {

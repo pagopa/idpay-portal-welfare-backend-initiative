@@ -480,13 +480,14 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         responseOnboardingDTO.getTotalPages());
   }
 
-    private void validate(String contentType, String fileName) {
+    public void validate(String contentType, String fileName) {
         Assert.notNull(fileName, "file name cannot be null");
 
         if (!allowedInitiativeLogoMimeTypes.contains(contentType)) {
             throw new InvalidMimeTypeException(contentType, String.format("allowed only %s",
                     allowedInitiativeLogoMimeTypes));
         }
+        System.out.println(allowedInitiativeLogoMimeTypes);
 
         String fileExtension = Files.getFileExtension(fileName).toLowerCase();
         if (!allowedInitiativeLogoExtensions.contains(fileExtension)) {

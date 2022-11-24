@@ -303,4 +303,10 @@ class InitiativeValidationServiceTest {
         initiativeBeneficiaryRuleDTO.setAutomatedCriteria(automatedCriteriaList);
         return initiativeBeneficiaryRuleDTO;
     }
+
+    @Test
+    void testCheckPermissionBeforeInsert2() {
+        assertThrows(InitiativeException.class,
+                () -> initiativeValidationService.checkPermissionBeforeInsert("ope_base"));
+    }
 }
