@@ -54,7 +54,7 @@ public class InitiativeConstants {
             public static final String CODE = BASE_CODE + ".bad.request";
             public static final String INITIATIVE_BENEFICIARY_RANKING_ENABLED_AUTOMATED_CRITERIA_ORDER_OPERATION_ISEE_EQ_OP_NOT_VALID = "Automated criteria not valid. OrderDirection not feasible. When Ranking enabled, It must be used ISEE only with non 'Equals' operator";
             public static final String INITIATIVE_BENEFICIARY_RANKING_ENABLED_AUTOMATED_CRITERIA_ORDER_OPERATION_MISSING_NOT_VALID = "Automated criteria not valid. OrderDirection is Missing. Please check it when Ranking is enabled";
-
+            public static final String INITIATIVE_BENEFICIARY_RANKING_ENABLED_AUTOMATED_CRITERIA_ISEE_MISSING_NOT_VALID = "Automated criteria not valid. ISEE is Missing. Please check it when Ranking is enabled";
             public static final String INITIATIVE_STATUS_NOT_IN_REVISION = "The status of initiative [%s] is not IN_REVISION";
             public static final String INITIATIVE_BY_INITIATIVE_ID_PROPERTIES_NOT_VALID = "Initiative %s properties are not valid for this request";
             public static final String INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_STATUS_NOT_VALID = "Initiative %s unprocessable for status not valid";

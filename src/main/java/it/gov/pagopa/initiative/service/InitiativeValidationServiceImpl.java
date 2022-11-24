@@ -84,11 +84,13 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
     public void checkAutomatedCriteriaOrderDirectionWithRanking(Initiative initiative, List<AutomatedCriteria> automatedCriteriaList) {
         InitiativeGeneral general = initiative.getGeneral();
         if (Boolean.TRUE.equals(general.getRankingEnabled())){
+            boolean checkIsee = false;
             for(AutomatedCriteria automatedCriteria : automatedCriteriaList){
                 String code = automatedCriteria.getCode();
                 FilterOperatorEnumModel operator = automatedCriteria.getOperator();
                 AutomatedCriteria.OrderDirection orderDirection = automatedCriteria.getOrderDirection();
                 if(ISEE.equals(code)) {
+                    checkIsee=true;
                     if (orderDirection == null) {
                         throw new InitiativeException(
                                 InitiativeConstants.Exception.BadRequest.CODE,
@@ -103,6 +105,13 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
                         );
                     }
                 }
+            }
+            if(checkIsee==false){
+                throw new InitiativeException(
+                        InitiativeConstants.Exception.BadRequest.CODE,
+                        InitiativeConstants.Exception.BadRequest.INITIATIVE_BENEFICIARY_RANKING_ENABLED_AUTOMATED_CRITERIA_ISEE_MISSING_NOT_VALID,
+                        HttpStatus.BAD_REQUEST
+                );
             }
         }
     }
