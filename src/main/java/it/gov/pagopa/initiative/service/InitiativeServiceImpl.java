@@ -503,10 +503,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     }
 
     private String getUserId(){
-        RequestAttributes requestAttributes = Optional.ofNullable(RequestContextHolder.getRequestAttributes())
-                .orElseThrow(() -> new IllegalStateException("Request Attributes should not be null"));
-        Object organizationUserIdObject = Optional.ofNullable(requestAttributes.getAttribute("organizationUserId", RequestAttributes.SCOPE_REQUEST))
-                .orElseThrow(() -> new IllegalStateException("[organizationUserId] Request Attribute should not be null"));
-        return organizationUserIdObject.toString();
+        RequestAttributes requestAttributes =RequestContextHolder.getRequestAttributes();
+        return (String) requestAttributes.getAttribute("organizationUserId", RequestAttributes.SCOPE_REQUEST);
     }
 }
