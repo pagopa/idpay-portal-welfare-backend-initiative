@@ -1031,7 +1031,6 @@ class InitiativeServiceTest {
         initiativeGeneral.setDescriptionMap(language);
         return initiativeGeneral;
     }
-
     private InitiativeAdditional createInitiativeAdditional() {
         InitiativeAdditional initiativeAdditional = new InitiativeAdditional();
         initiativeAdditional.setServiceIO(true);

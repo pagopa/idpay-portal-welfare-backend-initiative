@@ -23,6 +23,7 @@ import it.gov.pagopa.initiative.model.InitiativeAdditional;
 import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
 import it.gov.pagopa.initiative.utils.InitiativeUtils;
+import it.gov.pagopa.initiative.utils.Utilities;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,7 +32,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.InvalidMimeTypeException;
-
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.time.LocalDateTime;
@@ -61,6 +63,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     private final Set<String> allowedInitiativeLogoMimeTypes;
     private final Set<String> allowedInitiativeLogoExtensions;
     private final InitiativeUtils initiativeUtils;
+    private final Utilities utilities;
 
     public InitiativeServiceImpl(
             @Value("${app.initiative.conditions.notifyEmail}") boolean notifyEmail,
@@ -79,8 +82,8 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             EmailNotificationService emailNotificationService,
             IOTokenService ioTokenService,
             InitiativeValidationService initiativeValidationService,
-            InitiativeUtils initiativeUtils
-    ){
+            InitiativeUtils initiativeUtils,
+            Utilities utilities){
         this.notifyEmail = notifyEmail;
         this.initiativeRepository = initiativeRepository;
         this.initiativeModelToDTOMapper = initiativeModelToDTOMapper;
@@ -98,6 +101,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         this.ioTokenService = ioTokenService;
         this.initiativeValidationService = initiativeValidationService;
         this.initiativeUtils = initiativeUtils;
+        this.utilities = utilities;
     }
 
     public List<Initiative> retrieveInitiativeSummary(String organizationId, String role) {
@@ -129,11 +133,13 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         if(notifyEmail){
             emailNotificationService.sendInitiativeToCurrentOrganization(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_CREATED, SUBJECT_INITIATIVE_CREATED);
         }
+        utilities.newInitiative(this.getUserId(), initiative.getInitiativeId());
         return initiativeReturned;
     }
 
     @Override
     public Initiative getInitiative(String organizationId, String initiativeId, String role) {
+        utilities.getIniziative(this.getUserId(), initiativeId);
         return initiativeValidationService.getInitiative(organizationId, initiativeId, role);
     }
 
@@ -205,6 +211,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         initiative.setStatus(InitiativeConstants.Status.DRAFT);
         if (changeInitiativeStatus) {
             initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
+            utilities.initiativeInRevision(this.getUserId(),initiativeId);
             log.info("[UPDATE_TO_IN_REVISION_STATUS] - Initiative: {}. Status successfully set to IN_REVISION.", initiativeId);
         }
         this.initiativeRepository.save(initiative);
@@ -224,6 +231,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         isInitiativeStatusNotInRevisionThenThrow(initiative, InitiativeConstants.Status.APPROVED);
         initiative.setStatus(InitiativeConstants.Status.APPROVED);
         this.initiativeRepository.save(initiative);
+        utilities.initiativeApproved(this.getUserId(),initiativeId);
         log.info("[UPDATE_TO_APPROVED_STATUS] - Initiative: {}. Status successfully changed", initiative.getInitiativeId());
         if(notifyEmail){
             try {
@@ -240,6 +248,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         isInitiativeStatusNotInRevisionThenThrow(initiative, InitiativeConstants.Status.TO_CHECK);
         initiative.setStatus(InitiativeConstants.Status.TO_CHECK);
         this.initiativeRepository.save(initiative);
+        utilities.initiativeToCheck(this.getUserId(), initiativeId);
         log.info("[UPDATE_TO_CHECK_STATUS] - Initiative: {}. Status successfully changed", initiative.getInitiativeId());
         if(notifyEmail){
             try {
@@ -388,6 +397,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         initiative.getAdditionalInfo().setPrimaryTokenIO(encryptedPrimaryToken);
         initiative.getAdditionalInfo().setSecondaryTokenIO(encryptedSecondaryToken);
         additionalInfo.setServiceId(serviceResponseDTO.getServiceId());
+        utilities.initiativePublished(this.getUserId(),initiative.getInitiativeId());
         if(notifyEmail){
             try {
                 emailNotificationService.sendInitiativeToCurrentOrganization(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
@@ -421,7 +431,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
   @Override
   public OnboardingDTO getOnboardingStatusList(String organizationId,String initiativeId, String CF,
       LocalDateTime startDate, LocalDateTime endDate, String status, Pageable pageable) {
-
+    utilities.onboardingCitizen(this.getUserId(), initiativeId);
     log.info("start get status onboarding, initiative: "+initiativeId);
     Initiative initiative = initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(
             organizationId, initiativeId, true)
@@ -490,5 +500,13 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             throw new IllegalArgumentException(String.format("Invalid file extension \"%s\": allowed only %s", fileExtension,
                     allowedInitiativeLogoExtensions));
         }
+    }
+
+    private String getUserId(){
+        RequestAttributes requestAttributes = Optional.ofNullable(RequestContextHolder.getRequestAttributes())
+                .orElseThrow(() -> new IllegalStateException("Request Attributes should not be null"));
+        Object organizationUserIdObject = Optional.ofNullable(requestAttributes.getAttribute("organizationUserId", RequestAttributes.SCOPE_REQUEST))
+                .orElseThrow(() -> new IllegalStateException("[organizationUserId] Request Attribute should not be null"));
+        return organizationUserIdObject.toString();
     }
 }
