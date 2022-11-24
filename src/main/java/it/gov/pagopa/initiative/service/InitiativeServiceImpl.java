@@ -489,7 +489,6 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
     private void validate(String contentType, String fileName) {
         Assert.notNull(fileName, "file name cannot be null");
-
         if (!allowedInitiativeLogoMimeTypes.contains(contentType)) {
             throw new InvalidMimeTypeException(contentType, String.format("allowed only %s",
                     allowedInitiativeLogoMimeTypes));
