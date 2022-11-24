@@ -51,6 +51,7 @@ public class InitiativeModelToDTOMapper {
     }
 
     public InitiativeDTO toInitiativeDTO(Initiative initiative) {
+        InitiativeUtils initiativeUtils = new InitiativeUtils();
         if (initiative == null) {
             return null;
         }
@@ -64,7 +65,7 @@ public class InitiativeModelToDTOMapper {
         initiativeDto.setGeneral(this.toInitiativeGeneralDTO(initiative.getGeneral()));
         initiativeDto.setAdditionalInfo(this.toInitiativeAdditionalDTO(initiative.getAdditionalInfo()));
         if(initiativeDto.getAdditionalInfo() != null && initiativeDto.getAdditionalInfo().getLogoFileName() != null){
-            initiativeDto.getAdditionalInfo().setLogoURL(new InitiativeUtils().createLogoUrl(initiative.getOrganizationId(),
+            initiativeDto.getAdditionalInfo().setLogoURL(initiativeUtils.createLogoUrl(initiative.getOrganizationId(),
                     initiative.getInitiativeId()));
         }
         initiativeDto.setBeneficiaryRule(this.toInitiativeBeneficiaryRuleDTO(initiative.getBeneficiaryRule()));
