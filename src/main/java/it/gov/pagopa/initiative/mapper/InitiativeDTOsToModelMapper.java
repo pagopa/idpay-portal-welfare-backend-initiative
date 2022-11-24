@@ -19,6 +19,7 @@ import it.gov.pagopa.initiative.model.rule.reward.InitiativeRewardRule;
 import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
 import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
 import it.gov.pagopa.initiative.model.rule.trx.*;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -103,7 +104,7 @@ public class InitiativeDTOsToModelMapper {
                             .operator(FilterOperatorEnumModel.valueOf(automatedCriteriaDTO.getOperator().name()))
                             .authority(automatedCriteriaDTO.getAuthority())//TODO definire modalità di recupero authority
                             .value(automatedCriteriaDTO.getValue())
-                            .value2(automatedCriteriaDTO.getValue2())
+                            .value2(StringUtils.isBlank(automatedCriteriaDTO.getValue2()) ? null : automatedCriteriaDTO.getValue2())
                             .orderDirection(automatedCriteriaDTO.getOrderDirection() != null
                                     ? AutomatedCriteria.OrderDirection.valueOf(automatedCriteriaDTO.getOrderDirection().name())
                                     : null)
