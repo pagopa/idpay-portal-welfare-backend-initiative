@@ -175,7 +175,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         isInitiativeAllowedToBeEditableThenThrows(initiative);
         InitiativeAdditional infoOriginal = initiative.getAdditionalInfo();
         InitiativeAdditional infoNew =  initiativeAdditionalInfo.getAdditionalInfo();
-        BeanUtils.copyProperties(infoNew, infoNew, "logoFileName", "logoUploadDate", "serviceId", "primaryTokenIO", "secondaryTokenIO");
+        BeanUtils.copyProperties(infoNew, infoOriginal, "logoFileName", "logoUploadDate", "serviceId", "primaryTokenIO", "secondaryTokenIO");
         initiative.setStatus(InitiativeConstants.Status.DRAFT);
         this.initiativeRepository.save(initiative);
     }
