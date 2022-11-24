@@ -1,32 +1,25 @@
 package it.gov.pagopa.initiative.utils.validator;
 
 import it.gov.pagopa.initiative.dto.InitiativeGeneralDTO;
-import java.util.HashMap;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
 import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
-import static it.gov.pagopa.initiative.utils.constraint.initiative.general.RankingGracePeriodConstraint.FAIL_WHEN_RANKING_ENABLED_THE_START_DATE_MUST_BE_10_DAYS_GREATER_THAN_THE_RANKING_END_DATE;
-import static org.assertj.core.api.Assertions.anyOf;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestPropertySource(
         locations = "classpath:application.yml",
@@ -211,6 +204,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
     }
     private InitiativeGeneralDTO createInitiativeGeneralDTO_ok() {
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
@@ -230,6 +224,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
 
     private InitiativeGeneralDTO createInitiativeGeneralDTO_ko() {
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
@@ -249,6 +244,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
 
     private InitiativeGeneralDTO createInitiativeGeneralOnlyRankingStartIsNull_ko() {
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
@@ -265,6 +261,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
 
     private InitiativeGeneralDTO createInitiativeGeneralOnlyRankingEndIsNull_ko() {
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
@@ -282,6 +279,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
 
     private InitiativeGeneralDTO createInitiativeGeneralOnlyStartDateIsNull_ko(){
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
@@ -298,6 +296,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
     }
     private InitiativeGeneralDTO createInitiativeGeneralOnlyEndDateIsNull_ko(){
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
@@ -315,6 +314,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
 
     private InitiativeGeneralDTO createInitiativeGeneralStartAndEndDateAreNull_ko(){
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
@@ -329,6 +329,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
     }
     private InitiativeGeneralDTO createInitiativeGeneralRankingStartAndEndDateAreNullButStartAndEndAreNotValid_ko(){
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
@@ -343,6 +344,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
 
     private InitiativeGeneralDTO createInitiativeGeneralRankingStartAndEndDateAreNullAndStartAndEndAreValid_ok(){
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
@@ -356,6 +358,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
     }
     private InitiativeGeneralDTO createInitiativeGeneralStartAfterEnd_ko(){
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
@@ -374,6 +377,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
     }
     private InitiativeGeneralDTO createInitiativeGeneralRankingStartAfterRankingEnd_ko(){
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
@@ -392,6 +396,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
     }
     private InitiativeGeneralDTO createInitiativeGeneralRankingEndAfterStartDate_ko(){
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
@@ -410,6 +415,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
     }
     private InitiativeGeneralDTO createInitiativeGeneralAllDatesValid_ok(){
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
@@ -428,6 +434,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
     }
     private InitiativeGeneralDTO createInitiativeGeneralStartDateBeforeRankingDates_ko(){
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
@@ -447,6 +454,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
 
     private InitiativeGeneralDTO createInitiativeGeneralBudgetValid_ok(){
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
@@ -465,6 +473,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
     }
     private InitiativeGeneralDTO createInitiativeGeneralBudgetNotValid_ko(){
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
         initiativeGeneralDTO.setBeneficiaryBudget(null);
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);

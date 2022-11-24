@@ -1,6 +1,5 @@
 package it.gov.pagopa.initiative.mapper;
 
-import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.rule.refund.AccumulatedAmountDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
@@ -23,12 +22,34 @@ import it.gov.pagopa.initiative.utils.InitiativeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 
 @Component
 public class InitiativeModelToDTOMapper {
+
+
+    public InitiativeDataDTO toInitiativeDataDTO(Initiative initiative, Locale acceptLanguage) {
+        if (initiative == null) {
+            return null;
+        }
+        String description = StringUtils.EMPTY;
+        if (initiative.getGeneral() != null && initiative.getGeneral().getDescriptionMap() != null) {
+            //if no description for the given accepted language, try the default to italian
+            description = StringUtils.defaultString(
+                    initiative.getGeneral().getDescriptionMap().get(acceptLanguage.getLanguage()),
+                    initiative.getGeneral().getDescriptionMap().get(Locale.ITALIAN.getLanguage())
+            );
+        }
+        return InitiativeDataDTO.builder()
+                .initiativeId(initiative.getInitiativeId())
+                .description(description)
+                .build();
+    }
+
     public InitiativeDTO toInitiativeDTO(Initiative initiative) {
         if (initiative == null) {
             return null;

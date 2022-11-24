@@ -1,6 +1,5 @@
 package it.gov.pagopa.initiative.exception;
 
-import feign.FeignException;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.ErrorDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -23,14 +22,14 @@ public class RestResponseExceptionHandler {
     // API
     @ExceptionHandler({InitiativeException.class})
     public ResponseEntity<ErrorDTO> handleInitiativeException(InitiativeException ex) {
-        log.warn(ex.getMessage());
+        log.error(ex.getMessage());
         return new ResponseEntity<>(new ErrorDTO(ex.getCode(), ex.getMessage()),
                 ex.getHttpStatus());
     }
 
     @ExceptionHandler({MethodArgumentNotValidException.class})
     public ResponseEntity<ErrorDTO> handleMethodArgumentNotValidExceptions(MethodArgumentNotValidException ex) {
-        log.warn(ex.getMessage());
+        log.error(ex.getMessage());
         List<String> errors = new ArrayList<>();
         ex.getBindingResult().getAllErrors().forEach(error -> {
             if(error instanceof FieldError fieldErrorInput) {
@@ -51,7 +50,7 @@ public class RestResponseExceptionHandler {
 
     @ExceptionHandler({HttpMessageNotReadableException.class})
     public ResponseEntity<ErrorDTO> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
-        log.warn(ex.getMessage());
+        log.error(ex.getMessage());
         String localizedMessage = StringUtils.split(ex.getMostSpecificCause().getLocalizedMessage(), System.lineSeparator())[0];
         return new ResponseEntity<>(
                 new ErrorDTO(InitiativeConstants.Exception.BadRequest.CODE, localizedMessage), HttpStatus.BAD_REQUEST);
@@ -59,9 +58,15 @@ public class RestResponseExceptionHandler {
 
     @ExceptionHandler({IntegrationException.class})
     public ResponseEntity<ErrorDTO> handleIntegrationException(IntegrationException ex) {
-        log.warn(ex.getMessage());
+        log.error(ex.getMessage());
         return new ResponseEntity<>(
                 new ErrorDTO(InitiativeConstants.Exception.Publish.BadRequest.CODE, InitiativeConstants.Exception.Publish.BadRequest.INTEGRATION_FAILED), ex.getHttpStatus());
     }
 
+    @ExceptionHandler({Exception.class})
+    public ResponseEntity<ErrorDTO> handleGenericException(Exception ex) {
+        log.error(ex.getMessage());
+        return new ResponseEntity<>(
+                new ErrorDTO(InitiativeConstants.Exception.GeneralError.CODE, ex.getLocalizedMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

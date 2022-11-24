@@ -34,7 +34,6 @@ import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
 import it.gov.pagopa.initiative.model.rule.trx.*;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
 import it.gov.pagopa.initiative.utils.InitiativeUtils;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
@@ -65,7 +64,6 @@ import static org.mockito.Mockito.*;
         })
 @WebMvcTest(value = {
         InitiativeService.class})
-@Slf4j
 class InitiativeServiceTest {
 
     private static final String ANY_NOT_INITIATIVE_STATE = "ANY_NOT_INITIATIVE_STATE";
@@ -228,7 +226,7 @@ class InitiativeServiceTest {
         try {
             List<Initiative> initiatives = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, ADMIN);
         } catch (InitiativeException e) {
-            log.info("InitiativeException: " + e.getCode());
+            System.out.println("InitiativeException: " + e.getCode());
             assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
             assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
         }
@@ -267,7 +265,7 @@ class InitiativeServiceTest {
         try{
             Initiative initiative = initiativeService.getInitiativeIdFromServiceId(SERVICE_ID);
         }catch (InitiativeException e){
-            log.info("InitiativeException: " + e.getCode());
+            System.out.println("InitiativeException: " + e.getCode());
             assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
             assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
             assertEquals(String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_ID_BY_SERVICE_ID_MESSAGE, SERVICE_ID), e.getMessage());
@@ -289,7 +287,7 @@ class InitiativeServiceTest {
         try{
             InitiativeAdditional additional = initiativeService.getPrimaryAndSecondaryTokenIO(INITIATIVE_ID);
         }catch (InitiativeException e){
-            log.info("InitiativeException: " + e.getCode());
+            System.out.println("InitiativeException: " + e.getCode());
             assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
             assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
             assertEquals(String.format(InitiativeConstants.Exception.NotFound.PRIMARY_AND_SECONDARY_TOKEN_MESSAGE, INITIATIVE_ID), e.getMessage());
@@ -424,7 +422,7 @@ class InitiativeServiceTest {
         try {
             Initiative initiative = initiativeService.getInitiativeBeneficiaryView(INITIATIVE_ID);
         } catch (InitiativeException e) {
-            log.info("InitiativeException: " + e.getCode());
+            System.out.println("InitiativeException: " + e.getCode());
             assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
             assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
         }
@@ -1067,6 +1065,8 @@ class InitiativeServiceTest {
     }
 
     private InitiativeGeneralDTO createInitiativeGeneralDTO(boolean beneficiaryKnown) {
+        Map<String, String> language = new HashMap<>();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(beneficiaryKnown);
@@ -1080,6 +1080,7 @@ class InitiativeServiceTest {
         initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
         initiativeGeneralDTO.setStartDate(startDate);
         initiativeGeneralDTO.setEndDate(endDate);
+        initiativeGeneralDTO.setDescriptionMap(language);
         return initiativeGeneralDTO;
     }
 

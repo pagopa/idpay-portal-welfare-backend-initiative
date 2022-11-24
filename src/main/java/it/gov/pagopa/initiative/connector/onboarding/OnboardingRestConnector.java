@@ -1,10 +1,11 @@
 package it.gov.pagopa.initiative.connector.onboarding;
 
 import it.gov.pagopa.initiative.dto.ResponseOnboardingDTO;
-import java.time.LocalDateTime;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.time.LocalDateTime;
 
 public interface OnboardingRestConnector {
 

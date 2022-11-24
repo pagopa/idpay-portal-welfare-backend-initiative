@@ -1,6 +1,5 @@
 package it.gov.pagopa.initiative.connector.file_storage;
 
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 

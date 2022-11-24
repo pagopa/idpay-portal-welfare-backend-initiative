@@ -3,8 +3,8 @@ api.key.decrypt: ${PDV_DECRYPT_API_KEY:}
 spring.servlet.multipart.max-file-size: ${MULTIPART_MAX_FILE_SIZE:1MB}
 spring.servlet.multipart.resolve-lazily: true
 spring.servlet.multipart.file-size-threshold: ${MULTIPART_MAX_FILE_SIZE:1MB}
-blobStorage.connectionString: ${BLOB_STORAGE_CONNECTION_STRING}
-blobStorage.initiative.logo.containerReference: ${BLOB_STORAGE_CONTAINER_REFERENCE}
+blobStorage.connectionString: ${BLOB_STORAGE_CONNECTION_STRING:}
+blobStorage.initiative.logo.containerReference: ${BLOB_STORAGE_CONTAINER_REFERENCE:}
 
 spring:
   data:

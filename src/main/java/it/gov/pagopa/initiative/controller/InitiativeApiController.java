@@ -9,18 +9,20 @@ import it.gov.pagopa.initiative.mapper.InitiativeDTOsToModelMapper;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.service.InitiativeService;
-import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.LocaleUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import org.springframework.web.multipart.MultipartFile;
+import java.util.Locale;
 
 @RestController
 @Slf4j
@@ -265,9 +267,16 @@ public class InitiativeApiController implements InitiativeApi {
 
     @ResponseStatus(HttpStatus.OK)
     @Override
-    public ResponseEntity<InitiativeDTO> getInitiativeIdFromServiceId(String serviceId){
+    public ResponseEntity<InitiativeDataDTO> getInitiativeIdFromServiceId(Locale acceptLanguage, String serviceId) {
         log.info("[GET_INITIATIVE_ID_FROM_SERVICE_ID] - Start searching the initiativeId for serviceId {}", serviceId);
-        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDTO(this.initiativeService.getInitiativeIdFromServiceId(serviceId)));
+        //check if valid locale, if not the utility throw an exception
+        if(!LocaleUtils.isAvailableLocale(acceptLanguage)){
+            throw new InitiativeException(
+                    InitiativeConstants.Exception.BadRequest.CODE,
+                    String.format(InitiativeConstants.Exception.BadRequest.INVALID_LOCALE_FORMAT, acceptLanguage),
+                    HttpStatus.BAD_REQUEST);
+        }
+        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDataDTO(this.initiativeService.getInitiativeIdFromServiceId(serviceId), acceptLanguage));
     }
 
     @ResponseStatus(HttpStatus.OK)

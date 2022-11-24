@@ -3,7 +3,6 @@ package it.gov.pagopa.initiative.utils.validator;
 import it.gov.pagopa.initiative.dto.InitiativeGeneralDTO;
 import it.gov.pagopa.initiative.utils.constraint.RankingAndSpendingDatesDoubleUseCaseValue;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
