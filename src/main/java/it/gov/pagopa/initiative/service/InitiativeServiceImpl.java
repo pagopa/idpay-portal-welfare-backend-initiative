@@ -21,9 +21,9 @@ import it.gov.pagopa.initiative.model.AutomatedCriteria;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeAdditional;
 import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
-import it.gov.pagopa.initiative.model.rule.refund.AdditionalInfo;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
 import it.gov.pagopa.initiative.utils.InitiativeUtils;
+import it.gov.pagopa.initiative.utils.Utilities;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -35,11 +35,6 @@ import org.springframework.util.Assert;
 import org.springframework.util.InvalidMimeTypeException;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.time.LocalDateTime;
-import java.util.*;
-
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.time.LocalDateTime;
@@ -139,7 +134,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
     @Override
     public Initiative getInitiative(String organizationId, String initiativeId, String role) {
-        utilities.getIniziative(this.getUserId(), initiativeId);
+        utilities.getInitiative(this.getUserId(), initiativeId);
         return initiativeValidationService.getInitiative(organizationId, initiativeId, role);
     }
 
@@ -505,7 +500,12 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     }
 
     private String getUserId(){
-        RequestAttributes requestAttributes =RequestContextHolder.getRequestAttributes();
-        return (String) requestAttributes.getAttribute("organizationUserId", RequestAttributes.SCOPE_REQUEST);
+        String userId = null;
+        if(RequestContextHolder.getRequestAttributes()!=null) {
+            RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+            userId = (String) requestAttributes.getAttribute("organizationUserId",
+                    RequestAttributes.SCOPE_REQUEST);
+        }
+        return userId;
     }
 }

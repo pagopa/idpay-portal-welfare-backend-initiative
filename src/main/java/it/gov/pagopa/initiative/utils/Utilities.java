@@ -100,7 +100,7 @@ public class Utilities {
             initiativeId);
     logger.info(testLog);
   }
-  public void getIniziative(String userId, String initiativeId) {
+  public void getInitiative(String userId, String initiativeId) {
     String testLog = this.buildLog("Get initiative by the user ", userId,
             initiativeId);
     logger.info(testLog);
