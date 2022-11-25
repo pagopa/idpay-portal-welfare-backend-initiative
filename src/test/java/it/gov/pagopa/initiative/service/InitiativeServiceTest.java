@@ -36,22 +36,18 @@ import it.gov.pagopa.initiative.repository.InitiativeRepository;
 import it.gov.pagopa.initiative.utils.InitiativeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.print.DocFlavor;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -102,6 +98,9 @@ class InitiativeServiceTest {
     private static final String STATUS = "ONBOARDING_OK";
     private static final LocalDateTime STARTDATE = LocalDateTime.now();
     private static final LocalDateTime ENDDATE = LocalDateTime.now();
+    private static final String LOGO_EXTENSION = "png";
+    private static final String LOGO_MIME_TYPE = "image/png";
+    private static final String FILE_NAME = "logo.png";
 
     @Autowired
     InitiativeService initiativeService;
@@ -228,7 +227,6 @@ class InitiativeServiceTest {
     }
 
 
-
     @Test
     void retrieveInitiativeSummary_ko() {
         //Try to call the Real Service (which is using the instructed Repo)
@@ -259,7 +257,7 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void getInitiativeIdFromServiceId_thenValidationIsPassed(){
+    void getInitiativeIdFromServiceId_thenValidationIsPassed() {
         Initiative step1Initiative = createStep1Initiative();
         when(initiativeRepository.retrieveServiceId(SERVICE_ID)).thenReturn(Optional.ofNullable(step1Initiative));
         Initiative initiative = initiativeService.getInitiativeIdFromServiceId(SERVICE_ID);
@@ -268,12 +266,12 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void getInitiativeIdFromServiceId_throwInitiativeException_thenValidationFailed() throws Exception{
+    void getInitiativeIdFromServiceId_throwInitiativeException_thenValidationFailed() throws Exception {
         Initiative step1Initiative = new Initiative();
         when(initiativeRepository.retrieveServiceId(SERVICE_ID)).thenReturn(Optional.empty());
-        try{
+        try {
             Initiative initiative = initiativeService.getInitiativeIdFromServiceId(SERVICE_ID);
-        }catch (InitiativeException e){
+        } catch (InitiativeException e) {
             log.info("InitiativeException: " + e.getCode());
             assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
             assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
@@ -282,7 +280,7 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void getPrimaryAndSecondaryToken_thenValidationIsPassed(){
+    void getPrimaryAndSecondaryToken_thenValidationIsPassed() {
         Initiative step1Initiative = createStep1Initiative();
         when(initiativeRepository.findByInitiativeIdAndEnabled(INITIATIVE_ID, true)).thenReturn(Optional.ofNullable(step1Initiative));
         InitiativeAdditional additional = initiativeService.getPrimaryAndSecondaryTokenIO(INITIATIVE_ID);
@@ -291,11 +289,11 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void getPrimaryAndSecondaryToken_throwInitiativeException_thenValidationFailed() throws Exception{
+    void getPrimaryAndSecondaryToken_throwInitiativeException_thenValidationFailed() throws Exception {
         when(initiativeRepository.findByInitiativeIdAndEnabled(INITIATIVE_ID, true)).thenReturn(Optional.empty());
-        try{
+        try {
             InitiativeAdditional additional = initiativeService.getPrimaryAndSecondaryTokenIO(INITIATIVE_ID);
-        }catch (InitiativeException e){
+        } catch (InitiativeException e) {
             log.info("InitiativeException: " + e.getCode());
             assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
             assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
@@ -489,32 +487,22 @@ class InitiativeServiceTest {
     void storeInitiativeLogo_ok() throws Exception {
         InputStream logo = new ByteArrayInputStream("logo.png".getBytes());
         Initiative initiative = this.createFullInitiative();
+        Set <String> logoExtension = new HashSet<>();
+        Set <String> logoMimeTypes = new HashSet<>();
+        logoExtension.add(LOGO_EXTENSION);
+        logoMimeTypes.add(LOGO_MIME_TYPE);
         InitiativeGeneral general = createInitiativeGeneral(true);
         initiative.setGeneral(general);
-        Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID,INITIATIVE_ID,true)).thenReturn(Optional.of(initiative));
+        Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
         Mockito.doNothing().when(fileStorageConnector).uploadInitiativeLogo(Mockito.any(), Mockito.anyString(),
                 Mockito.anyString());
-        /*Mockito.doNothing().when(initiativeRepository).save(Mockito.any());
-*/      /*Mockito.doNothing().when(initiativeService).validate(Mockito.anyString(), Mockito.anyString());
-        */LogoDTO logoDTO = initiativeService.storeInitiativeLogo(ORGANIZATION_ID, INITIATIVE_ID, logo, "${app" +
-                        ".initiative.logo.allowed-mime-types}",
-                "logo.${app.initiative.logo.allowed-extensions}");
+        Mockito.when(initiativeUtils.getAllowedInitiativeLogoExtensions()).thenReturn(logoExtension);
+        Mockito.when(initiativeUtils.getAllowedInitiativeLogoMimeTypes()).thenReturn(logoMimeTypes);
+        LogoDTO logoDTO = initiativeService.storeInitiativeLogo(ORGANIZATION_ID, INITIATIVE_ID, logo, LOGO_MIME_TYPE,
+                FILE_NAME);
 
-        assertEquals(logoDTO.getLogoFileName(), "logo.${app.initiative.logo.allowed-extensions}");
+        assertEquals(logoDTO.getLogoFileName(), FILE_NAME);
     }
-
-    /*@Test
-    void storeInitiativeLogo_ko() throws Exception {
-        Initiative initiative = this.createFullInitiative();
-        Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID,INITIATIVE_ID,true)).thenReturn(Optional.of(initiative));
-        Mockito.doThrow(new InitiativeException(InternalServerError.CODE, "",HttpStatus.INTERNAL_SERVER_ERROR)).when(onboardingRestConnector).getOnboarding(INITIATIVE_ID,null,USER_ID,STARTDATE,ENDDATE,STATUS);
-        try{
-            OnboardingDTO onboardingDTO1 = initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID,CF, STARTDATE,ENDDATE,STATUS,null);
-            Assertions.fail();
-        }catch(InitiativeException e){
-            assertEquals(e.getCode(), InternalServerError.CODE);
-        }
-    }*/
 
     @Test
     void updateInitiativeAdditionalInfo_ok() throws Exception {
@@ -624,7 +612,7 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void updateRefundRules_ok(){
+    void updateRefundRules_ok() {
         Initiative initiative = createInitiativeOnlyRefundRule();
         when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(initiative);
         initiativeService.updateInitiativeRefundRules(ORGANIZATION_ID, INITIATIVE_ID, ROLE, initiative, false);
@@ -632,7 +620,7 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void updateRefundRules_thenThrowInitiativeException(){
+    void updateRefundRules_thenThrowInitiativeException() {
         Initiative initiative = createInitiativeOnlyRefundRule();
 
         //doThrow InitiativeException for getInitiative method
@@ -650,7 +638,7 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void updateRefundRule_whenInitiativeUnprocessableForStatusNotValid_then400isRaisedForInitiativeException(){
+    void updateRefundRule_whenInitiativeUnprocessableForStatusNotValid_then400isRaisedForInitiativeException() {
         Initiative initiative = Initiative.builder().initiativeId(INITIATIVE_ID).status(InitiativeConstants.Status.PUBLISHED).build();
 
         //doThrow InitiativeException for getInitiative method
@@ -668,7 +656,7 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void givenStatusIN_REVISION_updateInitiativeApprovedStatus_thenStatusIsChangedWithSuccess(){
+    void givenStatusIN_REVISION_updateInitiativeApprovedStatus_thenStatusIsChangedWithSuccess() {
         Initiative initiative = createStep4Initiative();
         initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
 
@@ -681,7 +669,7 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void givenStatusIN_REVISION_updateInitiativeApprovedStatus_thenThrowInitiativeException(){
+    void givenStatusIN_REVISION_updateInitiativeApprovedStatus_thenThrowInitiativeException() {
         Initiative initiative = createStep4Initiative();
         initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
 
@@ -700,7 +688,7 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void givenStatusTO_CHECK_updateInitiativeApprovedStatus_whenStatusNotValid_thenThrowInitiativeException(){
+    void givenStatusTO_CHECK_updateInitiativeApprovedStatus_whenStatusNotValid_thenThrowInitiativeException() {
         Initiative initiative = createStep4Initiative();
         initiative.setStatus(InitiativeConstants.Status.TO_CHECK);
 
@@ -715,7 +703,7 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void logicallyDeleteInitiative_thenDeletedIsSettedToTrueWithSuccess(){
+    void logicallyDeleteInitiative_thenDeletedIsSettedToTrueWithSuccess() {
         Initiative initiative = createStep5Initiative();
         initiative.setEnabled(true);
 
@@ -728,7 +716,7 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void logicallyDeleteInitiative_thenThrowNewInitiativeException(){
+    void logicallyDeleteInitiative_thenThrowNewInitiativeException() {
         Initiative initiative = createStep5Initiative();
         initiative.setEnabled(true);
 
@@ -747,7 +735,7 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void updateInitiativeStatusToCheck_thenStatusIsUpdatedWithSuccess(){
+    void updateInitiativeStatusToCheck_thenStatusIsUpdatedWithSuccess() {
         Initiative step4Initiative = createStep4Initiative();
         step4Initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
 
@@ -758,8 +746,9 @@ class InitiativeServiceTest {
         // you are expecting initiativeValidationService to be called once with correct param
         verify(initiativeValidationService, times(1)).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
     }
+
     @Test
-    void updateInitiativeStatusToCheck_thenThrowInitiativeExceptionStatusIsNotInRevision(){
+    void updateInitiativeStatusToCheck_thenThrowInitiativeExceptionStatusIsNotInRevision() {
         Initiative step4Initiative = createStep4Initiative();
         step4Initiative.setStatus(InitiativeConstants.Status.TO_CHECK);
 
@@ -778,7 +767,7 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void updateInitiativeStatusToPUBLISHED_thenInitiativeIsUpdated(){
+    void updateInitiativeStatusToPUBLISHED_thenInitiativeIsUpdated() {
         Initiative initiativeExpected = createStep5Initiative();
         initiativeExpected.setStatus(InitiativeConstants.Status.PUBLISHED);
 
@@ -793,9 +782,8 @@ class InitiativeServiceTest {
     }
 
 
-
     @Test
-    void givenInitiativeAPPROVEDandNextStatusPUBLISHED_whenInitiativeIsAllowedToBeNextStatus_thenOk(){
+    void givenInitiativeAPPROVEDandNextStatusPUBLISHED_whenInitiativeIsAllowedToBeNextStatus_thenOk() {
         //Instruct Initiative to have a status Valid (APPROVED)
         Initiative initiative = createStep5Initiative();
         initiative.setStatus(InitiativeConstants.Status.APPROVED);
@@ -807,7 +795,7 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void givenOneOfInitiativeStatusNotAPPROVEDandNextStatusPUBLISHED_whenInitiativeIsNOTAllowedToBeNextStatus_thenThrowInitiativeException(){
+    void givenOneOfInitiativeStatusNotAPPROVEDandNextStatusPUBLISHED_whenInitiativeIsNOTAllowedToBeNextStatus_thenThrowInitiativeException() {
         //Instruct Initiative to have a status Not Valid
         Initiative initiative = createStep5Initiative();
         initiative.setStatus(InitiativeConstants.Status.TO_CHECK);
@@ -823,7 +811,7 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void givenAnyInitiative_whenNextStatusIsNotSetOfInitiativeStatus_thenThrowInitiativeException(){
+    void givenAnyInitiative_whenNextStatusIsNotSetOfInitiativeStatus_thenThrowInitiativeException() {
         //Instruct Initiative to have a status Not Valid
         Initiative initiative = createStep5Initiative();
 
@@ -838,7 +826,7 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void givenInitiativeDTO_whenRuleEngineProduceIsValid_thenOk(){
+    void givenInitiativeDTO_whenRuleEngineProduceIsValid_thenOk() {
         //Instruct Initiative
         Initiative initiative = createStep5Initiative();
 
@@ -852,7 +840,7 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void givenInitiativeDTO_whenRuleEngineProduceIsNotValid_thenThrowException(){
+    void givenInitiativeDTO_whenRuleEngineProduceIsNotValid_thenThrowException() {
         //Instruct Initiative
         Initiative initiative = createStep5Initiative();
 
@@ -865,7 +853,8 @@ class InitiativeServiceTest {
         IllegalStateException exception = Assertions.assertThrows(IllegalStateException.class, executable);
     }
 
-    @Test //Mancano i test con Exception
+    @Test
+        //Mancano i test con Exception
     void givenDTOsInitiativeAndInitiativeOrganizationInfo_whenIntegrationWithIOBackEndIsOK_thenReturnInitiativeUpdated() throws Exception {
         //Instruct Initiative
         Initiative initiative = createStep5Initiative();
@@ -896,17 +885,17 @@ class InitiativeServiceTest {
     @Test
     void getOnboardingStatusList_ok() {
         Initiative initiative = this.createFullInitiative();
-        OnboardingStatusCitizenDTO onboardingStatusCitizenDTO = new OnboardingStatusCitizenDTO(USER_ID,STATUS,LocalDateTime.now().toString());
+        OnboardingStatusCitizenDTO onboardingStatusCitizenDTO = new OnboardingStatusCitizenDTO(USER_ID, STATUS, LocalDateTime.now().toString());
         List<OnboardingStatusCitizenDTO> onboardingStatusCitizenDTOS = new ArrayList<>();
         onboardingStatusCitizenDTOS.add(onboardingStatusCitizenDTO);
-        ResponseOnboardingDTO onboardingDTO = new ResponseOnboardingDTO(onboardingStatusCitizenDTOS,1,1,1,1);
+        ResponseOnboardingDTO onboardingDTO = new ResponseOnboardingDTO(onboardingStatusCitizenDTOS, 1, 1, 1, 1);
         DecryptCfDTO decryptCfDTO = new DecryptCfDTO(CF);
         EncryptedCfDTO encryptedCfDTO = new EncryptedCfDTO(USER_ID);
         Mockito.when(encryptRestConnector.upsertToken(Mockito.any())).thenReturn(encryptedCfDTO);
-        Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID,INITIATIVE_ID,true)).thenReturn(Optional.of(initiative));
-        Mockito.when(onboardingRestConnector.getOnboarding(INITIATIVE_ID,null,USER_ID,STARTDATE,ENDDATE,STATUS)).thenReturn(onboardingDTO);
+        Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
+        Mockito.when(onboardingRestConnector.getOnboarding(INITIATIVE_ID, null, USER_ID, STARTDATE, ENDDATE, STATUS)).thenReturn(onboardingDTO);
         Mockito.when(decryptRestConnector.getPiiByToken(USER_ID)).thenReturn(decryptCfDTO);
-        OnboardingDTO onboardingDTO1 = initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID,CF, STARTDATE,ENDDATE,STATUS,null);
+        OnboardingDTO onboardingDTO1 = initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID, CF, STARTDATE, ENDDATE, STATUS, null);
         assertEquals(onboardingDTO1.getContent().get(0).getBeneficiary(), CF);
         assertEquals(onboardingDTO1.getContent().get(0).getBeneficiaryState(), STATUS);
 
@@ -915,14 +904,14 @@ class InitiativeServiceTest {
     @Test
     void getOnboardingStatusList_ko_encrypt() {
         Initiative initiative = this.createFullInitiative();
-        OnboardingStatusCitizenDTO onboardingStatusCitizenDTO = new OnboardingStatusCitizenDTO(USER_ID,STATUS,LocalDateTime.now().toString());
+        OnboardingStatusCitizenDTO onboardingStatusCitizenDTO = new OnboardingStatusCitizenDTO(USER_ID, STATUS, LocalDateTime.now().toString());
         EncryptedCfDTO encryptedCfDTO = new EncryptedCfDTO(USER_ID);
-        Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID,INITIATIVE_ID,true)).thenReturn(Optional.of(initiative));
-        Mockito.doThrow(new InitiativeException(InternalServerError.CODE, "",HttpStatus.INTERNAL_SERVER_ERROR)).when(encryptRestConnector).upsertToken(Mockito.any());
-        try{
-            OnboardingDTO onboardingDTO1 = initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID,CF, STARTDATE,ENDDATE,STATUS,null);
+        Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
+        Mockito.doThrow(new InitiativeException(InternalServerError.CODE, "", HttpStatus.INTERNAL_SERVER_ERROR)).when(encryptRestConnector).upsertToken(Mockito.any());
+        try {
+            OnboardingDTO onboardingDTO1 = initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID, CF, STARTDATE, ENDDATE, STATUS, null);
             Assertions.fail();
-        }catch(InitiativeException e){
+        } catch (InitiativeException e) {
             assertEquals(e.getCode(), InternalServerError.CODE);
         }
     }
@@ -930,19 +919,19 @@ class InitiativeServiceTest {
     @Test
     void getOnboardingStatusList_ko_decrypt() {
         Initiative initiative = this.createFullInitiative();
-        OnboardingStatusCitizenDTO onboardingStatusCitizenDTO = new OnboardingStatusCitizenDTO(USER_ID,STATUS,LocalDateTime.now().toString());
+        OnboardingStatusCitizenDTO onboardingStatusCitizenDTO = new OnboardingStatusCitizenDTO(USER_ID, STATUS, LocalDateTime.now().toString());
         List<OnboardingStatusCitizenDTO> onboardingStatusCitizenDTOS = new ArrayList<>();
         onboardingStatusCitizenDTOS.add(onboardingStatusCitizenDTO);
-        ResponseOnboardingDTO onboardingDTO = new ResponseOnboardingDTO(onboardingStatusCitizenDTOS,1,1,1,1);
+        ResponseOnboardingDTO onboardingDTO = new ResponseOnboardingDTO(onboardingStatusCitizenDTOS, 1, 1, 1, 1);
         EncryptedCfDTO encryptedCfDTO = new EncryptedCfDTO(USER_ID);
         Mockito.when(encryptRestConnector.upsertToken(Mockito.any())).thenReturn(encryptedCfDTO);
-        Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID,INITIATIVE_ID,true)).thenReturn(Optional.of(initiative));
-        Mockito.when(onboardingRestConnector.getOnboarding(INITIATIVE_ID,null,USER_ID,STARTDATE,ENDDATE,STATUS)).thenReturn(onboardingDTO);
-        Mockito.doThrow(new InitiativeException(InternalServerError.CODE, "",HttpStatus.INTERNAL_SERVER_ERROR)).when(decryptRestConnector).getPiiByToken(Mockito.anyString());
-        try{
-            OnboardingDTO onboardingDTO1 = initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID,CF, STARTDATE,ENDDATE,STATUS,null);
+        Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
+        Mockito.when(onboardingRestConnector.getOnboarding(INITIATIVE_ID, null, USER_ID, STARTDATE, ENDDATE, STATUS)).thenReturn(onboardingDTO);
+        Mockito.doThrow(new InitiativeException(InternalServerError.CODE, "", HttpStatus.INTERNAL_SERVER_ERROR)).when(decryptRestConnector).getPiiByToken(Mockito.anyString());
+        try {
+            OnboardingDTO onboardingDTO1 = initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID, CF, STARTDATE, ENDDATE, STATUS, null);
             Assertions.fail();
-        }catch(InitiativeException e){
+        } catch (InitiativeException e) {
             assertEquals(e.getCode(), InternalServerError.CODE);
         }
     }
@@ -952,22 +941,22 @@ class InitiativeServiceTest {
         Initiative initiative = this.createFullInitiative();
         EncryptedCfDTO encryptedCfDTO = new EncryptedCfDTO(USER_ID);
         Mockito.when(encryptRestConnector.upsertToken(Mockito.any())).thenReturn(encryptedCfDTO);
-        Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID,INITIATIVE_ID,true)).thenReturn(Optional.of(initiative));
-        Mockito.doThrow(new InitiativeException(InternalServerError.CODE, "",HttpStatus.INTERNAL_SERVER_ERROR)).when(onboardingRestConnector).getOnboarding(INITIATIVE_ID,null,USER_ID,STARTDATE,ENDDATE,STATUS);
-        try{
-            OnboardingDTO onboardingDTO1 = initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID,CF, STARTDATE,ENDDATE,STATUS,null);
+        Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
+        Mockito.doThrow(new InitiativeException(InternalServerError.CODE, "", HttpStatus.INTERNAL_SERVER_ERROR)).when(onboardingRestConnector).getOnboarding(INITIATIVE_ID, null, USER_ID, STARTDATE, ENDDATE, STATUS);
+        try {
+            OnboardingDTO onboardingDTO1 = initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID, CF, STARTDATE, ENDDATE, STATUS, null);
             Assertions.fail();
-        }catch(InitiativeException e){
+        } catch (InitiativeException e) {
             assertEquals(e.getCode(), InternalServerError.CODE);
         }
     }
 
     @Test
     void getOnboardingStatusList_initiative_not_found() {
-        try{
-            OnboardingDTO onboardingDTO1 = initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID,CF, STARTDATE,ENDDATE,STATUS,null);
+        try {
+            OnboardingDTO onboardingDTO1 = initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID, CF, STARTDATE, ENDDATE, STATUS, null);
             Assertions.fail();
-        }catch(InitiativeException e){
+        } catch (InitiativeException e) {
             assertEquals(e.getCode(), NotFound.CODE);
         }
     }
@@ -1025,12 +1014,12 @@ class InitiativeServiceTest {
                 .build();
     }
 
-    Initiative createFullInitiative () {
+    Initiative createFullInitiative() {
         Initiative initiative = createStep5Initiative();
         return initiative;
     }
 
-    InitiativeDTO createFullInitiativeDTO () {
+    InitiativeDTO createFullInitiativeDTO() {
         InitiativeDTO initiativeDTO = createStep5InitiativeDTO();
         return initiativeDTO;
     }
@@ -1039,7 +1028,7 @@ class InitiativeServiceTest {
      * Step 1
      */
 
-    Initiative createStep1Initiative () {
+    Initiative createStep1Initiative() {
         Initiative initiative = new Initiative();
         initiative.setInitiativeId(INITIATIVE_ID);
         initiative.setInitiativeName(INITIATIVE_NAME);
@@ -1086,7 +1075,7 @@ class InitiativeServiceTest {
         return initiativeAdditional;
     }
 
-    InitiativeDTO createStep1InitiativeDTO () {
+    InitiativeDTO createStep1InitiativeDTO() {
         InitiativeDTO initiativeDTO = new InitiativeDTO();
         initiativeDTO = initiativeDTO.builder()
                 .initiativeId(INITIATIVE_ID)
@@ -1125,7 +1114,8 @@ class InitiativeServiceTest {
         initiativeAdditionalDTO.setServiceName("serviceName");
         initiativeAdditionalDTO.setServiceScope(InitiativeAdditionalDTO.ServiceScope.LOCAL);
         initiativeAdditionalDTO.setDescription("description");
-        initiativeAdditionalDTO.setPrivacyLink("privacy.url.it");;
+        initiativeAdditionalDTO.setPrivacyLink("privacy.url.it");
+        ;
         initiativeAdditionalDTO.setTcLink("tos.url.it");
         ChannelDTO channelDTO = new ChannelDTO();
         channelDTO.setType(ChannelDTO.TypeEnum.WEB);
@@ -1140,7 +1130,7 @@ class InitiativeServiceTest {
      * Step 2
      */
 
-    Initiative createStep2Initiative () {
+    Initiative createStep2Initiative() {
         Initiative initiative = createStep1Initiative();
         InitiativeBeneficiaryRule initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
         initiative.setBeneficiaryRule(initiativeBeneficiaryRule);
@@ -1178,7 +1168,7 @@ class InitiativeServiceTest {
         return initiativeBeneficiaryRule;
     }
 
-    InitiativeDTO createStep2InitiativeDTO () {
+    InitiativeDTO createStep2InitiativeDTO() {
         InitiativeDTO initiativeDTO = createStep1InitiativeDTO();
         InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
         initiativeDTO.setBeneficiaryRule(initiativeBeneficiaryRuleDTO);
@@ -1217,10 +1207,10 @@ class InitiativeServiceTest {
     }
 
     /*
-    * Step 3
+     * Step 3
      */
 
-    Initiative createStep3Initiative () {
+    Initiative createStep3Initiative() {
         Initiative initiative = createStep2Initiative();
         //TODO ora settato con l'utilizzo dei RewardGroups. Associare un faker booleano per i casi OK, altrimenti separare i 2 casi
         initiative.setRewardRule(createRewardRule(false));
@@ -1229,11 +1219,10 @@ class InitiativeServiceTest {
     }
 
     private InitiativeRewardRule createRewardRule(boolean isRewardFixedValue) {
-        if(isRewardFixedValue){
+        if (isRewardFixedValue) {
             //TODO Aggiungere RewardValue
             return null;
-        }
-        else {
+        } else {
             RewardGroups rewardGroups = new RewardGroups();
             RewardGroups.RewardGroup rewardGroup1 = new RewardGroups.RewardGroup(BigDecimal.valueOf(10), BigDecimal.valueOf(20), BigDecimal.valueOf(30));
             RewardGroups.RewardGroup rewardGroup2 = new RewardGroups.RewardGroup(BigDecimal.valueOf(10), BigDecimal.valueOf(30), BigDecimal.valueOf(40));
@@ -1303,7 +1292,7 @@ class InitiativeServiceTest {
         return initiativeTrxConditions;
     }
 
-    InitiativeDTO createStep3InitiativeDTO () {
+    InitiativeDTO createStep3InitiativeDTO() {
         InitiativeDTO initiativeDTO = createStep2InitiativeDTO();
         //TODO ora settato con l'utilizzo dei RewardGroups. Associare un faker booleano per i casi OK, altrimenti separare i 2 casi
         initiativeDTO.setRewardRule(createRewardRuleDTO(false));
@@ -1312,11 +1301,10 @@ class InitiativeServiceTest {
     }
 
     private InitiativeRewardRuleDTO createRewardRuleDTO(boolean isRewardFixedValue) {
-        if(isRewardFixedValue){
+        if (isRewardFixedValue) {
             //TODO Aggiungere RewardValue
             return null;
-        }
-        else {
+        } else {
             RewardGroupsDTO rewardGroupsDTO = new RewardGroupsDTO();
             RewardGroupsDTO.RewardGroupDTO rewardGroupDTO1 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(10), BigDecimal.valueOf(20), BigDecimal.valueOf(30));
             RewardGroupsDTO.RewardGroupDTO rewardGroupDTO2 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(10), BigDecimal.valueOf(30), BigDecimal.valueOf(40));
@@ -1386,53 +1374,54 @@ class InitiativeServiceTest {
         return initiativeTrxConditionsDTO;
     }
 
-    private Initiative createStep4Initiative () {
+    private Initiative createStep4Initiative() {
         Initiative initiative = createStep3Initiative();
         return initiative;
     }
 
-    private InitiativeDTO createStep4InitiativeDTO () {
+    private InitiativeDTO createStep4InitiativeDTO() {
         InitiativeDTO initiativeDTO = createStep3InitiativeDTO();
         return initiativeDTO;
     }
 
-    private Initiative createStep5Initiative () {
+    private Initiative createStep5Initiative() {
         Initiative initiative = createStep4Initiative();
         return initiative;
     }
 
-    private InitiativeDTO createStep5InitiativeDTO () {
+    private InitiativeDTO createStep5InitiativeDTO() {
         InitiativeDTO initiativeDTO = createStep4InitiativeDTO();
         return initiativeDTO;
     }
 
-    AccumulatedAmount createAccumulatedAmountValid(){
+    AccumulatedAmount createAccumulatedAmountValid() {
         AccumulatedAmount amount = new AccumulatedAmount();
         amount.setAccumulatedType(AccumulatedAmount.AccumulatedTypeEnum.THRESHOLD_REACHED);
         amount.setRefundThreshold(BigDecimal.valueOf(100000));
         return amount;
     }
 
-    TimeParameter createTimeParameterValid(){
+    TimeParameter createTimeParameterValid() {
         TimeParameter timeParameter = new TimeParameter();
         timeParameter.setTimeType(TimeParameter.TimeTypeEnum.CLOSED);
         return timeParameter;
     }
 
-    AdditionalInfo createAdditionalInfoValid(){
+    AdditionalInfo createAdditionalInfoValid() {
         AdditionalInfo additionalInfo = new AdditionalInfo();
         additionalInfo.setIdentificationCode("B002");
         return additionalInfo;
     }
 
-    InitiativeRefundRule createRefundRuleValidWithAccumulatedAmount(){
+    InitiativeRefundRule createRefundRuleValidWithAccumulatedAmount() {
         InitiativeRefundRule refundRule = new InitiativeRefundRule();
         refundRule.setAccumulatedAmount(createAccumulatedAmountValid());
         refundRule.setTimeParameter(null);
         refundRule.setAdditionalInfo(createAdditionalInfoValid());
         return refundRule;
     }
-    InitiativeRefundRule createRefundRuleValidWithTimeParameter(){
+
+    InitiativeRefundRule createRefundRuleValidWithTimeParameter() {
         InitiativeRefundRule refundRule = new InitiativeRefundRule();
         refundRule.setAccumulatedAmount(null);
         refundRule.setTimeParameter(createTimeParameterValid());
@@ -1440,7 +1429,7 @@ class InitiativeServiceTest {
         return refundRule;
     }
 
-    Initiative createInitiativeOnlyRefundRule(){
+    Initiative createInitiativeOnlyRefundRule() {
         Initiative initiative = createStep1Initiative();
         initiative.setRefundRule(createRefundRuleValidWithAccumulatedAmount());
         return initiative;
