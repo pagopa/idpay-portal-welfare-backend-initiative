@@ -435,6 +435,12 @@ class InitiativeValidationServiceTest {
         return initiativeBeneficiaryRuleDTO;
     }
 
+    @Test
+    void testCheckPermissionBeforeInsert2() {
+        assertThrows(InitiativeException.class,
+                () -> initiativeValidationService.checkPermissionBeforeInsert("ope_base"));
+    }
+
     /*
      * ############### Step 4 ###############
      */
@@ -597,5 +603,4 @@ class InitiativeValidationServiceTest {
         initiativeDTO.setRefundRule(createRefundRuleDTOValidWithTimeParameter());
         return initiativeDTO;
     }
-
 }
