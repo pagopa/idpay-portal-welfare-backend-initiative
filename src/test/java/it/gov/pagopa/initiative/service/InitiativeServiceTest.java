@@ -56,8 +56,7 @@ import java.util.*;
 
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.ADMIN;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.OPE_BASE;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -505,6 +504,52 @@ class InitiativeServiceTest {
                 FILE_NAME);
 
         assertEquals(logoDTO.getLogoFileName(), FILE_NAME);
+    }
+
+    @Test
+    void storeInitiativeLogo_koExtension() throws Exception {
+        InputStream logo = new ByteArrayInputStream("logo.png".getBytes());
+        Initiative initiative = this.createFullInitiative();
+        Set <String> logoExtension = new HashSet<>();
+        Set <String> logoMimeTypes = new HashSet<>();
+        logoExtension.add(LOGO_EXTENSION);
+        logoMimeTypes.add(LOGO_MIME_TYPE);
+        InitiativeGeneral general = createInitiativeGeneral(true);
+        initiative.setGeneral(general);
+        Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
+        Mockito.doNothing().when(fileStorageConnector).uploadInitiativeLogo(Mockito.any(), Mockito.anyString(),
+                Mockito.anyString());
+        Mockito.when(initiativeUtils.getAllowedInitiativeLogoExtensions()).thenReturn(logoExtension);
+        Mockito.when(initiativeUtils.getAllowedInitiativeLogoMimeTypes()).thenReturn(logoMimeTypes);
+        try {
+            LogoDTO logoDTO = initiativeService.storeInitiativeLogo(ORGANIZATION_ID, INITIATIVE_ID, logo, LOGO_MIME_TYPE,
+                    "logo.jpg");
+        } catch(Exception e) {
+            assertTrue(e.getMessage().contains("Invalid file extension"));
+        }
+    }
+
+    @Test
+    void storeInitiativeLogo_koMimeType() throws Exception {
+        InputStream logo = new ByteArrayInputStream("logo.png".getBytes());
+        Initiative initiative = this.createFullInitiative();
+        Set <String> logoExtension = new HashSet<>();
+        Set <String> logoMimeTypes = new HashSet<>();
+        logoExtension.add(LOGO_EXTENSION);
+        logoMimeTypes.add(LOGO_MIME_TYPE);
+        InitiativeGeneral general = createInitiativeGeneral(true);
+        initiative.setGeneral(general);
+        Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
+        Mockito.doNothing().when(fileStorageConnector).uploadInitiativeLogo(Mockito.any(), Mockito.anyString(),
+                Mockito.anyString());
+        Mockito.when(initiativeUtils.getAllowedInitiativeLogoExtensions()).thenReturn(logoExtension);
+        Mockito.when(initiativeUtils.getAllowedInitiativeLogoMimeTypes()).thenReturn(logoMimeTypes);
+        try {
+            LogoDTO logoDTO = initiativeService.storeInitiativeLogo(ORGANIZATION_ID, INITIATIVE_ID, logo, "image/jpg",
+                    FILE_NAME);
+        } catch(Exception e) {
+            assertTrue(e.getMessage().contains("allowed only"));
+        }
     }
 
     @Test
