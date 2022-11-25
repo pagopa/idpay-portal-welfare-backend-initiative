@@ -4,7 +4,6 @@ import it.gov.pagopa.initiative.dto.config.ConfigMccDTO;
 import it.gov.pagopa.initiative.dto.config.ConfigTrxRuleDTO;
 import it.gov.pagopa.initiative.model.config.ConfigMcc;
 import it.gov.pagopa.initiative.model.config.ConfigTrxRule;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @WebMvcTest(value = {
         ConfigStaticModelToDTOMapper.class})
-@Slf4j
 class ConfigStaticModelToDTOMapperTest {
     @Autowired
     ConfigStaticModelToDTOMapper configStaticModelToDTOMapper;

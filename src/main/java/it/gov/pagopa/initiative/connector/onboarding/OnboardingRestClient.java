@@ -1,7 +1,6 @@
 package it.gov.pagopa.initiative.connector.onboarding;
 
 import it.gov.pagopa.initiative.dto.ResponseOnboardingDTO;
-import java.time.LocalDateTime;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -10,6 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.time.LocalDateTime;
 
 @FeignClient(
     name = "${rest-client.onboarding.serviceCode}",

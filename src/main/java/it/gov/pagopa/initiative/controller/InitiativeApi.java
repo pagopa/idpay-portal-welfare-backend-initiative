@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
 import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
-import java.io.IOException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -20,10 +19,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import org.springframework.web.multipart.MultipartFile;
+import java.util.Locale;
 
 public interface InitiativeApi {
 
@@ -350,7 +351,7 @@ public interface InitiativeApi {
       @ApiResponse(responseCode = "500", description = "Server ERROR", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))})
   @GetMapping(value = "/idpay/initiative",
       produces = {"application/json"})
-  ResponseEntity<InitiativeDTO> getInitiativeIdFromServiceId(
+  ResponseEntity<InitiativeDataDTO> getInitiativeIdFromServiceId(@RequestHeader(value = "Accept-Language", defaultValue = "it_IT") Locale acceptLanguage,
       @RequestParam(required = true) String serviceId);
 
   @Operation(summary = "Return primary and secondary token of the specified initiative", description = "", security = {

@@ -81,6 +81,7 @@ microservice-chart:
     SELC_UID: idpay
     BLOB_STORAGE_CONTAINER_REFERENCE: logo
     INITIATIVE_LOGO_URL: "https://idpaydinitiativestorage.blob.core.windows.net/logo/"
+    RANKING_GRACE_PERIOD: "10"
 
   envConfigMapExternals:
     idpay-common:

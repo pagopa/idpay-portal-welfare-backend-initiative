@@ -3,7 +3,6 @@ package it.gov.pagopa.initiative.utils.validator;
 import it.gov.pagopa.initiative.dto.InitiativeGeneralDTO;
 import it.gov.pagopa.initiative.utils.constraint.RankingAndSpendingDatesDoubleUseCaseValue;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -18,40 +17,14 @@ import java.time.LocalDate;
 @Slf4j
 public class RankingAndSpendingDatesDoubleUseCaseValidator implements ConstraintValidator<RankingAndSpendingDatesDoubleUseCaseValue, InitiativeGeneralDTO> {
 
-    private static final SpelExpressionParser PARSER = new SpelExpressionParser();
-    private String rankingStart;
-    private String rankingEnd;
-    private String start;
-    private String end;
-    @Override
-    public void initialize(RankingAndSpendingDatesDoubleUseCaseValue constraintAnnotation) {
-        rankingStart = constraintAnnotation.date1();
-        rankingEnd = constraintAnnotation.date2();
-        start = constraintAnnotation.date3();
-        end = constraintAnnotation.date4();
-    }
-
     @Override
     public boolean isValid(InitiativeGeneralDTO value, ConstraintValidatorContext context) {
-        LocalDate rankingStartDate = null;
-        LocalDate rankingEndDate = null;
-        LocalDate startDate = null;
-        LocalDate endDate = null;
-        if (PARSER.parseExpression(rankingStart).getValue(value) instanceof LocalDate localeDateInput){
-            rankingStartDate = localeDateInput;
-        }
-        if (PARSER.parseExpression(rankingEnd).getValue(value) instanceof LocalDate localeDateInput){
-            rankingEndDate = localeDateInput;
-        }
-        if (PARSER.parseExpression(start).getValue(value) instanceof LocalDate localeDateInput){
-            startDate = localeDateInput;
-        }
-        if (PARSER.parseExpression(end).getValue(value) instanceof LocalDate localeDateInput){
-            endDate = localeDateInput;
-        }
+        LocalDate rankingStartDate = value.getRankingStartDate();
+        LocalDate rankingEndDate = value.getRankingEndDate();
+        LocalDate startDate = value.getStartDate();
+        LocalDate endDate = value.getEndDate();
 
-
-        if (startDate != null && endDate != null){//if both start and end buy dates are not present, false.
+        if (startDate != null && endDate != null){//if both start and end buy dates are not present, then Violation! return false.
             log.debug("start and end date not null");
             if (rankingStartDate != null){//if dates are all present, they are checked.
                 if (rankingEndDate != null){

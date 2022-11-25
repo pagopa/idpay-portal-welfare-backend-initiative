@@ -34,7 +34,7 @@ import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
 import it.gov.pagopa.initiative.model.rule.trx.*;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
 import it.gov.pagopa.initiative.utils.InitiativeUtils;
-import lombok.extern.slf4j.Slf4j;
+import it.gov.pagopa.initiative.utils.Utilities;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
@@ -68,7 +68,6 @@ import static org.mockito.Mockito.*;
         })
 @WebMvcTest(value = {
         InitiativeService.class})
-@Slf4j
 class InitiativeServiceTest {
 
     private static final String ANY_NOT_INITIATIVE_STATE = "ANY_NOT_INITIATIVE_STATE";
@@ -113,6 +112,9 @@ class InitiativeServiceTest {
 
     @MockBean
     InitiativeModelToDTOMapper initiativeModelToDTOMapper;
+
+    @MockBean
+    Utilities utilities;
 
     @MockBean
     InitiativeAdditionalDTOsToIOServiceRequestDTOMapper initiativeAdditionalDTOsToIOServiceRequestDTOMapper;
@@ -233,7 +235,7 @@ class InitiativeServiceTest {
         try {
             List<Initiative> initiatives = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, ADMIN);
         } catch (InitiativeException e) {
-            log.info("InitiativeException: " + e.getCode());
+            System.out.println("InitiativeException: " + e.getCode());
             assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
             assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
         }
@@ -429,7 +431,7 @@ class InitiativeServiceTest {
         try {
             Initiative initiative = initiativeService.getInitiativeBeneficiaryView(INITIATIVE_ID);
         } catch (InitiativeException e) {
-            log.info("InitiativeException: " + e.getCode());
+            System.out.println("InitiativeException: " + e.getCode());
             assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
             assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
         }
@@ -549,8 +551,12 @@ class InitiativeServiceTest {
         //Instruct the initiativeValidationService Mock to return Dummy Initiatives
         when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step2Initiative);
 
+        List<AutomatedCriteria> automatedCriteriaList = new ArrayList<>();
+        //Instruct the initiativeValidationService Mock to do nothing for checkAutomatedCriteriaOrderDirectionWithRanking
+        doNothing().when(initiativeValidationService).checkAutomatedCriteriaOrderDirectionWithRanking(step2Initiative,automatedCriteriaList);
+
         //Try to call the Real Service (which is using the instructed Repo)
-        initiativeService.updateInitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule, ROLE);
+        initiativeService.updateStep3InitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule, ROLE);
 
         // you are expecting initiativeValidationService to be called once with correct param
         verify(initiativeValidationService, times(1)).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
@@ -568,7 +574,7 @@ class InitiativeServiceTest {
                 .when(initiativeValidationService).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
 
         //prepare Executable with invocation of the method on your system under test
-        Executable executable = () -> initiativeService.updateInitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule, ROLE);
+        Executable executable = () -> initiativeService.updateStep3InitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule, ROLE);
         InitiativeException exception = Assertions.assertThrows(InitiativeException.class, executable);
         assertEquals(InitiativeConstants.Exception.NotFound.CODE, exception.getCode());
         assertEquals(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE.formatted(INITIATIVE_ID), exception.getMessage());
@@ -1056,7 +1062,6 @@ class InitiativeServiceTest {
         initiativeGeneral.setDescriptionMap(language);
         return initiativeGeneral;
     }
-
     private InitiativeAdditional createInitiativeAdditional() {
         InitiativeAdditional initiativeAdditional = new InitiativeAdditional();
         initiativeAdditional.setServiceIO(true);
@@ -1091,6 +1096,8 @@ class InitiativeServiceTest {
     }
 
     private InitiativeGeneralDTO createInitiativeGeneralDTO(boolean beneficiaryKnown) {
+        Map<String, String> language = new HashMap<>();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(beneficiaryKnown);
@@ -1104,6 +1111,7 @@ class InitiativeServiceTest {
         initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
         initiativeGeneralDTO.setStartDate(startDate);
         initiativeGeneralDTO.setEndDate(endDate);
+        initiativeGeneralDTO.setDescriptionMap(language);
         return initiativeGeneralDTO;
     }
 

@@ -17,19 +17,28 @@ import it.gov.pagopa.initiative.event.InitiativeProducer;
 import it.gov.pagopa.initiative.exception.InitiativeException;
 import it.gov.pagopa.initiative.mapper.InitiativeAdditionalDTOsToIOServiceRequestDTOMapper;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
+import it.gov.pagopa.initiative.model.AutomatedCriteria;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeAdditional;
 import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
+import it.gov.pagopa.initiative.model.rule.refund.AdditionalInfo;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
 import it.gov.pagopa.initiative.utils.InitiativeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.InvalidMimeTypeException;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.time.LocalDateTime;
+import java.util.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -58,6 +67,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     private final IOTokenService ioTokenService;
     private final InitiativeValidationService initiativeValidationService;
     private final InitiativeUtils initiativeUtils;
+    private final Utilities utilities;
 
     public InitiativeServiceImpl(
             @Value("${app.initiative.conditions.notifyEmail}") boolean notifyEmail,
@@ -74,8 +84,8 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             EmailNotificationService emailNotificationService,
             IOTokenService ioTokenService,
             InitiativeValidationService initiativeValidationService,
-            InitiativeUtils initiativeUtils
-    ) {
+            InitiativeUtils initiativeUtils,
+            Utilities utilities){
         this.notifyEmail = notifyEmail;
         this.initiativeRepository = initiativeRepository;
         this.initiativeModelToDTOMapper = initiativeModelToDTOMapper;
@@ -91,6 +101,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         this.ioTokenService = ioTokenService;
         this.initiativeValidationService = initiativeValidationService;
         this.initiativeUtils = initiativeUtils;
+        this.utilities = utilities;
     }
 
     public List<Initiative> retrieveInitiativeSummary(String organizationId, String role) {
@@ -122,11 +133,13 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         if (notifyEmail) {
             emailNotificationService.sendInitiativeToCurrentOrganization(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_CREATED, SUBJECT_INITIATIVE_CREATED);
         }
+        utilities.newInitiative(this.getUserId(), initiative.getInitiativeId());
         return initiativeReturned;
     }
 
     @Override
     public Initiative getInitiative(String organizationId, String initiativeId, String role) {
+        utilities.getIniziative(this.getUserId(), initiativeId);
         return initiativeValidationService.getInitiative(organizationId, initiativeId, role);
     }
 
@@ -158,14 +171,18 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     public void updateInitiativeAdditionalInfo(String organizationId, String initiativeId, Initiative initiativeAdditionalInfo, String role) {
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
         isInitiativeAllowedToBeEditableThenThrows(initiative);
-        initiative.setAdditionalInfo(initiativeAdditionalInfo.getAdditionalInfo());
+        InitiativeAdditional infoOriginal = initiative.getAdditionalInfo();
+        InitiativeAdditional infoNew =  initiativeAdditionalInfo.getAdditionalInfo();
+        BeanUtils.copyProperties(infoNew, infoOriginal, "logoFileName", "logoUploadDate", "serviceId", "primaryTokenIO", "secondaryTokenIO");
         initiative.setStatus(InitiativeConstants.Status.DRAFT);
         this.initiativeRepository.save(initiative);
     }
 
     @Override
-    public void updateInitiativeBeneficiary(String organizationId, String initiativeId, InitiativeBeneficiaryRule initiativeBeneficiaryRuleModel, String role) {
+    public void updateStep3InitiativeBeneficiary(String organizationId, String initiativeId, InitiativeBeneficiaryRule initiativeBeneficiaryRuleModel, String role){
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
+        List<AutomatedCriteria> automatedCriteriaList = initiativeBeneficiaryRuleModel.getAutomatedCriteria();
+        initiativeValidationService.checkAutomatedCriteriaOrderDirectionWithRanking(initiative, automatedCriteriaList);
         //Check Initiative Status
         isInitiativeAllowedToBeEditableThenThrows(initiative);
         initiative.setBeneficiaryRule(initiativeBeneficiaryRuleModel);
@@ -187,6 +204,8 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     @Override
     public void updateInitiativeRefundRules(String organizationId, String initiativeId, String role, Initiative refundRule, boolean changeInitiativeStatus) {
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
+        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(initiative);
+        //initiativeValidationService.validateAllWizardSteps(initiativeDTO);
         //Check Initiative Status
         isInitiativeAllowedToBeEditableThenThrows(initiative);
         initiative.setRefundRule(refundRule.getRefundRule());
@@ -194,6 +213,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         initiative.setStatus(InitiativeConstants.Status.DRAFT);
         if (changeInitiativeStatus) {
             initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
+            utilities.initiativeInRevision(this.getUserId(),initiativeId);
             log.info("[UPDATE_TO_IN_REVISION_STATUS] - Initiative: {}. Status successfully set to IN_REVISION.", initiativeId);
         }
         this.initiativeRepository.save(initiative);
@@ -213,6 +233,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         isInitiativeStatusNotInRevisionThenThrow(initiative, InitiativeConstants.Status.APPROVED);
         initiative.setStatus(InitiativeConstants.Status.APPROVED);
         this.initiativeRepository.save(initiative);
+        utilities.initiativeApproved(this.getUserId(),initiativeId);
         log.info("[UPDATE_TO_APPROVED_STATUS] - Initiative: {}. Status successfully changed", initiative.getInitiativeId());
         if (notifyEmail) {
             try {
@@ -229,6 +250,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         isInitiativeStatusNotInRevisionThenThrow(initiative, InitiativeConstants.Status.TO_CHECK);
         initiative.setStatus(InitiativeConstants.Status.TO_CHECK);
         this.initiativeRepository.save(initiative);
+        utilities.initiativeToCheck(this.getUserId(), initiativeId);
         log.info("[UPDATE_TO_CHECK_STATUS] - Initiative: {}. Status successfully changed", initiative.getInitiativeId());
         if (notifyEmail) {
             try {
@@ -377,7 +399,8 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         initiative.getAdditionalInfo().setPrimaryTokenIO(encryptedPrimaryToken);
         initiative.getAdditionalInfo().setSecondaryTokenIO(encryptedSecondaryToken);
         additionalInfo.setServiceId(serviceResponseDTO.getServiceId());
-        if (notifyEmail) {
+        utilities.initiativePublished(this.getUserId(),initiative.getInitiativeId());
+        if(notifyEmail){
             try {
                 emailNotificationService.sendInitiativeToCurrentOrganization(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
                 emailNotificationService.sendInitiativeToPagoPA(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
@@ -479,5 +502,10 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             throw new IllegalArgumentException(String.format("Invalid file extension \"%s\": allowed only %s", fileExtension,
                     initiativeUtils.getAllowedInitiativeLogoExtensions()));
         }
+    }
+
+    private String getUserId(){
+        RequestAttributes requestAttributes =RequestContextHolder.getRequestAttributes();
+        return (String) requestAttributes.getAttribute("organizationUserId", RequestAttributes.SCOPE_REQUEST);
     }
 }

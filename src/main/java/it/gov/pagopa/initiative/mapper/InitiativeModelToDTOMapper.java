@@ -1,6 +1,5 @@
 package it.gov.pagopa.initiative.mapper;
 
-import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.rule.refund.AccumulatedAmountDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
@@ -21,14 +20,38 @@ import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
 import it.gov.pagopa.initiative.model.rule.trx.*;
 import it.gov.pagopa.initiative.utils.InitiativeUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 
 @Component
 public class InitiativeModelToDTOMapper {
+
+    @Autowired
+    InitiativeUtils initiativeUtils;
+    public InitiativeDataDTO toInitiativeDataDTO(Initiative initiative, Locale acceptLanguage) {
+        if (initiative == null) {
+            return null;
+        }
+        String description = StringUtils.EMPTY;
+        if (initiative.getGeneral() != null && initiative.getGeneral().getDescriptionMap() != null) {
+            //if no description for the given accepted language, try the default to italian
+            description = StringUtils.defaultString(
+                    initiative.getGeneral().getDescriptionMap().get(acceptLanguage.getLanguage()),
+                    initiative.getGeneral().getDescriptionMap().get(Locale.ITALIAN.getLanguage())
+            );
+        }
+        return InitiativeDataDTO.builder()
+                .initiativeId(initiative.getInitiativeId())
+                .description(description)
+                .build();
+    }
+
     public InitiativeDTO toInitiativeDTO(Initiative initiative) {
         if (initiative == null) {
             return null;
@@ -43,7 +66,7 @@ public class InitiativeModelToDTOMapper {
         initiativeDto.setGeneral(this.toInitiativeGeneralDTO(initiative.getGeneral()));
         initiativeDto.setAdditionalInfo(this.toInitiativeAdditionalDTO(initiative.getAdditionalInfo()));
         if(initiativeDto.getAdditionalInfo() != null && initiativeDto.getAdditionalInfo().getLogoFileName() != null){
-            initiativeDto.getAdditionalInfo().setLogoURL(new InitiativeUtils().createLogoUrl(initiative.getOrganizationId(),
+            initiativeDto.getAdditionalInfo().setLogoURL(initiativeUtils.createLogoUrl(initiative.getOrganizationId(),
                     initiative.getInitiativeId()));
         }
         initiativeDto.setBeneficiaryRule(this.toInitiativeBeneficiaryRuleDTO(initiative.getBeneficiaryRule()));
@@ -85,6 +108,7 @@ public class InitiativeModelToDTOMapper {
                 .startDate(general.getStartDate())
                 .rankingEndDate(general.getRankingEndDate())
                 .rankingStartDate(general.getRankingStartDate())
+                .rankingEnabled(general.getRankingEnabled())
                 .descriptionMap(general.getDescriptionMap()).build();
     }
 
@@ -128,14 +152,17 @@ public class InitiativeModelToDTOMapper {
             beneficiaryRuleDto.setAutomatedCriteria(Collections.emptyList());
         } else {
 
-            beneficiaryRuleDto.setAutomatedCriteria(beneficiaryRule.getAutomatedCriteria().stream().map(x ->
+            beneficiaryRuleDto.setAutomatedCriteria(beneficiaryRule.getAutomatedCriteria().stream().map(modelAC ->
                     AutomatedCriteriaDTO.builder()
-                            .code(x.getCode())
-                            .field(x.getField())
-                            .operator(FilterOperatorEnum.valueOf(x.getOperator().name()))
-                            .authority(x.getAuthority())//TODO definire modalità di recupero authority
-                            .value(x.getValue())
-                            .value2(x.getValue2())
+                            .code(modelAC.getCode())
+                            .field(modelAC.getField())
+                            .operator(FilterOperatorEnum.valueOf(modelAC.getOperator().name()))
+                            .authority(modelAC.getAuthority())//TODO definire modalità di recupero authority
+                            .value(modelAC.getValue())
+                            .value2(modelAC.getValue2())
+                            .orderDirection(modelAC.getOrderDirection() != null
+                                    ? AutomatedCriteriaDTO.OrderDirection.valueOf(modelAC.getOrderDirection().name())
+                                    : null)
                             .build()
             ).toList());
         }
@@ -171,16 +198,20 @@ public class InitiativeModelToDTOMapper {
         if (CollectionUtils.isEmpty(initiatives)) {
             return Collections.emptyList();
         }
-        return initiatives.stream().map(x -> InitiativeSummaryDTO.builder()
-                .initiativeId(x.getInitiativeId())
-                .initiativeName(StringUtils.isNotBlank(x.getInitiativeName()) ?
-                        x.getInitiativeName() :
-                        x.getAdditionalInfo() != null ?
-                                x.getAdditionalInfo().getServiceName()
+        return initiatives.stream().map(initiativeModel -> InitiativeSummaryDTO.builder()
+                .initiativeId(initiativeModel.getInitiativeId())
+                .initiativeName(StringUtils.isNotBlank(initiativeModel.getInitiativeName()) ?
+                        initiativeModel.getInitiativeName() :
+                        initiativeModel.getAdditionalInfo() != null ?
+                                initiativeModel.getAdditionalInfo().getServiceName()
                                 : StringUtils.EMPTY)
-                .status(x.getStatus())
-                .creationDate(x.getCreationDate())
-                .updateDate(x.getUpdateDate())
+                .status(initiativeModel.getStatus())
+                .creationDate(initiativeModel.getCreationDate())
+                .updateDate(initiativeModel.getUpdateDate())
+                .rankingEnabled(initiativeModel.getGeneral() !=null
+                        ? initiativeModel.getGeneral().getRankingEnabled() != null
+                            ? initiativeModel.getGeneral().getRankingEnabled() : null
+                        : null)
                 .build()).toList();
     }
 

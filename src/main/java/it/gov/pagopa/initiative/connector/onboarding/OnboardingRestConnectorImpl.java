@@ -1,9 +1,10 @@
 package it.gov.pagopa.initiative.connector.onboarding;
 
 import it.gov.pagopa.initiative.dto.ResponseOnboardingDTO;
-import java.time.LocalDateTime;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 public class OnboardingRestConnectorImpl implements OnboardingRestConnector {

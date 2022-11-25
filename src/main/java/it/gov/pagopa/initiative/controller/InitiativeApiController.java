@@ -9,18 +9,20 @@ import it.gov.pagopa.initiative.mapper.InitiativeDTOsToModelMapper;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.service.InitiativeService;
-import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.LocaleUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import org.springframework.web.multipart.MultipartFile;
+import java.util.Locale;
 
 @RestController
 @Slf4j
@@ -67,7 +69,7 @@ public class InitiativeApiController implements InitiativeApi {
     @Override
     public ResponseEntity<InitiativeDTO> saveInitiativeServiceInfo(String organizationId, InitiativeAdditionalDTO initiativeAdditionalDTO) {
         String role = initiativeAdditionalDTO.getOrganizationUserRole();
-        log.info("[{}][SAVE_GENERAL_INFO]-[FIRST_CREATION_TO_DRAFT_STATUS] - Initiative: Start processing...", role);
+        log.info("[{}][SAVE_ADDITIONAL_INFO]-[FIRST_CREATION_TO_DRAFT_STATUS] - Initiative: Start processing...", role);
         Initiative initiativeToSave = this.initiativeDTOsToModelMapper.toInitiative(initiativeAdditionalDTO);
         Initiative insertedInitiative = initiativeService.insertInitiative(initiativeToSave, organizationId, initiativeAdditionalDTO.getOrganizationName(), role);
         return new ResponseEntity<>(this.initiativeModelToDTOMapper.toDtoOnlyId(insertedInitiative), HttpStatus.CREATED);
@@ -86,7 +88,7 @@ public class InitiativeApiController implements InitiativeApi {
     @Override
     public ResponseEntity<Void> updateInitiativeAdditionalInfo(String organizationId, String initiativeId, InitiativeAdditionalDTO initiativeAdditionalDTO) {
         String role = initiativeAdditionalDTO.getOrganizationUserRole();
-        log.info("[{}][UPDATE_GENERAL_INFO]-[UPDATE_TO_DRAFT_STATUS] - Initiative: {}. Start processing...", role, initiativeId);
+        log.info("[{}][UPDATE_ADDITIONAL_INFO]-[UPDATE_TO_DRAFT_STATUS] - Initiative: {}. Start processing...", role, initiativeId);
         this.initiativeService.updateInitiativeAdditionalInfo(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toInitiative(initiativeAdditionalDTO), role);
         return ResponseEntity.noContent().build();
     }
@@ -112,7 +114,7 @@ public class InitiativeApiController implements InitiativeApi {
                     String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_PROPERTIES_NOT_VALID, initiativeId),
                     HttpStatus.BAD_REQUEST);
         }
-        this.initiativeService.updateInitiativeBeneficiary(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toBeneficiaryRule(beneficiaryRuleDto), role);
+        this.initiativeService.updateStep3InitiativeBeneficiary(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toBeneficiaryRule(beneficiaryRuleDto), role);
         return ResponseEntity.noContent().build();
     }
 
@@ -121,7 +123,7 @@ public class InitiativeApiController implements InitiativeApi {
     public ResponseEntity<Void> updateInitiativeBeneficiaryDraft(String organizationId, String initiativeId, InitiativeBeneficiaryRuleDTO beneficiaryRuleDto) {
         String role = beneficiaryRuleDto.getOrganizationUserRole();
         log.info("[{}][API-DRAFT]-[UPDATE_BENEFICIARY_RULE]-[UPDATE_TO_DRAFT_STATUS] - Initiative: {}. Start processing...", role, initiativeId);
-        this.initiativeService.updateInitiativeBeneficiary(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toBeneficiaryRule(beneficiaryRuleDto), role);
+        this.initiativeService.updateStep3InitiativeBeneficiary(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toBeneficiaryRule(beneficiaryRuleDto), role);
         return ResponseEntity.noContent().build();
     }
 
@@ -265,9 +267,16 @@ public class InitiativeApiController implements InitiativeApi {
 
     @ResponseStatus(HttpStatus.OK)
     @Override
-    public ResponseEntity<InitiativeDTO> getInitiativeIdFromServiceId(String serviceId){
+    public ResponseEntity<InitiativeDataDTO> getInitiativeIdFromServiceId(Locale acceptLanguage, String serviceId) {
         log.info("[GET_INITIATIVE_ID_FROM_SERVICE_ID] - Start searching the initiativeId for serviceId {}", serviceId);
-        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDTO(this.initiativeService.getInitiativeIdFromServiceId(serviceId)));
+        //check if valid locale, if not the utility throw an exception
+        if(!LocaleUtils.isAvailableLocale(acceptLanguage)){
+            throw new InitiativeException(
+                    InitiativeConstants.Exception.BadRequest.CODE,
+                    String.format(InitiativeConstants.Exception.BadRequest.INVALID_LOCALE_FORMAT, acceptLanguage),
+                    HttpStatus.BAD_REQUEST);
+        }
+        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDataDTO(this.initiativeService.getInitiativeIdFromServiceId(serviceId), acceptLanguage));
     }
 
     @ResponseStatus(HttpStatus.OK)
