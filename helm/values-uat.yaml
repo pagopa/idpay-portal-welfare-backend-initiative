@@ -36,6 +36,9 @@ microservice-chart:
 #          metricAggregationType: Count
 #          targetValue: "30"
 
+  envConfig:
+    INITIATIVE_LOGO_URL: "https://idpayuinitiativestorage.blob.core.windows.net/logo/"
+
   envSecret:
     aks-api-url: cstar-u-weu-uat01-aks-apiserver-url
 
