@@ -20,6 +20,7 @@ import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
 import it.gov.pagopa.initiative.model.rule.trx.*;
 import it.gov.pagopa.initiative.utils.InitiativeUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -31,7 +32,8 @@ import java.util.Locale;
 @Component
 public class InitiativeModelToDTOMapper {
 
-
+    @Autowired
+    InitiativeUtils initiativeUtils;
     public InitiativeDataDTO toInitiativeDataDTO(Initiative initiative, Locale acceptLanguage) {
         if (initiative == null) {
             return null;
@@ -51,7 +53,6 @@ public class InitiativeModelToDTOMapper {
     }
 
     public InitiativeDTO toInitiativeDTO(Initiative initiative) {
-        InitiativeUtils initiativeUtils = new InitiativeUtils();
         if (initiative == null) {
             return null;
         }

@@ -34,6 +34,7 @@ import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
 import it.gov.pagopa.initiative.model.rule.trx.*;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
 import it.gov.pagopa.initiative.utils.InitiativeUtils;
+import it.gov.pagopa.initiative.utils.Utilities;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
@@ -105,6 +106,9 @@ class InitiativeServiceTest {
 
     @MockBean
     InitiativeModelToDTOMapper initiativeModelToDTOMapper;
+
+    @MockBean
+    Utilities utilities;
 
     @MockBean
     InitiativeAdditionalDTOsToIOServiceRequestDTOMapper initiativeAdditionalDTOsToIOServiceRequestDTOMapper;
