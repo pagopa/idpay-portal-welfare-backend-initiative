@@ -20,7 +20,7 @@ import it.gov.pagopa.initiative.model.rule.reward.InitiativeRewardRule;
 import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
 import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
 import it.gov.pagopa.initiative.model.rule.trx.*;
-import lombok.extern.slf4j.Slf4j;
+import it.gov.pagopa.initiative.utils.InitiativeUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,12 +31,12 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @WebMvcTest(value = {
         InitiativeModelToDTOMapper.class})
-@Slf4j
 class InitiativeModelToDTOMapperTest {
     @Autowired
     InitiativeModelToDTOMapper initiativeModelToDTOMapper;
@@ -94,7 +94,8 @@ class InitiativeModelToDTOMapperTest {
 
     private InitiativeAdditionalDTO initiativeAdditionalDTOOnlyTokens;
     private InitiativeAdditional initiativeAdditionalOnlyTokens;
-
+    @MockBean
+    InitiativeUtils initiativeUtils;
 
     @BeforeEach
     public void setUp() {
@@ -275,6 +276,8 @@ class InitiativeModelToDTOMapperTest {
     }
 
     private InitiativeGeneral createInitiativeGeneral() {
+        Map<String, String> language = new HashMap<>();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneral initiativeGeneral = new InitiativeGeneral();
         initiativeGeneral.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneral.setBeneficiaryKnown(true);
@@ -288,6 +291,7 @@ class InitiativeModelToDTOMapperTest {
         initiativeGeneral.setRankingEndDate(rankingEndDate);
         initiativeGeneral.setStartDate(startDate);
         initiativeGeneral.setEndDate(endDate);
+        initiativeGeneral.setDescriptionMap(language);
         return initiativeGeneral;
     }
 
@@ -364,6 +368,8 @@ class InitiativeModelToDTOMapperTest {
     }
 
     private InitiativeGeneralDTO createInitiativeGeneralDTO() {
+        Map<String, String> language = new HashMap<>();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(true);
@@ -377,6 +383,7 @@ class InitiativeModelToDTOMapperTest {
         initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
         initiativeGeneralDTO.setStartDate(startDate);
         initiativeGeneralDTO.setEndDate(endDate);
+        initiativeGeneralDTO.setDescriptionMap(language);
         return initiativeGeneralDTO;
     }
 

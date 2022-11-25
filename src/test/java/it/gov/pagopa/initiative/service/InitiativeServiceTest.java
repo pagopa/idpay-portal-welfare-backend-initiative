@@ -1,9 +1,15 @@
 package it.gov.pagopa.initiative.service;
 
 
+import it.gov.pagopa.initiative.connector.decrypt.DecryptRestConnector;
+import it.gov.pagopa.initiative.connector.encrypt.EncryptRestConnector;
+import it.gov.pagopa.initiative.connector.file_storage.FileStorageConnector;
 import it.gov.pagopa.initiative.connector.group.GroupRestConnector;
 import it.gov.pagopa.initiative.connector.io_service.IOBackEndRestConnector;
+import it.gov.pagopa.initiative.connector.onboarding.OnboardingRestConnector;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
+import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.InternalServerError;
+import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.NotFound;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.io.service.ServiceMetadataDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
@@ -27,18 +33,24 @@ import it.gov.pagopa.initiative.model.rule.reward.InitiativeRewardRule;
 import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
 import it.gov.pagopa.initiative.model.rule.trx.*;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
+import it.gov.pagopa.initiative.utils.InitiativeUtils;
+import it.gov.pagopa.initiative.utils.Utilities;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.TestPropertySource;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 
@@ -49,6 +61,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@Slf4j
 @TestPropertySource(
         locations = "classpath:application.yml",
         properties = {
@@ -56,7 +69,6 @@ import static org.mockito.Mockito.*;
         })
 @WebMvcTest(value = {
         InitiativeService.class})
-@Slf4j
 class InitiativeServiceTest {
 
     private static final String ANY_NOT_INITIATIVE_STATE = "ANY_NOT_INITIATIVE_STATE";
@@ -80,7 +92,15 @@ class InitiativeServiceTest {
     private static final String PRODUCT_DEPARTMENT_NAME = "productDepartmentName";
     private static final String SERVICE_ID = "serviceId";
     public static final String ANY_KEY_TOKEN_IO = "ANY_KEY_TOKEN_IO";
-    private static final String ROLE = "admin";
+    private static final String ROLE = "ROLE";
+    private static final String CF = "CF";
+    private static final String USER_ID = "USER_ID";
+    private static final String STATUS = "ONBOARDING_OK";
+    private static final LocalDateTime STARTDATE = LocalDateTime.now();
+    private static final LocalDateTime ENDDATE = LocalDateTime.now();
+    private static final String LOGO_EXTENSION = "png";
+    private static final String LOGO_MIME_TYPE = "image/png";
+    private static final String FILE_NAME = "logo.png";
 
     @Autowired
     InitiativeService initiativeService;
@@ -95,6 +115,9 @@ class InitiativeServiceTest {
     InitiativeModelToDTOMapper initiativeModelToDTOMapper;
 
     @MockBean
+    Utilities utilities;
+
+    @MockBean
     InitiativeAdditionalDTOsToIOServiceRequestDTOMapper initiativeAdditionalDTOsToIOServiceRequestDTOMapper;
 
     @MockBean
@@ -104,10 +127,28 @@ class InitiativeServiceTest {
     GroupRestConnector groupRestConnector;
 
     @MockBean
+    FileStorageConnector fileStorageConnector;
+
+    @MockBean
+    OnboardingRestConnector onboardingRestConnector;
+
+    @MockBean
+    EncryptRestConnector encryptRestConnector;
+
+    @MockBean
+    DecryptRestConnector decryptRestConnector;
+
+    @MockBean
     EmailNotificationService emailNotificationService;
 
     @MockBean
     IOTokenService ioTokenService;
+
+    @MockBean
+    InitiativeValidationService initiativeValidationService;
+
+    @MockBean
+    InitiativeUtils initiativeUtils;
 
     @Test
     void givenRoleAdmin_retrieveInitiativeSummary_ok() throws Exception {
@@ -189,14 +230,13 @@ class InitiativeServiceTest {
     }
 
 
-
     @Test
     void retrieveInitiativeSummary_ko() {
         //Try to call the Real Service (which is using the instructed Repo)
         try {
             List<Initiative> initiatives = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, ADMIN);
         } catch (InitiativeException e) {
-            log.info("InitiativeException: " + e.getCode());
+            System.out.println("InitiativeException: " + e.getCode());
             assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
             assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
         }
@@ -210,7 +250,7 @@ class InitiativeServiceTest {
         when(initiativeRepository.insert(any(Initiative.class))).thenReturn(step2Initiative);
 
         //Try to call the Real Service (which is using the instructed Repo)
-        Initiative initiative = initiativeService.insertInitiative(step2Initiative);
+        Initiative initiative = initiativeService.insertInitiative(step2Initiative, ORGANIZATION_ID, ORGANIZATION_NAME, ROLE);
 
         //Check the equality of the results
         assertEquals(step2Initiative, initiative);
@@ -220,7 +260,7 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void getInitiativeIdFromServiceId_thenValidationIsPassed(){
+    void getInitiativeIdFromServiceId_thenValidationIsPassed() {
         Initiative step1Initiative = createStep1Initiative();
         when(initiativeRepository.retrieveServiceId(SERVICE_ID)).thenReturn(Optional.ofNullable(step1Initiative));
         Initiative initiative = initiativeService.getInitiativeIdFromServiceId(SERVICE_ID);
@@ -229,12 +269,12 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void getInitiativeIdFromServiceId_throwInitiativeException_thenValidationFailed() throws Exception{
+    void getInitiativeIdFromServiceId_throwInitiativeException_thenValidationFailed() throws Exception {
         Initiative step1Initiative = new Initiative();
         when(initiativeRepository.retrieveServiceId(SERVICE_ID)).thenReturn(Optional.empty());
-        try{
+        try {
             Initiative initiative = initiativeService.getInitiativeIdFromServiceId(SERVICE_ID);
-        }catch (InitiativeException e){
+        } catch (InitiativeException e) {
             log.info("InitiativeException: " + e.getCode());
             assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
             assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
@@ -243,7 +283,7 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void getPrimaryAndSecondaryToken_thenValidationIsPassed(){
+    void getPrimaryAndSecondaryToken_thenValidationIsPassed() {
         Initiative step1Initiative = createStep1Initiative();
         when(initiativeRepository.findByInitiativeIdAndEnabled(INITIATIVE_ID, true)).thenReturn(Optional.ofNullable(step1Initiative));
         InitiativeAdditional additional = initiativeService.getPrimaryAndSecondaryTokenIO(INITIATIVE_ID);
@@ -252,11 +292,11 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void getPrimaryAndSecondaryToken_throwInitiativeException_thenValidationFailed() throws Exception{
+    void getPrimaryAndSecondaryToken_throwInitiativeException_thenValidationFailed() throws Exception {
         when(initiativeRepository.findByInitiativeIdAndEnabled(INITIATIVE_ID, true)).thenReturn(Optional.empty());
-        try{
+        try {
             InitiativeAdditional additional = initiativeService.getPrimaryAndSecondaryTokenIO(INITIATIVE_ID);
-        }catch (InitiativeException e){
+        } catch (InitiativeException e) {
             log.info("InitiativeException: " + e.getCode());
             assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
             assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
@@ -268,81 +308,87 @@ class InitiativeServiceTest {
     void getInitiative_ok() throws Exception {
         Initiative step2Initiative = createStep2Initiative();
 
-        //Instruct the Repo Mock to return Dummy Initiatives
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.ofNullable(step2Initiative));
+        //Instruct the initiativeValidationService Mock to return Dummy Initiatives
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step2Initiative);
 
         //Try to call the Real Service (which is using the instructed Repo)
         Initiative initiative = initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
 
         //Check the equality of the results
-        assertEquals(Optional.ofNullable(step2Initiative).get(), initiative);
+        assertEquals(step2Initiative, initiative);
 
-        // you are expecting repo to be called once with correct param
-        verify(initiativeRepository).findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true); // same as: verify(initiativeRepository, times(1)).retrieveInitiativeSummary(anyString());
+        // you are expecting initiativeValidationService to be called once with correct param
+        verify(initiativeValidationService).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE); // same as: verify(initiativeValidationService, times(1))
     }
 
     @Test
     void getInitiative_ko() throws Exception {
-        //Try to call the Real Service (which is using the instructed Repo)
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.empty());
-        try {
-            Initiative initiative = initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
-        } catch (InitiativeException e) {
-            log.info("InitiativeException: " + e.getCode());
-            assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
-            assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
-        }
+        //doThrow InitiativeException for getInitiative method
+        doThrow(new InitiativeException(
+                InitiativeConstants.Exception.NotFound.CODE,
+                String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID),
+                HttpStatus.NOT_FOUND))
+                .when(initiativeValidationService).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
+
+        //prepare Executable with invocation of the method on your system under test
+        Executable executable = () -> initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
+        InitiativeException exception = Assertions.assertThrows(InitiativeException.class, executable);
+        assertEquals(InitiativeConstants.Exception.NotFound.CODE, exception.getCode());
+        assertEquals(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE.formatted(INITIATIVE_ID), exception.getMessage());
     }
 
     @Test
     void getInitiative_roleBase_statusInRevision_ok() throws Exception {
         Initiative step2Initiative = createStep2Initiative();
         step2Initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
-        //Instruct the Repo Mock to return Dummy Initiatives
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.ofNullable(step2Initiative));
+
+        //Instruct the initiativeValidationService Mock to return Dummy Initiatives
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step2Initiative);
 
         //Try to call the Real Service (which is using the instructed Repo)
-        Initiative initiative = initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, OPE_BASE);
+        Initiative initiative = initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
 
         //Check the equality of the results
-        assertEquals(Optional.ofNullable(step2Initiative).get(), initiative);
+        assertEquals(step2Initiative, initiative);
 
-        // you are expecting repo to be called once with correct param
-        verify(initiativeRepository).findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true); // same as: verify(initiativeRepository, times(1)).retrieveInitiativeSummary(anyString());
+        // you are expecting initiativeValidationService to be called once with correct param
+        verify(initiativeValidationService).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE); // same as: verify(initiativeValidationService, times(1))
     }
 
     @Test
     void getInitiative_roleBase_statusApproved_ok() throws Exception {
         Initiative step2Initiative = createStep2Initiative();
         step2Initiative.setStatus(InitiativeConstants.Status.APPROVED);
-        //Instruct the Repo Mock to return Dummy Initiatives
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.ofNullable(step2Initiative));
+
+        //Instruct the initiativeValidationService Mock to return Dummy Initiatives
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step2Initiative);
 
         //Try to call the Real Service (which is using the instructed Repo)
-        Initiative initiative = initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, OPE_BASE);
+        Initiative initiative = initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
 
         //Check the equality of the results
-        assertEquals(Optional.ofNullable(step2Initiative).get(), initiative);
+        assertEquals(step2Initiative, initiative);
 
-        // you are expecting repo to be called once with correct param
-        verify(initiativeRepository).findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true); // same as: verify(initiativeRepository, times(1)).retrieveInitiativeSummary(anyString());
+        // you are expecting initiativeValidationService to be called once with correct param
+        verify(initiativeValidationService).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE); // same as: verify(initiativeValidationService, times(1))
     }
 
     @Test
     void getInitiative_roleBase_statusToCheck_ok() throws Exception {
         Initiative step2Initiative = createStep2Initiative();
         step2Initiative.setStatus(InitiativeConstants.Status.TO_CHECK);
-        //Instruct the Repo Mock to return Dummy Initiatives
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.ofNullable(step2Initiative));
+
+        //Instruct the initiativeValidationService Mock to return Dummy Initiatives
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step2Initiative);
 
         //Try to call the Real Service (which is using the instructed Repo)
-        Initiative initiative = initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, OPE_BASE);
+        Initiative initiative = initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
 
         //Check the equality of the results
-        assertEquals(Optional.ofNullable(step2Initiative).get(), initiative);
+        assertEquals(step2Initiative, initiative);
 
-        // you are expecting repo to be called once with correct param
-        verify(initiativeRepository).findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true); // same as: verify(initiativeRepository, times(1)).retrieveInitiativeSummary(anyString());
+        // you are expecting initiativeValidationService to be called once with correct param
+        verify(initiativeValidationService).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE); // same as: verify(initiativeValidationService, times(1))
     }
 
     @Test
@@ -350,13 +396,17 @@ class InitiativeServiceTest {
         Initiative step2Initiative = createStep2Initiative();
         step2Initiative.setStatus(InitiativeConstants.Status.PUBLISHED);
 
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.ofNullable(step2Initiative));
+        //Instruct the initiativeValidationService Mock to return Dummy Initiatives
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step2Initiative);
 
-        Executable executable = () -> initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, OPE_BASE);
+        //Try to call the Real Service (which is using the instructed Repo)
+        Initiative initiative = initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
 
-        assertThrows(InitiativeException.class, executable);
+        //Check the equality of the results
+        assertEquals(step2Initiative, initiative);
 
-        verify(initiativeRepository).findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true); // same as: verify(initiativeRepository, times(1)).retrieveInitiativeSummary(anyString());
+        // you are expecting initiativeValidationService to be called once with correct param
+        verify(initiativeValidationService).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE); // same as: verify(initiativeValidationService, times(1))
     }
 
     @Test
@@ -382,7 +432,7 @@ class InitiativeServiceTest {
         try {
             Initiative initiative = initiativeService.getInitiativeBeneficiaryView(INITIATIVE_ID);
         } catch (InitiativeException e) {
-            log.info("InitiativeException: " + e.getCode());
+            System.out.println("InitiativeException: " + e.getCode());
             assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
             assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
         }
@@ -391,56 +441,107 @@ class InitiativeServiceTest {
     @Test
     void updateInitiativeGeneralInfo_ok() throws Exception {
         Initiative step2Initiative = createStep2Initiative();
-
-        //Instruct the Repo Mock to return Dummy Initiatives
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.ofNullable(step2Initiative));
-
+        InitiativeGeneral initiativeGeneral = createInitiativeGeneral(true);
+        step2Initiative.setGeneral(initiativeGeneral);
+        //Instruct the initiativeValidationService Mock to return Dummy Initiatives
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step2Initiative);
         //Try to call the Real Service (which is using the instructed Repo)
-        initiativeService.updateInitiativeGeneralInfo(ORGANIZATION_ID, INITIATIVE_ID, step2Initiative);
+        initiativeService.updateInitiativeGeneralInfo(ORGANIZATION_ID, INITIATIVE_ID, step2Initiative, ROLE);
+        // you are expecting initiativeValidationService to be called once with correct param
+        verify(initiativeValidationService, times(1)).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
+    }
 
-        // you are expecting repo to be called once with correct param
-        verify(initiativeRepository, times(1)).findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true);
+    @Test
+    void updateInitiativeGeneralInfo_FakeInPUBLISHED_thenUnprocessableState() throws Exception {
+        Initiative step2Initiative = createStep2Initiative();
+        InitiativeGeneral initiativeGeneral = createInitiativeGeneral(true);
+        step2Initiative.setGeneral(initiativeGeneral);
+        step2Initiative.setStatus(InitiativeConstants.Status.PUBLISHED);
+
+        //Instruct the initiativeValidationService Mock to return Dummy Initiatives
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step2Initiative);
+
+        //prepare Executable with invocation of the method on your system under test
+        Executable executable = () -> initiativeService.updateInitiativeGeneralInfo(ORGANIZATION_ID, INITIATIVE_ID, step2Initiative, ROLE);
+        InitiativeException exception = Assertions.assertThrows(InitiativeException.class, executable);
+        assertEquals(InitiativeConstants.Exception.BadRequest.CODE, exception.getCode());
+        assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_STATUS_NOT_VALID.formatted(INITIATIVE_ID), exception.getMessage());
     }
 
     @Test
     void updateInitiativeGeneralInfo_thenThrowInitiativeException() throws Exception {
         Initiative fullInitiative = createStep2Initiative();
-        //Try to call the Real Service (which is using the instructed Repo)
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.empty());
-        try {
-            initiativeService.updateInitiativeGeneralInfo(ORGANIZATION_ID, INITIATIVE_ID, fullInitiative);
-        } catch (InitiativeException e) {
-            log.info("InitiativeException: " + e.getCode());
-            assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
-            assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
-        }
+
+        //doThrow InitiativeException for getInitiative method
+        doThrow(new InitiativeException(
+                InitiativeConstants.Exception.NotFound.CODE,
+                String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID),
+                HttpStatus.NOT_FOUND))
+                .when(initiativeValidationService).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
+
+        //prepare Executable with invocation of the method on your system under test
+        Executable executable = () -> initiativeService.updateInitiativeGeneralInfo(ORGANIZATION_ID, INITIATIVE_ID, fullInitiative, ROLE);
+        InitiativeException exception = Assertions.assertThrows(InitiativeException.class, executable);
+        assertEquals(InitiativeConstants.Exception.NotFound.CODE, exception.getCode());
+        assertEquals(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE.formatted(INITIATIVE_ID), exception.getMessage());
+    }
+
+    @Test
+    void storeInitiativeLogo_ok() throws Exception {
+        InputStream logo = new ByteArrayInputStream("logo.png".getBytes());
+        Initiative initiative = this.createFullInitiative();
+        Set <String> logoExtension = new HashSet<>();
+        Set <String> logoMimeTypes = new HashSet<>();
+        logoExtension.add(LOGO_EXTENSION);
+        logoMimeTypes.add(LOGO_MIME_TYPE);
+        InitiativeGeneral general = createInitiativeGeneral(true);
+        initiative.setGeneral(general);
+        Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
+        Mockito.doNothing().when(fileStorageConnector).uploadInitiativeLogo(Mockito.any(), Mockito.anyString(),
+                Mockito.anyString());
+        Mockito.when(initiativeUtils.getAllowedInitiativeLogoExtensions()).thenReturn(logoExtension);
+        Mockito.when(initiativeUtils.getAllowedInitiativeLogoMimeTypes()).thenReturn(logoMimeTypes);
+        LogoDTO logoDTO = initiativeService.storeInitiativeLogo(ORGANIZATION_ID, INITIATIVE_ID, logo, LOGO_MIME_TYPE,
+                FILE_NAME);
+
+        assertEquals(logoDTO.getLogoFileName(), FILE_NAME);
     }
 
     @Test
     void updateInitiativeAdditionalInfo_ok() throws Exception {
         Initiative step2Initiative = createStep1Initiative();
+        Initiative initiativeSavedExpected = createStep1Initiative();
 
         //Instruct the Repo Mock to return Dummy Initiatives
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.ofNullable(step2Initiative));
+        when(initiativeRepository.save(any(Initiative.class))).thenReturn(initiativeSavedExpected);
+        //Instruct the initiativeValidationService Mock to return Dummy Initiatives
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step2Initiative);
 
         //Try to call the Real Service (which is using the instructed Repo)
-        initiativeService.updateInitiativeAdditionalInfo(ORGANIZATION_ID, INITIATIVE_ID, step2Initiative);
+        initiativeService.updateInitiativeAdditionalInfo(ORGANIZATION_ID, INITIATIVE_ID, step2Initiative, ROLE);
 
-        // you are expecting repo to be called once with correct param
-        verify(initiativeRepository, times(1)).findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true);
+        // you are expecting initiativeValidationService to be called once with correct param
+        verify(initiativeValidationService, times(1)).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
+        //Expecting repo to be called once with correct param
+        verify(initiativeRepository, times(1)).save(any(Initiative.class));
     }
 
     @Test
     void updateInitiativeAdditionalInfo_thenThrowInitiativeException() throws Exception {
         Initiative fullInitiative = createStep1Initiative();
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.empty());
-        try {
-            initiativeService.updateInitiativeAdditionalInfo(ORGANIZATION_ID, INITIATIVE_ID, fullInitiative);
-        } catch (InitiativeException e) {
-            log.info("InitiativeException: " + e.getCode());
-            assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
-            assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
-        }
+
+        //doThrow InitiativeException for getInitiative method
+        doThrow(new InitiativeException(
+                InitiativeConstants.Exception.NotFound.CODE,
+                String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID),
+                HttpStatus.NOT_FOUND))
+                .when(initiativeValidationService).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
+
+        //prepare Executable with invocation of the method on your system under test
+        Executable executable = () -> initiativeService.updateInitiativeGeneralInfo(ORGANIZATION_ID, INITIATIVE_ID, fullInitiative, ROLE);
+        InitiativeException exception = Assertions.assertThrows(InitiativeException.class, executable);
+        assertEquals(InitiativeConstants.Exception.NotFound.CODE, exception.getCode());
+        assertEquals(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE.formatted(INITIATIVE_ID), exception.getMessage());
     }
 
     @Test
@@ -448,32 +549,36 @@ class InitiativeServiceTest {
         Initiative step2Initiative = createStep2Initiative();
         InitiativeBeneficiaryRule initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
 
-        //Instruct the Repo Mock to return Dummy Initiatives
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.ofNullable(step2Initiative));
+        //Instruct the initiativeValidationService Mock to return Dummy Initiatives
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step2Initiative);
+
+        List<AutomatedCriteria> automatedCriteriaList = new ArrayList<>();
+        //Instruct the initiativeValidationService Mock to do nothing for checkAutomatedCriteriaOrderDirectionWithRanking
+        doNothing().when(initiativeValidationService).checkAutomatedCriteriaOrderDirectionWithRanking(step2Initiative,automatedCriteriaList);
 
         //Try to call the Real Service (which is using the instructed Repo)
-        initiativeService.updateInitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule);
+        initiativeService.updateStep3InitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule, ROLE);
 
-        // you are expecting repo to be called once with correct param
-        verify(initiativeRepository, times(1)).findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true);
+        // you are expecting initiativeValidationService to be called once with correct param
+        verify(initiativeValidationService, times(1)).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
     }
 
     @Test
     void updateInitiativeBeneficiary_thenThrowInitiativeException() throws Exception {
         InitiativeBeneficiaryRule initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
 
-        //Instruct the Repo Mock to return Dummy Initiatives
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.empty());
+        //doThrow InitiativeException for getInitiative method
+        doThrow(new InitiativeException(
+                InitiativeConstants.Exception.NotFound.CODE,
+                String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID),
+                HttpStatus.NOT_FOUND))
+                .when(initiativeValidationService).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
 
-        //Try to call the Real Service (which is using the instructed Repo)
-        try {
-            initiativeService.updateInitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule);
-        } catch (InitiativeException e) {
-            log.info("InitiativeException: " + e.getCode());
-            assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
-            assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
-            assertEquals(String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID), e.getMessage());
-        }
+        //prepare Executable with invocation of the method on your system under test
+        Executable executable = () -> initiativeService.updateStep3InitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule, ROLE);
+        InitiativeException exception = Assertions.assertThrows(InitiativeException.class, executable);
+        assertEquals(InitiativeConstants.Exception.NotFound.CODE, exception.getCode());
+        assertEquals(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE.formatted(INITIATIVE_ID), exception.getMessage());
     }
 
     @Test
@@ -484,14 +589,13 @@ class InitiativeServiceTest {
         InitiativeTrxConditions trxRuleCondition = createTrxRuleCondition();
         Initiative initiative = Initiative.builder().rewardRule(rewardRule).trxRule(trxRuleCondition).build();
 
-        //Instruct the Repo Mock to return Dummy Initiatives
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.ofNullable(step3Initiative));
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step3Initiative);
 
         //Try to call the Real Service (which is using the instructed Repo)
-        initiativeService.updateTrxAndRewardRules(ORGANIZATION_ID, INITIATIVE_ID, initiative);
+        initiativeService.updateTrxAndRewardRules(ORGANIZATION_ID, INITIATIVE_ID, initiative, ROLE);
 
-        // you are expecting repo to be called once with correct param
-        verify(initiativeRepository, times(1)).findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true);
+        // you are expecting initiativeValidationService to be called once with correct param
+        verify(initiativeValidationService, times(1)).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
     }
 
     @Test
@@ -500,260 +604,177 @@ class InitiativeServiceTest {
         InitiativeTrxConditions trxRuleCondition = createTrxRuleCondition();
         Initiative initiative = Initiative.builder().rewardRule(rewardRule).trxRule(trxRuleCondition).build();
 
-        //Instruct the Repo Mock to return Dummy Initiatives
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.empty());
+        //doThrow InitiativeException for getInitiative method
+        doThrow(new InitiativeException(
+                InitiativeConstants.Exception.NotFound.CODE,
+                String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID),
+                HttpStatus.NOT_FOUND))
+                .when(initiativeValidationService).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
 
-        //Try to call the Real Service (which is using the instructed Repo)
-        try {
-            initiativeService.updateTrxAndRewardRules(ORGANIZATION_ID, INITIATIVE_ID, initiative);
-        } catch (InitiativeException e) {
-            log.info("InitiativeException: " + e.getCode());
-            assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
-            assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
-            assertEquals(String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID), e.getMessage());
-        }
+        //prepare Executable with invocation of the method on your system under test
+        Executable executable = () -> initiativeService.updateTrxAndRewardRules(ORGANIZATION_ID, INITIATIVE_ID, initiative, ROLE);
+        InitiativeException exception = Assertions.assertThrows(InitiativeException.class, executable);
+        assertEquals(InitiativeConstants.Exception.NotFound.CODE, exception.getCode());
+        assertEquals(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE.formatted(INITIATIVE_ID), exception.getMessage());
     }
 
     @Test
-    void updateRefundRules_ok(){
+    void updateRefundRules_ok() {
         Initiative initiative = createInitiativeOnlyRefundRule();
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.ofNullable(initiative));
-        initiativeService.updateInitiativeRefundRules(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID, initiative, false);
-        verify(initiativeRepository, times(1)).findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true);
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(initiative);
+        initiativeService.updateInitiativeRefundRules(ORGANIZATION_ID, INITIATIVE_ID, ROLE, initiative, false);
+        verify(initiativeValidationService, times(1)).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
     }
 
     @Test
-    void updateRefundRules_thenThrowInitiativeException(){
+    void updateRefundRules_thenThrowInitiativeException() {
         Initiative initiative = createInitiativeOnlyRefundRule();
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.empty());
 
-        try{
-            initiativeService.updateInitiativeRefundRules(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID, initiative, false);
-        }catch (InitiativeException e){
-            log.info("InitiativeException: " + e.getCode());
-            assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
-            assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
-            assertEquals(String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID), e.getMessage());
-        }
+        //doThrow InitiativeException for getInitiative method
+        doThrow(new InitiativeException(
+                InitiativeConstants.Exception.NotFound.CODE,
+                String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID),
+                HttpStatus.NOT_FOUND))
+                .when(initiativeValidationService).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
+
+        //prepare Executable with invocation of the method on your system under test
+        Executable executable = () -> initiativeService.updateInitiativeRefundRules(ORGANIZATION_ID, INITIATIVE_ID, ROLE, initiative, false);
+        InitiativeException exception = Assertions.assertThrows(InitiativeException.class, executable);
+        assertEquals(InitiativeConstants.Exception.NotFound.CODE, exception.getCode());
+        assertEquals(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE.formatted(INITIATIVE_ID), exception.getMessage());
     }
 
     @Test
-    void updateRefundRule_whenInitiativeUnprocessableForStatusNotValid_then400isRaisedForInitiativeException(){
+    void updateRefundRule_whenInitiativeUnprocessableForStatusNotValid_then400isRaisedForInitiativeException() {
         Initiative initiative = Initiative.builder().initiativeId(INITIATIVE_ID).status(InitiativeConstants.Status.PUBLISHED).build();
-        Initiative initiativeNotProcessable = Initiative.builder().initiativeId(INITIATIVE_ID).status(InitiativeConstants.Status.PUBLISHED).build();
 
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.ofNullable(initiativeNotProcessable));
+        //doThrow InitiativeException for getInitiative method
+        doThrow(new InitiativeException(
+                InitiativeConstants.Exception.NotFound.CODE,
+                String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID),
+                HttpStatus.NOT_FOUND))
+                .when(initiativeValidationService).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
 
-        InitiativeException exception = assertThrows(InitiativeException.class, () -> initiativeService.updateInitiativeRefundRules(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID, initiative, true));
+        InitiativeException exception = assertThrows(InitiativeException.class, () -> initiativeService.updateInitiativeRefundRules(ORGANIZATION_ID, INITIATIVE_ID, ROLE, initiative, true));
 
-        assertEquals(HttpStatus.BAD_REQUEST, exception.getHttpStatus());
-        assertEquals(InitiativeConstants.Exception.BadRequest.CODE, exception.getCode());
-        assertEquals(String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_STATUS_NOT_VALID, INITIATIVE_ID), exception.getMessage());
+        assertEquals(HttpStatus.NOT_FOUND, exception.getHttpStatus());
+        assertEquals(InitiativeConstants.Exception.NotFound.CODE, exception.getCode());
+        assertEquals(String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID), exception.getMessage());
     }
 
     @Test
-    void updateInitiativeApprovedStatus_thenStatusIsChangedWithSuccess(){
+    void givenStatusIN_REVISION_updateInitiativeApprovedStatus_thenStatusIsChangedWithSuccess() {
         Initiative initiative = createStep4Initiative();
         initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.ofNullable(initiative));
-        initiativeService.updateInitiativeApprovedStatus(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID);
-        verify(initiativeRepository, times(1)).findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true);
+
+        //Instruct the initiativeValidationService Mock to return Dummy Initiatives
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(initiative);
+        //Try to call the Real Service (which is using the instructed Repo)
+        initiativeService.updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
+        // you are expecting initiativeValidationService to be called once with correct param
+        verify(initiativeValidationService, times(1)).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
     }
 
     @Test
-    void updateInitiativeApprovedStatus_thenThrowInitiativeException(){
+    void givenStatusIN_REVISION_updateInitiativeApprovedStatus_thenThrowInitiativeException() {
+        Initiative initiative = createStep4Initiative();
+        initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
+
+        //doThrow InitiativeException for getInitiative method
+        doThrow(new InitiativeException(
+                InitiativeConstants.Exception.NotFound.CODE,
+                String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID),
+                HttpStatus.NOT_FOUND))
+                .when(initiativeValidationService).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
+
+        //prepare Executable with invocation of the method on your system under test
+        Executable executable = () -> initiativeService.updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
+        InitiativeException exception = Assertions.assertThrows(InitiativeException.class, executable);
+        assertEquals(InitiativeConstants.Exception.NotFound.CODE, exception.getCode());
+        assertEquals(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE.formatted(INITIATIVE_ID), exception.getMessage());
+    }
+
+    @Test
+    void givenStatusTO_CHECK_updateInitiativeApprovedStatus_whenStatusNotValid_thenThrowInitiativeException() {
         Initiative initiative = createStep4Initiative();
         initiative.setStatus(InitiativeConstants.Status.TO_CHECK);
 
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenThrow(
-                new InitiativeException(
-                        InitiativeConstants.Exception.BadRequest.CODE,
-                        String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_IN_REVISION, INITIATIVE_ID),
-                        HttpStatus.BAD_REQUEST
-                )
-        );
+        //Instruct the initiativeValidationService Mock to return Dummy Initiatives
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(initiative);
 
-        try{
-            initiativeService.updateInitiativeApprovedStatus(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID);
-        }catch (InitiativeException e){
-            log.info("InitiativeException: " + e.getCode());
-            assertEquals(HttpStatus.BAD_REQUEST, e.getHttpStatus());
-            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
-            assertEquals(String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_IN_REVISION), e.getMessage());
-        }
+        //prepare Executable with invocation of the method on your system under test
+        Executable executable = () -> initiativeService.updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
+        InitiativeException exception = Assertions.assertThrows(InitiativeException.class, executable);
+        assertEquals(InitiativeConstants.Exception.BadRequest.CODE, exception.getCode());
+        assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_IN_REVISION.formatted(INITIATIVE_ID), exception.getMessage());
     }
 
     @Test
-    void updateInitiativeApprovedStatus_then400isRaisedForInitiativeException(){
-        Initiative initiative = createStep4Initiative();
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.empty());
-
-        try{
-            initiativeService.updateInitiativeApprovedStatus(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID);
-        }catch (InitiativeException e){
-            log.info("InitiativeException: " + e.getCode());
-            assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
-            assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
-            assertEquals(String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID), e.getMessage());
-        }
-    }
-
-    @Test
-    void logicallyDeleteInitiative_thenDeletedIsSettedToTrueWithSuccess(){
+    void logicallyDeleteInitiative_thenDeletedIsSettedToTrueWithSuccess() {
         Initiative initiative = createStep5Initiative();
         initiative.setEnabled(true);
 
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.ofNullable(initiative));
-        initiativeService.logicallyDeleteInitiative(ORGANIZATION_ID, INITIATIVE_ID);
-
-        verify(initiativeRepository, times(1)).findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true);
+        //Instruct the initiativeValidationService Mock to return Dummy Initiatives
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(initiative);
+        //Try to call the Real Service (which is using the instructed Repo)
+        initiativeService.logicallyDeleteInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
+        // you are expecting initiativeValidationService to be called once with correct param
+        verify(initiativeValidationService, times(1)).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
     }
 
     @Test
-    void logicallyDeleteInitiative_thenThrowNewInitiativeException(){
+    void logicallyDeleteInitiative_thenThrowNewInitiativeException() {
         Initiative initiative = createStep5Initiative();
         initiative.setEnabled(true);
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.empty());
 
-        //Try to call the Real Service
-        //Prepare Executable with invocation of the method on your system under test
-        Executable executable = () -> initiativeService.logicallyDeleteInitiative(ORGANIZATION_ID, INITIATIVE_ID);
+        //doThrow InitiativeException for getInitiative method
+        doThrow(new InitiativeException(
+                InitiativeConstants.Exception.NotFound.CODE,
+                String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID),
+                HttpStatus.NOT_FOUND))
+                .when(initiativeValidationService).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
 
+        //prepare Executable with invocation of the method on your system under test
+        Executable executable = () -> initiativeService.logicallyDeleteInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
         InitiativeException exception = Assertions.assertThrows(InitiativeException.class, executable);
         assertEquals(InitiativeConstants.Exception.NotFound.CODE, exception.getCode());
-        assertEquals(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE.formatted(initiative.getInitiativeId()), exception.getMessage());
-        assertEquals(HttpStatus.NOT_FOUND, exception.getHttpStatus());
+        assertEquals(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE.formatted(INITIATIVE_ID), exception.getMessage());
     }
 
     @Test
-    void logicallyDeleteInitiativeStatusInRevision_thenThrowNewInitiativeException(){
-        Initiative initiative = createStep5Initiative();
-        initiative.setEnabled(true);
-        initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
-
-        //Instruct the Repo Mock to return Dummy Initiatives
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
-
-        try{
-            initiativeService.logicallyDeleteInitiative(ORGANIZATION_ID, INITIATIVE_ID);
-        }catch (InitiativeException e){
-            log.info("InitiativeException: " + e.getCode());
-            assertEquals(HttpStatus.BAD_REQUEST, e.getHttpStatus());
-            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
-            assertEquals(String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_CANNOT_BE_DELETED, INITIATIVE_ID), e.getMessage());
-        }
-    }
-
-    @Test
-    void logicallyDeleteInitiativeStatusPublished_thenThrowNewInitiativeException(){
-        Initiative initiative = createStep5Initiative();
-        initiative.setEnabled(true);
-        initiative.setStatus(InitiativeConstants.Status.PUBLISHED);
-
-        //Instruct the Repo Mock to return Dummy Initiatives
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
-
-        try{
-            initiativeService.logicallyDeleteInitiative(ORGANIZATION_ID, INITIATIVE_ID);
-        }catch (InitiativeException e){
-            log.info("InitiativeException: " + e.getCode());
-            assertEquals(HttpStatus.BAD_REQUEST, e.getHttpStatus());
-            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
-            assertEquals(String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_CANNOT_BE_DELETED, INITIATIVE_ID), e.getMessage());
-        }
-    }
-
-    @Test
-    void logicallyDeleteInitiativeStatusClosed_thenThrowNewInitiativeException(){
-        Initiative initiative = createStep5Initiative();
-        initiative.setEnabled(true);
-        initiative.setStatus(InitiativeConstants.Status.CLOSED);
-
-        //Instruct the Repo Mock to return Dummy Initiatives
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
-
-        try{
-            initiativeService.logicallyDeleteInitiative(ORGANIZATION_ID, INITIATIVE_ID);
-        }catch (InitiativeException e){
-            log.info("InitiativeException: " + e.getCode());
-            assertEquals(HttpStatus.BAD_REQUEST, e.getHttpStatus());
-            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
-            assertEquals(String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_CANNOT_BE_DELETED, INITIATIVE_ID), e.getMessage());
-        }
-    }
-
-    @Test
-    void logicallyDeleteInitiativeStatusSuspended_thenThrowNewInitiativeException(){
-        Initiative initiative = createStep5Initiative();
-        initiative.setEnabled(true);
-        initiative.setStatus(InitiativeConstants.Status.SUSPENDED);
-
-        //Instruct the Repo Mock to return Dummy Initiatives
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
-
-        try{
-            initiativeService.logicallyDeleteInitiative(ORGANIZATION_ID, INITIATIVE_ID);
-        }catch (InitiativeException e){
-            log.info("InitiativeException: " + e.getCode());
-            assertEquals(HttpStatus.BAD_REQUEST, e.getHttpStatus());
-            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
-            assertEquals(String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_CANNOT_BE_DELETED, INITIATIVE_ID), e.getMessage());
-        }
-    }
-
-    @Test
-    void updateInitiativeStatusToCheck_thenStatusIsUpdatedWithSuccess(){
+    void updateInitiativeStatusToCheck_thenStatusIsUpdatedWithSuccess() {
         Initiative step4Initiative = createStep4Initiative();
         step4Initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
 
-        //Instruct the Repo Mock to return Dummy Initiatives
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.ofNullable(step4Initiative));
-
+        //Instruct the initiativeValidationService Mock to return Dummy Initiatives
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step4Initiative);
         //Try to call the Real Service (which is using the instructed Repo)
-        initiativeService.updateInitiativeToCheckStatus(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID);
-
-        // you are expecting repo to be called once with correct param
-        verify(initiativeRepository, times(1)).findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true);
+        initiativeService.updateInitiativeToCheckStatus(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
+        // you are expecting initiativeValidationService to be called once with correct param
+        verify(initiativeValidationService, times(1)).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
     }
+
     @Test
-    void updateInitiativeStatusToCheck_thenThrowInitiativeExceptionStatusIsNotInRevision(){
+    void updateInitiativeStatusToCheck_thenThrowInitiativeExceptionStatusIsNotInRevision() {
         Initiative step4Initiative = createStep4Initiative();
         step4Initiative.setStatus(InitiativeConstants.Status.TO_CHECK);
 
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenThrow(
-                new InitiativeException(
-                        InitiativeConstants.Exception.BadRequest.CODE,
-                        String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_IN_REVISION, INITIATIVE_ID),
-                        HttpStatus.BAD_REQUEST
-                )
-        );
+        //doThrow InitiativeException for getInitiative method
+        doThrow(new InitiativeException(
+                InitiativeConstants.Exception.NotFound.CODE,
+                String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID),
+                HttpStatus.NOT_FOUND))
+                .when(initiativeValidationService).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
 
-        try{
-            initiativeService.updateInitiativeToCheckStatus(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID);
-        }catch (InitiativeException e){
-            log.info("InitiativeException: " + e.getCode());
-            assertEquals(HttpStatus.BAD_REQUEST, e.getHttpStatus());
-            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
-            assertEquals(String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_IN_REVISION, INITIATIVE_ID), e.getMessage());
-        }
+        //prepare Executable with invocation of the method on your system under test
+        Executable executable = () -> initiativeService.updateInitiativeToCheckStatus(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
+        InitiativeException exception = Assertions.assertThrows(InitiativeException.class, executable);
+        assertEquals(InitiativeConstants.Exception.NotFound.CODE, exception.getCode());
+        assertEquals(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE.formatted(INITIATIVE_ID), exception.getMessage());
     }
 
     @Test
-    void updateInitiativeStatusToCheck_thenThrowExceptionAndStatusIsNotUpdated(){
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.empty());
-
-        try{
-            initiativeService.updateInitiativeToCheckStatus(ORGANIZATION_ID, ORGANIZATION_NAME, INITIATIVE_ID);
-        }catch (InitiativeException e){
-            log.info("InitiativeException: " + e.getCode());
-            assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
-            assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
-            assertEquals(String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID), e.getMessage());
-        }
-    }
-
-    @Test
-    void updateInitiativeStatusToPUBLISHED_thenInitiativeIsUpdated(){
+    void updateInitiativeStatusToPUBLISHED_thenInitiativeIsUpdated() {
         Initiative initiativeExpected = createStep5Initiative();
         initiativeExpected.setStatus(InitiativeConstants.Status.PUBLISHED);
 
@@ -768,28 +789,27 @@ class InitiativeServiceTest {
     }
 
 
-
     @Test
-    void givenInitiativeAPPROVEDandNextStatusPUBLISHED_whenInitiativeIsAllowedToBeNextStatus_thenOk(){
+    void givenInitiativeAPPROVEDandNextStatusPUBLISHED_whenInitiativeIsAllowedToBeNextStatus_thenOk() {
         //Instruct Initiative to have a status Valid (APPROVED)
         Initiative initiative = createStep5Initiative();
         initiative.setStatus(InitiativeConstants.Status.APPROVED);
 
         //Try to call the Real Service
         //Prepare Executable with invocation of the method on your system under test
-        Executable executable = () -> initiativeService.isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED);
+        Executable executable = () -> initiativeService.isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED, ROLE);
         Assertions.assertDoesNotThrow(executable);
     }
 
     @Test
-    void givenOneOfInitiativeStatusNotAPPROVEDandNextStatusPUBLISHED_whenInitiativeIsNOTAllowedToBeNextStatus_thenThrowInitiativeException(){
+    void givenOneOfInitiativeStatusNotAPPROVEDandNextStatusPUBLISHED_whenInitiativeIsNOTAllowedToBeNextStatus_thenThrowInitiativeException() {
         //Instruct Initiative to have a status Not Valid
         Initiative initiative = createStep5Initiative();
         initiative.setStatus(InitiativeConstants.Status.TO_CHECK);
 
         //Try to call the Real Service
         //Prepare Executable with invocation of the method on your system under test
-        Executable executable = () -> initiativeService.isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED);
+        Executable executable = () -> initiativeService.isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED, ROLE);
 
         InitiativeException exception = Assertions.assertThrows(InitiativeException.class, executable);
         assertEquals(InitiativeConstants.Exception.BadRequest.CODE, exception.getCode());
@@ -798,13 +818,13 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void givenAnyInitiative_whenNextStatusIsNotSetOfInitiativeStatus_thenThrowInitiativeException(){
+    void givenAnyInitiative_whenNextStatusIsNotSetOfInitiativeStatus_thenThrowInitiativeException() {
         //Instruct Initiative to have a status Not Valid
         Initiative initiative = createStep5Initiative();
 
         //Try to call the Real Service
         //Prepare Executable with invocation of the method on your system under test
-        Executable executable = () -> initiativeService.isInitiativeAllowedToBeNextStatusThenThrows(initiative, ANY_NOT_INITIATIVE_STATE);
+        Executable executable = () -> initiativeService.isInitiativeAllowedToBeNextStatusThenThrows(initiative, ANY_NOT_INITIATIVE_STATE, ROLE);
 
         InitiativeException exception = Assertions.assertThrows(InitiativeException.class, executable);
         assertEquals(InitiativeConstants.Exception.BadRequest.CODE, exception.getCode());
@@ -813,7 +833,7 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void givenInitiativeDTO_whenRuleEngineProduceIsValid_thenOk(){
+    void givenInitiativeDTO_whenRuleEngineProduceIsValid_thenOk() {
         //Instruct Initiative
         Initiative initiative = createStep5Initiative();
 
@@ -827,7 +847,7 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void givenInitiativeDTO_whenRuleEngineProduceIsNotValid_thenThrowException(){
+    void givenInitiativeDTO_whenRuleEngineProduceIsNotValid_thenThrowException() {
         //Instruct Initiative
         Initiative initiative = createStep5Initiative();
 
@@ -840,7 +860,8 @@ class InitiativeServiceTest {
         IllegalStateException exception = Assertions.assertThrows(IllegalStateException.class, executable);
     }
 
-    @Test //Mancano i test con Exception
+    @Test
+        //Mancano i test con Exception
     void givenDTOsInitiativeAndInitiativeOrganizationInfo_whenIntegrationWithIOBackEndIsOK_thenReturnInitiativeUpdated() throws Exception {
         //Instruct Initiative
         Initiative initiative = createStep5Initiative();
@@ -850,7 +871,6 @@ class InitiativeServiceTest {
         InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = InitiativeOrganizationInfoDTO.builder()
                 .organizationName(ORGANIZATION_NAME)
                 .organizationVat(ORGANIZATION_VAT)
-                .organizationUserId(ORGANIZATION_USER_ID)
                 .organizationUserRole(ORGANIZATION_USER_ROLE)
                 .build();
 
@@ -867,6 +887,85 @@ class InitiativeServiceTest {
 
         //Expecting connector to be called once with correct param
         verify(ioBackEndRestConnector, times(1)).createService(serviceRequestDTOexpected);
+    }
+
+    @Test
+    void getOnboardingStatusList_ok() {
+        Initiative initiative = this.createFullInitiative();
+        OnboardingStatusCitizenDTO onboardingStatusCitizenDTO = new OnboardingStatusCitizenDTO(USER_ID, STATUS, LocalDateTime.now().toString());
+        List<OnboardingStatusCitizenDTO> onboardingStatusCitizenDTOS = new ArrayList<>();
+        onboardingStatusCitizenDTOS.add(onboardingStatusCitizenDTO);
+        ResponseOnboardingDTO onboardingDTO = new ResponseOnboardingDTO(onboardingStatusCitizenDTOS, 1, 1, 1, 1);
+        DecryptCfDTO decryptCfDTO = new DecryptCfDTO(CF);
+        EncryptedCfDTO encryptedCfDTO = new EncryptedCfDTO(USER_ID);
+        Mockito.when(encryptRestConnector.upsertToken(Mockito.any())).thenReturn(encryptedCfDTO);
+        Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
+        Mockito.when(onboardingRestConnector.getOnboarding(INITIATIVE_ID, null, USER_ID, STARTDATE, ENDDATE, STATUS)).thenReturn(onboardingDTO);
+        Mockito.when(decryptRestConnector.getPiiByToken(USER_ID)).thenReturn(decryptCfDTO);
+        OnboardingDTO onboardingDTO1 = initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID, CF, STARTDATE, ENDDATE, STATUS, null);
+        assertEquals(onboardingDTO1.getContent().get(0).getBeneficiary(), CF);
+        assertEquals(onboardingDTO1.getContent().get(0).getBeneficiaryState(), STATUS);
+
+    }
+
+    @Test
+    void getOnboardingStatusList_ko_encrypt() {
+        Initiative initiative = this.createFullInitiative();
+        OnboardingStatusCitizenDTO onboardingStatusCitizenDTO = new OnboardingStatusCitizenDTO(USER_ID, STATUS, LocalDateTime.now().toString());
+        EncryptedCfDTO encryptedCfDTO = new EncryptedCfDTO(USER_ID);
+        Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
+        Mockito.doThrow(new InitiativeException(InternalServerError.CODE, "", HttpStatus.INTERNAL_SERVER_ERROR)).when(encryptRestConnector).upsertToken(Mockito.any());
+        try {
+            OnboardingDTO onboardingDTO1 = initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID, CF, STARTDATE, ENDDATE, STATUS, null);
+            Assertions.fail();
+        } catch (InitiativeException e) {
+            assertEquals(e.getCode(), InternalServerError.CODE);
+        }
+    }
+
+    @Test
+    void getOnboardingStatusList_ko_decrypt() {
+        Initiative initiative = this.createFullInitiative();
+        OnboardingStatusCitizenDTO onboardingStatusCitizenDTO = new OnboardingStatusCitizenDTO(USER_ID, STATUS, LocalDateTime.now().toString());
+        List<OnboardingStatusCitizenDTO> onboardingStatusCitizenDTOS = new ArrayList<>();
+        onboardingStatusCitizenDTOS.add(onboardingStatusCitizenDTO);
+        ResponseOnboardingDTO onboardingDTO = new ResponseOnboardingDTO(onboardingStatusCitizenDTOS, 1, 1, 1, 1);
+        EncryptedCfDTO encryptedCfDTO = new EncryptedCfDTO(USER_ID);
+        Mockito.when(encryptRestConnector.upsertToken(Mockito.any())).thenReturn(encryptedCfDTO);
+        Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
+        Mockito.when(onboardingRestConnector.getOnboarding(INITIATIVE_ID, null, USER_ID, STARTDATE, ENDDATE, STATUS)).thenReturn(onboardingDTO);
+        Mockito.doThrow(new InitiativeException(InternalServerError.CODE, "", HttpStatus.INTERNAL_SERVER_ERROR)).when(decryptRestConnector).getPiiByToken(Mockito.anyString());
+        try {
+            OnboardingDTO onboardingDTO1 = initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID, CF, STARTDATE, ENDDATE, STATUS, null);
+            Assertions.fail();
+        } catch (InitiativeException e) {
+            assertEquals(e.getCode(), InternalServerError.CODE);
+        }
+    }
+
+    @Test
+    void getOnboardingStatusList_ko_onboarding() {
+        Initiative initiative = this.createFullInitiative();
+        EncryptedCfDTO encryptedCfDTO = new EncryptedCfDTO(USER_ID);
+        Mockito.when(encryptRestConnector.upsertToken(Mockito.any())).thenReturn(encryptedCfDTO);
+        Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
+        Mockito.doThrow(new InitiativeException(InternalServerError.CODE, "", HttpStatus.INTERNAL_SERVER_ERROR)).when(onboardingRestConnector).getOnboarding(INITIATIVE_ID, null, USER_ID, STARTDATE, ENDDATE, STATUS);
+        try {
+            OnboardingDTO onboardingDTO1 = initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID, CF, STARTDATE, ENDDATE, STATUS, null);
+            Assertions.fail();
+        } catch (InitiativeException e) {
+            assertEquals(e.getCode(), InternalServerError.CODE);
+        }
+    }
+
+    @Test
+    void getOnboardingStatusList_initiative_not_found() {
+        try {
+            OnboardingDTO onboardingDTO1 = initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID, CF, STARTDATE, ENDDATE, STATUS, null);
+            Assertions.fail();
+        } catch (InitiativeException e) {
+            assertEquals(e.getCode(), NotFound.CODE);
+        }
     }
 
     private ServiceResponseErrorDTO createServiceResponseErrorDTO(int httpStatus) {
@@ -922,12 +1021,12 @@ class InitiativeServiceTest {
                 .build();
     }
 
-    Initiative createFullInitiative () {
+    Initiative createFullInitiative() {
         Initiative initiative = createStep5Initiative();
         return initiative;
     }
 
-    InitiativeDTO createFullInitiativeDTO () {
+    InitiativeDTO createFullInitiativeDTO() {
         InitiativeDTO initiativeDTO = createStep5InitiativeDTO();
         return initiativeDTO;
     }
@@ -936,7 +1035,7 @@ class InitiativeServiceTest {
      * Step 1
      */
 
-    Initiative createStep1Initiative () {
+    Initiative createStep1Initiative() {
         Initiative initiative = new Initiative();
         initiative.setInitiativeId(INITIATIVE_ID);
         initiative.setInitiativeName(INITIATIVE_NAME);
@@ -950,6 +1049,8 @@ class InitiativeServiceTest {
     }
 
     private InitiativeGeneral createInitiativeGeneral(boolean beneficiaryKnown) {
+        Map<String, String> language = new HashMap<>();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneral initiativeGeneral = new InitiativeGeneral();
         initiativeGeneral.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneral.setBeneficiaryKnown(true);
@@ -959,9 +1060,9 @@ class InitiativeServiceTest {
         initiativeGeneral.setStartDate(LocalDate.of(2022, 8, 8));
         initiativeGeneral.setRankingStartDate(LocalDate.of(2022, 9, 18));
         initiativeGeneral.setRankingEndDate(LocalDate.of(2022, 8, 18));
+        initiativeGeneral.setDescriptionMap(language);
         return initiativeGeneral;
     }
-
     private InitiativeAdditional createInitiativeAdditional() {
         InitiativeAdditional initiativeAdditional = new InitiativeAdditional();
         initiativeAdditional.setServiceIO(true);
@@ -980,7 +1081,7 @@ class InitiativeServiceTest {
         return initiativeAdditional;
     }
 
-    InitiativeDTO createStep1InitiativeDTO () {
+    InitiativeDTO createStep1InitiativeDTO() {
         InitiativeDTO initiativeDTO = new InitiativeDTO();
         initiativeDTO = initiativeDTO.builder()
                 .initiativeId(INITIATIVE_ID)
@@ -996,6 +1097,8 @@ class InitiativeServiceTest {
     }
 
     private InitiativeGeneralDTO createInitiativeGeneralDTO(boolean beneficiaryKnown) {
+        Map<String, String> language = new HashMap<>();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(beneficiaryKnown);
@@ -1009,6 +1112,7 @@ class InitiativeServiceTest {
         initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
         initiativeGeneralDTO.setStartDate(startDate);
         initiativeGeneralDTO.setEndDate(endDate);
+        initiativeGeneralDTO.setDescriptionMap(language);
         return initiativeGeneralDTO;
     }
 
@@ -1019,7 +1123,8 @@ class InitiativeServiceTest {
         initiativeAdditionalDTO.setServiceName("serviceName");
         initiativeAdditionalDTO.setServiceScope(InitiativeAdditionalDTO.ServiceScope.LOCAL);
         initiativeAdditionalDTO.setDescription("description");
-        initiativeAdditionalDTO.setPrivacyLink("privacy.url.it");;
+        initiativeAdditionalDTO.setPrivacyLink("privacy.url.it");
+        ;
         initiativeAdditionalDTO.setTcLink("tos.url.it");
         ChannelDTO channelDTO = new ChannelDTO();
         channelDTO.setType(ChannelDTO.TypeEnum.WEB);
@@ -1034,7 +1139,7 @@ class InitiativeServiceTest {
      * Step 2
      */
 
-    Initiative createStep2Initiative () {
+    Initiative createStep2Initiative() {
         Initiative initiative = createStep1Initiative();
         InitiativeBeneficiaryRule initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
         initiative.setBeneficiaryRule(initiativeBeneficiaryRule);
@@ -1072,7 +1177,7 @@ class InitiativeServiceTest {
         return initiativeBeneficiaryRule;
     }
 
-    InitiativeDTO createStep2InitiativeDTO () {
+    InitiativeDTO createStep2InitiativeDTO() {
         InitiativeDTO initiativeDTO = createStep1InitiativeDTO();
         InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
         initiativeDTO.setBeneficiaryRule(initiativeBeneficiaryRuleDTO);
@@ -1111,10 +1216,10 @@ class InitiativeServiceTest {
     }
 
     /*
-    * Step 3
+     * Step 3
      */
 
-    Initiative createStep3Initiative () {
+    Initiative createStep3Initiative() {
         Initiative initiative = createStep2Initiative();
         //TODO ora settato con l'utilizzo dei RewardGroups. Associare un faker booleano per i casi OK, altrimenti separare i 2 casi
         initiative.setRewardRule(createRewardRule(false));
@@ -1123,11 +1228,10 @@ class InitiativeServiceTest {
     }
 
     private InitiativeRewardRule createRewardRule(boolean isRewardFixedValue) {
-        if(isRewardFixedValue){
+        if (isRewardFixedValue) {
             //TODO Aggiungere RewardValue
             return null;
-        }
-        else {
+        } else {
             RewardGroups rewardGroups = new RewardGroups();
             RewardGroups.RewardGroup rewardGroup1 = new RewardGroups.RewardGroup(BigDecimal.valueOf(10), BigDecimal.valueOf(20), BigDecimal.valueOf(30));
             RewardGroups.RewardGroup rewardGroup2 = new RewardGroups.RewardGroup(BigDecimal.valueOf(10), BigDecimal.valueOf(30), BigDecimal.valueOf(40));
@@ -1197,7 +1301,7 @@ class InitiativeServiceTest {
         return initiativeTrxConditions;
     }
 
-    InitiativeDTO createStep3InitiativeDTO () {
+    InitiativeDTO createStep3InitiativeDTO() {
         InitiativeDTO initiativeDTO = createStep2InitiativeDTO();
         //TODO ora settato con l'utilizzo dei RewardGroups. Associare un faker booleano per i casi OK, altrimenti separare i 2 casi
         initiativeDTO.setRewardRule(createRewardRuleDTO(false));
@@ -1206,11 +1310,10 @@ class InitiativeServiceTest {
     }
 
     private InitiativeRewardRuleDTO createRewardRuleDTO(boolean isRewardFixedValue) {
-        if(isRewardFixedValue){
+        if (isRewardFixedValue) {
             //TODO Aggiungere RewardValue
             return null;
-        }
-        else {
+        } else {
             RewardGroupsDTO rewardGroupsDTO = new RewardGroupsDTO();
             RewardGroupsDTO.RewardGroupDTO rewardGroupDTO1 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(10), BigDecimal.valueOf(20), BigDecimal.valueOf(30));
             RewardGroupsDTO.RewardGroupDTO rewardGroupDTO2 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(10), BigDecimal.valueOf(30), BigDecimal.valueOf(40));
@@ -1280,53 +1383,54 @@ class InitiativeServiceTest {
         return initiativeTrxConditionsDTO;
     }
 
-    private Initiative createStep4Initiative () {
+    private Initiative createStep4Initiative() {
         Initiative initiative = createStep3Initiative();
         return initiative;
     }
 
-    private InitiativeDTO createStep4InitiativeDTO () {
+    private InitiativeDTO createStep4InitiativeDTO() {
         InitiativeDTO initiativeDTO = createStep3InitiativeDTO();
         return initiativeDTO;
     }
 
-    private Initiative createStep5Initiative () {
+    private Initiative createStep5Initiative() {
         Initiative initiative = createStep4Initiative();
         return initiative;
     }
 
-    private InitiativeDTO createStep5InitiativeDTO () {
+    private InitiativeDTO createStep5InitiativeDTO() {
         InitiativeDTO initiativeDTO = createStep4InitiativeDTO();
         return initiativeDTO;
     }
 
-    AccumulatedAmount createAccumulatedAmountValid(){
+    AccumulatedAmount createAccumulatedAmountValid() {
         AccumulatedAmount amount = new AccumulatedAmount();
         amount.setAccumulatedType(AccumulatedAmount.AccumulatedTypeEnum.THRESHOLD_REACHED);
         amount.setRefundThreshold(BigDecimal.valueOf(100000));
         return amount;
     }
 
-    TimeParameter createTimeParameterValid(){
+    TimeParameter createTimeParameterValid() {
         TimeParameter timeParameter = new TimeParameter();
         timeParameter.setTimeType(TimeParameter.TimeTypeEnum.CLOSED);
         return timeParameter;
     }
 
-    AdditionalInfo createAdditionalInfoValid(){
+    AdditionalInfo createAdditionalInfoValid() {
         AdditionalInfo additionalInfo = new AdditionalInfo();
         additionalInfo.setIdentificationCode("B002");
         return additionalInfo;
     }
 
-    InitiativeRefundRule createRefundRuleValidWithAccumulatedAmount(){
+    InitiativeRefundRule createRefundRuleValidWithAccumulatedAmount() {
         InitiativeRefundRule refundRule = new InitiativeRefundRule();
         refundRule.setAccumulatedAmount(createAccumulatedAmountValid());
         refundRule.setTimeParameter(null);
         refundRule.setAdditionalInfo(createAdditionalInfoValid());
         return refundRule;
     }
-    InitiativeRefundRule createRefundRuleValidWithTimeParameter(){
+
+    InitiativeRefundRule createRefundRuleValidWithTimeParameter() {
         InitiativeRefundRule refundRule = new InitiativeRefundRule();
         refundRule.setAccumulatedAmount(null);
         refundRule.setTimeParameter(createTimeParameterValid());
@@ -1334,7 +1438,7 @@ class InitiativeServiceTest {
         return refundRule;
     }
 
-    Initiative createInitiativeOnlyRefundRule(){
+    Initiative createInitiativeOnlyRefundRule() {
         Initiative initiative = createStep1Initiative();
         initiative.setRefundRule(createRefundRuleValidWithAccumulatedAmount());
         return initiative;

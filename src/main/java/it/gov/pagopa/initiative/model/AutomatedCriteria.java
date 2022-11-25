@@ -1,6 +1,7 @@
 package it.gov.pagopa.initiative.model;
 
 import lombok.*;
+import org.springframework.lang.Nullable;
 
 @Data
 @AllArgsConstructor
@@ -15,5 +16,23 @@ public class AutomatedCriteria {
   private FilterOperatorEnumModel operator;
   private String value;
   private String value2;
+  @Nullable
+  private OrderDirection orderDirection;
+
+  public enum OrderDirection {
+    ASC,
+    DESC;
+
+    OrderDirection() {
+    }
+
+    public boolean isAscending() {
+      return this.equals(ASC);
+    }
+
+    public boolean isDescending() {
+      return this.equals(DESC);
+    }
+  }
 
 }

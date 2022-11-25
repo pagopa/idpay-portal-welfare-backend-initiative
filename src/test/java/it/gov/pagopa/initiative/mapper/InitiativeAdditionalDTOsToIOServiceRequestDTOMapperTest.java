@@ -5,7 +5,6 @@ import it.gov.pagopa.initiative.dto.io.service.ServiceMetadataDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
 import it.gov.pagopa.initiative.model.Channel;
 import it.gov.pagopa.initiative.model.InitiativeAdditional;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
         })
 @WebMvcTest(value = {
         InitiativeAdditionalDTOsToIOServiceRequestDTOMapper.class})
-@Slf4j
 class InitiativeAdditionalDTOsToIOServiceRequestDTOMapperTest {
 
     @Autowired
@@ -59,7 +57,6 @@ class InitiativeAdditionalDTOsToIOServiceRequestDTOMapperTest {
         InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = InitiativeOrganizationInfoDTO.builder()
                 .organizationName("")
                 .organizationVat(ORGANIZATION_VAT)
-                .organizationUserId(ORGANIZATION_USER_ID)
                 .organizationUserRole(ORGANIZATION_USER_ROLE)
                 .build();
 
@@ -76,7 +73,6 @@ class InitiativeAdditionalDTOsToIOServiceRequestDTOMapperTest {
         InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = InitiativeOrganizationInfoDTO.builder()
                 .organizationName(ORGANIZATION_NAME)
                 .organizationVat(ORGANIZATION_VAT)
-                .organizationUserId(ORGANIZATION_USER_ID)
                 .organizationUserRole(ORGANIZATION_USER_ROLE)
                 .build();
 

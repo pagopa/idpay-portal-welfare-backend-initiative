@@ -14,6 +14,6 @@ import lombok.experimental.SuperBuilder;
 public class InitiativeOrganizationInfoDTO {
     private String organizationName;
     private String organizationVat;
-    private String organizationUserId;
+//    private String organizationUserId;
     private String organizationUserRole;
 }

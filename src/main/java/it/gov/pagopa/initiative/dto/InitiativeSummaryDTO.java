@@ -31,4 +31,7 @@ public class InitiativeSummaryDTO   {
 
   @JsonProperty("updateDate")
   private LocalDateTime updateDate;
+
+  @JsonProperty("rankingEnabled")
+  private Boolean rankingEnabled;
 }

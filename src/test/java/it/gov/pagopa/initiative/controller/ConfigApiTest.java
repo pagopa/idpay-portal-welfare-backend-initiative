@@ -5,7 +5,6 @@ import it.gov.pagopa.initiative.mapper.ConfigStaticModelToDTOMapper;
 import it.gov.pagopa.initiative.model.config.ConfigMcc;
 import it.gov.pagopa.initiative.model.config.ConfigTrxRule;
 import it.gov.pagopa.initiative.service.ConfigService;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +27,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 
 @WebMvcTest(value = {
         ConfigApi.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
-@Slf4j
 class ConfigApiTest {
 
     @MockBean
