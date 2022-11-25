@@ -11,7 +11,6 @@ import it.gov.pagopa.initiative.dto.io.service.ServiceMetadataDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceResponseDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceResponseErrorDTO;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -41,7 +40,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
                 "rest-client.backend-io.service.name=backend-io",
                 "rest-client.backend-io.service.subscriptionKey=subscriptionKey"
         })
-@Slf4j
 @SpringBootTest
 @ContextConfiguration(
         initializers = IOBackEndFeignRestClientTest.WireMockInitializer.class,

@@ -1,11 +1,12 @@
 package it.gov.pagopa.initiative.utils;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.security.NoSuchAlgorithmException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+
+import java.security.NoSuchAlgorithmException;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class AESUtilTest {
 

@@ -79,6 +79,9 @@ microservice-chart:
     LOG_LEVEL_INITIATIVE: INFO
     FEIGN_CLIENT_CONFIG_IO_LOG_LEVEL: basic
     SELC_UID: idpay
+    BLOB_STORAGE_CONTAINER_REFERENCE: logo
+    INITIATIVE_LOGO_URL: "https://idpaydinitiativestorage.blob.core.windows.net/logo/"
+    RANKING_GRACE_PERIOD: "10"
 
   envConfigMapExternals:
     idpay-common:
@@ -89,6 +92,9 @@ microservice-chart:
       GROUP_MS_HOST: idpay_group_host
       EMAIL_NOTIFICATION_MS_HOST: email_notification_ms_host
       SELC_BASE_URL: selc_base_url
+      PDV_ENCRYPT_BASE_URL: pdv_decrypt_base_url
+      ONBOARDING_URI: idpay_onboarding_host
+      PDV_DECRYPT_BASE_URL: pdv_decrypt_base_url
     idpay-eventhub-01:
       KAFKA_BINDER_BROKER_ENDPOINT_LIST: kafka_broker
       KAFKA_INITIATIVE_SASL_MECHANISM: kafka_sasl_mechanism
@@ -103,6 +109,10 @@ microservice-chart:
     UTIL_CRYPTO_AES_SECRET_TYPE_PBE_SALT: notification-token-salt
     UTIL_CRYPTO_AES_SECRET_TYPE_PBE_PASSPHRASE: notification-token-passphrase
     UTIL_CRYPTO_AES_MODE_GCM_IV: notification-token-iv
+    PDV_ENCRYPT_API_KEY: pdv-api-key
+    PDV_DECRYPT_API_KEY: pdv-api-key
+    BLOB_STORAGE_CONNECTION_STRING: initiative-storage-connection-string
+
 
   # nodeSelector: {}
 

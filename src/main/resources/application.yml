@@ -1,3 +1,11 @@
+api.key.encrypt: ${PDV_ENCRYPT_API_KEY:}
+api.key.decrypt: ${PDV_DECRYPT_API_KEY:}
+spring.servlet.multipart.max-file-size: ${MULTIPART_MAX_FILE_SIZE:1MB}
+spring.servlet.multipart.resolve-lazily: true
+spring.servlet.multipart.file-size-threshold: ${MULTIPART_MAX_FILE_SIZE:1MB}
+blobStorage.connectionString: ${BLOB_STORAGE_CONNECTION_STRING:}
+blobStorage.initiative.logo.containerReference: ${BLOB_STORAGE_CONTAINER_REFERENCE:}
+
 spring:
   data:
     mongodb:
@@ -37,6 +45,15 @@ rest-client:
       request:
         departmentName: ${IO_BACKEND_SERVICE_DEPARTMENT_NAME:}
         isVisible: ${IO_BACKEND_SERVICE_IS_VISIBLE:false}
+  onboarding:
+    serviceCode: idpay-onboarding
+    uri: ${ONBOARDING_URI:}
+  encryptpdv:
+    base-url: ${PDV_ENCRYPT_BASE_URL:}
+    cf: ${PDV_ENCRYPT_SERVICE_CODE:pdv-ms-tokenizer-encrypt}
+  decrypt:
+    baseUrl: ${PDV_DECRYPT_BASE_URL:}
+    cf: ${PDV_DECRYPT_SERVICE_CODE:pdv-ms-tokenizer}
   group:
     service:
       name: ms-group
@@ -80,10 +97,17 @@ logging:
 
 app:
   initiative:
+    logo:
+      allowed-mime-types: ${INSTITUTION_LOGO_ALLOWED_MIME_TYPES:image/png}
+      allowed-extensions: ${INSTITUTION_LOGO_ALLOWED_EXTENSIONS:png}
+      url: ${INITIATIVE_LOGO_URL}
+    ranking:
+      gracePeriod: ${RANKING_GRACE_PERIOD:10}
     conditions:
       notifyIO: ${APP_INITIATIVE_CONDITIONS_NOTIFY_IO:true}
       notifyRE: ${APP_INITIATIVE_CONDITIONS_NOTIFY_RE:true}
       notifyEmail: ${APP_INITIATIVE_CONDITIONS_NOTIFY_EMAIL:true}
+      notifyInternal: ${APP_INITIATIVE_CONDITIONS_NOTIFY_INTERNAL:true}
 
 util:
   crypto:

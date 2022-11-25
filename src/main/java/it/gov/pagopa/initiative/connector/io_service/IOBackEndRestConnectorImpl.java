@@ -1,5 +1,6 @@
 package it.gov.pagopa.initiative.connector.io_service;
 
+import it.gov.pagopa.initiative.dto.LogoIODTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceResponseDTO;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +26,11 @@ public class IOBackEndRestConnectorImpl implements IOBackEndRestConnector {
   public ServiceResponseDTO createService(@Valid ServiceRequestDTO serviceRequestDTO) {
     ResponseEntity<ServiceResponseDTO> responseEntity = ioBackEndFeignRestClient.createService(serviceRequestDTO, subscriptionKey);
     return responseEntity.getBody();
+  }
+
+  @Override
+  public void sendLogoIo(String serviceId, String primaryKey, LogoIODTO logo) {
+    ResponseEntity<Void> responseEntity = ioBackEndFeignRestClient.sendLogo(serviceId, logo, primaryKey);
   }
 
 }
