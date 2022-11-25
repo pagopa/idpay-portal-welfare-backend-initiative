@@ -207,7 +207,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     public void updateInitiativeRefundRules(String organizationId, String initiativeId, String role, Initiative refundRule, boolean changeInitiativeStatus){
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
         InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(initiative);
-        initiativeValidationService.validateAllWizardSteps(initiativeDTO);
+        //initiativeValidationService.validateAllWizardSteps(initiativeDTO);
         //Check Initiative Status
         isInitiativeAllowedToBeEditableThenThrows(initiative);
         initiative.setRefundRule(refundRule.getRefundRule());
