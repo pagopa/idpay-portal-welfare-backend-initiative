@@ -94,6 +94,7 @@ microservice-chart:
       SELC_BASE_URL: selc_base_url
       PDV_ENCRYPT_BASE_URL: pdv_decrypt_base_url
       ONBOARDING_URI: idpay_onboarding_host
+      RANKING_URI: idpay_ranking_host
       PDV_DECRYPT_BASE_URL: pdv_decrypt_base_url
     idpay-eventhub-01:
       KAFKA_BINDER_BROKER_ENDPOINT_LIST: kafka_broker
