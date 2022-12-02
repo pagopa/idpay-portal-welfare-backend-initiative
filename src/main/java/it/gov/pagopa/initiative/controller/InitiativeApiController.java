@@ -287,6 +287,12 @@ public class InitiativeApiController implements InitiativeApi {
     }
 
     @Override
+    public ResponseEntity<BeneficiaryRankingPageDTO> getRankingList(String organizationId,
+            String initiativeId, Pageable pageable, String beneficiary, String state) {
+        return ResponseEntity.ok(this.initiativeService.getRankingList(organizationId, initiativeId, pageable, beneficiary, state));
+    }
+
+    @Override
     public ResponseEntity<OnboardingDTO> getOnboardingStatus(String organizationId,String initiativeId, Pageable pageable,
         String beneficiary, LocalDateTime dateFrom, LocalDateTime dateTo, String state) {
         return ResponseEntity.ok(this.initiativeService.getOnboardingStatusList(organizationId,initiativeId,beneficiary,dateFrom,dateTo,state,pageable));
