@@ -21,6 +21,7 @@ import java.util.List;
 public interface InitiativeService {
 
     List<Initiative> retrieveInitiativeSummary(String organizationId, String role);
+    List<Initiative> getInitiativesIssuerList();
 
 //    Initiative insertInitiative(Initiative initiative, String organizationId);
     Initiative insertInitiative(Initiative initiative, String organizationId, String organizationName, String role);

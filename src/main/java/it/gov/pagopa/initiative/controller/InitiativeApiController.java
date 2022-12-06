@@ -59,6 +59,12 @@ public class InitiativeApiController implements InitiativeApi {
         ));
     }
 
+    @Override
+    public ResponseEntity<List<InitiativeIssuerDTO>> getInitiativeIssuerList() {
+        log.info("[{}][GET_INITIATIVES] - Initiative issuer: Start processing...");
+        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeIssuerDTOList(this.initiativeService.getInitiativesIssuerList()));
+    }
+
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<InitiativeDTO> getInitiativeDetail(String organizationId, String initiativeId, String role) {
         log.info("[{}][GET_INITIATIVE_DETAIL] - Initiative: {}. Start processing...", role, initiativeId);

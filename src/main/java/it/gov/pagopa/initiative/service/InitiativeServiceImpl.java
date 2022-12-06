@@ -12,6 +12,7 @@ import it.gov.pagopa.initiative.connector.ranking.RankingRestConnector;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest;
 import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.InternalServerError;
+import it.gov.pagopa.initiative.constants.InitiativeConstants.Status;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceResponseDTO;
@@ -117,6 +118,10 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                                         initiative.getStatus().equals(InitiativeConstants.Status.TO_CHECK) ||
                                         initiative.getStatus().equals(InitiativeConstants.Status.APPROVED)))
                 .toList() : initiatives;
+    }
+
+    public List<Initiative> getInitiativesIssuerList() {
+        return initiativeRepository.findByEnabledAndStatus(true, Status.PUBLISHED);
     }
 
     @Override
