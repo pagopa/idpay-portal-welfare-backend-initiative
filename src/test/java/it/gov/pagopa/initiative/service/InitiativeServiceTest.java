@@ -7,6 +7,7 @@ import it.gov.pagopa.initiative.connector.file_storage.FileStorageConnector;
 import it.gov.pagopa.initiative.connector.group.GroupRestConnector;
 import it.gov.pagopa.initiative.connector.io_service.IOBackEndRestConnector;
 import it.gov.pagopa.initiative.connector.onboarding.OnboardingRestConnector;
+import it.gov.pagopa.initiative.connector.ranking.RankingRestConnector;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.InternalServerError;
 import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.NotFound;
@@ -136,6 +137,9 @@ class InitiativeServiceTest {
 
     @MockBean
     DecryptRestConnector decryptRestConnector;
+
+    @MockBean
+    RankingRestConnector rankingRestConnector;
 
     @MockBean
     EmailNotificationService emailNotificationService;

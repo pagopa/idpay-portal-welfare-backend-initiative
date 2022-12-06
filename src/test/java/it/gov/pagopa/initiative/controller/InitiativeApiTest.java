@@ -433,27 +433,6 @@ class InitiativeApiTest {
     }
 
     @Test
-    void addLogoOk() throws Exception{
-        objectMapper.registerModule(new JavaTimeModule());
-
-        InitiativeRefundRuleDTO refundRuleDTO = createRefundRuleDTOValidWithAccumulatedAmount();
-
-        Initiative initiative = createInitiativeOnlyRefundRule();
-
-        when(initiativeDTOsToModelMapper.toInitiative(refundRuleDTO)).thenReturn(initiative);
-
-        doNothing().when(initiativeService).storeInitiativeLogo(Mockito.anyString(),Mockito.anyString(),Mockito.any(),Mockito.anyString(),Mockito.anyString());
-
-        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_REFUND_RULES_INFO_URL + "/draft", ORGANIZATION_ID, INITIATIVE_ID))
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(refundRuleDTO))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNoContent())
-                .andDo(print())
-                .andReturn();
-    }
-
-    @Test
     void updateInitiativeBeneficiaryDraft_statusNoContent() throws Exception {
         objectMapper.registerModule(new JavaTimeModule());
 

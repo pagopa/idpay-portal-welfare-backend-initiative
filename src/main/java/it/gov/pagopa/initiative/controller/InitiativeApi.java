@@ -41,6 +41,17 @@ public interface InitiativeApi {
       @PathVariable("organizationId") String organizationId,
       @RequestParam(required = false) String role);
 
+  @Operation(summary = "Returns the list of published initiatives", description = "", security = {
+          @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = InitiativeSummaryDTO.class))),
+          @ApiResponse(responseCode = "401", description = "Authentication failed", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+          @ApiResponse(responseCode = "429", description = "Too many Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+          @ApiResponse(responseCode = "500", description = "Server ERROR", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))})
+  @GetMapping(value = "/idpay/initiatives",
+          produces = {"application/json"})
+  ResponseEntity<List<InitiativeIssuerDTO>> getInitiativeIssuerList();
+
   @Operation(summary = "Returns the detail of an active initiative", description = "", security = {
       @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
   @ApiResponses(value = {
