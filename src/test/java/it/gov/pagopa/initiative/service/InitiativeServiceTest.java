@@ -511,7 +511,7 @@ class InitiativeServiceTest {
         Map<String, String> language = new HashMap<>();
         language.put(Locale.ENGLISH.getLanguage(), "en");
 
-        InitiativeGeneral initiativeGeneral = createInitiativeGeneral();
+        InitiativeGeneral initiativeGeneral = createInitiativeGeneral(true);
         initiativeGeneral.setDescriptionMap(language);
         step2Initiative.setGeneral(initiativeGeneral);
 
@@ -1269,12 +1269,12 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void getOnboardingStatusList_initiative_not_found() {
+    void getOnboardingStatusList_initiative_internal_server_error() {
         try {
             OnboardingDTO onboardingDTO1 = initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID, CF, STARTDATE, ENDDATE, STATUS, null);
             Assertions.fail();
         } catch (InitiativeException e) {
-            assertEquals(NotFound.CODE,e.getCode());
+            assertEquals(InternalServerError.CODE,e.getCode());
         }
     }
 

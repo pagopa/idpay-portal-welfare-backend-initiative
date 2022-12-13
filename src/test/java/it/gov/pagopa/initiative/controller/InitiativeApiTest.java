@@ -194,8 +194,8 @@ class InitiativeApiTest {
 
         Boolean beneficiaryKnown = false;
         //create Dummy Initiative
-        Initiative step2Initiative = createStep2Initiative(beneficiaryKnown, false);
-        Initiative step2Initiative2 = createStep2Initiative(beneficiaryKnown, false);
+        Initiative step2Initiative = createStep2Initiative(beneficiaryKnown);
+        Initiative step2Initiative2 = createStep2Initiative(beneficiaryKnown);
         List<Initiative> initiatives = Arrays.asList(step2Initiative, step2Initiative2);
 
         // Returning something from Repo by using ServiceMock
