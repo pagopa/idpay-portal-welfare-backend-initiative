@@ -216,7 +216,7 @@ class RewardAndTrxRuleValidatorTest {
         InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = createInitiativeRewardAndTrxRulesDTO_ok();
         Set<ConstraintViolation<InitiativeRewardAndTrxRulesDTO>> violations = validator.validate(initiativeRewardAndTrxRulesDTO, ValidationOnGroup.class);
         assertTrue(violations.isEmpty());
-        assertThat(violations.size()).isEqualTo(0);
+        assertThat(0).isEqualTo(0);
     }
 
     InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardGroupsDTO_ok(){
@@ -291,19 +291,16 @@ class RewardAndTrxRuleValidatorTest {
                 .type("rewardValue")
                 .build();
     }
-    void createInitiativeTrxCondition(InitiativeRewardRuleDTO initiativeRewardRuleDTO, InitiativeTrxConditionsDTO initiativeTrxConditionsDTO){
-
-    }
 
     InitiativeTrxConditionsDTO creatInitiativeTrxConditionsDTODaysOfWeekIntervarlsEmpty_ko(){
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = new InitiativeTrxConditionsDTO();
-        List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<DayOfWeekDTO.DayConfig>();
+        List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<>();
         DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
         dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
         dayOfWeeks.add(DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
-        List<DayOfWeekDTO.Interval> intervals = new ArrayList<DayOfWeekDTO.Interval>();
+        List<DayOfWeekDTO.Interval> intervals = new ArrayList<>();
         dayConfig1.setIntervals(intervals);
         dayConfigs.add(dayConfig1);
 
@@ -325,12 +322,12 @@ class RewardAndTrxRuleValidatorTest {
 
         MccFilterDTO mccFilterDTO = new MccFilterDTO();
         mccFilterDTO.setAllowedList(true);
-        Set<String> values = new HashSet<String>();
+        Set<String> values = new HashSet<>();
         values.add("123");
         values.add("456");
         mccFilterDTO.setValues(values);
 
-        List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<RewardLimitsDTO>();
+        List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<>();
         RewardLimitsDTO rewardLimitsDTO1 = new RewardLimitsDTO();
         rewardLimitsDTO1.setFrequency(RewardLimitsDTO.RewardLimitFrequency.DAILY);
         rewardLimitsDTO1.setRewardLimit(BigDecimal.valueOf(100));
@@ -351,13 +348,13 @@ class RewardAndTrxRuleValidatorTest {
 
     InitiativeTrxConditionsDTO creatInitiativeTrxConditionsDTODaysOfWeekIntervalsNotValid_ko(){
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = new InitiativeTrxConditionsDTO();
-        List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<DayOfWeekDTO.DayConfig>();
+        List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<>();
         DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
         dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
         dayOfWeeks.add(DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
-        List<DayOfWeekDTO.Interval> intervals = new ArrayList<DayOfWeekDTO.Interval>();
+        List<DayOfWeekDTO.Interval> intervals = new ArrayList<>();
         DayOfWeekDTO.Interval interval1 = new DayOfWeekDTO.Interval();
         LocalTime t1 = LocalTime.of(6, 0, 0);
         LocalTime t2 = LocalTime.of(12, 0, 0);
@@ -391,12 +388,12 @@ class RewardAndTrxRuleValidatorTest {
 
         MccFilterDTO mccFilterDTO = new MccFilterDTO();
         mccFilterDTO.setAllowedList(true);
-        Set<String> values = new HashSet<String>();
+        Set<String> values = new HashSet<>();
         values.add("123");
         values.add("456");
         mccFilterDTO.setValues(values);
 
-        List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<RewardLimitsDTO>();
+        List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<>();
         RewardLimitsDTO rewardLimitsDTO1 = new RewardLimitsDTO();
         rewardLimitsDTO1.setFrequency(RewardLimitsDTO.RewardLimitFrequency.DAILY);
         rewardLimitsDTO1.setRewardLimit(BigDecimal.valueOf(100));
@@ -418,13 +415,13 @@ class RewardAndTrxRuleValidatorTest {
 
     InitiativeTrxConditionsDTO creatInitiativeTrxConditionsDTOThresholdFromAndToTooSmall_ko(){
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = new InitiativeTrxConditionsDTO();
-        List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<DayOfWeekDTO.DayConfig>();
+        List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<>();
         DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
         dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
         dayOfWeeks.add(DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
-        List<DayOfWeekDTO.Interval> intervals = new ArrayList<DayOfWeekDTO.Interval>();
+        List<DayOfWeekDTO.Interval> intervals = new ArrayList<>();
         DayOfWeekDTO.Interval interval1 = new DayOfWeekDTO.Interval();
         LocalTime t1 = LocalTime.of(6, 0, 0);
         LocalTime t2 = LocalTime.of(12, 0, 0);
@@ -452,12 +449,12 @@ class RewardAndTrxRuleValidatorTest {
 
         MccFilterDTO mccFilterDTO = new MccFilterDTO();
         mccFilterDTO.setAllowedList(true);
-        Set<String> values = new HashSet<String>();
+        Set<String> values = new HashSet<>();
         values.add("123");
         values.add("456");
         mccFilterDTO.setValues(values);
 
-        List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<RewardLimitsDTO>();
+        List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<>();
         RewardLimitsDTO rewardLimitsDTO1 = new RewardLimitsDTO();
         rewardLimitsDTO1.setFrequency(RewardLimitsDTO.RewardLimitFrequency.DAILY);
         rewardLimitsDTO1.setRewardLimit(BigDecimal.valueOf(100));
@@ -479,13 +476,13 @@ class RewardAndTrxRuleValidatorTest {
 
     InitiativeTrxConditionsDTO creatInitiativeTrxConditionsDTOTrxRuleFromAndToTooSmall_ko(){
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = new InitiativeTrxConditionsDTO();
-        List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<DayOfWeekDTO.DayConfig>();
+        List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<>();
         DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
         dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
         dayOfWeeks.add(DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
-        List<DayOfWeekDTO.Interval> intervals = new ArrayList<DayOfWeekDTO.Interval>();
+        List<DayOfWeekDTO.Interval> intervals = new ArrayList<>();
         DayOfWeekDTO.Interval interval1 = new DayOfWeekDTO.Interval();
         LocalTime t1 = LocalTime.of(6, 0, 0);
         LocalTime t2 = LocalTime.of(12, 0, 0);
@@ -513,12 +510,12 @@ class RewardAndTrxRuleValidatorTest {
 
         MccFilterDTO mccFilterDTO = new MccFilterDTO();
         mccFilterDTO.setAllowedList(true);
-        Set<String> values = new HashSet<String>();
+        Set<String> values = new HashSet<>();
         values.add("123");
         values.add("456");
         mccFilterDTO.setValues(values);
 
-        List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<RewardLimitsDTO>();
+        List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<>();
         RewardLimitsDTO rewardLimitsDTO1 = new RewardLimitsDTO();
         rewardLimitsDTO1.setFrequency(RewardLimitsDTO.RewardLimitFrequency.DAILY);
         rewardLimitsDTO1.setRewardLimit(BigDecimal.valueOf(100));
@@ -540,13 +537,13 @@ class RewardAndTrxRuleValidatorTest {
 
     InitiativeTrxConditionsDTO creatInitiativeTrxConditionsDTOValid_ok(){
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = new InitiativeTrxConditionsDTO();
-        List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<DayOfWeekDTO.DayConfig>();
+        List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<>();
         DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
         dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
         dayOfWeeks.add(DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
-        List<DayOfWeekDTO.Interval> intervals = new ArrayList<DayOfWeekDTO.Interval>();
+        List<DayOfWeekDTO.Interval> intervals = new ArrayList<>();
         DayOfWeekDTO.Interval interval1 = new DayOfWeekDTO.Interval();
         LocalTime t1 = LocalTime.of(6, 0, 0);
         LocalTime t2 = LocalTime.of(12, 0, 0);
@@ -574,12 +571,12 @@ class RewardAndTrxRuleValidatorTest {
 
         MccFilterDTO mccFilterDTO = new MccFilterDTO();
         mccFilterDTO.setAllowedList(true);
-        Set<String> values = new HashSet<String>();
+        Set<String> values = new HashSet<>();
         values.add("123");
         values.add("456");
         mccFilterDTO.setValues(values);
 
-        List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<RewardLimitsDTO>();
+        List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<>();
         RewardLimitsDTO rewardLimitsDTO1 = new RewardLimitsDTO();
         rewardLimitsDTO1.setFrequency(RewardLimitsDTO.RewardLimitFrequency.DAILY);
         rewardLimitsDTO1.setRewardLimit(BigDecimal.valueOf(100));
@@ -624,11 +621,11 @@ class RewardAndTrxRuleValidatorTest {
     private DayOfWeekDTO.DayConfig createDayConfigWithWrongIntervalsItems(){
         DayOfWeekDTO.DayConfig dayConfig = new DayOfWeekDTO.DayConfig();
 
-        Set<DayOfWeek> dayOfWeeks = new HashSet<DayOfWeek>();
+        Set<DayOfWeek> dayOfWeeks = new HashSet<>();
         dayOfWeeks.add(DayOfWeek.MONDAY);
         dayOfWeeks.add(DayOfWeek.THURSDAY);
 
-        List<DayOfWeekDTO.Interval> intervals = new ArrayList<DayOfWeekDTO.Interval>();
+        List<DayOfWeekDTO.Interval> intervals = new ArrayList<>();
         intervals.add( new DayOfWeekDTO.Interval(null, LocalTime.of(6,0,0)));
         intervals.add( new DayOfWeekDTO.Interval(LocalTime.of(7,0,0), LocalTime.of(22,0,0)));
 
@@ -638,7 +635,7 @@ class RewardAndTrxRuleValidatorTest {
     }
 
     private DayOfWeekDTO.Interval createIntervalWithEndTimeNull(){
-        return new DayOfWeekDTO.Interval(LocalTime.of(10, 00, 00), null);
+        return new DayOfWeekDTO.Interval(LocalTime.of(10, 0, 0), null);
     }
 
 }

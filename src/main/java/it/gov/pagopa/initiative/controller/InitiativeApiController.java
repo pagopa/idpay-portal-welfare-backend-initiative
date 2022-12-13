@@ -236,7 +236,7 @@ public class InitiativeApiController implements InitiativeApi {
                 initiativeService.sendInitiativeInfoToRuleEngine(initiative);
             }
             //1. Only for the Initiatives to be provided to IO, the integration is carried out with the creation of the Initiative Service to IO BackEnd
-            if(initiative.getAdditionalInfo().getServiceIO()) {
+            if(Boolean.TRUE.equals(initiative.getAdditionalInfo().getServiceIO())) {
                 if(notifyIO) {
                     log.info("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Notification to IO BackEnd of the published Initiative", initiativeId);
                     initiative = initiativeService.sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(initiative, initiativeOrganizationInfoDTO);
@@ -245,10 +245,8 @@ public class InitiativeApiController implements InitiativeApi {
                 //Send citizen to MS-Group via API
                 //This integration necessarily takes place in succession to having created the service with IO in order not to send "orphan" resources (not associated with any Initiative known by IO).
                 //2. BeneficiaryKnown is true -> Send to MS-Group via API about the publishing of Initiative. Then, MS Groups will send it via Topics to NotificationManager and Onboarding
-                if (null != initiative.getGeneral() && initiative.getGeneral().getBeneficiaryKnown()) {
-                    if(notifyInternal) {
+                if (null != initiative.getGeneral() && initiative.getGeneral().getBeneficiaryKnown() && notifyInternal) {
                         initiativeService.sendInitiativeInfoToNotificationManager(initiative);
-                    }
                 }
             }
         } catch (Exception e) {

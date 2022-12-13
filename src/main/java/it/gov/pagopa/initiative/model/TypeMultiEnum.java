@@ -8,18 +8,18 @@ import com.fasterxml.jackson.annotation.JsonValue;
  */
 public enum TypeMultiEnum {
 
-    MULTI("multi");
+    MULTI();
 
     private final String value;
 
-    TypeMultiEnum(String value) {
-        this.value = value;
+    TypeMultiEnum() {
+        this.value = "multi";
     }
 
     @Override
     @JsonValue
     public String toString() {
-        return String.valueOf(value);
+        return value;
     }
 
     @JsonCreator

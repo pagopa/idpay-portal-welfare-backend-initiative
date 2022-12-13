@@ -14,9 +14,6 @@ public class RefundRuleTypeValidator implements ConstraintValidator<RefundRuleTy
     public boolean isValid(InitiativeRefundRuleDTO value, ConstraintValidatorContext context) {
         AccumulatedAmountDTO amountDTO = value.getAccumulatedAmount();
         TimeParameterDTO timeParameterDTO = value.getTimeParameter();
-        if ((amountDTO == null && timeParameterDTO != null) || (amountDTO != null && timeParameterDTO == null)){
-            return true;
-        }
-        return false;
+        return (amountDTO == null && timeParameterDTO != null) || (amountDTO != null && timeParameterDTO == null);
     }
 }

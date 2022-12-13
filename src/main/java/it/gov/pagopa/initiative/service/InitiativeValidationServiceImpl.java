@@ -106,7 +106,7 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
                     }
                 }
             }
-            if(checkIsee==false){
+            if(!checkIsee){
                 throw new InitiativeException(
                         InitiativeConstants.Exception.BadRequest.CODE,
                         InitiativeConstants.Exception.BadRequest.INITIATIVE_BENEFICIARY_RANKING_ENABLED_AUTOMATED_CRITERIA_ISEE_MISSING_NOT_VALID,
@@ -120,18 +120,20 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
     public void validateAllWizardSteps(InitiativeDTO initiativeDTO) {
         Set<ConstraintViolation<InitiativeAdditionalDTO>> violationsAdditional = validator.validate(initiativeDTO.getAdditionalInfo(), ValidationOnGroup.class);
         Set<ConstraintViolation<InitiativeGeneralDTO>> violationsGeneral = validator.validate(initiativeDTO.getGeneral(), ValidationOnGroup.class);
-        Set<ConstraintViolation<InitiativeBeneficiaryRuleDTO>> violationsBeneficiry = validator.validate(initiativeDTO.getBeneficiaryRule(), ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeBeneficiaryRuleDTO>> violationsBeneficiary =
+                validator.validate(initiativeDTO.getBeneficiaryRule(), ValidationOnGroup.class);
         Set<ConstraintViolation<InitiativeRewardRuleDTO>> violationsReward = validator.validate(initiativeDTO.getRewardRule(), ValidationOnGroup.class);
         Set<ConstraintViolation<InitiativeTrxConditionsDTO>> violationsTrx = validator.validate(initiativeDTO.getTrxRule(), ValidationOnGroup.class);
         if(!violationsAdditional.isEmpty() ||
                 !violationsGeneral.isEmpty() ||
-                !violationsBeneficiry.isEmpty() ||
+                !violationsBeneficiary.isEmpty() ||
                 !violationsReward.isEmpty() ||
                 !violationsTrx.isEmpty()){
             Set<String> s = Stream.of(
                     violationsAdditional.stream().map(violation -> String.format(STRING_FORMAT_VIOLATION, violation.getPropertyPath(), violation.getMessage())).collect(Collectors.toSet()),
                             violationsGeneral.stream().map(violation -> String.format(STRING_FORMAT_VIOLATION, violation.getPropertyPath(), violation.getMessage())).collect(Collectors.toSet()),
-                            violationsBeneficiry.stream().map(violation -> String.format(STRING_FORMAT_VIOLATION, violation.getPropertyPath(), violation.getMessage())).collect(Collectors.toSet()),
+                            violationsBeneficiary.stream().map(violation -> String.format(STRING_FORMAT_VIOLATION,
+                                    violation.getPropertyPath(), violation.getMessage())).collect(Collectors.toSet()),
                             violationsReward.stream().map(violation -> String.format(STRING_FORMAT_VIOLATION, violation.getPropertyPath(), violation.getMessage())).collect(Collectors.toSet()),
                             violationsTrx.stream().map(violation -> String.format(STRING_FORMAT_VIOLATION, violation.getPropertyPath(), violation.getMessage())).collect(Collectors.toSet())
                     )

@@ -22,7 +22,6 @@ import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
 import it.gov.pagopa.initiative.model.rule.trx.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
@@ -33,7 +32,6 @@ import java.time.LocalTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 @WebMvcTest(value = {
         InitiativeDTOsToModelMapper.class})
@@ -236,31 +234,26 @@ class InitiativeDTOsToModelMapperTest {
 
     private Initiative createFullInitiative () {
         //TODO Test onGoing for different steps. Must use Step6 at the end
-        Initiative initiative = createStep2Initiative();
-        return initiative;
+        return createStep2Initiative();
     }
 
     private InitiativeDTO createFullInitiativeDTO () {
         //TODO Test onGoing for different steps. Must use Step6 at the end
-        InitiativeDTO initiativeDTO = createStep2InitiativeDTO();
-        return initiativeDTO;
+        return createStep2InitiativeDTO();
     }
 
-    private Initiative createInitiativeBaseFields(Initiative initiative) {
+    private void createInitiativeBaseFields(Initiative initiative) {
         initiative.setInitiativeId("Id1");
         initiative.setInitiativeName("initiativeName1");
         initiative.setOrganizationId("organizationId1");
         initiative.setStatus("DRAFT");
         initiative.setPdndToken("pdndToken1");
-        return initiative;
     }
 
     private Initiative createStep1Initiative () {
         Initiative initiative = new Initiative();
-        initiative = createInitiativeBaseFields(initiative);
+        createInitiativeBaseFields(initiative);
         initiative.setAdditionalInfo(createInitiativeAdditional());
-//        initiative.setBeneficiaryRule(createInitiativeBeneficiaryRule());
-//        initiative.setLegal(createInitiativeLegal());
         return initiative;
     }
 
@@ -478,7 +471,7 @@ class InitiativeDTOsToModelMapperTest {
     private InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardGroupDTO(){
         RewardGroupsDTO rewardGroupsDTO = new RewardGroupsDTO();
         rewardGroupsDTO.setType("rewardGroups");
-        List<RewardGroupsDTO.RewardGroupDTO> list = new ArrayList<RewardGroupsDTO.RewardGroupDTO>();
+        List<RewardGroupsDTO.RewardGroupDTO> list = new ArrayList<>();
         RewardGroupsDTO.RewardGroupDTO groupDTO1 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(10), BigDecimal.valueOf(100), BigDecimal.valueOf(50));
         list.add(groupDTO1);
         rewardGroupsDTO.setRewardGroups(list);
@@ -487,13 +480,13 @@ class InitiativeDTOsToModelMapperTest {
 
     private InitiativeTrxConditionsDTO createInitiativeTrxConditionsDTOValid(){
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = new InitiativeTrxConditionsDTO();
-        List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<DayOfWeekDTO.DayConfig>();
+        List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<>();
         DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
         dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
         dayOfWeeks.add(DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
-        List<DayOfWeekDTO.Interval> intervals = new ArrayList<DayOfWeekDTO.Interval>();
+        List<DayOfWeekDTO.Interval> intervals = new ArrayList<>();
         DayOfWeekDTO.Interval interval1 = new DayOfWeekDTO.Interval();
         LocalTime t1 = LocalTime.of(6, 0, 0);
         LocalTime t2 = LocalTime.of(12, 0, 0);
@@ -521,12 +514,12 @@ class InitiativeDTOsToModelMapperTest {
 
         MccFilterDTO mccFilterDTO = new MccFilterDTO();
         mccFilterDTO.setAllowedList(true);
-        Set<String> values = new HashSet<String>();
+        Set<String> values = new HashSet<>();
         values.add("123");
         values.add("456");
         mccFilterDTO.setValues(values);
 
-        List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<RewardLimitsDTO>();
+        List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<>();
         RewardLimitsDTO rewardLimitsDTO1 = new RewardLimitsDTO();
         rewardLimitsDTO1.setFrequency(RewardLimitsDTO.RewardLimitFrequency.DAILY);
         rewardLimitsDTO1.setRewardLimit(BigDecimal.valueOf(100));
@@ -547,13 +540,13 @@ class InitiativeDTOsToModelMapperTest {
 
     private InitiativeTrxConditionsDTO createInitiativeTrxConditionsDTOThresholdNull(){
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = new InitiativeTrxConditionsDTO();
-        List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<DayOfWeekDTO.DayConfig>();
+        List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<>();
         DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
         dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
         dayOfWeeks.add(DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
-        List<DayOfWeekDTO.Interval> intervals = new ArrayList<DayOfWeekDTO.Interval>();
+        List<DayOfWeekDTO.Interval> intervals = new ArrayList<>();
         DayOfWeekDTO.Interval interval1 = new DayOfWeekDTO.Interval();
         LocalTime t1 = LocalTime.of(6, 0, 0);
         LocalTime t2 = LocalTime.of(12, 0, 0);
@@ -565,8 +558,6 @@ class InitiativeDTOsToModelMapperTest {
 
         DayOfWeekDTO dayOfWeekDTO = new DayOfWeekDTO(dayConfigs);
 
-        ThresholdDTO thresholdDTO = null;
-
         TrxCountDTO trxCountDTO = new TrxCountDTO();
 
         trxCountDTO.setFrom(10L);
@@ -576,12 +567,12 @@ class InitiativeDTOsToModelMapperTest {
 
         MccFilterDTO mccFilterDTO = new MccFilterDTO();
         mccFilterDTO.setAllowedList(true);
-        Set<String> values = new HashSet<String>();
+        Set<String> values = new HashSet<>();
         values.add("123");
         values.add("456");
         mccFilterDTO.setValues(values);
 
-        List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<RewardLimitsDTO>();
+        List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<>();
         RewardLimitsDTO rewardLimitsDTO1 = new RewardLimitsDTO();
         rewardLimitsDTO1.setFrequency(RewardLimitsDTO.RewardLimitFrequency.DAILY);
         rewardLimitsDTO1.setRewardLimit(BigDecimal.valueOf(100));
@@ -592,7 +583,7 @@ class InitiativeDTOsToModelMapperTest {
         rewardLimitsDTOList.add(rewardLimitsDTO2);
 
         initiativeTrxConditionsDTO.setDaysOfWeek(dayOfWeekDTO);
-        initiativeTrxConditionsDTO.setThreshold(thresholdDTO);
+        initiativeTrxConditionsDTO.setThreshold(null);
         initiativeTrxConditionsDTO.setTrxCount(trxCountDTO);
         initiativeTrxConditionsDTO.setMccFilter(mccFilterDTO);
         initiativeTrxConditionsDTO.setRewardLimits(rewardLimitsDTOList);
@@ -602,13 +593,13 @@ class InitiativeDTOsToModelMapperTest {
 
     private InitiativeTrxConditionsDTO createInitiativeTrxConditionsDTORewardLimitsEmpty(){
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = new InitiativeTrxConditionsDTO();
-        List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<DayOfWeekDTO.DayConfig>();
+        List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<>();
         DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
         dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
         dayOfWeeks.add(DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
-        List<DayOfWeekDTO.Interval> intervals = new ArrayList<DayOfWeekDTO.Interval>();
+        List<DayOfWeekDTO.Interval> intervals = new ArrayList<>();
         DayOfWeekDTO.Interval interval1 = new DayOfWeekDTO.Interval();
         LocalTime t1 = LocalTime.of(6, 0, 0);
         LocalTime t2 = LocalTime.of(12, 0, 0);
@@ -636,12 +627,12 @@ class InitiativeDTOsToModelMapperTest {
 
         MccFilterDTO mccFilterDTO = new MccFilterDTO();
         mccFilterDTO.setAllowedList(true);
-        Set<String> values = new HashSet<String>();
+        Set<String> values = new HashSet<>();
         values.add("123");
         values.add("456");
         mccFilterDTO.setValues(values);
 
-        List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<RewardLimitsDTO>();
+        List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<>();
 
         initiativeTrxConditionsDTO.setDaysOfWeek(dayOfWeekDTO);
         initiativeTrxConditionsDTO.setThreshold(thresholdDTO);
@@ -654,13 +645,13 @@ class InitiativeDTOsToModelMapperTest {
 
     private InitiativeTrxConditionsDTO createInitiativeTrxConditionsDTODayOfWeekNull(){
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = new InitiativeTrxConditionsDTO();
-        List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<DayOfWeekDTO.DayConfig>();
+        List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<>();
         DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
         dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
         dayOfWeeks.add(DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
-        List<DayOfWeekDTO.Interval> intervals = new ArrayList<DayOfWeekDTO.Interval>();
+        List<DayOfWeekDTO.Interval> intervals = new ArrayList<>();
         DayOfWeekDTO.Interval interval1 = new DayOfWeekDTO.Interval();
         LocalTime t1 = LocalTime.of(6, 0, 0);
         LocalTime t2 = LocalTime.of(12, 0, 0);
@@ -669,8 +660,6 @@ class InitiativeDTOsToModelMapperTest {
         intervals.add(interval1);
         dayConfig1.setIntervals(intervals);
         dayConfigs.add(dayConfig1);
-
-        DayOfWeekDTO dayOfWeekDTO = null;
 
         ThresholdDTO thresholdDTO = new ThresholdDTO();
 
@@ -688,12 +677,12 @@ class InitiativeDTOsToModelMapperTest {
 
         MccFilterDTO mccFilterDTO = new MccFilterDTO();
         mccFilterDTO.setAllowedList(true);
-        Set<String> values = new HashSet<String>();
+        Set<String> values = new HashSet<>();
         values.add("123");
         values.add("456");
         mccFilterDTO.setValues(values);
 
-        List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<RewardLimitsDTO>();
+        List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<>();
         RewardLimitsDTO rewardLimitsDTO1 = new RewardLimitsDTO();
         rewardLimitsDTO1.setFrequency(RewardLimitsDTO.RewardLimitFrequency.DAILY);
         rewardLimitsDTO1.setRewardLimit(BigDecimal.valueOf(100));
@@ -703,7 +692,7 @@ class InitiativeDTOsToModelMapperTest {
         rewardLimitsDTOList.add(rewardLimitsDTO1);
         rewardLimitsDTOList.add(rewardLimitsDTO2);
 
-        initiativeTrxConditionsDTO.setDaysOfWeek(dayOfWeekDTO);
+        initiativeTrxConditionsDTO.setDaysOfWeek(null);
         initiativeTrxConditionsDTO.setThreshold(thresholdDTO);
         initiativeTrxConditionsDTO.setTrxCount(trxCountDTO);
         initiativeTrxConditionsDTO.setMccFilter(mccFilterDTO);
@@ -714,13 +703,13 @@ class InitiativeDTOsToModelMapperTest {
 
     private InitiativeTrxConditionsDTO createInitiativeTrxConditionsDTOMccFilterNull(){
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = new InitiativeTrxConditionsDTO();
-        List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<DayOfWeekDTO.DayConfig>();
+        List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<>();
         DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
         dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
         dayOfWeeks.add(DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
-        List<DayOfWeekDTO.Interval> intervals = new ArrayList<DayOfWeekDTO.Interval>();
+        List<DayOfWeekDTO.Interval> intervals = new ArrayList<>();
         DayOfWeekDTO.Interval interval1 = new DayOfWeekDTO.Interval();
         LocalTime t1 = LocalTime.of(6, 0, 0);
         LocalTime t2 = LocalTime.of(12, 0, 0);
@@ -746,9 +735,7 @@ class InitiativeDTOsToModelMapperTest {
         trxCountDTO.setTo(30L);
         trxCountDTO.setToIncluded(true);
 
-        MccFilterDTO mccFilterDTO = null;
-
-        List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<RewardLimitsDTO>();
+        List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<>();
         RewardLimitsDTO rewardLimitsDTO1 = new RewardLimitsDTO();
         rewardLimitsDTO1.setFrequency(RewardLimitsDTO.RewardLimitFrequency.DAILY);
         rewardLimitsDTO1.setRewardLimit(BigDecimal.valueOf(100));
@@ -761,7 +748,7 @@ class InitiativeDTOsToModelMapperTest {
         initiativeTrxConditionsDTO.setDaysOfWeek(dayOfWeekDTO);
         initiativeTrxConditionsDTO.setThreshold(thresholdDTO);
         initiativeTrxConditionsDTO.setTrxCount(trxCountDTO);
-        initiativeTrxConditionsDTO.setMccFilter(mccFilterDTO);
+        initiativeTrxConditionsDTO.setMccFilter(null);
         initiativeTrxConditionsDTO.setRewardLimits(rewardLimitsDTOList);
 
         return initiativeTrxConditionsDTO;
@@ -769,13 +756,13 @@ class InitiativeDTOsToModelMapperTest {
 
     private InitiativeTrxConditionsDTO createInitiativeTrxConditionsDTOTrxCountNull(){
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = new InitiativeTrxConditionsDTO();
-        List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<DayOfWeekDTO.DayConfig>();
+        List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<>();
         DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
         dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
         dayOfWeeks.add(DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
-        List<DayOfWeekDTO.Interval> intervals = new ArrayList<DayOfWeekDTO.Interval>();
+        List<DayOfWeekDTO.Interval> intervals = new ArrayList<>();
         DayOfWeekDTO.Interval interval1 = new DayOfWeekDTO.Interval();
         LocalTime t1 = LocalTime.of(6, 0, 0);
         LocalTime t2 = LocalTime.of(12, 0, 0);
@@ -794,16 +781,14 @@ class InitiativeDTOsToModelMapperTest {
         thresholdDTO.setTo(BigDecimal.valueOf(30));
         thresholdDTO.setToIncluded(true);
 
-        TrxCountDTO trxCountDTO = null;
-
         MccFilterDTO mccFilterDTO = new MccFilterDTO();
         mccFilterDTO.setAllowedList(true);
-        Set<String> values = new HashSet<String>();
+        Set<String> values = new HashSet<>();
         values.add("123");
         values.add("456");
         mccFilterDTO.setValues(values);
 
-        List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<RewardLimitsDTO>();
+        List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<>();
         RewardLimitsDTO rewardLimitsDTO1 = new RewardLimitsDTO();
         rewardLimitsDTO1.setFrequency(RewardLimitsDTO.RewardLimitFrequency.DAILY);
         rewardLimitsDTO1.setRewardLimit(BigDecimal.valueOf(100));
@@ -815,7 +800,7 @@ class InitiativeDTOsToModelMapperTest {
 
         initiativeTrxConditionsDTO.setDaysOfWeek(dayOfWeekDTO);
         initiativeTrxConditionsDTO.setThreshold(thresholdDTO);
-        initiativeTrxConditionsDTO.setTrxCount(trxCountDTO);
+        initiativeTrxConditionsDTO.setTrxCount(null);
         initiativeTrxConditionsDTO.setMccFilter(mccFilterDTO);
         initiativeTrxConditionsDTO.setRewardLimits(rewardLimitsDTOList);
 
@@ -908,7 +893,7 @@ class InitiativeDTOsToModelMapperTest {
     private InitiativeRewardRule createInitiativeRewardRuleRewardGroup(){
         RewardGroups rewardGroups = new RewardGroups();
         rewardGroups.setType("rewardGroups");
-        List<RewardGroups.RewardGroup> list = new ArrayList<RewardGroups.RewardGroup>();
+        List<RewardGroups.RewardGroup> list = new ArrayList<>();
         RewardGroups.RewardGroup group1 = new RewardGroups.RewardGroup(BigDecimal.valueOf(10), BigDecimal.valueOf(100), BigDecimal.valueOf(50));
         list.add(group1);
         rewardGroups.setRewardGroups(list);
@@ -917,13 +902,13 @@ class InitiativeDTOsToModelMapperTest {
 
     private InitiativeTrxConditions createInitiativeTrxConditionsValid(){
         InitiativeTrxConditions initiativeTrxConditions = new InitiativeTrxConditions();
-        List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig> dayConfigs = new ArrayList<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig>();
+        List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig> dayConfigs = new ArrayList<>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig dayConfig1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig();
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
         dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
         dayOfWeeks.add(DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
-        List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval> intervals = new ArrayList<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval>();
+        List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval> intervals = new ArrayList<>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval interval1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval();
         LocalTime t1 = LocalTime.of(6, 0, 0);
         LocalTime t2 = LocalTime.of(12, 0, 0);
@@ -951,12 +936,12 @@ class InitiativeDTOsToModelMapperTest {
 
         MccFilter mccFilter = new MccFilter();
         mccFilter.setAllowedList(true);
-        Set<String> values = new HashSet<String>();
+        Set<String> values = new HashSet<>();
         values.add("123");
         values.add("456");
         mccFilter.setValues(values);
 
-        List<RewardLimits> rewardLimitsList = new ArrayList<RewardLimits>();
+        List<RewardLimits> rewardLimitsList = new ArrayList<>();
         RewardLimits rewardLimits1 = new RewardLimits();
         rewardLimits1.setFrequency(RewardLimits.RewardLimitFrequency.DAILY);
         rewardLimits1.setRewardLimit(BigDecimal.valueOf(100));
@@ -977,13 +962,13 @@ class InitiativeDTOsToModelMapperTest {
 
     private InitiativeTrxConditions createInitiativeTrxConditionsThresholdNull(){
         InitiativeTrxConditions initiativeTrxConditions = new InitiativeTrxConditions();
-        List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig> dayConfigs = new ArrayList<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig>();
+        List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig> dayConfigs = new ArrayList<>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig dayConfig1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig();
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
         dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
         dayOfWeeks.add(DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
-        List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval> intervals = new ArrayList<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval>();
+        List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval> intervals = new ArrayList<>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval interval1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval();
         LocalTime t1 = LocalTime.of(6, 0, 0);
         LocalTime t2 = LocalTime.of(12, 0, 0);
@@ -995,8 +980,6 @@ class InitiativeDTOsToModelMapperTest {
 
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek dayOfWeek = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek(dayConfigs);
 
-        Threshold threshold = null;
-
         TrxCount trxCount = new TrxCount();
 
         trxCount.setFrom(10L);
@@ -1006,12 +989,12 @@ class InitiativeDTOsToModelMapperTest {
 
         MccFilter mccFilter = new MccFilter();
         mccFilter.setAllowedList(true);
-        Set<String> values = new HashSet<String>();
+        Set<String> values = new HashSet<>();
         values.add("123");
         values.add("456");
         mccFilter.setValues(values);
 
-        List<RewardLimits> rewardLimitsList = new ArrayList<RewardLimits>();
+        List<RewardLimits> rewardLimitsList = new ArrayList<>();
         RewardLimits rewardLimits1 = new RewardLimits();
         rewardLimits1.setFrequency(RewardLimits.RewardLimitFrequency.DAILY);
         rewardLimits1.setRewardLimit(BigDecimal.valueOf(100));
@@ -1022,7 +1005,7 @@ class InitiativeDTOsToModelMapperTest {
         rewardLimitsList.add(rewardLimits2);
 
         initiativeTrxConditions.setDaysOfWeek(dayOfWeek);
-        initiativeTrxConditions.setThreshold(threshold);
+        initiativeTrxConditions.setThreshold(null);
         initiativeTrxConditions.setTrxCount(trxCount);
         initiativeTrxConditions.setMccFilter(mccFilter);
         initiativeTrxConditions.setRewardLimits(rewardLimitsList);
@@ -1032,13 +1015,13 @@ class InitiativeDTOsToModelMapperTest {
 
     private InitiativeTrxConditions createInitiativeTrxConditionsRewardLimitsEmpty(){
         InitiativeTrxConditions initiativeTrxConditions = new InitiativeTrxConditions();
-        List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig> dayConfigs = new ArrayList<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig>();
+        List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig> dayConfigs = new ArrayList<>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig dayConfig1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig();
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
         dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
         dayOfWeeks.add(DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
-        List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval> intervals = new ArrayList<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval>();
+        List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval> intervals = new ArrayList<>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval interval1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval();
         LocalTime t1 = LocalTime.of(6, 0, 0);
         LocalTime t2 = LocalTime.of(12, 0, 0);
@@ -1066,12 +1049,12 @@ class InitiativeDTOsToModelMapperTest {
 
         MccFilter mccFilter = new MccFilter();
         mccFilter.setAllowedList(true);
-        Set<String> values = new HashSet<String>();
+        Set<String> values = new HashSet<>();
         values.add("123");
         values.add("456");
         mccFilter.setValues(values);
 
-        List<RewardLimits> rewardLimitsList = new ArrayList<RewardLimits>();
+        List<RewardLimits> rewardLimitsList = new ArrayList<>();
 
         initiativeTrxConditions.setDaysOfWeek(dayOfWeek);
         initiativeTrxConditions.setThreshold(threshold);
@@ -1084,13 +1067,13 @@ class InitiativeDTOsToModelMapperTest {
 
     private InitiativeTrxConditions createInitiativeTrxConditionsDayOfWeekNull(){
         InitiativeTrxConditions initiativeTrxConditions = new InitiativeTrxConditions();
-        List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig> dayConfigs = new ArrayList<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig>();
+        List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig> dayConfigs = new ArrayList<>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig dayConfig1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig();
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
         dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
         dayOfWeeks.add(DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
-        List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval> intervals = new ArrayList<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval>();
+        List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval> intervals = new ArrayList<>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval interval1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval();
         LocalTime t1 = LocalTime.of(6, 0, 0);
         LocalTime t2 = LocalTime.of(12, 0, 0);
@@ -1099,8 +1082,6 @@ class InitiativeDTOsToModelMapperTest {
         intervals.add(interval1);
         dayConfig1.setIntervals(intervals);
         dayConfigs.add(dayConfig1);
-
-        it.gov.pagopa.initiative.model.rule.trx.DayOfWeek dayOfWeek = null;
 
         Threshold threshold = new Threshold();
 
@@ -1118,12 +1099,12 @@ class InitiativeDTOsToModelMapperTest {
 
         MccFilter mccFilter = new MccFilter();
         mccFilter.setAllowedList(true);
-        Set<String> values = new HashSet<String>();
+        Set<String> values = new HashSet<>();
         values.add("123");
         values.add("456");
         mccFilter.setValues(values);
 
-        List<RewardLimits> rewardLimitsList = new ArrayList<RewardLimits>();
+        List<RewardLimits> rewardLimitsList = new ArrayList<>();
         RewardLimits rewardLimits1 = new RewardLimits();
         rewardLimits1.setFrequency(RewardLimits.RewardLimitFrequency.DAILY);
         rewardLimits1.setRewardLimit(BigDecimal.valueOf(100));
@@ -1133,7 +1114,7 @@ class InitiativeDTOsToModelMapperTest {
         rewardLimitsList.add(rewardLimits1);
         rewardLimitsList.add(rewardLimits2);
 
-        initiativeTrxConditions.setDaysOfWeek(dayOfWeek);
+        initiativeTrxConditions.setDaysOfWeek(null);
         initiativeTrxConditions.setThreshold(threshold);
         initiativeTrxConditions.setTrxCount(trxCount);
         initiativeTrxConditions.setMccFilter(mccFilter);
@@ -1144,13 +1125,13 @@ class InitiativeDTOsToModelMapperTest {
 
     private InitiativeTrxConditions createInitiativeTrxConditionsMccFilterNull(){
         InitiativeTrxConditions initiativeTrxConditions = new InitiativeTrxConditions();
-        List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig> dayConfigs = new ArrayList<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig>();
+        List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig> dayConfigs = new ArrayList<>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig dayConfig1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig();
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
         dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
         dayOfWeeks.add(DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
-        List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval> intervals = new ArrayList<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval>();
+        List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval> intervals = new ArrayList<>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval interval1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval();
         LocalTime t1 = LocalTime.of(6, 0, 0);
         LocalTime t2 = LocalTime.of(12, 0, 0);
@@ -1176,9 +1157,7 @@ class InitiativeDTOsToModelMapperTest {
         trxCount.setTo(30L);
         trxCount.setToIncluded(true);
 
-        MccFilter mccFilter = null;
-
-        List<RewardLimits> rewardLimitsList = new ArrayList<RewardLimits>();
+        List<RewardLimits> rewardLimitsList = new ArrayList<>();
         RewardLimits rewardLimits1 = new RewardLimits();
         rewardLimits1.setFrequency(RewardLimits.RewardLimitFrequency.DAILY);
         rewardLimits1.setRewardLimit(BigDecimal.valueOf(100));
@@ -1191,7 +1170,7 @@ class InitiativeDTOsToModelMapperTest {
         initiativeTrxConditions.setDaysOfWeek(dayOfWeek);
         initiativeTrxConditions.setThreshold(threshold);
         initiativeTrxConditions.setTrxCount(trxCount);
-        initiativeTrxConditions.setMccFilter(mccFilter);
+        initiativeTrxConditions.setMccFilter(null);
         initiativeTrxConditions.setRewardLimits(rewardLimitsList);
 
         return initiativeTrxConditions;
@@ -1199,13 +1178,13 @@ class InitiativeDTOsToModelMapperTest {
 
     private InitiativeTrxConditions createInitiativeTrxConditionsTrxCountNull(){
         InitiativeTrxConditions initiativeTrxConditions = new InitiativeTrxConditions();
-        List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig> dayConfigs = new ArrayList<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig>();
+        List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig> dayConfigs = new ArrayList<>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig dayConfig1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig();
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
         dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
         dayOfWeeks.add(DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
-        List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval> intervals = new ArrayList<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval>();
+        List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval> intervals = new ArrayList<>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval interval1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval();
         LocalTime t1 = LocalTime.of(6, 0, 0);
         LocalTime t2 = LocalTime.of(12, 0, 0);
@@ -1224,16 +1203,14 @@ class InitiativeDTOsToModelMapperTest {
         threshold.setTo(BigDecimal.valueOf(30));
         threshold.setToIncluded(true);
 
-        TrxCount trxCount = null;
-
         MccFilter mccFilter = new MccFilter();
         mccFilter.setAllowedList(true);
-        Set<String> values = new HashSet<String>();
+        Set<String> values = new HashSet<>();
         values.add("123");
         values.add("456");
         mccFilter.setValues(values);
 
-        List<RewardLimits> rewardLimitsList = new ArrayList<RewardLimits>();
+        List<RewardLimits> rewardLimitsList = new ArrayList<>();
         RewardLimits rewardLimits1 = new RewardLimits();
         rewardLimits1.setFrequency(RewardLimits.RewardLimitFrequency.DAILY);
         rewardLimits1.setRewardLimit(BigDecimal.valueOf(100));
@@ -1245,7 +1222,7 @@ class InitiativeDTOsToModelMapperTest {
 
         initiativeTrxConditions.setDaysOfWeek(dayOfWeek);
         initiativeTrxConditions.setThreshold(threshold);
-        initiativeTrxConditions.setTrxCount(trxCount);
+        initiativeTrxConditions.setTrxCount(null);
         initiativeTrxConditions.setMccFilter(mccFilter);
         initiativeTrxConditions.setRewardLimits(rewardLimitsList);
 
@@ -1324,13 +1301,11 @@ class InitiativeDTOsToModelMapperTest {
         return initiative;
     }
     private Initiative createStep5Initiative () {
-        Initiative initiative = createStep4Initiative();
-        return initiative;
+        return createStep4Initiative();
     }
 
     private InitiativeDTO createStep5InitiativeDTO () {
-        InitiativeDTO initiativeDTO = createStep4InitiativeDTO();
-        return initiativeDTO;
+        return createStep4InitiativeDTO();
     }
 
 

@@ -111,7 +111,7 @@ class InitiativeAdditionalDTOsToIOServiceRequestDTOMapperTest {
         initiativeAdditional.setServiceName("serviceName");
         initiativeAdditional.setServiceScope(InitiativeAdditional.ServiceScope.LOCAL);
         initiativeAdditional.setDescription("description");
-        initiativeAdditional.setPrivacyLink("privacy.url.it");;
+        initiativeAdditional.setPrivacyLink("privacy.url.it");
         initiativeAdditional.setTcLink("tos.url.it");
         Channel channel = new Channel();
         channel.setType(Channel.TypeEnum.WEB);

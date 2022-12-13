@@ -17,7 +17,6 @@ import org.springframework.test.context.TestPropertySource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @TestPropertySource(
@@ -59,7 +58,7 @@ class IOBackEndRestConnectorTest {
     IOBackEndFeignRestClient ioBackEndFeignRestClient;
 
     @Test
-    void givenServiceFromInitiativePublished_whenPostCreateServiceCalled_thenReturnOkResponse() throws Exception {
+    void givenServiceFromInitiativePublished_whenPostCreateServiceCalled_thenReturnOkResponse() {
         ServiceRequestDTO serviceRequestDTO = createServiceRequestDTO();
         ServiceResponseDTO serviceResponseDTOexpected = createServiceResponseDTO();
 
@@ -110,11 +109,11 @@ class IOBackEndRestConnectorTest {
 
     @Test
     void testSendLogoIo() {
-        when(ioBackEndFeignRestClient.sendLogo((String) any(), (LogoIODTO) any(), (String) any()))
+        when(ioBackEndFeignRestClient.sendLogo(any(), any(), any()))
                 .thenReturn(new ResponseEntity<>(HttpStatus.CONTINUE));
         LogoIODTO logoIODTO = new LogoIODTO("Logo");
-        ioBackEndRestConnector.sendLogoIo("42", "Primary Key", logoIODTO);
-        verify(ioBackEndFeignRestClient).sendLogo((String) any(), (LogoIODTO) any(), (String) any());
+        ioBackEndRestConnector.sendLogoIo(SERVICE_ID, "Primary Key", logoIODTO);
+        verify(ioBackEndFeignRestClient).sendLogo(any(), any(), any());
         assertEquals("Logo", logoIODTO.getLogo());
     }
 }

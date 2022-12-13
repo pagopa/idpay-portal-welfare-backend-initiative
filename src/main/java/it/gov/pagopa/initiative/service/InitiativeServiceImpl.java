@@ -19,7 +19,6 @@ import it.gov.pagopa.initiative.dto.io.service.ServiceResponseDTO;
 import it.gov.pagopa.initiative.event.InitiativeProducer;
 import it.gov.pagopa.initiative.exception.InitiativeException;
 import it.gov.pagopa.initiative.mapper.InitiativeAdditionalDTOsToIOServiceRequestDTOMapper;
-import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.AutomatedCriteria;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeAdditional;
@@ -38,6 +37,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.InvalidMimeTypeException;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
+
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.time.LocalDateTime;
@@ -52,7 +52,6 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
     private final boolean notifyEmail;
     private final InitiativeRepository initiativeRepository;
-    private final InitiativeModelToDTOMapper initiativeModelToDTOMapper;
     private final InitiativeAdditionalDTOsToIOServiceRequestDTOMapper initiativeAdditionalDTOsToIOServiceRequestDTOMapper;
     private final InitiativeProducer initiativeProducer;
     private final IOBackEndRestConnector ioBackEndRestConnector;
@@ -71,7 +70,6 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     public InitiativeServiceImpl(
             @Value("${app.initiative.conditions.notifyEmail}") boolean notifyEmail,
             InitiativeRepository initiativeRepository,
-            InitiativeModelToDTOMapper initiativeModelToDTOMapper,
             InitiativeAdditionalDTOsToIOServiceRequestDTOMapper initiativeAdditionalDTOsToIOServiceRequestDTOMapper,
             InitiativeProducer initiativeProducer,
             IOBackEndRestConnector ioBackEndRestConnector,
@@ -87,7 +85,6 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             Utilities utilities){
         this.notifyEmail = notifyEmail;
         this.initiativeRepository = initiativeRepository;
-        this.initiativeModelToDTOMapper = initiativeModelToDTOMapper;
         this.initiativeProducer = initiativeProducer;
         this.initiativeAdditionalDTOsToIOServiceRequestDTOMapper = initiativeAdditionalDTOsToIOServiceRequestDTOMapper;
         this.ioBackEndRestConnector = ioBackEndRestConnector;
@@ -106,12 +103,6 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
     public List<Initiative> retrieveInitiativeSummary(String organizationId, String role) {
         List<Initiative> initiatives = initiativeRepository.retrieveInitiativeSummary(organizationId, true);
-//        if(initiatives.isEmpty()){
-//            throw new InitiativeException(
-//                    InitiativeConstants.Exception.NotFound.CODE,
-//                    String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_LIST_BY_ORGANIZATION_MESSAGE, organizationId),
-//                    HttpStatus.NOT_FOUND);
-//        }
         return InitiativeConstants.Role.OPE_BASE.equals(role) ? initiatives.stream().filter(
                         initiative -> (
                                 initiative.getStatus().equals(InitiativeConstants.Status.IN_REVISION) ||
@@ -208,8 +199,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     @Override
     public void updateInitiativeRefundRules(String organizationId, String initiativeId, String role, Initiative refundRule, boolean changeInitiativeStatus) {
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
-        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(initiative);
-        //initiativeValidationService.validateAllWizardSteps(initiativeDTO);
+
         //Check Initiative Status
         isInitiativeAllowedToBeEditableThenThrows(initiative);
         initiative.setRefundRule(refundRule.getRefundRule());
@@ -315,37 +305,19 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                     String.format(InitiativeConstants.Exception.BadRequest.PERMISSION_NOT_VALID, role),
                     HttpStatus.BAD_REQUEST);
         }
-        switch (nextStatus) {
-//            case InitiativeConstants.Status.DRAFT:
-//                isInitiativeAllowedToBeEditableThenThrows(initiative);
-//                break;
-//            case InitiativeConstants.Status.TO_CHECK:
-//                isInitiativeAllowedToBeEditableThenThrows(initiative);
-//                isInitiativeStatusNotInRevisionThenThrow(initiative, nextStatus);
-//                break;
-//            case InitiativeConstants.Status.IN_REVISION:
-//                break;
-//            case InitiativeConstants.Status.APPROVED:
-//                isInitiativeStatusNotInRevisionThenThrow(initiative, nextStatus);
-//                break;
-            case InitiativeConstants.Status.PUBLISHED:
-                if (!Arrays.asList(InitiativeConstants.Status.Validation.INITIATIVE_ALLOWED_STATES_TO_BECOME_PUBLISHED_ARRAY).contains(initiative.getStatus())) {
-                    log.info("[UPDATE_TO_{}_STATUS] - Initiative: {} Status: {}. Not processable status", nextStatus, initiative.getInitiativeId(), initiative.getStatus());
-                    throw new InitiativeException(
-                            InitiativeConstants.Exception.BadRequest.CODE,
-                            String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_STATUS_NOT_VALID, initiative.getInitiativeId()),
-                            HttpStatus.BAD_REQUEST);
-                }
-                break;
-//            case InitiativeConstants.Status.CLOSED:
-//                break;
-//            case InitiativeConstants.Status.SUSPENDED:
-//                break;
-            default:
+        if (InitiativeConstants.Status.PUBLISHED.equals(nextStatus)) {
+            if (!Arrays.asList(InitiativeConstants.Status.Validation.INITIATIVE_ALLOWED_STATES_TO_BECOME_PUBLISHED_ARRAY).contains(initiative.getStatus())) {
+                log.info("[UPDATE_TO_{}_STATUS] - Initiative: {} Status: {}. Not processable status", nextStatus, initiative.getInitiativeId(), initiative.getStatus());
                 throw new InitiativeException(
                         InitiativeConstants.Exception.BadRequest.CODE,
                         String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_STATUS_NOT_VALID, initiative.getInitiativeId()),
                         HttpStatus.BAD_REQUEST);
+            }
+        } else {
+            throw new InitiativeException(
+                    InitiativeConstants.Exception.BadRequest.CODE,
+                    String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_STATUS_NOT_VALID, initiative.getInitiativeId()),
+                    HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -380,8 +352,6 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
-
     }
 
     @Override
@@ -439,14 +409,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                                                  LocalDateTime startDate, LocalDateTime endDate, String status, Pageable pageable) {
 
         log.info("start get status onboarding, initiative: " + initiativeId);
-        Initiative initiative = initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(
-                        organizationId, initiativeId, true)
-                .orElseThrow(() -> new InitiativeException(
-                        InitiativeConstants.Exception.NotFound.CODE,
-                        String.format(
-                                InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE,
-                                initiativeId),
-                        HttpStatus.NOT_FOUND));
+
         String userId = null;
         if (CF != null) {
             try {
@@ -460,7 +423,8 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                         HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
-        ResponseOnboardingDTO responseOnboardingDTO = new ResponseOnboardingDTO();
+        new ResponseOnboardingDTO();
+        ResponseOnboardingDTO responseOnboardingDTO;
         try {
             responseOnboardingDTO = onboardingRestConnector.getOnboarding(initiativeId, pageable,
                     userId,

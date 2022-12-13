@@ -10,6 +10,7 @@ import it.gov.pagopa.initiative.dto.selc.UserResource;
 import it.gov.pagopa.initiative.model.TypeBoolEnum;
 import it.gov.pagopa.initiative.model.TypeMultiEnum;
 import it.gov.pagopa.initiative.model.*;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,60 +51,33 @@ class EmailNotificationServiceTest {
     @MockBean
     private SelcRestConnector selcRestConnector;
 
-//    @BeforeEach
-//    public void setupSingleTest(){
-////        Map<String, String> user = new HashMap<>();
-////        user.put("organizationUserId", "a0a00000-0aaa-00aa-0000-0000000a0000");
-////        ThreadLocal<Map<String, String>> myThreadLocal = loginThreadLocal.getMyThreadLocal();
-////        myThreadLocal.set(user);
-//        MockHttpServletRequest request = new MockHttpServletRequest();
-////        request.setAttribute("organization-user-id", "a0a00000-0aaa-00aa-0000-0000000a0000");
-//        request.setAttribute("organizationUserId", "a0a00000-0aaa-00aa-0000-0000000a0000");
-//        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
-//    }
-//
-//    @AfterEach
-//    public void setupClosingSingleTest(){
-////        ThreadLocal<Map<String, String>> myThreadLocal = loginThreadLocal.getMyThreadLocal();
-////        myThreadLocal.remove();
-//    }
-
-    /**
-     * Method under test: {@link EmailNotificationService#sendInitiativeToCurrentOrganization(Initiative, String, String)}
-     */
     @Test
     void testSendInitiativePagoPA_success() {
         doNothing().when(emailNotificationRestConnector)
-                .notifyInitiativeToEmailNotification((Initiative) any(), (String) any(), (Map<String, String>) any(),
-                        (String) any(), (String) any(), (String) any());
+                .notifyInitiativeToEmailNotification(any(), any(), any(),
+                        any(), any(), any());
 
         Initiative step2Initiative = createStep2Initiative();
         emailNotificationServiceImpl.sendInitiativeToPagoPA(step2Initiative, TEMPLATE_NAME, SUBJECT);
-        verify(emailNotificationRestConnector, atLeast(1)).notifyInitiativeToEmailNotification((Initiative) any(),
-                (String) any(), (Map<String, String>) any(), (String) any(), (String) any(), (String) any());
+        verify(emailNotificationRestConnector, atLeast(1)).notifyInitiativeToEmailNotification(any(),
+                any(), any(), any(), any(), any());
     }
 
-    /**
-     * Method under test: {@link EmailNotificationService#sendInitiativeToCurrentOrganization(Initiative, String, String)}
-     */
     @Test
     void testSendInitiativePagoPA_FeignException() {
         Initiative step2Initiative = createStep2Initiative();
-        Request request = Request.create(Request.HttpMethod.POST, "url", Collections.<String, Collection<String>>emptyMap(), null, new RequestTemplate());
+        Request request = Request.create(Request.HttpMethod.POST, "url", Collections.emptyMap(), null, new RequestTemplate());
         //doThrow FeignException
         doThrow(new FeignException.InternalServerError(EXCEPTION_MESSAGE, request, null, null))
-                .when(emailNotificationRestConnector).notifyInitiativeToEmailNotification((Initiative) any(), (String) any(), (Map<String, String>) any(),
-                        (String) any(), (String) any(), (String) any());
+                .when(emailNotificationRestConnector).notifyInitiativeToEmailNotification(any(), any(), any(),
+                        any(), any(), any());
 
         emailNotificationServiceImpl.sendInitiativeToPagoPA(step2Initiative, TEMPLATE_NAME, SUBJECT);
 
-        verify(emailNotificationRestConnector, atLeast(1)).notifyInitiativeToEmailNotification((Initiative) any(),
-                (String) any(), (Map<String, String>) any(), (String) any(), (String) any(), (String) any());
+        verify(emailNotificationRestConnector, atLeast(1)).notifyInitiativeToEmailNotification(any(),
+                any(), any(), any(), any(), any());
     }
 
-    /**
-     * Method under test: {@link EmailNotificationService#sendInitiativeToPagoPA(Initiative, String, String)}
-     */
     @Test
     void testSendInitiativeCurrentOrganization_success() {
         MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest();
@@ -112,8 +86,8 @@ class EmailNotificationServiceTest {
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(mockHttpServletRequest));
 
         doNothing().when(emailNotificationRestConnector)
-                .notifyInitiativeToEmailNotification((Initiative) any(), (String) any(), (Map<String, String>) any(),
-                        (String) any(), (String) any(), (String) any());
+                .notifyInitiativeToEmailNotification(any(), any(), any(),
+                        any(), any(), any());
         UUID uuid = UUID.fromString("a0a00000-0aaa-00aa-0000-0000000a0000");
         List<UserResource> userResources = new ArrayList<>();
         List<String> roles = new ArrayList<>();
@@ -126,18 +100,15 @@ class EmailNotificationServiceTest {
                 .roles(roles)
                 .build();
         userResources.add(userResource);
-        when(selcRestConnector.getInstitutionProductUsers((String) any())).thenReturn(userResources);
+        when(selcRestConnector.getInstitutionProductUsers(any())).thenReturn(userResources);
 
         Initiative step2Initiative = createStep2Initiative();
         emailNotificationServiceImpl.sendInitiativeToCurrentOrganization(step2Initiative, TEMPLATE_NAME, SUBJECT);
-        verify(emailNotificationRestConnector, atLeast(1)).notifyInitiativeToEmailNotification((Initiative) any(),
-                (String) any(), (Map<String, String>) any(), (String) any(), (String) any(), (String) any());
-        verify(selcRestConnector, times(1)).getInstitutionProductUsers((String) any());
+        verify(emailNotificationRestConnector, atLeast(1)).notifyInitiativeToEmailNotification(any(),
+                any(), any(), any(), any(), any());
+        verify(selcRestConnector, times(1)).getInstitutionProductUsers(any());
     }
 
-    /**
-     * Method under test: {@link EmailNotificationService#sendInitiativeToPagoPA(Initiative, String, String)}
-     */
     @Test
     void testSendInitiativeCurrentOrganization_IllegalStateException() {
         Initiative step2Initiative = createStep2Initiative();
@@ -154,11 +125,11 @@ class EmailNotificationServiceTest {
         mockHttpServletRequest.setAttribute("organizationUserId", "a0a00000-0aaa-00aa-0000-0000000a0000");
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(mockHttpServletRequest));
 
-        Request request = Request.create(Request.HttpMethod.POST, "url", Collections.<String, Collection<String>>emptyMap(), null, new RequestTemplate());
+        Request request = Request.create(Request.HttpMethod.POST, "url", Collections.emptyMap(), null, new RequestTemplate());
         //doThrow FeignException
         doThrow(new FeignException.InternalServerError(EXCEPTION_MESSAGE, request, null, null))
-                .when(emailNotificationRestConnector).notifyInitiativeToEmailNotification((Initiative) any(), (String) any(), (Map<String, String>) any(),
-                        (String) any(), (String) any(), (String) any());
+                .when(emailNotificationRestConnector).notifyInitiativeToEmailNotification(any(), any(), any(),
+                        any(), any(), any());
 
         UUID uuid = UUID.fromString("a0a00000-0aaa-00aa-0000-0000000a0000");
         List<UserResource> userResources = new ArrayList<>();
@@ -172,15 +143,23 @@ class EmailNotificationServiceTest {
                 .roles(roles)
                 .build();
         userResources.add(userResource);
-        when(selcRestConnector.getInstitutionProductUsers((String) any())).thenReturn(userResources);
+        when(selcRestConnector.getInstitutionProductUsers(any())).thenReturn(userResources);
 
         Initiative step2Initiative = createStep2Initiative();
         emailNotificationServiceImpl.sendInitiativeToCurrentOrganization(step2Initiative, TEMPLATE_NAME, SUBJECT);
-        verify(emailNotificationRestConnector, atLeast(1)).notifyInitiativeToEmailNotification((Initiative) any(),
-                (String) any(), (Map<String, String>) any(), (String) any(), (String) any(), (String) any());
-        verify(selcRestConnector, times(1)).getInstitutionProductUsers((String) any());
+        verify(emailNotificationRestConnector, atLeast(1)).notifyInitiativeToEmailNotification(any(),
+                any(), any(), any(), any(), any());
+        verify(selcRestConnector, times(1)).getInstitutionProductUsers(any());
+    }
 
-
+    @Test
+    void getInstitutionProductUsersEmailsByRole_Exception() {
+        when(selcRestConnector.getInstitutionProductUsers(ORGANIZATION_ID));
+        try {
+            emailNotificationServiceImpl.getInstitutionProductUsersEmailsByRole(ORGANIZATION_ID);
+        } catch (Exception exception) {
+            Assertions.fail(String.valueOf(exception));
+        }
     }
 
     /*
@@ -195,8 +174,6 @@ class EmailNotificationServiceTest {
         initiative.setStatus("DRAFT");
         initiative.setPdndToken("pdndToken1");
         initiative.setAdditionalInfo(createInitiativeAdditional());
-//        initiative.setBeneficiaryRule(createInitiativeBeneficiaryRule());
-//        initiative.setLegal(createInitiativeLegal());
         return initiative;
     }
 
@@ -235,8 +212,9 @@ class EmailNotificationServiceTest {
     }
 
     InitiativeDTO createStep1InitiativeDTO () {
-        InitiativeDTO initiativeDTO = new InitiativeDTO();
-        initiativeDTO = initiativeDTO.builder()
+        new InitiativeDTO();
+        InitiativeDTO initiativeDTO;
+        initiativeDTO = InitiativeDTO.builder()
                 .initiativeId(INITIATIVE_ID)
                 .initiativeName(INITIATIVE_NAME)
                 .organizationId(ORGANIZATION_ID)
@@ -276,7 +254,7 @@ class EmailNotificationServiceTest {
         initiativeAdditionalDTO.setServiceName("serviceName");
         initiativeAdditionalDTO.setServiceScope(InitiativeAdditionalDTO.ServiceScope.LOCAL);
         initiativeAdditionalDTO.setDescription("description");
-        initiativeAdditionalDTO.setPrivacyLink("privacy.url.it");;
+        initiativeAdditionalDTO.setPrivacyLink("privacy.url.it");
         initiativeAdditionalDTO.setTcLink("tos.url.it");
         ChannelDTO channelDTO = new ChannelDTO();
         channelDTO.setType(ChannelDTO.TypeEnum.WEB);

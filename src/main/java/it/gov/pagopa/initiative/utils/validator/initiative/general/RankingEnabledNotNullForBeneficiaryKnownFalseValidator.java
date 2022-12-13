@@ -13,10 +13,7 @@ public class RankingEnabledNotNullForBeneficiaryKnownFalseValidator implements C
         Boolean beneficiaryKnown = value.getBeneficiaryKnown();
         Boolean rankingEnabled = value.getRankingEnabled();
         if(!beneficiaryKnown){
-            if (rankingEnabled != null)
-                return true;
-            else
-                return false;
+            return rankingEnabled != null;
         }
         return true;
     }

@@ -32,7 +32,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
 
     @Autowired
     private Validator validator;
-    private Map<String, String> language = new HashMap<>();
+    private final Map<String, String> language = new HashMap<>();
 
     @Test
     void whenAllValidationAreValid_InitiativeGeneralDTO_thenValidationArePassed() {
@@ -118,7 +118,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
 
         assertTrue(violations.isEmpty());
         //or
-        assertThat(violations.size()).isZero();
+        assertThat(0).isZero();
     }
 
     @Test
@@ -165,7 +165,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
 
         assertTrue(violations.isEmpty());
         //or
-        assertThat(violations.size()).isZero();
+        assertThat(0).isZero();
     }
 
     @Test
@@ -175,7 +175,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
         initiativeGeneralDTO.setBeneficiaryBudget(BigDecimal.valueOf(100));
         Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationOnGroup.class);
         assertTrue(violations.isEmpty());
-        assertThat(violations.size()).isZero();
+        assertThat(0).isZero();
     }
 
     @Test
@@ -230,12 +230,11 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
         LocalDate rankingStartDate = LocalDate.now();
-        LocalDate rankingEndDate = rankingStartDate;
-        LocalDate startDate = rankingEndDate.plusDays(10);
+        LocalDate startDate = rankingStartDate.plusDays(10);
         LocalDate endDate = startDate.plusDays(1);
         initiativeGeneralDTO.setRankingEnabled(true);
         initiativeGeneralDTO.setRankingStartDate(rankingStartDate);
-        initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
+        initiativeGeneralDTO.setRankingEndDate(rankingStartDate);
         initiativeGeneralDTO.setStartDate(startDate);
         initiativeGeneralDTO.setEndDate(endDate);
         initiativeGeneralDTO.setDescriptionMap(language);
