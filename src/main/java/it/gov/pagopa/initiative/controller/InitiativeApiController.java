@@ -59,6 +59,12 @@ public class InitiativeApiController implements InitiativeApi {
         ));
     }
 
+    @Override
+    public ResponseEntity<List<InitiativeIssuerDTO>> getInitiativeIssuerList() {
+        log.info("[{}][GET_INITIATIVES] - Initiative issuer: Start processing...");
+        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeIssuerDTOList(this.initiativeService.getInitiativesIssuerList()));
+    }
+
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<InitiativeDTO> getInitiativeDetail(String organizationId, String initiativeId, String role) {
         log.info("[{}][GET_INITIATIVE_DETAIL] - Initiative: {}. Start processing...", role, initiativeId);
@@ -282,6 +288,12 @@ public class InitiativeApiController implements InitiativeApi {
     public ResponseEntity<InitiativeAdditionalDTO> getPrimaryAndSecondaryTokenIO(String initiativeId){
         log.info("[GET_PRIMARY_AND_SECONDARY_TOKEN] - Start searching tokens for initiativeId {}...", initiativeId);
         return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeAdditionalDTOOnlyTokens(this.initiativeService.getPrimaryAndSecondaryTokenIO(initiativeId)));
+    }
+
+    @Override
+    public ResponseEntity<BeneficiaryRankingPageDTO> getRankingList(String organizationId,
+            String initiativeId, Pageable pageable, String beneficiary, String state) {
+        return ResponseEntity.ok(this.initiativeService.getRankingList(organizationId, initiativeId, pageable, beneficiary, state));
     }
 
     @Override

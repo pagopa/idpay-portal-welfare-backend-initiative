@@ -8,8 +8,11 @@ import it.gov.pagopa.initiative.connector.file_storage.FileStorageConnector;
 import it.gov.pagopa.initiative.connector.group.GroupRestConnector;
 import it.gov.pagopa.initiative.connector.io_service.IOBackEndRestConnector;
 import it.gov.pagopa.initiative.connector.onboarding.OnboardingRestConnector;
+import it.gov.pagopa.initiative.connector.ranking.RankingRestConnector;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
+import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest;
 import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.InternalServerError;
+import it.gov.pagopa.initiative.constants.InitiativeConstants.Status;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceResponseDTO;
@@ -54,6 +57,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     private final IOBackEndRestConnector ioBackEndRestConnector;
     private final GroupRestConnector groupRestConnector;
     private final OnboardingRestConnector onboardingRestConnector;
+    private final RankingRestConnector rankingRestConnector;
     private final EncryptRestConnector encryptRestConnector;
     private final DecryptRestConnector decryptRestConnector;
     private final FileStorageConnector fileStorageConnector;
@@ -71,7 +75,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             IOBackEndRestConnector ioBackEndRestConnector,
             GroupRestConnector groupRestConnector,
             OnboardingRestConnector onboardingRestConnector,
-            EncryptRestConnector encryptRestConnector,
+            RankingRestConnector rankingRestConnector, EncryptRestConnector encryptRestConnector,
             DecryptRestConnector decryptRestConnector,
             FileStorageConnector fileStorageConnector,
             EmailNotificationService emailNotificationService,
@@ -86,6 +90,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         this.ioBackEndRestConnector = ioBackEndRestConnector;
         this.groupRestConnector = groupRestConnector;
         this.onboardingRestConnector = onboardingRestConnector;
+        this.rankingRestConnector = rankingRestConnector;
         this.encryptRestConnector = encryptRestConnector;
         this.decryptRestConnector = decryptRestConnector;
         this.fileStorageConnector = fileStorageConnector;
@@ -104,6 +109,10 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                                         initiative.getStatus().equals(InitiativeConstants.Status.TO_CHECK) ||
                                         initiative.getStatus().equals(InitiativeConstants.Status.APPROVED)))
                 .toList() : initiatives;
+    }
+
+    public List<Initiative> getInitiativesIssuerList() {
+        return initiativeRepository.findByEnabledAndStatus(true, Status.PUBLISHED);
     }
 
     @Override
@@ -446,6 +455,69 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         return new OnboardingDTO(statusOnboardingDTOS, responseOnboardingDTO.getPageNo(),
                 responseOnboardingDTO.getPageSize(), responseOnboardingDTO.getTotalElements(),
                 responseOnboardingDTO.getTotalPages());
+    }
+
+    @Override
+    public BeneficiaryRankingPageDTO getRankingList(String organizationId, String initiativeId,
+            Pageable pageable, String beneficiary, String state) {
+        log.info("start get ranking, initiative: " + initiativeId);
+        Initiative initiative = initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(
+                        organizationId, initiativeId, true)
+                .orElseThrow(() -> new InitiativeException(
+                        InitiativeConstants.Exception.NotFound.CODE,
+                        String.format(
+                                InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE,
+                                initiativeId),
+                        HttpStatus.NOT_FOUND));
+        if(initiative.getGeneral() != null && !initiative.getGeneral().getRankingEnabled()){
+            throw new InitiativeException(
+                    InternalServerError.CODE,
+                    InternalServerError.NO_RANKING,
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        String userId = null;
+        if (beneficiary != null) {
+            try {
+                EncryptedCfDTO encryptedCfDTO = encryptRestConnector.upsertToken(
+                        new CFDTO(beneficiary));
+                userId = encryptedCfDTO.getToken();
+            } catch (Exception e) {
+                throw new InitiativeException(
+                        InternalServerError.CODE,
+                        e.getMessage(),
+                        HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+        RankingPageDTO rankingPageDTO = new RankingPageDTO();
+        try {
+            rankingPageDTO = rankingRestConnector.getRankingList(organizationId,initiativeId,pageable,state,userId);
+            log.info("response ranking: " + rankingPageDTO);
+        } catch (Exception e) {
+            throw new InitiativeException(
+                    InternalServerError.CODE,
+                    e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        List<BeneficiaryRankingDTO> beneficiaryRankingDTOS = new ArrayList<>();
+        for (RankingRequestDTO rankingRequestDTO : rankingPageDTO.getContent()) {
+            try {
+                DecryptCfDTO decryptedCfDTO = decryptRestConnector.getPiiByToken(
+                        rankingRequestDTO.getUserId());
+                beneficiaryRankingDTOS.add(new BeneficiaryRankingDTO(decryptedCfDTO.getPii(), rankingRequestDTO.getCriteriaConsensusTimestamp(),
+                        rankingRequestDTO.getRankingValue(), rankingRequestDTO.getRanking(),
+                        rankingRequestDTO.getBeneficiaryRankingStatus()));
+
+            } catch (Exception e) {
+                throw new InitiativeException(
+                        InternalServerError.CODE,
+                        e.getMessage(),
+                        HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+        return new BeneficiaryRankingPageDTO(beneficiaryRankingDTOS, rankingPageDTO.getPageNumber(),
+                rankingPageDTO.getPageSize(), rankingPageDTO.getTotalElements(),
+                rankingPageDTO.getTotalPages(), rankingPageDTO.getRankingStatus(), rankingPageDTO.getRankingPublishedTimeStamp(),rankingPageDTO.getRankingGeneratedTimeStamp(),rankingPageDTO.getTotalEligibleOk(),rankingPageDTO.getTotalEligibleKo(),rankingPageDTO.getTotalOnboardingKo(),
+                rankingPageDTO.getRankingFilePath());
     }
 
     public void validate(String contentType, String fileName) {

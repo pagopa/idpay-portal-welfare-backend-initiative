@@ -28,7 +28,7 @@ import java.util.Locale;
 
 public interface InitiativeApi {
 
-  @Operation(summary = "Returns the list of initiatives names for a specific organization", security = {
+  @Operation(summary = "Returns the list of initiatives names for a specific organization", description = "", security = {
       @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = InitiativeSummaryDTO.class))),
@@ -41,7 +41,18 @@ public interface InitiativeApi {
       @PathVariable("organizationId") String organizationId,
       @RequestParam(required = false) String role);
 
-  @Operation(summary = "Returns the detail of an active initiative", security = {
+  @Operation(summary = "Returns the list of published initiatives", description = "", security = {
+          @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = InitiativeSummaryDTO.class))),
+          @ApiResponse(responseCode = "401", description = "Authentication failed", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+          @ApiResponse(responseCode = "429", description = "Too many Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+          @ApiResponse(responseCode = "500", description = "Server ERROR", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))})
+  @GetMapping(value = "/idpay/initiatives",
+          produces = {"application/json"})
+  ResponseEntity<List<InitiativeIssuerDTO>> getInitiativeIssuerList();
+
+  @Operation(summary = "Returns the detail of an active initiative", description = "", security = {
       @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = InitiativeDTO.class))),
@@ -56,7 +67,7 @@ public interface InitiativeApi {
       @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId,
       @RequestParam(required = false) String role);
 
-    @Operation(summary = "Save initiative and first subset of data 'general info'", security = {
+    @Operation(summary = "Save initiative and first subset of data 'general info'", description = "", security = {
             @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Created"),
@@ -73,7 +84,7 @@ public interface InitiativeApi {
             @PathVariable("organizationId") String organizationId,
             @Parameter(in = ParameterIn.DEFAULT, description = "Unique identifier of the subscribed initiative, IBAN of the citizen", schema = @Schema()) @RequestBody @Validated(ValidationOnGroup.class) InitiativeAdditionalDTO body);
 
-  @Operation(summary = "Update the additional info of the initiative", security = {
+  @Operation(summary = "Update the additional info of the initiative", description = "", security = {
       @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
   @ApiResponses(value = {
       @ApiResponse(responseCode = "204", description = "No Content"),
@@ -92,7 +103,7 @@ public interface InitiativeApi {
       @RequestBody @Validated(ValidationOnGroup.class) InitiativeAdditionalDTO initiativeAdditionalDTO);
 
 
-    @Operation(summary = "Update initiative and first subset of data 'general info'", security = {
+    @Operation(summary = "Update initiative and first subset of data 'general info'", description = "", security = {
             @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "No Content"),
@@ -110,7 +121,7 @@ public interface InitiativeApi {
             @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId,
             @Parameter(in = ParameterIn.DEFAULT, description = "Unique identifier of the subscribed initiative, IBAN of the citizen", schema = @Schema()) @RequestBody @Validated(ValidationOnGroup.class) InitiativeGeneralDTO body);
 
-  @Operation(summary = "Update initiative and first subset of draft data 'general info'", security = {
+  @Operation(summary = "Update initiative and first subset of draft data 'general info'", description = "", security = {
       @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
   @ApiResponses(value = {
       @ApiResponse(responseCode = "204", description = "No Content"),
@@ -128,7 +139,7 @@ public interface InitiativeApi {
       @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId,
       @Parameter(in = ParameterIn.DEFAULT, description = "Unique identifier of the subscribed initiative, IBAN of the citizen", schema = @Schema()) @RequestBody InitiativeGeneralDTO initiativeGeneralDTO);
 
-  @Operation(summary = "Association of beneficiary rules to a draft initiative without validation", security = {
+  @Operation(summary = "Association of beneficiary rules to a draft initiative without validation", description = "", security = {
       @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
   @ApiResponses(value = {
       @ApiResponse(responseCode = "204", description = "No Content"),
@@ -146,7 +157,7 @@ public interface InitiativeApi {
       @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId,
       @Parameter(in = ParameterIn.DEFAULT, description = "Unique identifier of the subscribed initiative, instrument HPAN", schema = @Schema()) @RequestBody InitiativeBeneficiaryRuleDTO body);
 
-    @Operation(summary = "Association of beneficiary rules to an initiative", security = {
+    @Operation(summary = "Association of beneficiary rules to an initiative", description = "", security = {
             @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "No Content"),
@@ -165,7 +176,7 @@ public interface InitiativeApi {
             @Parameter(in = ParameterIn.DEFAULT, description = "Unique identifier of the subscribed initiative, instrument HPAN", schema = @Schema()) @RequestBody @Validated(ValidationOnGroup.class) InitiativeBeneficiaryRuleDTO body,
             @RequestParam(required = false) String role);
 
-  @Operation(summary = "Association of transaction and reward rules to a draft initiative without validation", security = {
+  @Operation(summary = "Association of transaction and reward rules to a draft initiative without validation", description = "", security = {
       @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
   @ApiResponses(value = {
       @ApiResponse(responseCode = "204", description = "No Content"),
@@ -178,12 +189,12 @@ public interface InitiativeApi {
   @PutMapping(value = "/idpay/organization/{organizationId}/initiative/{initiativeId}/reward/draft",
       produces = {"application/json"},
       consumes = {"application/json"})
-  ResponseEntity<Void> updateTrxAndRewardRulesDraft(
+  public ResponseEntity<Void> updateTrxAndRewardRulesDraft(
       @PathVariable("organizationId") String organizationId,
       @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId,
       @Parameter(in = ParameterIn.DEFAULT, schema = @Schema()) @RequestBody InitiativeRewardAndTrxRulesDTO rewardAndTrxRulesDTO);
 
-    @Operation(summary = "Association of transaction and reward rules to an initiative", security = {
+    @Operation(summary = "Association of transaction and reward rules to an initiative", description = "", security = {
             @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "No Content"),
@@ -196,12 +207,12 @@ public interface InitiativeApi {
     @PutMapping(value = "/idpay/organization/{organizationId}/initiative/{initiativeId}/reward",
             produces = {"application/json"},
             consumes = {"application/json"})
-    ResponseEntity<Void> updateTrxAndRewardRules(
+    public ResponseEntity<Void> updateTrxAndRewardRules(
             @PathVariable("organizationId") String organizationId,
             @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId,
             @Parameter(in = ParameterIn.DEFAULT, schema = @Schema()) @RequestBody @Validated(ValidationOnGroup.class) InitiativeRewardAndTrxRulesDTO rewardAndTrxRulesDTO);
 
-    @Operation(summary = "Save the refund rule of the initiative", security = {
+    @Operation(summary = "Save the refund rule of the initiative", description = "", security = {
             @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "No Content"),
@@ -219,7 +230,7 @@ public interface InitiativeApi {
             @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId,
             @Parameter(in = ParameterIn.DEFAULT, schema = @Schema()) @RequestBody @Validated(ValidationOnGroup.class) InitiativeRefundRuleDTO initiativeRefundRuleDTO);
 
-  @Operation(summary = "Save the draft refund rule of the initiative", security = {
+  @Operation(summary = "Save the draft refund rule of the initiative", description = "", security = {
       @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
   @ApiResponses(value = {
       @ApiResponse(responseCode = "204", description = "No Content"),
@@ -237,7 +248,7 @@ public interface InitiativeApi {
       @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId,
       @Parameter(in = ParameterIn.DEFAULT, schema = @Schema()) @RequestBody InitiativeRefundRuleDTO initiativeRefundRuleDTO);
 
-    @Operation(summary = "Update Initiative into APPROVED Status", security = {
+    @Operation(summary = "Update Initiative into APPROVED Status", description = "", security = {
             @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "No Content"),
@@ -253,7 +264,7 @@ public interface InitiativeApi {
             @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId,
             @RequestBody InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO);
 
-    @Operation(summary = "Save the draft refund rule of the initiative", security = {
+    @Operation(summary = "Save the draft refund rule of the initiative", description = "", security = {
             @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "No Content"),
@@ -271,7 +282,7 @@ public interface InitiativeApi {
             @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId,
             @RequestBody InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO);
 
-    @Operation(summary = "Logically Delete Initiative", security = {
+    @Operation(summary = "Logically Delete Initiative", description = "", security = {
             @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "No Content"),
@@ -289,7 +300,7 @@ public interface InitiativeApi {
             @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId,
             @RequestBody InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO);
 
-  @Operation(summary = "Returns the detail of an active initiative", security = {
+  @Operation(summary = "Returns the detail of an active initiative", description = "", security = {
       @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = InitiativeDTO.class))),
@@ -302,7 +313,7 @@ public interface InitiativeApi {
   ResponseEntity<InitiativeDTO> getInitiativeBeneficiaryView(
       @PathVariable("initiativeId") String initiativeId);
 
-  @Operation(summary = "Update Initiative into PUBLISHED Status", security = {
+  @Operation(summary = "Update Initiative into PUBLISHED Status", description = "", security = {
       @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
   @ApiResponses(value = {
       @ApiResponse(responseCode = "204", description = "No Content"),
@@ -321,7 +332,7 @@ public interface InitiativeApi {
       @Parameter(in = ParameterIn.DEFAULT, schema = @Schema()) @RequestBody InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO,
       @RequestParam(required = false) String role);
 
-  @Operation(summary = "Add logo to initiative", security = {
+  @Operation(summary = "Add logo to initiative", description = "", security = {
           @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
   @ApiResponses(value = {
           @ApiResponse(responseCode = "200", description = "No Content"),
@@ -340,7 +351,7 @@ public interface InitiativeApi {
           @Parameter(in = ParameterIn.DEFAULT, schema = @Schema()) @RequestPart("logo") MultipartFile logo)
           throws IOException;
 
-  @Operation(summary = "Return the initiative ID by the service ID", security = {
+  @Operation(summary = "Return the initiative ID by the service ID", description = "", security = {
       @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = InitiativeDTO.class))),
@@ -352,9 +363,9 @@ public interface InitiativeApi {
   @GetMapping(value = "/idpay/initiative",
       produces = {"application/json"})
   ResponseEntity<InitiativeDataDTO> getInitiativeIdFromServiceId(@RequestHeader(value = "Accept-Language", defaultValue = "it_IT") Locale acceptLanguage,
-      @RequestParam() String serviceId);
+      @RequestParam(required = true) String serviceId);
 
-  @Operation(summary = "Return primary and secondary token of the specified initiative", security = {
+  @Operation(summary = "Return primary and secondary token of the specified initiative", description = "", security = {
       @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = InitiativeAdditionalDTO.class))),
@@ -368,7 +379,7 @@ public interface InitiativeApi {
   ResponseEntity<InitiativeAdditionalDTO> getPrimaryAndSecondaryTokenIO(
       @PathVariable("initiativeId") String initiativeId);
 
-  @Operation(summary = "Return list onboarding status of the specified initiative", security = {
+  @Operation(summary = "Return ranking list onboarding status of the specified initiative", description = "", security = {
       @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = InitiativeAdditionalDTO.class))),
@@ -387,5 +398,23 @@ public interface InitiativeApi {
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateFrom,
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTo,
       @RequestParam(required = false) String state);
+
+  @Operation(summary = "Return ranking list for specified initiative", description = "", security = {
+          @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = InitiativeAdditionalDTO.class))),
+          @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+          @ApiResponse(responseCode = "401", description = "Authentication failed", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+          @ApiResponse(responseCode = "404", description = "Initiative ID not found for this service", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+          @ApiResponse(responseCode = "429", description = "Too many Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+          @ApiResponse(responseCode = "500", description = "Server ERROR", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))})
+  @GetMapping(value = "/idpay/organization/{organizationId}/initiative/{initiativeId}/ranking/exports",
+          produces = {"application/json"})
+  ResponseEntity<BeneficiaryRankingPageDTO> getRankingList(
+          @PathVariable("organizationId") String organizationId,
+          @PathVariable("initiativeId") String initiativeId,
+          @PageableDefault(size = 10) Pageable pageable,
+          @RequestParam(required = false) String beneficiary,
+          @RequestParam(required = false) String state);
 }
 

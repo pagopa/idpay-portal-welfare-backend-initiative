@@ -19,11 +19,12 @@ import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
 import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
 import it.gov.pagopa.initiative.model.rule.trx.*;
 import it.gov.pagopa.initiative.utils.InitiativeUtils;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -213,6 +214,49 @@ public class InitiativeModelToDTOMapper {
                             ? initiativeModel.getGeneral().getRankingEnabled() : null
                         : null)
                 .build()).toList();
+    }
+
+    public List<InitiativeIssuerDTO> toInitiativeIssuerDTOList(List<Initiative> initiatives) {
+        if (CollectionUtils.isEmpty(initiatives)) {
+            return Collections.emptyList();
+        }
+        return initiatives.stream().map(initiativeModel -> InitiativeIssuerDTO.builder()
+                .initiativeId(initiativeModel.getInitiativeId())
+                .initiativeName(StringUtils.isNotBlank(initiativeModel.getInitiativeName()) ?
+                        initiativeModel.getInitiativeName() :
+                        initiativeModel.getAdditionalInfo() != null ?
+                                initiativeModel.getAdditionalInfo().getServiceName()
+                                : StringUtils.EMPTY)
+                .organizationName(initiativeModel.getOrganizationName())
+                .descriptionMap(initiativeModel.getGeneral()!= null && initiativeModel.getGeneral().getDescriptionMap()!= null ?
+                        this.languageMap(initiativeModel.getGeneral().getDescriptionMap()):null)
+                .startDate(initiativeModel.getGeneral()!= null ? initiativeModel.getGeneral().getStartDate():null)
+                .endDate(initiativeModel.getGeneral()!= null ? initiativeModel.getGeneral().getEndDate():null)
+                .rankingEnabled(initiativeModel.getGeneral() !=null
+                        ? initiativeModel.getGeneral().getRankingEnabled() != null
+                        ? initiativeModel.getGeneral().getRankingEnabled() : null
+                        : null)
+                .rankingStartDate(initiativeModel.getGeneral()!= null ? initiativeModel.getGeneral().getRankingStartDate(): null)
+                .rankingEndDate(initiativeModel.getGeneral()!= null ? initiativeModel.getGeneral().getRankingEndDate(): null)
+                .beneficiaryKnown(initiativeModel.getGeneral()!= null ? initiativeModel.getGeneral().getBeneficiaryKnown(): null)
+                .status(initiativeModel.getStatus())
+                .tcLink(initiativeModel.getAdditionalInfo().getTcLink())
+                .privacyLink(initiativeModel.getAdditionalInfo().getPrivacyLink())
+                .logoURL(initiativeModel.getAdditionalInfo() != null
+                        ? initiativeModel.getAdditionalInfo().getLogoFileName() != null
+                        ? initiativeUtils.createLogoUrl(initiativeModel.getOrganizationId(),initiativeModel.getInitiativeId()):null
+                        :null)
+                .build()).toList();
+    }
+    private Map<String,String> languageMap(Map<String,String> map){
+            Map<String, String> descriptionItaEng = new HashMap<>();
+            descriptionItaEng.put(Locale.ITALIAN.getLanguage(),
+                    map.get(map.get(Locale.ITALIAN.getLanguage())));
+            if (map.containsKey(Locale.ENGLISH.getLanguage())) {
+                descriptionItaEng.put(Locale.ENGLISH.getLanguage(),
+                        map.get(map.get(Locale.ENGLISH.getLanguage())));
+            }
+            return descriptionItaEng;
     }
 
     private InitiativeRewardRuleDTO toRewardRuleDTO(InitiativeRewardRule rewardRule) {
