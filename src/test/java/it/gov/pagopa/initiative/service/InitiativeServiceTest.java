@@ -11,6 +11,7 @@ import it.gov.pagopa.initiative.connector.ranking.RankingRestConnector;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.InternalServerError;
 import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.NotFound;
+import it.gov.pagopa.initiative.constants.InitiativeConstants.Status;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.io.service.ServiceMetadataDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
@@ -507,7 +508,7 @@ class InitiativeServiceTest {
         LogoDTO logoDTO = initiativeService.storeInitiativeLogo(ORGANIZATION_ID, INITIATIVE_ID, logo, LOGO_MIME_TYPE,
                 FILE_NAME);
 
-        assertEquals(logoDTO.getLogoFileName(), FILE_NAME);
+        assertEquals(FILE_NAME,logoDTO.getLogoFileName());
     }
 
     @Test
@@ -939,6 +940,100 @@ class InitiativeServiceTest {
     }
 
     @Test
+    void getRankingList_ok() {
+        Initiative initiative = this.createFullInitiative();
+        RankingRequestDTO rankingRequestDTO = new RankingRequestDTO(USER_ID,INITIATIVE_ID,ORGANIZATION_ID,LocalDateTime.now(),LocalDateTime.now(),1,1,"test");
+        RankingPageDTO rankingPageDTO =new RankingPageDTO();
+        rankingPageDTO.setContent(List.of(rankingRequestDTO));
+        DecryptCfDTO decryptCfDTO = new DecryptCfDTO(CF);
+        EncryptedCfDTO encryptedCfDTO = new EncryptedCfDTO(USER_ID);
+        Mockito.when(rankingRestConnector.getRankingList(Mockito.anyString(),Mockito.anyString(),Mockito.any(),Mockito.anyString(),Mockito.anyString())).thenReturn(rankingPageDTO);
+        Mockito.when(encryptRestConnector.upsertToken(Mockito.any())).thenReturn(encryptedCfDTO);
+        Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
+        Mockito.when(decryptRestConnector.getPiiByToken(USER_ID)).thenReturn(decryptCfDTO);
+        BeneficiaryRankingPageDTO beneficiaryRankingDTO = initiativeService.getRankingList(ORGANIZATION_ID,INITIATIVE_ID,null, encryptedCfDTO.getToken(),
+                Status.PUBLISHED);
+        assertEquals(CF,beneficiaryRankingDTO.getContent().get(0).getBeneficiary());
+
+    }
+    @Test
+    void getRankingList_initiative_not_found() {
+        try {
+            BeneficiaryRankingPageDTO beneficiaryRankingDTO = initiativeService.getRankingList(ORGANIZATION_ID,INITIATIVE_ID,null, "",
+                    Status.PUBLISHED);
+            Assertions.fail();
+        } catch (InitiativeException e) {
+            assertEquals(NotFound.CODE,e.getCode());
+        }
+    }
+    @Test
+    void getRankingList_ko_encrypt() {
+        Initiative initiative = this.createFullInitiative();
+        OnboardingStatusCitizenDTO onboardingStatusCitizenDTO = new OnboardingStatusCitizenDTO(USER_ID, STATUS, LocalDateTime.now().toString());
+        EncryptedCfDTO encryptedCfDTO = new EncryptedCfDTO(USER_ID);
+        Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
+        Mockito.doThrow(new InitiativeException(InternalServerError.CODE, "", HttpStatus.INTERNAL_SERVER_ERROR)).when(encryptRestConnector).upsertToken(Mockito.any());
+        try {
+            BeneficiaryRankingPageDTO beneficiaryRankingDTO = initiativeService.getRankingList(ORGANIZATION_ID,INITIATIVE_ID,null, "",
+                    Status.PUBLISHED);
+            Assertions.fail();
+        } catch (InitiativeException e) {
+            assertEquals(InternalServerError.CODE,e.getCode());
+        }
+    }
+
+    @Test
+    void getRankingList_ko_decrypt() {
+        Initiative initiative = this.createFullInitiative();
+        RankingRequestDTO rankingRequestDTO = new RankingRequestDTO(USER_ID,INITIATIVE_ID,ORGANIZATION_ID,LocalDateTime.now(),LocalDateTime.now(),1,1,"test");
+        RankingPageDTO rankingPageDTO =new RankingPageDTO();
+        rankingPageDTO.setContent(List.of(rankingRequestDTO));
+        EncryptedCfDTO encryptedCfDTO = new EncryptedCfDTO(USER_ID);
+        Mockito.when(rankingRestConnector.getRankingList(Mockito.anyString(),Mockito.anyString(),Mockito.any(),Mockito.anyString(),Mockito.anyString())).thenReturn(rankingPageDTO);
+        Mockito.when(encryptRestConnector.upsertToken(Mockito.any())).thenReturn(encryptedCfDTO);
+        Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
+        Mockito.doThrow(new InitiativeException(InternalServerError.CODE, "", HttpStatus.INTERNAL_SERVER_ERROR)).when(decryptRestConnector).getPiiByToken(Mockito.anyString());
+        try {
+            BeneficiaryRankingPageDTO beneficiaryRankingDTO = initiativeService.getRankingList(ORGANIZATION_ID,INITIATIVE_ID,null, "",
+                    Status.PUBLISHED);
+            Assertions.fail();
+        } catch (InitiativeException e) {
+            assertEquals(InternalServerError.CODE,e.getCode());
+        }
+    }
+
+    @Test
+    void getRankingList_ko_ranking() {
+        Initiative initiative = this.createFullInitiative();
+        EncryptedCfDTO encryptedCfDTO = new EncryptedCfDTO(USER_ID);
+        Mockito.when(encryptRestConnector.upsertToken(Mockito.any())).thenReturn(encryptedCfDTO);
+        Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
+        Mockito.doThrow(new InitiativeException(InternalServerError.CODE, "", HttpStatus.INTERNAL_SERVER_ERROR)).when(rankingRestConnector).getRankingList(Mockito.anyString(),Mockito.anyString(),Mockito.any(),Mockito.anyString(),Mockito.anyString());
+        try {
+            BeneficiaryRankingPageDTO beneficiaryRankingDTO = initiativeService.getRankingList(ORGANIZATION_ID,INITIATIVE_ID,null, "",
+                    Status.PUBLISHED);
+            Assertions.fail();
+        } catch (InitiativeException e) {
+            assertEquals(InternalServerError.CODE,e.getCode());
+        }
+    }
+
+    @Test
+    void getRankingList_ko_ranking_disabled() {
+        Initiative initiative = this.createFullInitiative();
+        initiative.setGeneral(new InitiativeGeneral());
+        initiative.getGeneral().setRankingEnabled(false);
+        Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
+        try {
+            BeneficiaryRankingPageDTO beneficiaryRankingDTO = initiativeService.getRankingList(ORGANIZATION_ID,INITIATIVE_ID,null, "",
+                    Status.PUBLISHED);
+            Assertions.fail();
+        } catch (InitiativeException e) {
+            assertEquals(InternalServerError.CODE,e.getCode());
+        }
+    }
+
+    @Test
     void getOnboardingStatusList_ok() {
         Initiative initiative = this.createFullInitiative();
         OnboardingStatusCitizenDTO onboardingStatusCitizenDTO = new OnboardingStatusCitizenDTO(USER_ID, STATUS, LocalDateTime.now().toString());
@@ -952,8 +1047,8 @@ class InitiativeServiceTest {
         Mockito.when(onboardingRestConnector.getOnboarding(INITIATIVE_ID, null, USER_ID, STARTDATE, ENDDATE, STATUS)).thenReturn(onboardingDTO);
         Mockito.when(decryptRestConnector.getPiiByToken(USER_ID)).thenReturn(decryptCfDTO);
         OnboardingDTO onboardingDTO1 = initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID, CF, STARTDATE, ENDDATE, STATUS, null);
-        assertEquals(onboardingDTO1.getContent().get(0).getBeneficiary(), CF);
-        assertEquals(onboardingDTO1.getContent().get(0).getBeneficiaryState(), STATUS);
+        assertEquals(CF,onboardingDTO1.getContent().get(0).getBeneficiary());
+        assertEquals(STATUS,onboardingDTO1.getContent().get(0).getBeneficiaryState());
 
     }
 
@@ -968,7 +1063,7 @@ class InitiativeServiceTest {
             OnboardingDTO onboardingDTO1 = initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID, CF, STARTDATE, ENDDATE, STATUS, null);
             Assertions.fail();
         } catch (InitiativeException e) {
-            assertEquals(e.getCode(), InternalServerError.CODE);
+            assertEquals(InternalServerError.CODE,e.getCode());
         }
     }
 
@@ -988,7 +1083,7 @@ class InitiativeServiceTest {
             OnboardingDTO onboardingDTO1 = initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID, CF, STARTDATE, ENDDATE, STATUS, null);
             Assertions.fail();
         } catch (InitiativeException e) {
-            assertEquals(e.getCode(), InternalServerError.CODE);
+            assertEquals(InternalServerError.CODE,e.getCode());
         }
     }
 
@@ -1003,7 +1098,7 @@ class InitiativeServiceTest {
             OnboardingDTO onboardingDTO1 = initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID, CF, STARTDATE, ENDDATE, STATUS, null);
             Assertions.fail();
         } catch (InitiativeException e) {
-            assertEquals(e.getCode(), InternalServerError.CODE);
+            assertEquals(InternalServerError.CODE,e.getCode());
         }
     }
 
@@ -1013,7 +1108,7 @@ class InitiativeServiceTest {
             OnboardingDTO onboardingDTO1 = initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID, CF, STARTDATE, ENDDATE, STATUS, null);
             Assertions.fail();
         } catch (InitiativeException e) {
-            assertEquals(e.getCode(), NotFound.CODE);
+            assertEquals(NotFound.CODE,e.getCode());
         }
     }
 
