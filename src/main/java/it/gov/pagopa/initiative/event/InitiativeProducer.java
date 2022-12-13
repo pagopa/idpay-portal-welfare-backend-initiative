@@ -19,5 +19,4 @@ public class InitiativeProducer {
     log.debug("Sending Initiative to {}", INITIATIVE_QUEUE_OUT_0);
     return streamBridge.send(INITIATIVE_QUEUE_OUT_0, initiative);
   }
-
 }

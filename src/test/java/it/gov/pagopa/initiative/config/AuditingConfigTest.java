@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import it.gov.pagopa.initiative.service.AuditorAwareImpl;
 
-import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.junit.jupiter.api.Test;
@@ -28,7 +27,7 @@ class AuditingConfigTest {
     private MappingMongoConverter mappingMongoConverter;
 
     @Test
-    void testMyAuditorProvider() throws IOException {
+    void testMyAuditorProvider() {
         assertTrue(auditingConfig.myAuditorProvider() instanceof AuditorAwareImpl);
     }
 }

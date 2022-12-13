@@ -61,18 +61,21 @@ class InitiativeValidationServiceTest {
     @MockBean
     InitiativeRepository initiativeRepository;
 
+    @MockBean
+    AutomatedCriteria automatedCriteria;
+
     @Test
     void givenAdminRole_whenInitiativeStatusIsValid_thenOk() {
-        Initiative step2Initiative = createStep2Initiative(false, true);
+        Initiative step2Initiative = createStep2Initiative(true);
 
         //Instruct the Repo Mock to return Dummy Initiatives
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.ofNullable(step2Initiative));
+        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(step2Initiative));
         
         //Try to call the Real Service (which is using the instructed Repo)
         Initiative initiative = initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ADMIN_ROLE);
 
         //Check the equality of the results
-        assertEquals(Optional.ofNullable(step2Initiative).get(), initiative);
+        assertEquals(Optional.of(step2Initiative).get(), initiative);
 
         // you are expecting repo to be called once with correct param
         verify(initiativeRepository).findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true); // same as: verify(initiativeRepository, times(1)).retrieveInitiativeSummary(anyString());
@@ -93,14 +96,14 @@ class InitiativeValidationServiceTest {
 
     @Test
     void givenOpeBaseRole_whenInitiativeStatusIsValid_thenOk() {
-        Initiative step2Initiative = createStep2Initiative(false, true);
+        Initiative step2Initiative = createStep2Initiative(true);
         step2Initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
         //Instruct the Repo Mock to return Dummy Initiatives
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.ofNullable(step2Initiative));
+        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(step2Initiative));
         //Try to call the Real Service (which is using the instructed Repo)
         Initiative initiative = initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, OPE_BASE_ROLE);
         //Check the equality of the results
-        assertEquals(Optional.ofNullable(step2Initiative).get(), initiative);
+        assertEquals(Optional.of(step2Initiative).get(), initiative);
         // you are expecting repo to be called once with correct param
         verify(initiativeRepository).findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true); // same as: verify(initiativeRepository, times(1))
 
@@ -108,11 +111,11 @@ class InitiativeValidationServiceTest {
 
         step2Initiative.setStatus(InitiativeConstants.Status.TO_CHECK);
         //Instruct the Repo Mock to return Dummy Initiatives
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.ofNullable(step2Initiative));
+        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(step2Initiative));
         //Try to call the Real Service (which is using the instructed Repo)
         initiative = initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, OPE_BASE_ROLE);
         //Check the equality of the results
-        assertEquals(Optional.ofNullable(step2Initiative).get(), initiative);
+        assertEquals(Optional.of(step2Initiative).get(), initiative);
         // you are expecting repo to be called once with correct param
         verify(initiativeRepository).findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true); // same as: verify(initiativeRepository, times(1))
 
@@ -120,21 +123,21 @@ class InitiativeValidationServiceTest {
 
         step2Initiative.setStatus(InitiativeConstants.Status.APPROVED);
         //Instruct the Repo Mock to return Dummy Initiatives
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.ofNullable(step2Initiative));
+        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(step2Initiative));
         //Try to call the Real Service (which is using the instructed Repo)
         initiative = initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, OPE_BASE_ROLE);
         //Check the equality of the results
-        assertEquals(Optional.ofNullable(step2Initiative).get(), initiative);
+        assertEquals(Optional.of(step2Initiative).get(), initiative);
         // you are expecting repo to be called once with correct param
         verify(initiativeRepository).findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true); // same as: verify(initiativeRepository, times(1))
     }
 
     @Test
     void givenOpeBase_whenInitiativeUnprocessableForStatusNotValid_then400isRaisedForInitiativeException() {
-        Initiative step2Initiative = createStep2Initiative(false, true);
+        Initiative step2Initiative = createStep2Initiative(true);
 
         //Instruct the Repo Mock to return Dummy Initiatives
-        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.ofNullable(step2Initiative));
+        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(step2Initiative));
 
         InitiativeException exception = assertThrows(InitiativeException.class, () -> initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, OPE_BASE_ROLE));
 
@@ -151,7 +154,7 @@ class InitiativeValidationServiceTest {
 
     @Test
     void testCheckAutomatedCriteriaOrderDirectionWithRanking() {
-        Initiative step3Initiative = createStep3Initiative(false, false);
+        Initiative step3Initiative = createStep3Initiative(false);
         List<AutomatedCriteria> automatedCriteriaList = step3Initiative.getBeneficiaryRule().getAutomatedCriteria();
         Executable executable = () -> initiativeValidationService.checkAutomatedCriteriaOrderDirectionWithRanking(step3Initiative, automatedCriteriaList);
         assertDoesNotThrow(executable);
@@ -159,27 +162,43 @@ class InitiativeValidationServiceTest {
 
     @Test
     void testCheckAutomatedCriteriaOrderDirectionWithRanking2() {
-        Initiative step3Initiative = createStep3Initiative(false, true);
+        Initiative step3Initiative = createStep3Initiative(true);
         List<AutomatedCriteria> automatedCriteriaList = step3Initiative.getBeneficiaryRule().getAutomatedCriteria();
-        InitiativeException exception = assertThrows(InitiativeException.class, () -> initiativeValidationService.checkAutomatedCriteriaOrderDirectionWithRanking(step3Initiative, automatedCriteriaList));
+        assertThrows(InitiativeException.class, () -> initiativeValidationService.checkAutomatedCriteriaOrderDirectionWithRanking(step3Initiative, automatedCriteriaList));
     }
 
     @Test
     void testCheckAutomatedCriteriaOrderDirectionWithRanking3() {
-        Initiative step3Initiative = createStep3Initiative_EQ(false, true);
+        Initiative step3Initiative = createStep3Initiative_EQ();
         List<AutomatedCriteria> automatedCriteriaList = step3Initiative.getBeneficiaryRule().getAutomatedCriteria();
-        InitiativeException exception = assertThrows(InitiativeException.class, () -> initiativeValidationService.checkAutomatedCriteriaOrderDirectionWithRanking(step3Initiative, automatedCriteriaList));
+        assertThrows(InitiativeException.class, () -> initiativeValidationService.checkAutomatedCriteriaOrderDirectionWithRanking(step3Initiative, automatedCriteriaList));
+    }
+
+    @Test
+    void testCheckAutomatedCriteriaOrderDirectionWithRanking_Exception() {
+        Initiative step3Initiative = createStep3Initiative(true);
+        AutomatedCriteria automatedCriteria = new AutomatedCriteria();
+        automatedCriteria.setCode("noMatch");
+        List<AutomatedCriteria> automatedCriteriaList = new ArrayList<>();
+        automatedCriteriaList.add(automatedCriteria);
+
+        try {
+            initiativeValidationService.checkAutomatedCriteriaOrderDirectionWithRanking(step3Initiative,
+                    automatedCriteriaList);
+        } catch (InitiativeException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.CODE , e.getCode());
+        }
     }
 
     @Test
     void givenRankingEndDateAndStartDateNotValid_whenValidateAllWizardSteps_thenExceptionThrown() {
-        InitiativeDTO step5InitiativeDTO = createStep5InitiativeDTO(false, true);
-        InitiativeException exception = assertThrows(InitiativeException.class, () -> initiativeValidationService.validateAllWizardSteps(step5InitiativeDTO));
+        InitiativeDTO step5InitiativeDTO = createStep5InitiativeDTO(true);
+        assertThrows(InitiativeException.class, () -> initiativeValidationService.validateAllWizardSteps(step5InitiativeDTO));
     }
 
     @Test
     void givenInitiativeOk_whenValidateAllWizardSteps_thenDoNothing() {
-        InitiativeDTO step5InitiativeDTO = createStep5InitiativeDTO(false, true);
+        InitiativeDTO step5InitiativeDTO = createStep5InitiativeDTO(true);
         LocalDate startDate = step5InitiativeDTO.getGeneral().getStartDate();
         startDate = startDate.plusDays(20);
         LocalDate endDate = step5InitiativeDTO.getGeneral().getEndDate();
@@ -237,8 +256,7 @@ class InitiativeValidationServiceTest {
     }
 
     InitiativeAdditionalDTO createStep1InitiativeAdditionalDTO() {
-        InitiativeAdditionalDTO initiativeAdditionalDTO = createInitiativeAdditionalDTO();
-        return initiativeAdditionalDTO;
+        return createInitiativeAdditionalDTO();
     }
 
     private InitiativeAdditionalDTO createInitiativeAdditionalDTO() {
@@ -263,18 +281,18 @@ class InitiativeValidationServiceTest {
      * ############### Step 2 ###############
      */
 
-    private Initiative createStep2Initiative (Boolean beneficiaryKnown, Boolean rankingEnabled) {
+    private Initiative createStep2Initiative (Boolean rankingEnabled) {
         Initiative initiative = createStep1Initiative();
-        initiative.setGeneral(createInitiativeGeneral(beneficiaryKnown, rankingEnabled));
+        initiative.setGeneral(createInitiativeGeneral(rankingEnabled));
         return initiative;
     }
 
-    private InitiativeGeneral createInitiativeGeneral(Boolean beneficiaryKnown, Boolean rankingEnabled) {
+    private InitiativeGeneral createInitiativeGeneral(Boolean rankingEnabled) {
         Map<String, String> language = new HashMap<>();
         language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneral initiativeGeneral = new InitiativeGeneral();
         initiativeGeneral.setBeneficiaryBudget(new BigDecimal(10));
-        initiativeGeneral.setBeneficiaryKnown(beneficiaryKnown);
+        initiativeGeneral.setBeneficiaryKnown(false);
         initiativeGeneral.setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF);
         initiativeGeneral.setBudget(new BigDecimal(1000000000));
         LocalDate rankingStartDate = LocalDate.now();
@@ -290,18 +308,18 @@ class InitiativeValidationServiceTest {
         return initiativeGeneral;
     }
 
-    private InitiativeDTO createStep2InitiativeDTO (Boolean beneficiaryKnown, Boolean rankingEnabled) {
+    private InitiativeDTO createStep2InitiativeDTO (Boolean rankingEnabled) {
         InitiativeDTO initiativeDTO = createStep1InitiativeDTO();
-        initiativeDTO.setGeneral(createInitiativeGeneralDTO(beneficiaryKnown, rankingEnabled));
+        initiativeDTO.setGeneral(createInitiativeGeneralDTO(rankingEnabled));
         return initiativeDTO;
     }
 
-    private InitiativeGeneralDTO createInitiativeGeneralDTO(Boolean beneficiaryKnown, Boolean rankingEnabled) {
+    private InitiativeGeneralDTO createInitiativeGeneralDTO(Boolean rankingEnabled) {
         Map<String, String> language = new HashMap<>();
         language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
-        initiativeGeneralDTO.setBeneficiaryKnown(beneficiaryKnown);
+        initiativeGeneralDTO.setBeneficiaryKnown(false);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
         LocalDate rankingStartDate = LocalDate.now();
@@ -321,14 +339,14 @@ class InitiativeValidationServiceTest {
      * ############### Step 3 ###############
      */
 
-    private Initiative createStep3Initiative (Boolean beneficiaryKnown, Boolean rankingEnabled) {
-        Initiative initiative = createStep2Initiative(beneficiaryKnown, rankingEnabled);
+    private Initiative createStep3Initiative (Boolean rankingEnabled) {
+        Initiative initiative = createStep2Initiative(rankingEnabled);
         initiative.setBeneficiaryRule(createInitiativeBeneficiaryRule());
         return initiative;
     }
 
-    private Initiative createStep3Initiative_EQ (Boolean beneficiaryKnown, Boolean rankingEnabled) {
-        Initiative initiative = createStep2Initiative(beneficiaryKnown, rankingEnabled);
+    private Initiative createStep3Initiative_EQ () {
+        Initiative initiative = createStep2Initiative(true);
         initiative.setBeneficiaryRule(createInitiativeBeneficiaryRule_EQ());
         return initiative;
     }
@@ -396,11 +414,9 @@ class InitiativeValidationServiceTest {
         return initiativeBeneficiaryRule;
     }
 
-    private InitiativeDTO createStep3InitiativeDTO (Boolean beneficiaryKnown, Boolean rankingEnabled) {
-        InitiativeDTO initiativeDTO = createStep2InitiativeDTO(beneficiaryKnown, rankingEnabled);
-        if(!beneficiaryKnown) {
-            initiativeDTO.setBeneficiaryRule(createInitiativeBeneficiaryRuleDTO());
-        }
+    private InitiativeDTO createStep3InitiativeDTO (Boolean rankingEnabled) {
+        InitiativeDTO initiativeDTO = createStep2InitiativeDTO(rankingEnabled);
+        initiativeDTO.setBeneficiaryRule(createInitiativeBeneficiaryRuleDTO());
         return initiativeDTO;
     }
 
@@ -445,13 +461,12 @@ class InitiativeValidationServiceTest {
      * ############### Step 4 ###############
      */
 
-    private Initiative createStep4Initiative (Boolean beneficiaryKnown, Boolean rankingEnabled) {
-        Initiative initiative = createStep3Initiative(beneficiaryKnown, rankingEnabled);
-        return initiative;
+    private Initiative createStep4Initiative () {
+        return createStep3Initiative(false);
     }
 
-    private InitiativeDTO createStep4InitiativeDTO (Boolean beneficiaryKnown, Boolean rankingEnabled) {
-        InitiativeDTO initiativeDTO = createStep3InitiativeDTO(beneficiaryKnown, rankingEnabled);
+    private InitiativeDTO createStep4InitiativeDTO (Boolean rankingEnabled) {
+        InitiativeDTO initiativeDTO = createStep3InitiativeDTO(rankingEnabled);
         InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = createInitiativeRewardAndTrxRulesDTO();
         initiativeDTO.setRewardRule(initiativeRewardAndTrxRulesDTO.getRewardRule());
         initiativeDTO.setTrxRule(initiativeRewardAndTrxRulesDTO.getTrxRule());
@@ -474,13 +489,13 @@ class InitiativeValidationServiceTest {
 
     private InitiativeTrxConditionsDTO createInitiativeTrxConditionsDTOValid(){
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = new InitiativeTrxConditionsDTO();
-        List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<DayOfWeekDTO.DayConfig>();
+        List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<>();
         DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
         dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
         dayOfWeeks.add(DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
-        List<DayOfWeekDTO.Interval> intervals = new ArrayList<DayOfWeekDTO.Interval>();
+        List<DayOfWeekDTO.Interval> intervals = new ArrayList<>();
         DayOfWeekDTO.Interval interval1 = new DayOfWeekDTO.Interval();
         LocalTime t1 = LocalTime.of(6, 0, 0);
         LocalTime t2 = LocalTime.of(12, 0, 0);
@@ -508,12 +523,12 @@ class InitiativeValidationServiceTest {
 
         MccFilterDTO mccFilterDTO = new MccFilterDTO();
         mccFilterDTO.setAllowedList(true);
-        Set<String> values = new HashSet<String>();
+        Set<String> values = new HashSet<>();
         values.add("123");
         values.add("456");
         mccFilterDTO.setValues(values);
 
-        List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<RewardLimitsDTO>();
+        List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<>();
         RewardLimitsDTO rewardLimitsDTO1 = new RewardLimitsDTO();
         rewardLimitsDTO1.setFrequency(RewardLimitsDTO.RewardLimitFrequency.DAILY);
         rewardLimitsDTO1.setRewardLimit(BigDecimal.valueOf(100));
@@ -538,7 +553,7 @@ class InitiativeValidationServiceTest {
      */
 
     private Initiative createStep5Initiative () {
-        Initiative initiative = createStep5Initiative(false, false);
+        Initiative initiative = createStep4Initiative();
         initiative.setRefundRule(createRefundRuleValidWithTimeParameter());
         return initiative;
     }
@@ -563,13 +578,8 @@ class InitiativeValidationServiceTest {
         return additionalInfo;
     }
 
-    private Initiative createStep5Initiative (Boolean beneficiaryKnown, Boolean rankingEnabled) {
-        Initiative initiative = createStep4Initiative(beneficiaryKnown, rankingEnabled);
-        return initiative;
-    }
-
     private InitiativeDTO createStep5InitiativeDTO () {
-        InitiativeDTO initiativeDTO = createStep5InitiativeDTO(false, false);
+        InitiativeDTO initiativeDTO = createStep5InitiativeDTO(false);
         initiativeDTO.setRefundRule(createRefundRuleDTOValidWithTimeParameter());
         return initiativeDTO;
     }
@@ -598,8 +608,8 @@ class InitiativeValidationServiceTest {
         return refundAdditionalInfoDTO;
     }
 
-    private InitiativeDTO createStep5InitiativeDTO (Boolean beneficiaryKnown, Boolean rankingEnabled) {
-        InitiativeDTO initiativeDTO = createStep4InitiativeDTO(beneficiaryKnown, rankingEnabled);
+    private InitiativeDTO createStep5InitiativeDTO (Boolean rankingEnabled) {
+        InitiativeDTO initiativeDTO = createStep4InitiativeDTO(rankingEnabled);
         initiativeDTO.setRefundRule(createRefundRuleDTOValidWithTimeParameter());
         return initiativeDTO;
     }

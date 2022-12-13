@@ -4,7 +4,6 @@ import it.gov.pagopa.initiative.dto.config.ConfigMccDTO;
 import it.gov.pagopa.initiative.dto.config.ConfigTrxRuleDTO;
 import it.gov.pagopa.initiative.model.config.ConfigMcc;
 import it.gov.pagopa.initiative.model.config.ConfigTrxRule;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -24,10 +23,6 @@ class ConfigStaticModelToDTOMapperTest {
     private List<ConfigTrxRule> trxConfigRulesListActual;
     private List<ConfigMccDTO> mccConfigDTOListExpected;
     private List<ConfigTrxRuleDTO> trxConfigRulesDTOListExpected;
-
-    @BeforeEach
-    public void setUp() {
-    }
 
     private List<ConfigMcc> setUpMccConfigList(boolean doEmpty) {
         ConfigMcc configMcc = ConfigMcc.builder().code("code").description("description").build();

@@ -1,24 +1,18 @@
 package it.gov.pagopa.initiative.connector.group;
 
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import it.gov.pagopa.initiative.dto.group.InitiativeNotificationDTO;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeAdditional;
 import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
 import it.gov.pagopa.initiative.model.InitiativeGeneral;
 import it.gov.pagopa.initiative.model.rule.refund.InitiativeRefundRule;
-import it.gov.pagopa.initiative.model.rule.reward.InitiativeRewardRule;
 import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
 import it.gov.pagopa.initiative.model.rule.trx.InitiativeTrxConditions;
 
 import java.time.LocalDateTime;
-
-import org.junit.jupiter.api.Disabled;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,7 +34,7 @@ class GroupRestConnectorTest {
 
     @Test
     void testNotifyInitiativeToGroup() {
-        when(groupFeignRestClient.notifyInitiativeForCitizen((String) any(), (InitiativeNotificationDTO) any()))
+        when(groupFeignRestClient.notifyInitiativeForCitizen(any(), any()))
                 .thenReturn(new ResponseEntity<>(HttpStatus.CONTINUE));
 
         Initiative initiative = new Initiative();
@@ -63,7 +57,7 @@ class GroupRestConnectorTest {
         initiative.setUpdateDate(LocalDateTime.of(1, 1, 1, 1, 1));
         initiative.setUpdatedBy("2020-03-01");
         groupRestConnectorImpl.notifyInitiativeToGroup(initiative);
-        verify(groupFeignRestClient).notifyInitiativeForCitizen((String) any(), (InitiativeNotificationDTO) any());
+        verify(groupFeignRestClient).notifyInitiativeForCitizen(any(), any());
     }
 }
 

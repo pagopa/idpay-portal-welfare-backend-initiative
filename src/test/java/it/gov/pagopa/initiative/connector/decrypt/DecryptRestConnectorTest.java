@@ -25,9 +25,9 @@ class DecryptRestConnectorTest {
     @Test
     void testGetPiiByToken() {
         DecryptCfDTO decryptCfDTO = new DecryptCfDTO("Pii");
-        when(decryptRest.getPiiByToken((String) any(), (String) any())).thenReturn(decryptCfDTO);
+        when(decryptRest.getPiiByToken(any(), any())).thenReturn(decryptCfDTO);
         assertSame(decryptCfDTO, decryptRestConnectorImpl.getPiiByToken("ABC123"));
-        verify(decryptRest).getPiiByToken((String) any(), (String) any());
+        verify(decryptRest).getPiiByToken(any(), any());
     }
 }
 

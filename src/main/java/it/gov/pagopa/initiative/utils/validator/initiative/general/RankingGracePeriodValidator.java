@@ -20,9 +20,7 @@ public class RankingGracePeriodValidator implements ConstraintValidator<RankingG
             LocalDate rankingEndDate = value.getRankingEndDate();
             LocalDate startDate = value.getStartDate();
             if (startDate != null && rankingEndDate != null) {
-                if(!rankingEndDate.plusDays(gracePeriod).isBefore(startDate)){
-                    return false;
-                }
+                return rankingEndDate.plusDays(gracePeriod).isBefore(startDate);
             }
         }
         return true;

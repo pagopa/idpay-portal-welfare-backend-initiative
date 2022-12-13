@@ -8,18 +8,18 @@ import com.fasterxml.jackson.annotation.JsonValue;
  */
 public enum TypeBoolEnum {
 
-    BOOLEAN("boolean");
+    BOOLEAN();
 
     private final String value;
 
-    TypeBoolEnum(String value) {
-        this.value = value;
+    TypeBoolEnum() {
+        this.value = "boolean";
     }
 
     @Override
     @JsonValue
     public String toString() {
-        return String.valueOf(value);
+        return value;
     }
 
     @JsonCreator
