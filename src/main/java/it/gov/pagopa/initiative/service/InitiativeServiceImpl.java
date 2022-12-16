@@ -10,7 +10,6 @@ import it.gov.pagopa.initiative.connector.io_service.IOBackEndRestConnector;
 import it.gov.pagopa.initiative.connector.onboarding.OnboardingRestConnector;
 import it.gov.pagopa.initiative.connector.ranking.RankingRestConnector;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
-import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest;
 import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.InternalServerError;
 import it.gov.pagopa.initiative.constants.InitiativeConstants.Status;
 import it.gov.pagopa.initiative.dto.*;
@@ -516,7 +515,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         }
         return new BeneficiaryRankingPageDTO(beneficiaryRankingDTOS, rankingPageDTO.getPageNumber(),
                 rankingPageDTO.getPageSize(), rankingPageDTO.getTotalElements(),
-                rankingPageDTO.getTotalPages(), rankingPageDTO.getRankingStatus(), rankingPageDTO.getRankingPublishedTimeStamp(),rankingPageDTO.getRankingGeneratedTimeStamp(),rankingPageDTO.getTotalEligibleOk(),rankingPageDTO.getTotalEligibleKo(),rankingPageDTO.getTotalOnboardingKo(),
+                rankingPageDTO.getTotalPages(), rankingPageDTO.getRankingStatus(), rankingPageDTO.getRankingPublishedTimestamp(),rankingPageDTO.getRankingGeneratedTimestamp(),rankingPageDTO.getTotalEligibleOk(),rankingPageDTO.getTotalEligibleKo(),rankingPageDTO.getTotalOnboardingKo(),
                 rankingPageDTO.getRankingFilePath());
     }
 

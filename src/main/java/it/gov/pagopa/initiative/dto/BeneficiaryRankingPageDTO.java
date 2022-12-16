@@ -19,8 +19,8 @@ public class BeneficiaryRankingPageDTO {
     private long totalElements;
     private long totalPages;
     private String rankingStatus;
-    private LocalDateTime rankingPublishedTimeStamp;
-    private LocalDateTime rankingGeneratedTimeStamp;
+    private LocalDateTime rankingPublishedTimestamp;
+    private LocalDateTime rankingGeneratedTimestamp;
     private long totalEligibleOk;
     private long totalEligibleKo;
     private long totalOnboardingKo;
