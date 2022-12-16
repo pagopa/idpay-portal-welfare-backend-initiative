@@ -5,12 +5,15 @@ import feign.FeignException;
 import feign.Request;
 import feign.RequestTemplate;
 import it.gov.pagopa.initiative.connector.decrypt.DecryptRestConnector;
+import it.gov.pagopa.initiative.connector.email_notification.EmailNotificationRestConnector;
 import it.gov.pagopa.initiative.connector.encrypt.EncryptRestConnector;
 import it.gov.pagopa.initiative.connector.file_storage.FileStorageConnector;
 import it.gov.pagopa.initiative.connector.group.GroupRestConnector;
 import it.gov.pagopa.initiative.connector.io_service.IOBackEndRestConnector;
+import it.gov.pagopa.initiative.connector.io_service.IOBackEndRestConnectorImpl;
 import it.gov.pagopa.initiative.connector.onboarding.OnboardingRestConnector;
 import it.gov.pagopa.initiative.connector.ranking.RankingRestConnector;
+import it.gov.pagopa.initiative.connector.selc.SelcRestConnector;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.InternalServerError;
 import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.NotFound;
@@ -51,6 +54,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.validation.beanvalidation.CustomValidatorBean;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -245,6 +249,23 @@ class InitiativeServiceTest {
             assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
             assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
         }
+    }
+
+    @Test
+    void testGetInitiativesIssuerList() {
+        Initiative step2Initiative1 = createStep2Initiative();
+        step2Initiative1.setStatus(Status.PUBLISHED);
+        List<Initiative> initiativeList = List.of(step2Initiative1);
+
+        //Instruct the Repo Mock to return Dummy Initiatives
+        when(initiativeRepository.findByEnabledAndStatus(true, "PUBLISHED")).thenReturn(initiativeList);
+
+        //Try to call the Real Service (which is using the instructed Repo)
+        List<Initiative> initiatives = initiativeService.getInitiativesIssuerList();
+
+        //Check the equality of the results
+        assertEquals(initiativeList, initiatives);
+        verify(initiativeRepository).findByEnabledAndStatus(any(), any());
     }
 
     @Test
