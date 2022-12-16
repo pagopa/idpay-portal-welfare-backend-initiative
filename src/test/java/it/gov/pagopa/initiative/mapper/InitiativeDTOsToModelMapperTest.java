@@ -1,6 +1,11 @@
 package it.gov.pagopa.initiative.mapper;
 
 import it.gov.pagopa.initiative.dto.*;
+import it.gov.pagopa.initiative.dto.AnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems;
+import it.gov.pagopa.initiative.dto.AutomatedCriteriaDTO;
+import it.gov.pagopa.initiative.dto.FilterOperatorEnum;
+import it.gov.pagopa.initiative.dto.InitiativeBeneficiaryRuleDTO;
+import it.gov.pagopa.initiative.dto.SelfCriteriaBoolDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.AccumulatedAmountDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.RefundAdditionalInfoDTO;
@@ -9,6 +14,8 @@ import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardGroupsDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardValueDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.*;
+import it.gov.pagopa.initiative.model.AutomatedCriteria;
+import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
 import it.gov.pagopa.initiative.model.TypeBoolEnum;
 import it.gov.pagopa.initiative.model.TypeMultiEnum;
 import it.gov.pagopa.initiative.model.*;
@@ -20,8 +27,14 @@ import it.gov.pagopa.initiative.model.rule.reward.InitiativeRewardRule;
 import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
 import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
 import it.gov.pagopa.initiative.model.rule.trx.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
@@ -31,8 +44,23 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import static com.mongodb.assertions.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+@ContextConfiguration(classes = {InitiativeDTOsToModelMapper.class})
+@ExtendWith(SpringExtension.class)
 @WebMvcTest(value = {
         InitiativeDTOsToModelMapper.class})
 class InitiativeDTOsToModelMapperTest {
@@ -134,110 +162,111 @@ class InitiativeDTOsToModelMapperTest {
     }
 
     @Test
-    void toInitiativeFromInitiativeDTO_equals(){
+    void toInitiativeFromInitiativeDTO_equals() {
         Initiative initiative = initiativeDTOsToModelMapper.toInitiative(initiativeDTO);
         assertEquals(initiativeExpected, initiative);
     }
 
     @Test
-    void toInitiativeTrxConditionsNull_equals(){
+    void toInitiativeTrxConditionsNull_equals() {
         Initiative initiative = initiativeDTOsToModelMapper.toInitiative(initiativeRewardAndTrxRuleDTOTrxRuleNull);
         assertEquals(initiativeTrxRuleNull, initiative);
     }
 
     @Test
-    void toInitiativeOnlyRewardAndTrxRulesTrxCountNull_equals(){
+    void toInitiativeOnlyRewardAndTrxRulesTrxCountNull_equals() {
         Initiative initiative = initiativeDTOsToModelMapper.toInitiative(initiativeRewardAndTrxRulesDTOTrxCountNull);
         assertEquals(initiativeOnlyRewardAndTrxRulesTrxCountNull, initiative);
     }
 
     @Test
-    void toInitiativeOnlyRewardAndTrxRulesMccFilterNull_equals(){
+    void toInitiativeOnlyRewardAndTrxRulesMccFilterNull_equals() {
         Initiative initiative = initiativeDTOsToModelMapper.toInitiative(initiativeRewardAndTrxRulesDTOMccFilterNull);
         assertEquals(initiativeOnlyRewardAndTrxRulesMccFilterNull, initiative);
     }
 
     @Test
-    void toInitiativeOnlyRewardAndTrxRulesDayOfWeekNull_equals(){
+    void toInitiativeOnlyRewardAndTrxRulesDayOfWeekNull_equals() {
         Initiative initiative = initiativeDTOsToModelMapper.toInitiative(initiativeRewardAndTrxRulesDTODayOfWeekNull);
         assertEquals(initiativeOnlyRewardAndTrxRulesDayOfWeekNull, initiative);
     }
 
     @Test
-    void toInitiativeOnlyRewardAndTrxRulesRewardLimitsEmpty_equals(){
+    void toInitiativeOnlyRewardAndTrxRulesRewardLimitsEmpty_equals() {
         Initiative initiative = initiativeDTOsToModelMapper.toInitiative(initiativeRewardAndTrxRulesDTORewardLimitsNull);
         assertEquals(initiativeOnlyRewardAndTrxRulesRewardLimitsNull, initiative);
     }
 
     @Test
-    void toInitiativeOnlyRewardAndTrxRulesThresholdNull_equals(){
+    void toInitiativeOnlyRewardAndTrxRulesThresholdNull_equals() {
         Initiative initiative = initiativeDTOsToModelMapper.toInitiative(initiativeRewardAndTrxRulesDTOThresholdNull);
         assertEquals(initiativeOnlyRewardAndTrxRulesThresholdNull, initiative);
     }
 
     @Test
-    void toInitiativeOnlyRewardAndTrxRulesRewardGroups_equals(){
+    void toInitiativeOnlyRewardAndTrxRulesRewardGroups_equals() {
         Initiative initiative = initiativeDTOsToModelMapper.toInitiative(initiativeRewardAndTrxRulesDTORewardGroup);
         assertEquals(initiativeOnlyRewardAndTrxRulesRewardGroup, initiative);
     }
+
     @Test
-    void toInitiativeOnlyRewardAndTrxRules_equals(){
+    void toInitiativeOnlyRewardAndTrxRules_equals() {
         Initiative initiative = initiativeDTOsToModelMapper.toInitiative(initiativeRewardAndTrxRulesDTOcomplete);
         assertEquals(initiativeOnlyRewardAndTrxRules, initiative);
     }
 
 
     @Test
-    void toInitiativeOnlyRewardAndTrxRulesRewardRuleNull_equals(){
+    void toInitiativeOnlyRewardAndTrxRulesRewardRuleNull_equals() {
         Initiative initiative = initiativeDTOsToModelMapper.toInitiative(initiativeRewardAndTrxRulesDTORewardRuleNull);
         assertEquals(initiativeOnlyRewardAndTrxRulesRewardRuleNull, initiative);
     }
 
     @Test
-    void toInitiativeOnlyInfoGeneral_equals(){
+    void toInitiativeOnlyInfoGeneral_equals() {
         Initiative initiativeActual = initiativeDTOsToModelMapper.toInitiative(initiativeInfoOnlyInfoGeneralDTO);
         //Check the equality of the results
         assertEquals(initiativeOnlyInfoGeneral, initiativeActual);
     }
 
     @Test
-    void toInitiativeNoBaseFields_equals(){
+    void toInitiativeNoBaseFields_equals() {
         Initiative initiativeActual = initiativeDTOsToModelMapper.toInitiative(initiativeInfoDTOnoBaseFields);
         //Check the equality of the results
         assertEquals(initiativeNoBaseFields, initiativeActual);
     }
 
     @Test
-    void toBeneficiaryRule_equals(){
+    void toBeneficiaryRule_equals() {
         InitiativeBeneficiaryRule initiativeBeneficiaryRuleActual = initiativeDTOsToModelMapper.toBeneficiaryRule(initiativeBeneficiaryRuleDTO);
         //Check the equality of the results
         assertEquals(initiativeBeneficiaryRule, initiativeBeneficiaryRuleActual);
     }
 
     @Test
-    void toInitiativeOnlyRefundRule_equals(){
+    void toInitiativeOnlyRefundRule_equals() {
         Initiative initiative = initiativeDTOsToModelMapper.toInitiative(initiativeRefundRuleDTOAmount);
         assertEquals(initiativeOnlyRefundRule, initiative);
     }
 
     @Test
-    void toInitiativeOnlyRefundRule2_equals(){
+    void toInitiativeOnlyRefundRule2_equals() {
         Initiative initiative = initiativeDTOsToModelMapper.toInitiative(initiativeRefundRuleDTOTimeParameter);
         assertEquals(initiativeOnlyRefundRule2, initiative);
     }
 
     @Test
-    void toInitiativeOnlyRefundRule3_equals(){
+    void toInitiativeOnlyRefundRule3_equals() {
         Initiative initiative = initiativeDTOsToModelMapper.toInitiative(initiativeRefundRuleDTOAdditionalNull);
         assertEquals(initiativeOnlyRefundRule3, initiative);
     }
 
-    private Initiative createFullInitiative () {
+    private Initiative createFullInitiative() {
         //TODO Test onGoing for different steps. Must use Step6 at the end
         return createStep2Initiative();
     }
 
-    private InitiativeDTO createFullInitiativeDTO () {
+    private InitiativeDTO createFullInitiativeDTO() {
         //TODO Test onGoing for different steps. Must use Step6 at the end
         return createStep2InitiativeDTO();
     }
@@ -250,24 +279,24 @@ class InitiativeDTOsToModelMapperTest {
         initiative.setPdndToken("pdndToken1");
     }
 
-    private Initiative createStep1Initiative () {
+    private Initiative createStep1Initiative() {
         Initiative initiative = new Initiative();
         createInitiativeBaseFields(initiative);
         initiative.setAdditionalInfo(createInitiativeAdditional());
         return initiative;
     }
 
-    private Initiative createStep1InitiativeOnlyInfoGeneral () {
+    private Initiative createStep1InitiativeOnlyInfoGeneral() {
         Initiative initiative = new Initiative();
 //        initiative = createInitiativeBaseFields(initiative);
         initiative.setGeneral(createInitiativeGeneral());
         return initiative;
     }
 
-    private Initiative createStep1InitiativeNoBaseFields () {
+    private Initiative createStep1InitiativeNoBaseFields() {
         Initiative initiative = new Initiative();
         initiative.setAdditionalInfo(createInitiativeAdditional());
-        if(initiative.getAdditionalInfo() != null && initiative.getAdditionalInfo().getServiceName() != null)
+        if (initiative.getAdditionalInfo() != null && initiative.getAdditionalInfo().getServiceName() != null)
             initiative.setInitiativeName(initiative.getAdditionalInfo().getServiceName());
         return initiative;
     }
@@ -341,7 +370,7 @@ class InitiativeDTOsToModelMapperTest {
         return initiativeBeneficiaryRule;
     }
 
-    private InitiativeDTO createStep1InitiativeDTO () {
+    private InitiativeDTO createStep1InitiativeDTO() {
         return InitiativeDTO.builder()
                 .initiativeId("Id1")
                 .initiativeName("initiativeName1")
@@ -400,14 +429,14 @@ class InitiativeDTOsToModelMapperTest {
         return initiativeAdditionalDTO;
     }
 
-    private Initiative createStep2Initiative () {
+    private Initiative createStep2Initiative() {
         Initiative initiative = createStep1Initiative();
         InitiativeGeneral initiativeGeneral = createInitiativeGeneral();
         initiative.setGeneral(initiativeGeneral);
         return initiative;
     }
 
-    private InitiativeDTO createStep2InitiativeDTO () {
+    private InitiativeDTO createStep2InitiativeDTO() {
         InitiativeDTO initiativeDTO = createStep1InitiativeDTO();
         InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralDTO();
         initiativeDTO.setGeneral(initiativeGeneralDTO);
@@ -445,14 +474,14 @@ class InitiativeDTOsToModelMapperTest {
         return initiativeBeneficiaryRuleDTO;
     }
 
-    private Initiative createStep3Initiative () {
+    private Initiative createStep3Initiative() {
         Initiative initiative = createStep2Initiative();
         InitiativeBeneficiaryRule initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
         initiative.setBeneficiaryRule(initiativeBeneficiaryRule);
         return initiative;
     }
 
-    private InitiativeDTO createStep3InitiativeDTO () {
+    private InitiativeDTO createStep3InitiativeDTO() {
         InitiativeDTO initiativeDTO = createStep2InitiativeDTO();
         InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
         initiativeDTO.setBeneficiaryRule(initiativeBeneficiaryRuleDTO);
@@ -460,15 +489,14 @@ class InitiativeDTOsToModelMapperTest {
     }
 
 
-
-    private InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardValueDTO(){
+    private InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardValueDTO() {
         return RewardValueDTO.builder()
                 .rewardValue(BigDecimal.valueOf(50))
                 .type("rewardValue")
                 .build();
     }
 
-    private InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardGroupDTO(){
+    private InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardGroupDTO() {
         RewardGroupsDTO rewardGroupsDTO = new RewardGroupsDTO();
         rewardGroupsDTO.setType("rewardGroups");
         List<RewardGroupsDTO.RewardGroupDTO> list = new ArrayList<>();
@@ -478,7 +506,7 @@ class InitiativeDTOsToModelMapperTest {
         return rewardGroupsDTO;
     }
 
-    private InitiativeTrxConditionsDTO createInitiativeTrxConditionsDTOValid(){
+    private InitiativeTrxConditionsDTO createInitiativeTrxConditionsDTOValid() {
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = new InitiativeTrxConditionsDTO();
         List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<>();
         DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
@@ -538,7 +566,7 @@ class InitiativeDTOsToModelMapperTest {
         return initiativeTrxConditionsDTO;
     }
 
-    private InitiativeTrxConditionsDTO createInitiativeTrxConditionsDTOThresholdNull(){
+    private InitiativeTrxConditionsDTO createInitiativeTrxConditionsDTOThresholdNull() {
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = new InitiativeTrxConditionsDTO();
         List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<>();
         DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
@@ -591,7 +619,7 @@ class InitiativeDTOsToModelMapperTest {
         return initiativeTrxConditionsDTO;
     }
 
-    private InitiativeTrxConditionsDTO createInitiativeTrxConditionsDTORewardLimitsEmpty(){
+    private InitiativeTrxConditionsDTO createInitiativeTrxConditionsDTORewardLimitsEmpty() {
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = new InitiativeTrxConditionsDTO();
         List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<>();
         DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
@@ -643,7 +671,7 @@ class InitiativeDTOsToModelMapperTest {
         return initiativeTrxConditionsDTO;
     }
 
-    private InitiativeTrxConditionsDTO createInitiativeTrxConditionsDTODayOfWeekNull(){
+    private InitiativeTrxConditionsDTO createInitiativeTrxConditionsDTODayOfWeekNull() {
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = new InitiativeTrxConditionsDTO();
         List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<>();
         DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
@@ -701,7 +729,7 @@ class InitiativeDTOsToModelMapperTest {
         return initiativeTrxConditionsDTO;
     }
 
-    private InitiativeTrxConditionsDTO createInitiativeTrxConditionsDTOMccFilterNull(){
+    private InitiativeTrxConditionsDTO createInitiativeTrxConditionsDTOMccFilterNull() {
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = new InitiativeTrxConditionsDTO();
         List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<>();
         DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
@@ -754,7 +782,7 @@ class InitiativeDTOsToModelMapperTest {
         return initiativeTrxConditionsDTO;
     }
 
-    private InitiativeTrxConditionsDTO createInitiativeTrxConditionsDTOTrxCountNull(){
+    private InitiativeTrxConditionsDTO createInitiativeTrxConditionsDTOTrxCountNull() {
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = new InitiativeTrxConditionsDTO();
         List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<>();
         DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
@@ -807,7 +835,7 @@ class InitiativeDTOsToModelMapperTest {
         return initiativeTrxConditionsDTO;
     }
 
-    private InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTO(){
+    private InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTO() {
         InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = new InitiativeRewardAndTrxRulesDTO();
         InitiativeRewardRuleDTO initiativeRewardRuleDTO = createInitiativeRewardRuleDTORewardValueDTO();
         initiativeRewardAndTrxRulesDTO.setRewardRule(initiativeRewardRuleDTO);
@@ -816,7 +844,7 @@ class InitiativeDTOsToModelMapperTest {
         return initiativeRewardAndTrxRulesDTO;
     }
 
-    private InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTORewardGroup(){
+    private InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTORewardGroup() {
         InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = new InitiativeRewardAndTrxRulesDTO();
         InitiativeRewardRuleDTO initiativeRewardRuleDTO = createInitiativeRewardRuleDTORewardGroupDTO();
         initiativeRewardAndTrxRulesDTO.setRewardRule(initiativeRewardRuleDTO);
@@ -825,7 +853,7 @@ class InitiativeDTOsToModelMapperTest {
         return initiativeRewardAndTrxRulesDTO;
     }
 
-    private InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTORewardRuleNull(){
+    private InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTORewardRuleNull() {
         InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = new InitiativeRewardAndTrxRulesDTO();
         initiativeRewardAndTrxRulesDTO.setRewardRule(null);
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = createInitiativeTrxConditionsDTOValid();
@@ -833,49 +861,49 @@ class InitiativeDTOsToModelMapperTest {
         return initiativeRewardAndTrxRulesDTO;
     }
 
-    private InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTOThresholdNull(){
+    private InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTOThresholdNull() {
         InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = new InitiativeRewardAndTrxRulesDTO();
         initiativeRewardAndTrxRulesDTO.setRewardRule(createInitiativeRewardRuleDTORewardValueDTO());
         initiativeRewardAndTrxRulesDTO.setTrxRule(createInitiativeTrxConditionsDTOThresholdNull());
         return initiativeRewardAndTrxRulesDTO;
     }
 
-    private InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTORewardLimitsEmpty(){
+    private InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTORewardLimitsEmpty() {
         InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = new InitiativeRewardAndTrxRulesDTO();
         initiativeRewardAndTrxRulesDTO.setRewardRule(createInitiativeRewardRuleDTORewardValueDTO());
         initiativeRewardAndTrxRulesDTO.setTrxRule(createInitiativeTrxConditionsDTORewardLimitsEmpty());
         return initiativeRewardAndTrxRulesDTO;
     }
 
-    private InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTOMccFilterNull(){
+    private InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTOMccFilterNull() {
         InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = new InitiativeRewardAndTrxRulesDTO();
         initiativeRewardAndTrxRulesDTO.setRewardRule(createInitiativeRewardRuleDTORewardValueDTO());
         initiativeRewardAndTrxRulesDTO.setTrxRule(createInitiativeTrxConditionsDTOMccFilterNull());
         return initiativeRewardAndTrxRulesDTO;
     }
 
-    private InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTODayOfWeekNull(){
+    private InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTODayOfWeekNull() {
         InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = new InitiativeRewardAndTrxRulesDTO();
         initiativeRewardAndTrxRulesDTO.setRewardRule(createInitiativeRewardRuleDTORewardValueDTO());
         initiativeRewardAndTrxRulesDTO.setTrxRule(createInitiativeTrxConditionsDTODayOfWeekNull());
         return initiativeRewardAndTrxRulesDTO;
     }
 
-    private InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTOTrxCountNull(){
+    private InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTOTrxCountNull() {
         InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = new InitiativeRewardAndTrxRulesDTO();
         initiativeRewardAndTrxRulesDTO.setRewardRule(createInitiativeRewardRuleDTORewardValueDTO());
         initiativeRewardAndTrxRulesDTO.setTrxRule(createInitiativeTrxConditionsDTOTrxCountNull());
         return initiativeRewardAndTrxRulesDTO;
     }
 
-    private InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTOTrxRuleNull(){
+    private InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTOTrxRuleNull() {
         InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = new InitiativeRewardAndTrxRulesDTO();
         initiativeRewardAndTrxRulesDTO.setRewardRule(createInitiativeRewardRuleDTORewardValueDTO());
         initiativeRewardAndTrxRulesDTO.setTrxRule(null);
         return initiativeRewardAndTrxRulesDTO;
     }
 
-    private InitiativeDTO createStep4InitiativeDTO () {
+    private InitiativeDTO createStep4InitiativeDTO() {
         InitiativeDTO initiativeDTO = createStep3InitiativeDTO();
         initiativeDTO.setRewardRule(createInitiativeRewardRuleDTORewardValueDTO());
         initiativeDTO.setTrxRule(createInitiativeTrxConditionsDTOValid());
@@ -883,14 +911,14 @@ class InitiativeDTOsToModelMapperTest {
     }
 
 
-    private InitiativeRewardRule createInitiativeRewardRuleRewardValue(){
+    private InitiativeRewardRule createInitiativeRewardRuleRewardValue() {
         return RewardValue.builder()
                 .rewardValue(BigDecimal.valueOf(50))
                 .type("rewardValue")
                 .build();
     }
 
-    private InitiativeRewardRule createInitiativeRewardRuleRewardGroup(){
+    private InitiativeRewardRule createInitiativeRewardRuleRewardGroup() {
         RewardGroups rewardGroups = new RewardGroups();
         rewardGroups.setType("rewardGroups");
         List<RewardGroups.RewardGroup> list = new ArrayList<>();
@@ -900,7 +928,7 @@ class InitiativeDTOsToModelMapperTest {
         return rewardGroups;
     }
 
-    private InitiativeTrxConditions createInitiativeTrxConditionsValid(){
+    private InitiativeTrxConditions createInitiativeTrxConditionsValid() {
         InitiativeTrxConditions initiativeTrxConditions = new InitiativeTrxConditions();
         List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig> dayConfigs = new ArrayList<>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig dayConfig1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig();
@@ -960,7 +988,7 @@ class InitiativeDTOsToModelMapperTest {
         return initiativeTrxConditions;
     }
 
-    private InitiativeTrxConditions createInitiativeTrxConditionsThresholdNull(){
+    private InitiativeTrxConditions createInitiativeTrxConditionsThresholdNull() {
         InitiativeTrxConditions initiativeTrxConditions = new InitiativeTrxConditions();
         List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig> dayConfigs = new ArrayList<>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig dayConfig1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig();
@@ -1013,7 +1041,7 @@ class InitiativeDTOsToModelMapperTest {
         return initiativeTrxConditions;
     }
 
-    private InitiativeTrxConditions createInitiativeTrxConditionsRewardLimitsEmpty(){
+    private InitiativeTrxConditions createInitiativeTrxConditionsRewardLimitsEmpty() {
         InitiativeTrxConditions initiativeTrxConditions = new InitiativeTrxConditions();
         List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig> dayConfigs = new ArrayList<>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig dayConfig1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig();
@@ -1065,7 +1093,7 @@ class InitiativeDTOsToModelMapperTest {
         return initiativeTrxConditions;
     }
 
-    private InitiativeTrxConditions createInitiativeTrxConditionsDayOfWeekNull(){
+    private InitiativeTrxConditions createInitiativeTrxConditionsDayOfWeekNull() {
         InitiativeTrxConditions initiativeTrxConditions = new InitiativeTrxConditions();
         List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig> dayConfigs = new ArrayList<>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig dayConfig1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig();
@@ -1123,7 +1151,7 @@ class InitiativeDTOsToModelMapperTest {
         return initiativeTrxConditions;
     }
 
-    private InitiativeTrxConditions createInitiativeTrxConditionsMccFilterNull(){
+    private InitiativeTrxConditions createInitiativeTrxConditionsMccFilterNull() {
         InitiativeTrxConditions initiativeTrxConditions = new InitiativeTrxConditions();
         List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig> dayConfigs = new ArrayList<>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig dayConfig1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig();
@@ -1176,7 +1204,7 @@ class InitiativeDTOsToModelMapperTest {
         return initiativeTrxConditions;
     }
 
-    private InitiativeTrxConditions createInitiativeTrxConditionsTrxCountNull(){
+    private InitiativeTrxConditions createInitiativeTrxConditionsTrxCountNull() {
         InitiativeTrxConditions initiativeTrxConditions = new InitiativeTrxConditions();
         List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig> dayConfigs = new ArrayList<>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig dayConfig1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig();
@@ -1229,7 +1257,7 @@ class InitiativeDTOsToModelMapperTest {
         return initiativeTrxConditions;
     }
 
-    private Initiative createStep4Initiative () {
+    private Initiative createStep4Initiative() {
         Initiative initiative = createStep3Initiative();
         InitiativeRewardRule initiativeRewardRule = createInitiativeRewardRuleRewardValue();
         InitiativeTrxConditions initiativeTrxConditions = createInitiativeTrxConditionsValid();
@@ -1238,97 +1266,98 @@ class InitiativeDTOsToModelMapperTest {
         return initiative;
     }
 
-    private Initiative createStep4InitiativeTrxNull () {
+    private Initiative createStep4InitiativeTrxNull() {
         Initiative initiative = new Initiative();
         initiative.setRewardRule(createInitiativeRewardRuleRewardValue());
         initiative.setTrxRule(null);
         return initiative;
     }
 
-    private Initiative createInitiativeOnlyRewardAndTrxRulesThresholdNull(){
+    private Initiative createInitiativeOnlyRewardAndTrxRulesThresholdNull() {
         Initiative initiative = new Initiative();
         initiative.setRewardRule(createInitiativeRewardRuleRewardValue());
         initiative.setTrxRule(createInitiativeTrxConditionsThresholdNull());
         return initiative;
     }
 
-    private Initiative createInitiativeOnlyRewardAndTrxRulesRewardRuleNull(){
+    private Initiative createInitiativeOnlyRewardAndTrxRulesRewardRuleNull() {
         Initiative initiative = new Initiative();
         initiative.setRewardRule(null);
         initiative.setTrxRule(createInitiativeTrxConditionsValid());
         return initiative;
     }
 
-    private Initiative createInitiativeOnlyRewardAndTrxRewardLimitsEmpty(){
+    private Initiative createInitiativeOnlyRewardAndTrxRewardLimitsEmpty() {
         Initiative initiative = new Initiative();
         initiative.setRewardRule(createInitiativeRewardRuleRewardValue());
         initiative.setTrxRule(createInitiativeTrxConditionsRewardLimitsEmpty());
         return initiative;
     }
 
-    private Initiative createInitiativeOnlyRewardAndTrxDayOfWeekNull(){
+    private Initiative createInitiativeOnlyRewardAndTrxDayOfWeekNull() {
         Initiative initiative = new Initiative();
         initiative.setRewardRule(createInitiativeRewardRuleRewardValue());
         initiative.setTrxRule(createInitiativeTrxConditionsDayOfWeekNull());
         return initiative;
     }
 
-    private Initiative createInitiativeOnlyRewardAndTrxMccFilterNull(){
+    private Initiative createInitiativeOnlyRewardAndTrxMccFilterNull() {
         Initiative initiative = new Initiative();
         initiative.setRewardRule(createInitiativeRewardRuleRewardValue());
         initiative.setTrxRule(createInitiativeTrxConditionsMccFilterNull());
         return initiative;
     }
 
-    private Initiative createInitiativeOnlyRewardAndTrxRules(){
+    private Initiative createInitiativeOnlyRewardAndTrxRules() {
         Initiative initiative = new Initiative();
         initiative.setRewardRule(createInitiativeRewardRuleRewardValue());
         initiative.setTrxRule(createInitiativeTrxConditionsValid());
         return initiative;
     }
 
-    private Initiative createInitiativeOnlyRewardAndTrxRulesTrxCountNull(){
+    private Initiative createInitiativeOnlyRewardAndTrxRulesTrxCountNull() {
         Initiative initiative = new Initiative();
         initiative.setRewardRule(createInitiativeRewardRuleRewardValue());
         initiative.setTrxRule(createInitiativeTrxConditionsTrxCountNull());
         return initiative;
     }
 
-    private Initiative createInitiativeOnlyRewardAndTrxRulesRewardGroup(){
+    private Initiative createInitiativeOnlyRewardAndTrxRulesRewardGroup() {
         Initiative initiative = new Initiative();
         initiative.setRewardRule(createInitiativeRewardRuleRewardGroup());
         initiative.setTrxRule(createInitiativeTrxConditionsValid());
         return initiative;
     }
-    private Initiative createStep5Initiative () {
+
+    private Initiative createStep5Initiative() {
         return createStep4Initiative();
     }
 
-    private InitiativeDTO createStep5InitiativeDTO () {
+    private InitiativeDTO createStep5InitiativeDTO() {
         return createStep4InitiativeDTO();
     }
 
 
-    private AccumulatedAmountDTO createAccumulatedAmountDTOValid(){
+    private AccumulatedAmountDTO createAccumulatedAmountDTOValid() {
         AccumulatedAmountDTO amountDTO = new AccumulatedAmountDTO();
         amountDTO.setAccumulatedType(AccumulatedAmountDTO.AccumulatedTypeEnum.THRESHOLD_REACHED);
         amountDTO.setRefundThreshold(BigDecimal.valueOf(100000));
         return amountDTO;
     }
 
-    private TimeParameterDTO createTimeParameterDTOValid(){
+    private TimeParameterDTO createTimeParameterDTOValid() {
         TimeParameterDTO timeParameterDTO = new TimeParameterDTO();
         timeParameterDTO.setTimeType(TimeParameterDTO.TimeTypeEnum.CLOSED);
         return timeParameterDTO;
     }
 
-    private RefundAdditionalInfoDTO createAdditionalInfoDTOValid(){
+    private RefundAdditionalInfoDTO createAdditionalInfoDTOValid() {
         RefundAdditionalInfoDTO refundAdditionalInfoDTO = new RefundAdditionalInfoDTO();
         refundAdditionalInfoDTO.setIdentificationCode("B002");
         return refundAdditionalInfoDTO;
     }
 
-    private InitiativeRefundRuleDTO createRefundRuleDTOValidWithTimeParameter(){
+    private InitiativeRefundRuleDTO createRefundRuleDTOValidWithTimeParameter() {
         InitiativeRefundRuleDTO refundRuleDTO = new InitiativeRefundRuleDTO();
         refundRuleDTO.setAccumulatedAmount(null);
         refundRuleDTO.setTimeParameter(createTimeParameterDTOValid());
@@ -1336,7 +1365,7 @@ class InitiativeDTOsToModelMapperTest {
         return refundRuleDTO;
     }
 
-    private InitiativeRefundRuleDTO createRefundRuleDTOValidWithTimeParameterAndAdditionalNull(){
+    private InitiativeRefundRuleDTO createRefundRuleDTOValidWithTimeParameterAndAdditionalNull() {
         InitiativeRefundRuleDTO refundRuleDTO = new InitiativeRefundRuleDTO();
         refundRuleDTO.setAccumulatedAmount(null);
         refundRuleDTO.setTimeParameter(createTimeParameterDTOValid());
@@ -1344,7 +1373,7 @@ class InitiativeDTOsToModelMapperTest {
         return refundRuleDTO;
     }
 
-    private InitiativeRefundRuleDTO createRefundRuleDTOValidWithAccumulatedAmount(){
+    private InitiativeRefundRuleDTO createRefundRuleDTOValidWithAccumulatedAmount() {
         InitiativeRefundRuleDTO refundRuleDTO = new InitiativeRefundRuleDTO();
         refundRuleDTO.setAccumulatedAmount(createAccumulatedAmountDTOValid());
         refundRuleDTO.setTimeParameter(null);
@@ -1353,35 +1382,35 @@ class InitiativeDTOsToModelMapperTest {
     }
 
 
-
-    private AccumulatedAmount createAccumulatedAmountValid(){
+    private AccumulatedAmount createAccumulatedAmountValid() {
         AccumulatedAmount amount = new AccumulatedAmount();
         amount.setAccumulatedType(AccumulatedAmount.AccumulatedTypeEnum.THRESHOLD_REACHED);
         amount.setRefundThreshold(BigDecimal.valueOf(100000));
         return amount;
     }
 
-    private TimeParameter createTimeParameterValid(){
+    private TimeParameter createTimeParameterValid() {
         TimeParameter timeParameter = new TimeParameter();
         timeParameter.setTimeType(TimeParameter.TimeTypeEnum.CLOSED);
         return timeParameter;
     }
 
-    private AdditionalInfo createAdditionalInfoValid(){
+    private AdditionalInfo createAdditionalInfoValid() {
         AdditionalInfo additionalInfo = new AdditionalInfo();
         additionalInfo.setIdentificationCode("B002");
         return additionalInfo;
     }
 
 
-    private InitiativeRefundRule createRefundRuleValidWithAccumulatedAmount(){
+    private InitiativeRefundRule createRefundRuleValidWithAccumulatedAmount() {
         InitiativeRefundRule refundRule = new InitiativeRefundRule();
         refundRule.setAccumulatedAmount(createAccumulatedAmountValid());
         refundRule.setTimeParameter(null);
         refundRule.setAdditionalInfo(createAdditionalInfoValid());
         return refundRule;
     }
-    private InitiativeRefundRule createRefundRuleValidWithTimeParameter(){
+
+    private InitiativeRefundRule createRefundRuleValidWithTimeParameter() {
         InitiativeRefundRule refundRule = new InitiativeRefundRule();
         refundRule.setAccumulatedAmount(null);
         refundRule.setTimeParameter(createTimeParameterValid());
@@ -1389,26 +1418,27 @@ class InitiativeDTOsToModelMapperTest {
         return refundRule;
     }
 
-    private InitiativeRefundRule createRefundRuleValidWithTimeParameterAndAdditionalNull(){
+    private InitiativeRefundRule createRefundRuleValidWithTimeParameterAndAdditionalNull() {
         InitiativeRefundRule refundRule = new InitiativeRefundRule();
         refundRule.setAccumulatedAmount(null);
         refundRule.setTimeParameter(createTimeParameterValid());
         refundRule.setAdditionalInfo(null);
         return refundRule;
     }
-    private Initiative createInitiativeOnlyRefundRule(){
+
+    private Initiative createInitiativeOnlyRefundRule() {
         Initiative initiative = new Initiative();
         initiative.setRefundRule(createRefundRuleValidWithAccumulatedAmount());
         return initiative;
     }
 
-    private Initiative createInitiativeOnlyRefundRule2(){
+    private Initiative createInitiativeOnlyRefundRule2() {
         Initiative initiative = new Initiative();
         initiative.setRefundRule(createRefundRuleValidWithTimeParameter());
         return initiative;
     }
 
-    private Initiative createInitiativeOnlyRefundRule3(){
+    private Initiative createInitiativeOnlyRefundRule3() {
         Initiative initiative = new Initiative();
         initiative.setRefundRule(createRefundRuleValidWithTimeParameterAndAdditionalNull());
         return initiative;

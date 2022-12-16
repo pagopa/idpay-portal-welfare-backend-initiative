@@ -25,16 +25,23 @@ import it.gov.pagopa.initiative.model.rule.refund.AccumulatedAmount;
 import it.gov.pagopa.initiative.model.rule.refund.AdditionalInfo;
 import it.gov.pagopa.initiative.model.rule.refund.InitiativeRefundRule;
 import it.gov.pagopa.initiative.model.rule.refund.TimeParameter;
+import it.gov.pagopa.initiative.model.rule.reward.InitiativeRewardRule;
+import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
+import it.gov.pagopa.initiative.model.rule.trx.InitiativeTrxConditions;
 import it.gov.pagopa.initiative.service.InitiativeService;
+import org.apache.commons.lang3.LocaleUtils;
 import org.apache.kafka.common.KafkaException;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -45,6 +52,7 @@ import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 
@@ -254,6 +262,24 @@ class InitiativeApiTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(print())
                 .andReturn();
+    }
+
+    @Test
+    void getInitiativeIdFromServiceId_Exception() throws Exception {
+        Initiative step1Initiative = createStep1Initiative();
+        InitiativeGeneral initiativeGeneral = createInitiativeGeneral(true);
+        step1Initiative.setGeneral(initiativeGeneral);
+        Map<String, String> acceptLanguage = new HashMap<>();
+        acceptLanguage.put(Locale.CHINA.getLanguage(), "ch");
+        step1Initiative.getGeneral().setDescriptionMap(acceptLanguage);
+        when(initiativeService.getInitiativeIdFromServiceId(SERVICE_ID)).thenReturn(step1Initiative);
+
+        try {
+            initiativeService.getInitiativeIdFromServiceId(SERVICE_ID);
+        } catch (InitiativeException e) {
+            assertEquals(CODE, e.getCode());
+            assertEquals(String.format(InitiativeConstants.Exception.BadRequest.INVALID_LOCALE_FORMAT, Locale.ITALIAN), e.getMessage());
+        }
     }
 
     @Test
@@ -868,30 +894,16 @@ class InitiativeApiTest {
         assertTrue(error.getMessage().contains(InitiativeConstants.Exception.Publish.BadRequest.INTEGRATION_FAILED));
     }
 
-    /*@Test
-    void addLogo_statusNoContent() throws Exception{
-        objectMapper.registerModule(new JavaTimeModule());
-
-        //create Dummy Initiative
-        Initiative step1Initiative = createStep1Initiative();
-        InitiativeAdditionalDTO initiativeAdditionalDTO = createInitiativeAdditionalDTO();
-
-        // Instruct the Service to update a Dummy Initiative
-        when(initiativeDTOsToModelMapper.toInitiative(initiativeAdditionalDTO)).thenReturn(step1Initiative);
-
-        //doNothing only for Void method
-        doNothing().when(initiativeService).storeInitiativeLogo(ORGANIZATION_ID, INITIATIVE_ID, Mockito.any(),
-                Mockito.anyString(), Mockito.anyString());
-
-        mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_LOGO_URL,
-                                ORGANIZATION_ID, INITIATIVE_ID))
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(initiativeAdditionalDTO))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNoContent())
+    @Test
+    void testGetRankingList() throws Exception{
+        mvc.perform(
+                        MockMvcRequestBuilders.get(BASE_URL + String.format(GET_RANKING_LIST,
+                                        ORGANIZATION_ID, INITIATIVE_ID))
+                                .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(print())
                 .andReturn();
-    }*/
+    }
 
     @Test
     void getOnbordingList() throws Exception {

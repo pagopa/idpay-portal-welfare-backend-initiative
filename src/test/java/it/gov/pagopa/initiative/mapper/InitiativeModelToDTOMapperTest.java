@@ -1,6 +1,13 @@
 package it.gov.pagopa.initiative.mapper;
 
 import it.gov.pagopa.initiative.dto.*;
+import it.gov.pagopa.initiative.dto.AnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems;
+import it.gov.pagopa.initiative.dto.AutomatedCriteriaDTO;
+import it.gov.pagopa.initiative.dto.InitiativeAdditionalDTO;
+import it.gov.pagopa.initiative.dto.InitiativeBeneficiaryRuleDTO;
+import it.gov.pagopa.initiative.dto.InitiativeDTO;
+import it.gov.pagopa.initiative.dto.InitiativeDataDTO;
+import it.gov.pagopa.initiative.dto.InitiativeGeneralDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.AccumulatedAmountDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.RefundAdditionalInfoDTO;
@@ -9,6 +16,14 @@ import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardGroupsDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardValueDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.*;
+import it.gov.pagopa.initiative.model.AutomatedCriteria;
+import it.gov.pagopa.initiative.model.FilterOperatorEnumModel;
+import it.gov.pagopa.initiative.model.ISelfDeclarationCriteria;
+import it.gov.pagopa.initiative.model.Initiative;
+import it.gov.pagopa.initiative.model.InitiativeAdditional;
+import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
+import it.gov.pagopa.initiative.model.InitiativeGeneral;
+import it.gov.pagopa.initiative.model.SelfCriteriaBool;
 import it.gov.pagopa.initiative.model.TypeBoolEnum;
 import it.gov.pagopa.initiative.model.TypeMultiEnum;
 import it.gov.pagopa.initiative.model.*;
@@ -20,10 +35,19 @@ import it.gov.pagopa.initiative.model.rule.reward.InitiativeRewardRule;
 import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
 import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
 import it.gov.pagopa.initiative.model.rule.trx.*;
+import it.gov.pagopa.initiative.model.rule.trx.InitiativeTrxConditions;
 import it.gov.pagopa.initiative.utils.InitiativeUtils;
+
+import java.time.LocalDateTime;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +64,16 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ContextConfiguration(classes = {InitiativeModelToDTOMapper.class})
 @ExtendWith(SpringExtension.class)
@@ -140,12 +174,10 @@ class InitiativeModelToDTOMapperTest {
 
     @Test
     void toInitiativeDataDTO_returnNull() {
-        Initiative initiative = new Initiative();
-
         try {
-            initiativeModelToDTOMapper.toInitiativeDataDTO(initiative, Locale.ITALIAN);
+            initiativeModelToDTOMapper.toInitiativeDataDTO(null, Locale.ITALIAN);
         } catch (Exception e) {
-            assertNull(initiative);
+            assertNull(null);
         }
     }
 
@@ -269,8 +301,43 @@ class InitiativeModelToDTOMapperTest {
     }
 
     @Test
+    void testToInitiativeBeneficiaryRuleDTO_CollectionUtils_isEmpty() {
+        InitiativeBeneficiaryRule initiativeBeneficiaryRule = mock(InitiativeBeneficiaryRule.class);
+        when(initiativeBeneficiaryRule.getAutomatedCriteria()).thenReturn(new ArrayList<>());
+        when(initiativeBeneficiaryRule.getSelfDeclarationCriteria()).thenReturn(new ArrayList<>());
+        InitiativeBeneficiaryRuleDTO actualToInitiativeBeneficiaryRuleDTOResult = initiativeModelToDTOMapper
+                .toInitiativeBeneficiaryRuleDTO(initiativeBeneficiaryRule);
+        List<AutomatedCriteriaDTO> automatedCriteria = actualToInitiativeBeneficiaryRuleDTOResult.getAutomatedCriteria();
+        assertTrue(automatedCriteria.isEmpty());
+        assertSame(automatedCriteria, actualToInitiativeBeneficiaryRuleDTOResult.getSelfDeclarationCriteria());
+        verify(initiativeBeneficiaryRule).getAutomatedCriteria();
+        verify(initiativeBeneficiaryRule).getSelfDeclarationCriteria();
+    }
+
+    @Test
+    void testToInitiativeBeneficiaryRuleDTO_mapIfs() {
+        ArrayList<AutomatedCriteria> automatedCriteriaList = new ArrayList<>();
+        automatedCriteriaList.add(new AutomatedCriteria("JaneDoe", "Code", "Field", FilterOperatorEnumModel.EQ, "42",
+                "42", AutomatedCriteria.OrderDirection.ASC));
+        InitiativeBeneficiaryRule initiativeBeneficiaryRule = mock(InitiativeBeneficiaryRule.class);
+        when(initiativeBeneficiaryRule.getAutomatedCriteria()).thenReturn(automatedCriteriaList);
+        when(initiativeBeneficiaryRule.getSelfDeclarationCriteria()).thenReturn(new ArrayList<>());
+        InitiativeBeneficiaryRuleDTO actualToInitiativeBeneficiaryRuleDTOResult = initiativeModelToDTOMapper
+                .toInitiativeBeneficiaryRuleDTO(initiativeBeneficiaryRule);
+        assertEquals(1, actualToInitiativeBeneficiaryRuleDTOResult.getAutomatedCriteria().size());
+        assertTrue(actualToInitiativeBeneficiaryRuleDTOResult.getSelfDeclarationCriteria().isEmpty());
+        verify(initiativeBeneficiaryRule, atLeast(1)).getAutomatedCriteria();
+        verify(initiativeBeneficiaryRule).getSelfDeclarationCriteria();
+    }
+
+    @Test
     void toInitiativeBeneficiaryRuleDTONull_equals() {
         assertNull(initiativeModelToDTOMapper.toInitiativeBeneficiaryRuleDTO(null));
+    }
+
+    @Test
+    void testToInitiativeSummaryDTOList_isEmpty() {
+        assertTrue(initiativeModelToDTOMapper.toInitiativeSummaryDTOList(new ArrayList<>()).isEmpty());
     }
 
     @Test
@@ -278,6 +345,20 @@ class InitiativeModelToDTOMapperTest {
         List<InitiativeSummaryDTO> initiativeSummaryDTOListActual = initiativeModelToDTOMapper.toInitiativeSummaryDTOList(initiativeList);
         //Check the equality of the results
         assertEquals(initiativeSummaryDTOList, initiativeSummaryDTOListActual);
+    }
+
+    @Test
+    void testToInitiativeIssuerDTOList() {
+        assertTrue(initiativeModelToDTOMapper.toInitiativeIssuerDTOList(new ArrayList<>()).isEmpty());
+    }
+
+    @Test
+    void testToInitiativeIssuerDTOList2() {
+        Initiative initiative = createFullInitiative();
+
+        ArrayList<Initiative> initiativeList = new ArrayList<>();
+        initiativeList.add(initiative);
+        assertEquals(1, initiativeModelToDTOMapper.toInitiativeIssuerDTOList(initiativeList).size());
     }
 
     private Initiative createFullInitiative() {
