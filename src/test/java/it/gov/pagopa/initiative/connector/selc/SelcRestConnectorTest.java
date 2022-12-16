@@ -30,12 +30,12 @@ class SelcRestConnectorTest {
     @Test
     void testGetInstitutionProductUsers() {
         ArrayList<UserResource> userResourceList = new ArrayList<>();
-        when(selcFeignRestClient.getInstitutionProductUsers((String) any(), (String) any(), (String) any()))
+        when(selcFeignRestClient.getInstitutionProductUsers(any(), any(), any()))
                 .thenReturn(userResourceList);
         List<UserResource> actualInstitutionProductUsers = selcRestConnectorImpl.getInstitutionProductUsers("42");
         assertSame(userResourceList, actualInstitutionProductUsers);
         assertTrue(actualInstitutionProductUsers.isEmpty());
-        verify(selcFeignRestClient).getInstitutionProductUsers((String) any(), (String) any(), (String) any());
+        verify(selcFeignRestClient).getInstitutionProductUsers(any(), any(), any());
     }
 }
 

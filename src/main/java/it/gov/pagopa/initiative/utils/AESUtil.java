@@ -24,7 +24,7 @@ public class AESUtil {
     private final int keySize;
     private final int iterationCount;
     private final int gcmTagLength;
-    private String cipherInstance;
+    private final String cipherInstance;
 
     public AESUtil(@Value("${util.crypto.aes.cipherInstance}") String cipherInstance,
                    @Value("${util.crypto.aes.encoding}") String encoding,
@@ -48,8 +48,7 @@ public class AESUtil {
         try {
             SecretKeyFactory factory = SecretKeyFactory.getInstance(pbeAlgorithm);
             KeySpec spec = new PBEKeySpec(passphrase.toCharArray(), salt.getBytes(), iterationCount, keySize);
-            SecretKey key = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
-            return key;
+            return new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
         }
         catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw fail(e);

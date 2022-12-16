@@ -1,8 +1,12 @@
 package it.gov.pagopa.initiative.service;
 
+import it.gov.pagopa.initiative.dto.BeneficiaryRankingDTO;
+import it.gov.pagopa.initiative.dto.BeneficiaryRankingPageDTO;
 import it.gov.pagopa.initiative.dto.InitiativeOrganizationInfoDTO;
 import it.gov.pagopa.initiative.dto.LogoDTO;
 import it.gov.pagopa.initiative.dto.OnboardingDTO;
+import it.gov.pagopa.initiative.dto.RankingPageDTO;
+import it.gov.pagopa.initiative.dto.RankingRequestDTO;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeAdditional;
 import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
@@ -17,6 +21,7 @@ import java.util.List;
 public interface InitiativeService {
 
     List<Initiative> retrieveInitiativeSummary(String organizationId, String role);
+    List<Initiative> getInitiativesIssuerList();
 
 //    Initiative insertInitiative(Initiative initiative, String organizationId);
     Initiative insertInitiative(Initiative initiative, String organizationId, String organizationName, String role);
@@ -55,7 +60,7 @@ public interface InitiativeService {
     Initiative getInitiativeIdFromServiceId(String serviceId);
 
     InitiativeAdditional getPrimaryAndSecondaryTokenIO(String initiativeId);
-    OnboardingDTO getOnboardingStatusList(String organizationId,String initiativeId, String CF, LocalDateTime startDate, LocalDateTime endDate, String status, Pageable pageable);
-
+    OnboardingDTO getOnboardingStatusList(String organizationId, String initiativeId, String CF, LocalDateTime startDate, LocalDateTime endDate, String status, Pageable pageable);
+    BeneficiaryRankingPageDTO getRankingList(String organizationId, String initiativeId,  Pageable pageable, String beneficiary, String state);
     void validate(String contentType, String fileName);
 }

@@ -1,21 +1,16 @@
 package it.gov.pagopa.initiative.exception;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-
 import it.gov.pagopa.initiative.dto.ErrorDTO;
-
-import java.io.DataInputStream;
-
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.mock.http.MockHttpInputMessage;
-import org.springframework.validation.BindException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+
+import java.io.DataInputStream;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 
 class RestResponseExceptionHandlerTest {
 
@@ -28,13 +23,9 @@ class RestResponseExceptionHandlerTest {
         assertTrue(actualHandleInitiativeExceptionResult.getHeaders().isEmpty());
         assertEquals(HttpStatus.CONTINUE, actualHandleInitiativeExceptionResult.getStatusCode());
         ErrorDTO body = actualHandleInitiativeExceptionResult.getBody();
+        assert body != null;
         assertEquals("An error occurred", body.getMessage());
         assertEquals("Code", body.getCode());
-    }
-
-    @Test
-    void methodArgumentNotValidException() {
-
     }
 
     @Test
@@ -46,6 +37,7 @@ class RestResponseExceptionHandlerTest {
         assertTrue(actualHandleHttpMessageNotReadableExceptionResult.getHeaders().isEmpty());
         assertEquals(HttpStatus.BAD_REQUEST, actualHandleHttpMessageNotReadableExceptionResult.getStatusCode());
         ErrorDTO body = actualHandleHttpMessageNotReadableExceptionResult.getBody();
+        assert body != null;
         assertEquals("https://example.org/example", body.getMessage());
         assertEquals("it.gov.pagopa.initiative.bad.request", body.getCode());
     }
@@ -60,6 +52,7 @@ class RestResponseExceptionHandlerTest {
         assertTrue(actualHandleHttpMessageNotReadableExceptionResult.getHeaders().isEmpty());
         assertEquals(HttpStatus.BAD_REQUEST, actualHandleHttpMessageNotReadableExceptionResult.getStatusCode());
         ErrorDTO body = actualHandleHttpMessageNotReadableExceptionResult.getBody();
+        assert body != null;
         assertEquals("https://example.org/example", body.getMessage());
         assertEquals("it.gov.pagopa.initiative.bad.request", body.getCode());
     }
@@ -73,8 +66,23 @@ class RestResponseExceptionHandlerTest {
         assertTrue(actualHandleIntegrationExceptionResult.getHeaders().isEmpty());
         assertEquals(HttpStatus.CONTINUE, actualHandleIntegrationExceptionResult.getStatusCode());
         ErrorDTO body = actualHandleIntegrationExceptionResult.getBody();
+        assert body != null;
         assertEquals("Something gone wrong while notify Initiative for publishing", body.getMessage());
         assertEquals("it.gov.pagopa.initiative.published.bad.request", body.getCode());
+    }
+
+    @Test
+    void testHandleGenericException() {
+        RestResponseExceptionHandler restResponseExceptionHandler = new RestResponseExceptionHandler();
+        ResponseEntity<ErrorDTO> actualHandleGenericExceptionResult = restResponseExceptionHandler
+                .handleGenericException(new Exception());
+        assertTrue(actualHandleGenericExceptionResult.hasBody());
+        assertTrue(actualHandleGenericExceptionResult.getHeaders().isEmpty());
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, actualHandleGenericExceptionResult.getStatusCode());
+        ErrorDTO body = actualHandleGenericExceptionResult.getBody();
+        assert body != null;
+        assertNull(body.getMessage());
+        assertEquals("it.gov.pagopa.initiative.general.error", body.getCode());
     }
 }
 

@@ -163,14 +163,6 @@ class IOBackEndFeignRestClientTest {
         Executable executable = () -> ioBackEndFeignRestClient.createService(serviceRequestDTO, "subscriptionKey");
         FeignException exception = Assertions.assertThrows(FeignException.class, executable);
         assertThat(exception.getMessage()).contains("[400 Bad Request]");
-//        if(exception.responseBody().isPresent()) {
-//            ByteBuffer byteBuffer = exception.responseBody().get();
-//            String s = new ObjectMapper().writeValueAsString(byteBuffer);
-////            String responseJson = new String(byteBuffer.array(), StandardCharsets.UTF_8);
-//            String responseJson = new String(Base64.getDecoder().decode(s.substring(1, s.length()-1)));
-////            responseJson = responseJson.substring(1, responseJson.length() - 1);
-//            assertThat(new ObjectMapper().writeValueAsString(responseJson)).isEqualTo(serviceResponseErrorDTOjson);
-//        }
         assertThat(exception.status()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
         //Verifying has been done 1 external call to IO BackEnd with our Request
@@ -201,14 +193,6 @@ class IOBackEndFeignRestClientTest {
         Executable executable = () -> ioBackEndFeignRestClient.createService(serviceRequestDTO, "subscriptionKey");
         FeignException exception = Assertions.assertThrows(FeignException.class, executable);
         assertThat(exception.getMessage()).contains("[500 Server Error]");
-//        if(exception.responseBody().isPresent()) {
-//            ByteBuffer byteBuffer = exception.responseBody().get();
-//            String s = new ObjectMapper().writeValueAsString(byteBuffer);
-////            String responseJson = new String(byteBuffer.array(), StandardCharsets.UTF_8);
-//            String responseJson = new String(Base64.getDecoder().decode(s.substring(1, s.length()-1)));
-////            responseJson = responseJson.substring(1, responseJson.length() - 1);
-//            assertThat(new ObjectMapper().writeValueAsString(responseJson)).isEqualTo(serviceResponseErrorDTOjson);
-//        }
         assertThat(exception.status()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
 
         //Verifying has been done 1 external call to IO BackEnd with our Request

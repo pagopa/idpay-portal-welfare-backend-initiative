@@ -21,7 +21,7 @@ public class InitiativeAdditionalDTOsToIOServiceRequestDTOMapper {
     private Boolean isVisible;
 
     public ServiceRequestDTO toServiceRequestDTO(InitiativeAdditional initiativeAdditional, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO){
-        Map<Channel.TypeEnum, String> channelMap = initiativeAdditional.getChannels().stream().collect(Collectors.toMap(channel -> channel.getType(), Channel::getContact));
+        Map<Channel.TypeEnum, String> channelMap = initiativeAdditional.getChannels().stream().collect(Collectors.toMap(Channel::getType, Channel::getContact));
         ServiceMetadataDTO serviceMetadataDTO = ServiceMetadataDTO.builder()
                 .email(channelMap.get(Channel.TypeEnum.EMAIL))
                 .phone(channelMap.get(Channel.TypeEnum.MOBILE))

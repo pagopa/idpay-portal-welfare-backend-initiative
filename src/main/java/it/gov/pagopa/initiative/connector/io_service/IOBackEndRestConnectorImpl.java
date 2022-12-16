@@ -30,7 +30,7 @@ public class IOBackEndRestConnectorImpl implements IOBackEndRestConnector {
 
   @Override
   public void sendLogoIo(String serviceId, String primaryKey, LogoIODTO logo) {
-    ResponseEntity<Void> responseEntity = ioBackEndFeignRestClient.sendLogo(serviceId, logo, primaryKey);
+    ioBackEndFeignRestClient.sendLogo(serviceId, logo, primaryKey);
   }
 
 }
