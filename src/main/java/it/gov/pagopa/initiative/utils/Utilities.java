@@ -12,13 +12,13 @@ import org.springframework.stereotype.Component;
 @Component
 @AllArgsConstructor
 public class Utilities {
-  private static String SRCIP;
+  private static final String SRCIP;
 
   static {
     try {
       SRCIP = InetAddress.getLocalHost().getHostAddress();
     } catch (UnknownHostException e) {
-      new InitiativeException(
+      throw new InitiativeException(
               BadRequest.CODE,
               String.format(e.getMessage()),
               HttpStatus.BAD_REQUEST);

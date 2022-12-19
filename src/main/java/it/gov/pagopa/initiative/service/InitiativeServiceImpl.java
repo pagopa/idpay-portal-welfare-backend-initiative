@@ -8,15 +8,16 @@ import it.gov.pagopa.initiative.connector.file_storage.FileStorageConnector;
 import it.gov.pagopa.initiative.connector.group.GroupRestConnector;
 import it.gov.pagopa.initiative.connector.io_service.IOBackEndRestConnector;
 import it.gov.pagopa.initiative.connector.onboarding.OnboardingRestConnector;
+import it.gov.pagopa.initiative.connector.ranking.RankingRestConnector;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.InternalServerError;
+import it.gov.pagopa.initiative.constants.InitiativeConstants.Status;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceResponseDTO;
 import it.gov.pagopa.initiative.event.InitiativeProducer;
 import it.gov.pagopa.initiative.exception.InitiativeException;
 import it.gov.pagopa.initiative.mapper.InitiativeAdditionalDTOsToIOServiceRequestDTOMapper;
-import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.AutomatedCriteria;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeAdditional;
@@ -35,6 +36,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.InvalidMimeTypeException;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
+
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.time.LocalDateTime;
@@ -49,12 +51,12 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
     private final boolean notifyEmail;
     private final InitiativeRepository initiativeRepository;
-    private final InitiativeModelToDTOMapper initiativeModelToDTOMapper;
     private final InitiativeAdditionalDTOsToIOServiceRequestDTOMapper initiativeAdditionalDTOsToIOServiceRequestDTOMapper;
     private final InitiativeProducer initiativeProducer;
     private final IOBackEndRestConnector ioBackEndRestConnector;
     private final GroupRestConnector groupRestConnector;
     private final OnboardingRestConnector onboardingRestConnector;
+    private final RankingRestConnector rankingRestConnector;
     private final EncryptRestConnector encryptRestConnector;
     private final DecryptRestConnector decryptRestConnector;
     private final FileStorageConnector fileStorageConnector;
@@ -67,13 +69,12 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     public InitiativeServiceImpl(
             @Value("${app.initiative.conditions.notifyEmail}") boolean notifyEmail,
             InitiativeRepository initiativeRepository,
-            InitiativeModelToDTOMapper initiativeModelToDTOMapper,
             InitiativeAdditionalDTOsToIOServiceRequestDTOMapper initiativeAdditionalDTOsToIOServiceRequestDTOMapper,
             InitiativeProducer initiativeProducer,
             IOBackEndRestConnector ioBackEndRestConnector,
             GroupRestConnector groupRestConnector,
             OnboardingRestConnector onboardingRestConnector,
-            EncryptRestConnector encryptRestConnector,
+            RankingRestConnector rankingRestConnector, EncryptRestConnector encryptRestConnector,
             DecryptRestConnector decryptRestConnector,
             FileStorageConnector fileStorageConnector,
             EmailNotificationService emailNotificationService,
@@ -83,12 +84,12 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             Utilities utilities){
         this.notifyEmail = notifyEmail;
         this.initiativeRepository = initiativeRepository;
-        this.initiativeModelToDTOMapper = initiativeModelToDTOMapper;
         this.initiativeProducer = initiativeProducer;
         this.initiativeAdditionalDTOsToIOServiceRequestDTOMapper = initiativeAdditionalDTOsToIOServiceRequestDTOMapper;
         this.ioBackEndRestConnector = ioBackEndRestConnector;
         this.groupRestConnector = groupRestConnector;
         this.onboardingRestConnector = onboardingRestConnector;
+        this.rankingRestConnector = rankingRestConnector;
         this.encryptRestConnector = encryptRestConnector;
         this.decryptRestConnector = decryptRestConnector;
         this.fileStorageConnector = fileStorageConnector;
@@ -101,18 +102,16 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
     public List<Initiative> retrieveInitiativeSummary(String organizationId, String role) {
         List<Initiative> initiatives = initiativeRepository.retrieveInitiativeSummary(organizationId, true);
-//        if(initiatives.isEmpty()){
-//            throw new InitiativeException(
-//                    InitiativeConstants.Exception.NotFound.CODE,
-//                    String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_LIST_BY_ORGANIZATION_MESSAGE, organizationId),
-//                    HttpStatus.NOT_FOUND);
-//        }
         return InitiativeConstants.Role.OPE_BASE.equals(role) ? initiatives.stream().filter(
                         initiative -> (
                                 initiative.getStatus().equals(InitiativeConstants.Status.IN_REVISION) ||
                                         initiative.getStatus().equals(InitiativeConstants.Status.TO_CHECK) ||
                                         initiative.getStatus().equals(InitiativeConstants.Status.APPROVED)))
                 .toList() : initiatives;
+    }
+
+    public List<Initiative> getInitiativesIssuerList() {
+        return initiativeRepository.findByEnabledAndStatus(true, Status.PUBLISHED);
     }
 
     @Override
@@ -199,8 +198,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     @Override
     public void updateInitiativeRefundRules(String organizationId, String initiativeId, String role, Initiative refundRule, boolean changeInitiativeStatus) {
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
-        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(initiative);
-        //initiativeValidationService.validateAllWizardSteps(initiativeDTO);
+
         //Check Initiative Status
         isInitiativeAllowedToBeEditableThenThrows(initiative);
         initiative.setRefundRule(refundRule.getRefundRule());
@@ -306,37 +304,19 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                     String.format(InitiativeConstants.Exception.BadRequest.PERMISSION_NOT_VALID, role),
                     HttpStatus.BAD_REQUEST);
         }
-        switch (nextStatus) {
-//            case InitiativeConstants.Status.DRAFT:
-//                isInitiativeAllowedToBeEditableThenThrows(initiative);
-//                break;
-//            case InitiativeConstants.Status.TO_CHECK:
-//                isInitiativeAllowedToBeEditableThenThrows(initiative);
-//                isInitiativeStatusNotInRevisionThenThrow(initiative, nextStatus);
-//                break;
-//            case InitiativeConstants.Status.IN_REVISION:
-//                break;
-//            case InitiativeConstants.Status.APPROVED:
-//                isInitiativeStatusNotInRevisionThenThrow(initiative, nextStatus);
-//                break;
-            case InitiativeConstants.Status.PUBLISHED:
-                if (!Arrays.asList(InitiativeConstants.Status.Validation.INITIATIVE_ALLOWED_STATES_TO_BECOME_PUBLISHED_ARRAY).contains(initiative.getStatus())) {
-                    log.info("[UPDATE_TO_{}_STATUS] - Initiative: {} Status: {}. Not processable status", nextStatus, initiative.getInitiativeId(), initiative.getStatus());
-                    throw new InitiativeException(
-                            InitiativeConstants.Exception.BadRequest.CODE,
-                            String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_STATUS_NOT_VALID, initiative.getInitiativeId()),
-                            HttpStatus.BAD_REQUEST);
-                }
-                break;
-//            case InitiativeConstants.Status.CLOSED:
-//                break;
-//            case InitiativeConstants.Status.SUSPENDED:
-//                break;
-            default:
+        if (InitiativeConstants.Status.PUBLISHED.equals(nextStatus)) {
+            if (!Arrays.asList(InitiativeConstants.Status.Validation.INITIATIVE_ALLOWED_STATES_TO_BECOME_PUBLISHED_ARRAY).contains(initiative.getStatus())) {
+                log.info("[UPDATE_TO_{}_STATUS] - Initiative: {} Status: {}. Not processable status", nextStatus, initiative.getInitiativeId(), initiative.getStatus());
                 throw new InitiativeException(
                         InitiativeConstants.Exception.BadRequest.CODE,
                         String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_STATUS_NOT_VALID, initiative.getInitiativeId()),
                         HttpStatus.BAD_REQUEST);
+            }
+        } else {
+            throw new InitiativeException(
+                    InitiativeConstants.Exception.BadRequest.CODE,
+                    String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_STATUS_NOT_VALID, initiative.getInitiativeId()),
+                    HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -371,8 +351,6 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
-
     }
 
     @Override
@@ -430,14 +408,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                                                  LocalDateTime startDate, LocalDateTime endDate, String status, Pageable pageable) {
 
         log.info("start get status onboarding, initiative: " + initiativeId);
-        Initiative initiative = initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(
-                        organizationId, initiativeId, true)
-                .orElseThrow(() -> new InitiativeException(
-                        InitiativeConstants.Exception.NotFound.CODE,
-                        String.format(
-                                InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE,
-                                initiativeId),
-                        HttpStatus.NOT_FOUND));
+
         String userId = null;
         if (CF != null) {
             try {
@@ -451,7 +422,8 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                         HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
-        ResponseOnboardingDTO responseOnboardingDTO = new ResponseOnboardingDTO();
+        new ResponseOnboardingDTO();
+        ResponseOnboardingDTO responseOnboardingDTO;
         try {
             responseOnboardingDTO = onboardingRestConnector.getOnboarding(initiativeId, pageable,
                     userId,
@@ -482,6 +454,69 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         return new OnboardingDTO(statusOnboardingDTOS, responseOnboardingDTO.getPageNo(),
                 responseOnboardingDTO.getPageSize(), responseOnboardingDTO.getTotalElements(),
                 responseOnboardingDTO.getTotalPages());
+    }
+
+    @Override
+    public BeneficiaryRankingPageDTO getRankingList(String organizationId, String initiativeId,
+            Pageable pageable, String beneficiary, String state) {
+        log.info("start get ranking, initiative: " + initiativeId);
+        Initiative initiative = initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(
+                        organizationId, initiativeId, true)
+                .orElseThrow(() -> new InitiativeException(
+                        InitiativeConstants.Exception.NotFound.CODE,
+                        String.format(
+                                InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE,
+                                initiativeId),
+                        HttpStatus.NOT_FOUND));
+        if(initiative.getGeneral() != null && !initiative.getGeneral().getRankingEnabled()){
+            throw new InitiativeException(
+                    InternalServerError.CODE,
+                    InternalServerError.NO_RANKING,
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        String userId = null;
+        if (beneficiary != null) {
+            try {
+                EncryptedCfDTO encryptedCfDTO = encryptRestConnector.upsertToken(
+                        new CFDTO(beneficiary));
+                userId = encryptedCfDTO.getToken();
+            } catch (Exception e) {
+                throw new InitiativeException(
+                        InternalServerError.CODE,
+                        e.getMessage(),
+                        HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+        RankingPageDTO rankingPageDTO = new RankingPageDTO();
+        try {
+            rankingPageDTO = rankingRestConnector.getRankingList(organizationId,initiativeId,pageable,state,userId);
+            log.info("response ranking: " + rankingPageDTO);
+        } catch (Exception e) {
+            throw new InitiativeException(
+                    InternalServerError.CODE,
+                    e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        List<BeneficiaryRankingDTO> beneficiaryRankingDTOS = new ArrayList<>();
+        for (RankingRequestDTO rankingRequestDTO : rankingPageDTO.getContent()) {
+            try {
+                DecryptCfDTO decryptedCfDTO = decryptRestConnector.getPiiByToken(
+                        rankingRequestDTO.getUserId());
+                beneficiaryRankingDTOS.add(new BeneficiaryRankingDTO(decryptedCfDTO.getPii(), rankingRequestDTO.getCriteriaConsensusTimestamp(),
+                        rankingRequestDTO.getRankingValue(), rankingRequestDTO.getRanking(),
+                        rankingRequestDTO.getBeneficiaryRankingStatus()));
+
+            } catch (Exception e) {
+                throw new InitiativeException(
+                        InternalServerError.CODE,
+                        e.getMessage(),
+                        HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+        return new BeneficiaryRankingPageDTO(beneficiaryRankingDTOS, rankingPageDTO.getPageNumber(),
+                rankingPageDTO.getPageSize(), rankingPageDTO.getTotalElements(),
+                rankingPageDTO.getTotalPages(), rankingPageDTO.getRankingStatus(), rankingPageDTO.getRankingPublishedTimestamp(),rankingPageDTO.getRankingGeneratedTimestamp(),rankingPageDTO.getTotalEligibleOk(),rankingPageDTO.getTotalEligibleKo(),rankingPageDTO.getTotalOnboardingKo(),
+                rankingPageDTO.getRankingFilePath());
     }
 
     public void validate(String contentType, String fileName) {

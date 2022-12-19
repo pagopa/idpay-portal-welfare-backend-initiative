@@ -10,18 +10,18 @@ import com.fasterxml.jackson.annotation.*;
 public enum TypeBoolEnum {
 
     @JsonProperty("boolean")
-    BOOLEAN("boolean");
+    BOOLEAN();
 
     @JsonProperty("_type")
     private final String type;
 
     @Override
     public String toString() {
-        return String.valueOf(type);
+        return type;
     }
 
-    TypeBoolEnum(String type) {
-        this.type = type;
+    TypeBoolEnum() {
+        this.type = "boolean";
     }
 
     @JsonValue

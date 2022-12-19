@@ -34,9 +34,6 @@ public class AccumulatedAmountTypeValidator implements ConstraintValidator<Accum
         if (accumulatedType1 == AccumulatedAmountDTO.AccumulatedTypeEnum.THRESHOLD_REACHED && refundThreshold1 == null){
             return false;
         }
-        if (accumulatedType1 == AccumulatedAmountDTO.AccumulatedTypeEnum.BUDGET_EXHAUSTED && refundThreshold1 != null){
-            return false;
-        }
-        return true;
+        return accumulatedType1 != AccumulatedAmountDTO.AccumulatedTypeEnum.BUDGET_EXHAUSTED || refundThreshold1 == null;
     }
 }
