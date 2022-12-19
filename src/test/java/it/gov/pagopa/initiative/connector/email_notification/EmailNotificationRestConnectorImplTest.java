@@ -1,6 +1,5 @@
 package it.gov.pagopa.initiative.connector.email_notification;
 
-import it.gov.pagopa.initiative.dto.email_notification.EmailMessageDTO;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeAdditional;
 import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
@@ -37,7 +36,7 @@ class EmailNotificationRestConnectorImplTest {
      */
     @Test
     void testNotifyInitiativeToEmailNotification() {
-        when(emailNotificationFeignRestClient.notifyInitiativeInfo((EmailMessageDTO) any()))
+        when(emailNotificationFeignRestClient.notifyInitiativeInfo(any()))
                 .thenReturn(new ResponseEntity<>(HttpStatus.CONTINUE));
 
         Initiative initiative = new Initiative();
@@ -58,7 +57,7 @@ class EmailNotificationRestConnectorImplTest {
         initiative.setUpdateDate(LocalDateTime.of(1, 1, 1, 1, 1));
         emailNotificationRestConnectorImpl.notifyInitiativeToEmailNotification(initiative, "Template Name", new HashMap<>(),
                 "Hello from the Dreaming Spires", "Sender", "Recipients");
-        verify(emailNotificationFeignRestClient).notifyInitiativeInfo((EmailMessageDTO) any());
+        verify(emailNotificationFeignRestClient).notifyInitiativeInfo(any());
     }
 }
 

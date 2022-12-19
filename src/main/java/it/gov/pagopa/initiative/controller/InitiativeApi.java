@@ -41,6 +41,17 @@ public interface InitiativeApi {
       @PathVariable("organizationId") String organizationId,
       @RequestParam(required = false) String role);
 
+  @Operation(summary = "Returns the list of published initiatives", description = "", security = {
+          @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = InitiativeSummaryDTO.class))),
+          @ApiResponse(responseCode = "401", description = "Authentication failed", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+          @ApiResponse(responseCode = "429", description = "Too many Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+          @ApiResponse(responseCode = "500", description = "Server ERROR", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))})
+  @GetMapping(value = "/idpay/initiatives",
+          produces = {"application/json"})
+  ResponseEntity<List<InitiativeIssuerDTO>> getInitiativeIssuerList();
+
   @Operation(summary = "Returns the detail of an active initiative", description = "", security = {
       @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
   @ApiResponses(value = {
@@ -368,7 +379,7 @@ public interface InitiativeApi {
   ResponseEntity<InitiativeAdditionalDTO> getPrimaryAndSecondaryTokenIO(
       @PathVariable("initiativeId") String initiativeId);
 
-  @Operation(summary = "Return list onboarding status of the specified initiative", description = "", security = {
+  @Operation(summary = "Return ranking list onboarding status of the specified initiative", description = "", security = {
       @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = InitiativeAdditionalDTO.class))),
@@ -387,5 +398,23 @@ public interface InitiativeApi {
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateFrom,
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTo,
       @RequestParam(required = false) String state);
+
+  @Operation(summary = "Return ranking list for specified initiative", description = "", security = {
+          @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = InitiativeAdditionalDTO.class))),
+          @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+          @ApiResponse(responseCode = "401", description = "Authentication failed", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+          @ApiResponse(responseCode = "404", description = "Initiative ID not found for this service", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+          @ApiResponse(responseCode = "429", description = "Too many Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+          @ApiResponse(responseCode = "500", description = "Server ERROR", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))})
+  @GetMapping(value = "/idpay/organization/{organizationId}/initiative/{initiativeId}/ranking/exports",
+          produces = {"application/json"})
+  ResponseEntity<BeneficiaryRankingPageDTO> getRankingList(
+          @PathVariable("organizationId") String organizationId,
+          @PathVariable("initiativeId") String initiativeId,
+          @PageableDefault(size = 10) Pageable pageable,
+          @RequestParam(required = false) String beneficiary,
+          @RequestParam(required = false) String state);
 }
 

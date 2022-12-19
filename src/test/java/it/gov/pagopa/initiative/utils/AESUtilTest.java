@@ -4,8 +4,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
-import java.security.NoSuchAlgorithmException;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class AESUtilTest {
@@ -26,7 +24,7 @@ class AESUtilTest {
     private static final String CIPHER_TEXT_AES_GCM_NO_PADDING_KEY_256_ITERATION_10000 = "wzQD/tLo8vghu5EvhZYDaUnp1B5x1e1pBZJHTLkUlNYLGh/rrzkGgFMtrjZUEgOsZoKfJ5gL4DWQN209PooN0kwq6XTt1Kuj5NF2tvyO5yadXmqvV0DbRIQ";
 
     @Test
-    void testMultiEncrypt() throws NoSuchAlgorithmException {
+    void testMultiEncrypt() {
         util = new AESUtil(CIPHER_INSTANCE, ENCODING, PBE_ALGORITHM, SALT, KEY_SIZE, ITERATION_COUNT, GCM_IV, GCM_TAG_LENGTH);
         String encrypt = util.encrypt(PASSPHRASE, PLAIN_TEXT);
         assertEquals(CIPHER_TEXT_AES_GCM_NO_PADDING_KEY_256_ITERATION_10000, encrypt);
@@ -47,7 +45,7 @@ class AESUtilTest {
     //EXCEPTION TESTS:
 
     @Test
-    void testGenerateKey_throwInvalidKeyException() throws Throwable {
+    void testGenerateKey_throwInvalidKeyException() {
         util = new AESUtil(CIPHER_INSTANCE, ENCODING, PBE_ALGORITHM, SALT, 89, 18, GCM_IV, GCM_TAG_LENGTH);
         Executable executable = () -> util.encrypt(PASSPHRASE, PLAIN_TEXT);
         Assertions.assertThrows(IllegalStateException.class, executable);

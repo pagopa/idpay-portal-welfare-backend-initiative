@@ -94,7 +94,7 @@ public class EmailNotificationServiceImpl implements EmailNotificationService {
         return templateValues;
     }
 
-    private List<UserResource> getInstitutionProductUsersEmailsByRole(String organizationId) {
+    List<UserResource> getInstitutionProductUsersEmailsByRole(String organizationId) {
         List<UserResource> users = new ArrayList<>();
         try {
             users = this.selcRestConnector.getInstitutionProductUsers(organizationId);

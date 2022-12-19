@@ -1,18 +1,6 @@
 package it.gov.pagopa.initiative.config;
 
-import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import com.mongodb.ConnectionString;
-import com.mongodb.MongoCredential;
-import com.mongodb.ReadConcern;
-import com.mongodb.ReadConcernLevel;
-import com.mongodb.WriteConcern;
-
-import java.util.ArrayList;
-
+import com.mongodb.*;
 import org.bson.UuidRepresentation;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,6 +10,10 @@ import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.util.ArrayList;
+
+import static org.mockito.Mockito.*;
 
 @ContextConfiguration(classes = {MongoDBConfig.class})
 @ExtendWith(SpringExtension.class)

@@ -32,11 +32,11 @@ class RankingEnabledNotNullForBeneficiaryKnownFalseValidatorTest {
 
     @Autowired
     private Validator validator;
-    private Map<String, String> language = new HashMap<>();
+    private final Map<String, String> language = new HashMap<>();
 
     @Test
     void whenAllValidationAreValid_InitiativeGeneralDTO_thenValidationArePassed() {
-        InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralDTO_ok(false);
+        InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralDTO_ok();
         Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationOnGroup.class);
 
         assertTrue(violations.isEmpty());
@@ -44,7 +44,7 @@ class RankingEnabledNotNullForBeneficiaryKnownFalseValidatorTest {
 
     @Test
     void whenStartDateEndDateAreEqual_InitiativeGeneralDTO_thenValidationAreFailed() {
-        InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralDTO_ko(false);
+        InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralDTO_ko();
         Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationOnGroup.class);
 
         assertFalse(violations.isEmpty());
@@ -52,11 +52,11 @@ class RankingEnabledNotNullForBeneficiaryKnownFalseValidatorTest {
         assertThat(violations).hasSize(1);
     }
 
-    private InitiativeGeneralDTO createInitiativeGeneralDTO_ok(Boolean beneficiaryKnown) {
+    private InitiativeGeneralDTO createInitiativeGeneralDTO_ok() {
         language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
-        initiativeGeneralDTO.setBeneficiaryKnown(beneficiaryKnown);
+        initiativeGeneralDTO.setBeneficiaryKnown(false);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
         LocalDate rankingStartDate = LocalDate.now();
@@ -72,11 +72,11 @@ class RankingEnabledNotNullForBeneficiaryKnownFalseValidatorTest {
         return initiativeGeneralDTO;
     }
 
-    private InitiativeGeneralDTO createInitiativeGeneralDTO_ko(Boolean beneficiaryKnown) {
+    private InitiativeGeneralDTO createInitiativeGeneralDTO_ko() {
         language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
-        initiativeGeneralDTO.setBeneficiaryKnown(beneficiaryKnown);
+        initiativeGeneralDTO.setBeneficiaryKnown(false);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
         LocalDate rankingStartDate = LocalDate.now();

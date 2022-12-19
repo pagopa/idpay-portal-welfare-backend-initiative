@@ -59,6 +59,12 @@ public class InitiativeApiController implements InitiativeApi {
         ));
     }
 
+    @Override
+    public ResponseEntity<List<InitiativeIssuerDTO>> getInitiativeIssuerList() {
+        log.info("[{}][GET_INITIATIVES] - Initiative issuer: Start processing...");
+        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeIssuerDTOList(this.initiativeService.getInitiativesIssuerList()));
+    }
+
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<InitiativeDTO> getInitiativeDetail(String organizationId, String initiativeId, String role) {
         log.info("[{}][GET_INITIATIVE_DETAIL] - Initiative: {}. Start processing...", role, initiativeId);
@@ -230,7 +236,7 @@ public class InitiativeApiController implements InitiativeApi {
                 initiativeService.sendInitiativeInfoToRuleEngine(initiative);
             }
             //1. Only for the Initiatives to be provided to IO, the integration is carried out with the creation of the Initiative Service to IO BackEnd
-            if(initiative.getAdditionalInfo().getServiceIO()) {
+            if(Boolean.TRUE.equals(initiative.getAdditionalInfo().getServiceIO())) {
                 if(notifyIO) {
                     log.info("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Notification to IO BackEnd of the published Initiative", initiativeId);
                     initiative = initiativeService.sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(initiative, initiativeOrganizationInfoDTO);
@@ -239,10 +245,8 @@ public class InitiativeApiController implements InitiativeApi {
                 //Send citizen to MS-Group via API
                 //This integration necessarily takes place in succession to having created the service with IO in order not to send "orphan" resources (not associated with any Initiative known by IO).
                 //2. BeneficiaryKnown is true -> Send to MS-Group via API about the publishing of Initiative. Then, MS Groups will send it via Topics to NotificationManager and Onboarding
-                if (null != initiative.getGeneral() && initiative.getGeneral().getBeneficiaryKnown()) {
-                    if(notifyInternal) {
+                if (null != initiative.getGeneral() && initiative.getGeneral().getBeneficiaryKnown() && notifyInternal) {
                         initiativeService.sendInitiativeInfoToNotificationManager(initiative);
-                    }
                 }
             }
         } catch (Exception e) {
@@ -284,6 +288,12 @@ public class InitiativeApiController implements InitiativeApi {
     public ResponseEntity<InitiativeAdditionalDTO> getPrimaryAndSecondaryTokenIO(String initiativeId){
         log.info("[GET_PRIMARY_AND_SECONDARY_TOKEN] - Start searching tokens for initiativeId {}...", initiativeId);
         return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeAdditionalDTOOnlyTokens(this.initiativeService.getPrimaryAndSecondaryTokenIO(initiativeId)));
+    }
+
+    @Override
+    public ResponseEntity<BeneficiaryRankingPageDTO> getRankingList(String organizationId,
+            String initiativeId, Pageable pageable, String beneficiary, String state) {
+        return ResponseEntity.ok(this.initiativeService.getRankingList(organizationId, initiativeId, pageable, beneficiary, state));
     }
 
     @Override

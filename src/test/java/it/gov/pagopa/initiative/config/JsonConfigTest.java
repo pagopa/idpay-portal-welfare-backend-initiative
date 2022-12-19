@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.DeserializationConfig;
-import com.fasterxml.jackson.databind.MappingJsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.cfg.ContextAttributes;
 import com.fasterxml.jackson.databind.deser.DefaultDeserializationContext;
@@ -36,7 +35,7 @@ class JsonConfigTest {
         assertTrue(visibilityChecker instanceof VisibilityChecker.Std);
         assertNull(actualObjectMapperResult.getPropertyNamingStrategy());
         assertTrue(actualObjectMapperResult.getDeserializationContext() instanceof DefaultDeserializationContext.Impl);
-        assertSame(actualObjectMapperResult.getFactory(), actualObjectMapperResult.getJsonFactory());
+        assertSame(actualObjectMapperResult.getFactory(), actualObjectMapperResult.getFactory());
         assertTrue(actualObjectMapperResult.getSerializerFactory() instanceof BeanSerializerFactory);
         assertTrue(actualObjectMapperResult.getSerializerProvider() instanceof DefaultSerializerProvider.Impl);
         assertTrue(actualObjectMapperResult.getSerializerProviderInstance() instanceof DefaultSerializerProvider.Impl);

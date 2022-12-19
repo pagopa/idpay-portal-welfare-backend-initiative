@@ -85,6 +85,7 @@ public class InitiativeConstants {
         }
         public static final class InternalServerError { //500 (5xx)
             public static final String CODE = BASE_CODE + ".internal-server-error";
+            public static final String NO_RANKING = "Initiative without ranking";
             public static final String INTEGRATION_CODE = CODE + ".integration";
         }
     }

@@ -48,6 +48,9 @@ rest-client:
   onboarding:
     serviceCode: idpay-onboarding
     uri: ${ONBOARDING_URI:}
+  ranking:
+    serviceCode: idpay-ranking
+    uri: ${RANKING_URI:}
   encryptpdv:
     base-url: ${PDV_ENCRYPT_BASE_URL:}
     cf: ${PDV_ENCRYPT_SERVICE_CODE:pdv-ms-tokenizer-encrypt}

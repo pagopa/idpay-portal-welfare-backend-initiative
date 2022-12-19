@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -29,13 +28,13 @@ class OnboardingRestConnectorTest {
     @Test
     void testGetOnboarding() {
         ResponseOnboardingDTO responseOnboardingDTO = new ResponseOnboardingDTO();
-        when(onboardingRestClient.getOnboarding((String) any(), (Pageable) any(), (String) any(), (LocalDateTime) any(),
-                (LocalDateTime) any(), (String) any())).thenReturn(responseOnboardingDTO);
+        when(onboardingRestClient.getOnboarding(any(), any(), any(), any(),
+                any(), any())).thenReturn(responseOnboardingDTO);
         LocalDateTime startDate = LocalDateTime.of(1, 1, 1, 1, 1);
         assertSame(responseOnboardingDTO, onboardingRestConnectorImpl.getOnboarding("42", null, "42", startDate,
                 LocalDateTime.of(1, 1, 1, 1, 1), "Status"));
-        verify(onboardingRestClient).getOnboarding((String) any(), (Pageable) any(), (String) any(), (LocalDateTime) any(),
-                (LocalDateTime) any(), (String) any());
+        verify(onboardingRestClient).getOnboarding(any(), any(), any(), any(),
+                any(), any());
     }
 }
 
