@@ -150,12 +150,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     @Override
     public void updateInitiativeGeneralInfo(String organizationId, String initiativeId, Initiative initiativeInfoModel, String role) {
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
-        if (initiativeInfoModel.getGeneral().getDescriptionMap().get(Locale.ITALIAN.getLanguage()) == null) {
-            throw new InitiativeException(
-                    InitiativeConstants.Exception.BadRequest.CODE,
-                    InitiativeConstants.Exception.BadRequest.INITIATIVE_DESCRIPTION_LANGUAGE_MESSAGE,
-                    HttpStatus.BAD_REQUEST);
-        }
+
         isInitiativeAllowedToBeEditableThenThrows(initiative);
         initiative.setGeneral(initiativeInfoModel.getGeneral());
         initiative.setStatus(InitiativeConstants.Status.DRAFT);
@@ -206,6 +201,12 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         log.info("[UPDATE_REFUND_RULE] - Initiative: {}. Refund rules successfully set.", initiativeId);
         initiative.setStatus(InitiativeConstants.Status.DRAFT);
         if (changeInitiativeStatus) {
+            if (initiative.getGeneral().getDescriptionMap().get(Locale.ITALIAN.getLanguage()) == null) {
+                throw new InitiativeException(
+                        InitiativeConstants.Exception.BadRequest.CODE,
+                        InitiativeConstants.Exception.BadRequest.INITIATIVE_DESCRIPTION_LANGUAGE_MESSAGE,
+                        HttpStatus.BAD_REQUEST);
+            }
             initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
             utilities.initiativeInRevision(this.getUserId(),initiativeId);
             log.info("[UPDATE_TO_IN_REVISION_STATUS] - Initiative: {}. Status successfully set to IN_REVISION.", initiativeId);
