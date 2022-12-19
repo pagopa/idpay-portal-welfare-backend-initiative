@@ -152,6 +152,9 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
         isInitiativeAllowedToBeEditableThenThrows(initiative);
         initiative.setGeneral(initiativeInfoModel.getGeneral());
+        if (!initiative.getAdditionalInfo().getServiceName().equals(initiative.getInitiativeName())) {
+            initiative.setInitiativeName(initiative.getAdditionalInfo().getServiceName());
+        }
         initiative.setStatus(InitiativeConstants.Status.DRAFT);
         this.initiativeRepository.save(initiative);
     }
