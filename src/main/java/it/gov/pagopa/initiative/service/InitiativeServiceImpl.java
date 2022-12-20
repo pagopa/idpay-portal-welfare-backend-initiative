@@ -202,6 +202,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         initiative.setRefundRule(refundRule.getRefundRule());
         log.info("[UPDATE_REFUND_RULE] - Initiative: {}. Refund rules successfully set.", initiativeId);
         initiative.setStatus(InitiativeConstants.Status.DRAFT);
+        this.initiativeRepository.save(initiative);
         if (changeInitiativeStatus) {
             if (initiative.getGeneral().getDescriptionMap().get(Locale.ITALIAN.getLanguage()) == null) {
                 throw new InitiativeException(
