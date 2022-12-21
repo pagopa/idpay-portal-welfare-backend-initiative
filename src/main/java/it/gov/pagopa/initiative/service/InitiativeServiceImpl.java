@@ -124,9 +124,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             initiative.setStatus(InitiativeConstants.Status.DRAFT);
         }
         Initiative initiativeReturned = initiativeRepository.insert(initiative);
-        if (notifyEmail) {
-            emailNotificationService.sendInitiativeToCurrentOrganization(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_CREATED, SUBJECT_INITIATIVE_CREATED);
-        }
+        this.sendEmailToCurrentOrg(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_CREATED, SUBJECT_INITIATIVE_CREATED);
         utilities.newInitiative(this.getUserId(), initiative.getInitiativeId());
         return initiativeReturned;
     }
@@ -215,13 +213,9 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             log.info("[UPDATE_TO_IN_REVISION_STATUS] - Initiative: {}. Status successfully set to IN_REVISION.", initiativeId);
         }
         this.initiativeRepository.save(initiative);
-        if (changeInitiativeStatus && notifyEmail) {
-            try {
-                emailNotificationService.sendInitiativeToCurrentOrganization(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
-                emailNotificationService.sendInitiativeToPagoPA(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
-            } catch (FeignException e) {
-                log.error("[UPDATE_REFUND_RULE]-[EMAIL-NOTIFICATION] Message: {}", e.getMessage());
-            }
+        if (changeInitiativeStatus) {
+            this.sendEmailToPagoPA(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
+            this.sendEmailToCurrentOrg(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
         }
     }
 
@@ -233,13 +227,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         this.initiativeRepository.save(initiative);
         utilities.initiativeApproved(this.getUserId(),initiativeId);
         log.info("[UPDATE_TO_APPROVED_STATUS] - Initiative: {}. Status successfully changed", initiative.getInitiativeId());
-        if (notifyEmail) {
-            try {
-                emailNotificationService.sendInitiativeToCurrentOrganization(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
-            } catch (FeignException e) {
-                log.error("[UPDATE_TO_APPROVED_STATUS]-[EMAIL-NOTIFICATION] Message: {}", e.getMessage());
-            }
-        }
+        this.sendEmailToCurrentOrg(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
     }
 
     @Override
@@ -250,13 +238,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         this.initiativeRepository.save(initiative);
         utilities.initiativeToCheck(this.getUserId(), initiativeId);
         log.info("[UPDATE_TO_CHECK_STATUS] - Initiative: {}. Status successfully changed", initiative.getInitiativeId());
-        if (notifyEmail) {
-            try {
-                emailNotificationService.sendInitiativeToCurrentOrganization(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
-            } catch (FeignException e) {
-                log.error("[UPDATE_TO_CHECK_STATUS]-[EMAIL-NOTIFICATION] Message: {}", e.getMessage());
-            }
-        }
+        this.sendEmailToCurrentOrg(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
     }
 
     @Override
@@ -279,13 +261,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             this.initiativeRepository.save(initiative);
             log.info("[LOGICAL_DELETE_INITIATIVE] - Initiative: {}. Successfully logical elimination.", initiative.getInitiativeId());
         }
-        if (notifyEmail) {
-            try {
-                emailNotificationService.sendInitiativeToPagoPA(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
-            } catch (FeignException e) {
-                log.error("[LOGICAL_DELETE_INITIATIVE]-[EMAIL-NOTIFICATION] Message: {}", e.getMessage());
-            }
-        }
+        this.sendEmailToPagoPA(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
     }
 
     @Override
@@ -378,16 +354,31 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         initiative.getAdditionalInfo().setSecondaryTokenIO(encryptedSecondaryToken);
         additionalInfo.setServiceId(serviceResponseDTO.getServiceId());
         utilities.initiativePublished(this.getUserId(),initiative.getInitiativeId());
-        if(notifyEmail){
-            try {
-                emailNotificationService.sendInitiativeToCurrentOrganization(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
-                emailNotificationService.sendInitiativeToPagoPA(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
-            } catch (FeignException e) {
-                log.error("[UPDATE_TO_PUBLISHED_STATUS]-[EMAIL-NOTIFICATION] Message: {}", e.getMessage());
-            }
-        }
         return initiative;
     }
+
+    @Override
+    public void sendEmailToCurrentOrg(Initiative initiative, String template,  String subject){
+        if(notifyEmail){
+            try {
+                emailNotificationService.sendInitiativeToCurrentOrganization(initiative, template, subject);
+            } catch (FeignException e) {
+                log.error("[EMAIL-NOTIFICATION] Message: {}", e.getMessage());
+            }
+        }
+    }
+
+    @Override
+    public void sendEmailToPagoPA(Initiative initiative, String template,  String subject){
+        if(notifyEmail){
+            try {
+                emailNotificationService.sendInitiativeToPagoPA(initiative, template, subject);
+            } catch (FeignException e) {
+                log.error("[EMAIL-NOTIFICATION] Message: {}", e.getMessage());
+            }
+        }
+    }
+
 
     @Override
     public Initiative getInitiativeIdFromServiceId(String serviceId) {
