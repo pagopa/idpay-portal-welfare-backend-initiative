@@ -193,17 +193,17 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         this.initiativeRepository.save(initiative);
     }
 
+
     @Override
     public void updateInitiativeRefundRules(String organizationId, String initiativeId, String role, Initiative refundRule, boolean changeInitiativeStatus) {
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
-
         //Check Initiative Status
         isInitiativeAllowedToBeEditableThenThrows(initiative);
         initiative.setRefundRule(refundRule.getRefundRule());
         log.info("[UPDATE_REFUND_RULE] - Initiative: {}. Refund rules successfully set.", initiativeId);
-        initiative.setStatus(InitiativeConstants.Status.DRAFT);
-        this.initiativeRepository.save(initiative);
         if (changeInitiativeStatus) {
+            //Insert [All Steps validation -> validateAllWizardSteps with @Validated(value = ValidationOnGroup.class)]
+            //Move this validation in [All Steps validation -> .validateAllWizardSteps()]
             if (initiative.getGeneral().getDescriptionMap().get(Locale.ITALIAN.getLanguage()) == null) {
                 throw new InitiativeException(
                         InitiativeConstants.Exception.BadRequest.CODE,
@@ -213,6 +213,9 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
             utilities.initiativeInRevision(this.getUserId(),initiativeId);
             log.info("[UPDATE_TO_IN_REVISION_STATUS] - Initiative: {}. Status successfully set to IN_REVISION.", initiativeId);
+        }
+        else{
+            initiative.setStatus(InitiativeConstants.Status.DRAFT);
         }
         this.initiativeRepository.save(initiative);
         if (changeInitiativeStatus && notifyEmail) {
@@ -224,6 +227,8 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             }
         }
     }
+
+
 
     @Override
     public void updateInitiativeApprovedStatus(String organizationId, String initiativeId, String role) {

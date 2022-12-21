@@ -262,7 +262,7 @@ public class InitiativeDTOsToModelMapper {
     }
 
     private TimeParameter toTimeParameter(TimeParameterDTO timeParameterDTO){
-        if (timeParameterDTO == null){
+        if (timeParameterDTO == null || timeParameterDTO.getTimeType()==null){
             return null;
         }
         return TimeParameter.builder().timeType(TimeParameter.TimeTypeEnum.valueOf(timeParameterDTO.getTimeType().name())).build();
