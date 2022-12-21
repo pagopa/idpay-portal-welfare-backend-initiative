@@ -24,6 +24,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 
+import static it.gov.pagopa.initiative.constants.InitiativeConstants.Email.SUBJECT_CHANGE_STATE;
+import static it.gov.pagopa.initiative.constants.InitiativeConstants.Email.TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS;
+
 @RestController
 @Slf4j
 public class InitiativeApiController implements InitiativeApi {
@@ -249,6 +252,8 @@ public class InitiativeApiController implements InitiativeApi {
                         initiativeService.sendInitiativeInfoToNotificationManager(initiative);
                 }
             }
+            initiativeService.sendEmailToPagoPA(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
+            initiativeService.sendEmailToCurrentOrg(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
         } catch (Exception e) {
             //In case one of the previous Integrations ends badly, the Initiative is rolled back to the initial TEMP state
             log.error("[UPDATE_TO_PUBLISHED_STATUS] - [ROLLBACK STATUS] Initiative: {}. Generic Error: {}", initiativeId, e.getMessage());

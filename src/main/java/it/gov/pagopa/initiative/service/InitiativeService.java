@@ -1,12 +1,9 @@
 package it.gov.pagopa.initiative.service;
 
-import it.gov.pagopa.initiative.dto.BeneficiaryRankingDTO;
 import it.gov.pagopa.initiative.dto.BeneficiaryRankingPageDTO;
 import it.gov.pagopa.initiative.dto.InitiativeOrganizationInfoDTO;
 import it.gov.pagopa.initiative.dto.LogoDTO;
 import it.gov.pagopa.initiative.dto.OnboardingDTO;
-import it.gov.pagopa.initiative.dto.RankingPageDTO;
-import it.gov.pagopa.initiative.dto.RankingRequestDTO;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeAdditional;
 import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
@@ -56,6 +53,9 @@ public interface InitiativeService {
     LogoDTO storeInitiativeLogo(String organizationId, String initiativeId, InputStream logo, String contentType, String fileName);
 
     Initiative sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(Initiative initiative, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO);
+
+    void sendEmailToCurrentOrg(Initiative initiative, String template,  String subject);
+    void sendEmailToPagoPA(Initiative initiative, String template,  String subject);
 
     Initiative getInitiativeIdFromServiceId(String serviceId);
 

@@ -35,9 +35,9 @@ public class EmailNotificationServiceImpl implements EmailNotificationService {
         try {
             log.info("[EMAIL-NOTIFICATION] Send Initiative info to current Organization by Email");
             RequestAttributes requestAttributes = Optional.ofNullable(RequestContextHolder.getRequestAttributes())
-                    .orElseThrow(() -> new IllegalStateException("[EMAIL-NOTIFICATION]: Request Attributes should not be null"));
+                    .orElseThrow(() -> new IllegalStateException("Request Attributes should not be null"));
             Object organizationUserIdObject = Optional.ofNullable(requestAttributes.getAttribute("organizationUserId", RequestAttributes.SCOPE_REQUEST))
-                    .orElseThrow(() -> new IllegalStateException("[EMAIL-NOTIFICATION]: [organizationUserId] Request Attribute should not be null"));
+                    .orElseThrow(() -> new IllegalStateException("[organizationUserId] Request Attribute should not be null"));
             String organizationUserId = organizationUserIdObject.toString();
             log.trace("[EMAIL-NOTIFICATION] organizationUserId: {}", organizationUserId);
 
@@ -46,7 +46,7 @@ public class EmailNotificationServiceImpl implements EmailNotificationService {
             UserResource currentUserResource = institutionProductUsers.stream().filter(
                     user -> user.getId().toString().equals(organizationUserId))
                     .findFirst()
-                    .orElseThrow(() -> new IllegalStateException("[EMAIL-NOTIFICATION]: Current user not found from SelfCare institutional Users"));
+                    .orElseThrow(() -> new IllegalStateException("Current user not found from SelfCare institutional Users"));
             Set<String> institutionProductUsersEmailsByRoleSet = institutionProductUsers.stream().filter(
                             user -> user.getRoles().contains(InitiativeConstants.Role.ADMIN))
                     .map(UserResource::getEmail)
