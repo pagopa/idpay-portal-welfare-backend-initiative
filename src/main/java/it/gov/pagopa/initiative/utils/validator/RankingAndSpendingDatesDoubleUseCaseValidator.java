@@ -25,7 +25,7 @@ public class RankingAndSpendingDatesDoubleUseCaseValidator implements Constraint
         LocalDate endDate = value.getEndDate();
 
         if (startDate != null && endDate != null){//if both start and end buy dates are not present, then Violation! return false.
-            log.debug("start and end date not null");
+            log.trace("[RankingAndSpendingDatesDoubleUseCaseValidator] startDate, endDate not null");
             if (rankingStartDate != null){//if dates are all present, they are checked.
                 if (rankingEndDate != null){
                     return rankingStartDate.isBefore(rankingEndDate) && rankingEndDate.isBefore(startDate) && startDate.isBefore(endDate);
