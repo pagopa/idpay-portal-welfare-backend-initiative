@@ -30,11 +30,15 @@ spring:
           auto-create-topics: 'false'
           brokers: ${KAFKA_BINDER_BROKER_ENDPOINT_LIST}
           configuration:
-            heartbeat.interval.ms: ${KAFKA_CONFIG_INITIATIVE_HEARTBEAT_INTERVAL_MS:30000}
+            heartbeat.interval.ms: ${KAFKA_CONFIG_INITIATIVE_HEARTBEAT_INTERVAL_MS:3000}
             request.timeout.ms: ${KAFKA_CONFIG_INITIATIVE_REQUEST_TIMEOUT_MS:60000}
             session.timeout.ms: ${KAFKA_CONFIG_INITIATIVE_SESSION_TIMEOUT_MS:60000}
             sasl.mechanism: ${KAFKA_INITIATIVE_SASL_MECHANISM}
             security.protocol: ${KAFKA_INITIATIVE_SECURITY_PROTOCOL}
+            connections.max.idle.ms: ${KAFKA_CONFIG_CONNECTION_MAX_IDLE_TIME:180000}
+            metadata.max.idle.ms: ${KAFKA_CONFIG_METADATA_MAX_IDLE_MS:180000}
+            metadata.max.age.ms: ${KAFKA_CONFIG_METADATA_MAX_AGE_INTERVAL:180000}
+            max.request.size: ${KAFKA_CONFIG_METADATA_MAX_REQUEST_SIZE:1000000}
 
 rest-client:
   backend-io:
