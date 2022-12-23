@@ -344,12 +344,19 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         InitiativeAdditional additionalInfo = initiative.getAdditionalInfo();
         ServiceRequestDTO serviceRequestDTO = initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(additionalInfo, initiativeOrganizationInfoDTO);
         ServiceResponseDTO serviceResponseDTO = ioBackEndRestConnector.createService(serviceRequestDTO);
-
-        try {
-            ByteArrayOutputStream byteArrayOutputStream = fileStorageConnector.downloadInitiativeLogo(initiativeUtils.getPathLogo(initiative.getOrganizationId(), initiative.getInitiativeId()));
-            ioBackEndRestConnector.sendLogoIo(serviceResponseDTO.getServiceId(), serviceResponseDTO.getPrimaryKey(), LogoIODTO.builder().logo(new String(Base64.getEncoder().encode(byteArrayOutputStream.toByteArray()))).build());
-        } catch (Exception e) {
-            log.error("[UPLOAD_LOGO] - Initiative: {}. Error: " + e.getMessage(), initiative.getInitiativeId());
+        if(additionalInfo.getLogoFileName()!=null) {
+            try {
+                ByteArrayOutputStream byteArrayOutputStream = fileStorageConnector.downloadInitiativeLogo(
+                        initiativeUtils.getPathLogo(initiative.getOrganizationId(),
+                                initiative.getInitiativeId()));
+                ioBackEndRestConnector.sendLogoIo(serviceResponseDTO.getServiceId(),
+                        serviceResponseDTO.getPrimaryKey(), LogoIODTO.builder().logo(new String(
+                                        Base64.getEncoder().encode(byteArrayOutputStream.toByteArray())))
+                                .build());
+            } catch (Exception e) {
+                log.error("[UPLOAD_LOGO] - Initiative: {}. Error: " + e.getMessage(),
+                        initiative.getInitiativeId());
+            }
         }
         log.debug("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Start ServiceIO Keys encryption...", initiative.getInitiativeId());
         String encryptedPrimaryToken = ioTokenService.encrypt(serviceResponseDTO.getPrimaryKey());
