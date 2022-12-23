@@ -25,7 +25,7 @@ public class Utilities {
     }
   }
 
-  private static final String CEF = String.format("CEF:0|PagoPa|IDPAY|1.0|7|User interaction|2|event=Initiative srcip=%s srcport=17548 dstip=172.16.128.37 dstport=82",
+  private static final String CEF = String.format("CEF|PagoPa|IDPAY|1.0|7|User interaction|2|event=Initiative srcip=%s srcport=17548 dstip=172.16.128.37 dstport=82",
       SRCIP);
   private static final String MSG = " msg=";
   private static final String USER = "suser=";
