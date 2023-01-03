@@ -546,6 +546,20 @@ class InitiativeServiceTest {
     }
 
     @Test
+    void updateInitiativeRefundRules_inRevision() {
+        Initiative fullInitiative = createFullInitiative();
+        Map<String, String> language = new HashMap<>();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
+        InitiativeGeneral initiativeGeneral = createInitiativeGeneral(true);
+        initiativeGeneral.setDescriptionMap(language);
+        fullInitiative.setGeneral(initiativeGeneral);
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(fullInitiative);
+        initiativeService.updateInitiativeRefundRules(ORGANIZATION_ID, INITIATIVE_ID, ROLE, fullInitiative, true);
+        assertEquals(Status.IN_REVISION, fullInitiative.getStatus());
+
+    }
+
+    @Test
     void storeInitiativeLogo_ok() throws Exception {
         InputStream logo = new ByteArrayInputStream("logo.png".getBytes());
         Initiative initiative = this.createFullInitiative();
@@ -1072,7 +1086,6 @@ class InitiativeServiceTest {
     }
 
     @Test
-        //Mancano i test con Exception
     void givenDTOsInitiativeAndInitiativeOrganizationInfo_whenIntegrationWithIOBackEndIsOK_thenReturnInitiativeUpdated() {
         //Instruct Initiative
         Initiative initiative = createStep5Initiative();
@@ -1091,6 +1104,34 @@ class InitiativeServiceTest {
         when(initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(initiativeAdditional, initiativeOrganizationInfoDTO)).thenReturn(serviceRequestDTOexpected);
         when(ioBackEndRestConnector.createService(serviceRequestDTOexpected)).thenReturn(serviceResponseDTOexpected);
         when(ioTokenService.encrypt(anyString())).thenReturn(ANY_KEY_TOKEN_IO);
+
+        Initiative initiativeActual = initiativeService.sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(initiative, initiativeOrganizationInfoDTO);
+        assertEquals(SERVICE_ID, initiativeActual.getAdditionalInfo().getServiceId());
+        assertEquals(ANY_KEY_TOKEN_IO, initiativeActual.getAdditionalInfo().getPrimaryTokenIO());
+
+        //Expecting connector to be called once with correct param
+        verify(ioBackEndRestConnector, times(1)).createService(serviceRequestDTOexpected);
+    }
+
+    @Test
+    void sendInitiativeInfoToIOBackEndServiceAndUpdateInitiativeWithLogo() {
+        Initiative initiative = createStep5Initiative();
+        InitiativeAdditional initiativeAdditional = createInitiativeAdditional();
+        initiativeAdditional.setLogoFileName("logo file name");
+        initiative.setAdditionalInfo(initiativeAdditional);
+        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = InitiativeOrganizationInfoDTO.builder()
+                .organizationName(ORGANIZATION_NAME)
+                .organizationVat(ORGANIZATION_VAT)
+                .organizationUserRole(ORGANIZATION_USER_ROLE)
+                .build();
+
+        ServiceRequestDTO serviceRequestDTOexpected = createServiceRequestDTO();
+        ServiceResponseDTO serviceResponseDTOexpected = createServiceResponseDTO();
+
+        when(initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(initiativeAdditional, initiativeOrganizationInfoDTO)).thenReturn(serviceRequestDTOexpected);
+        when(ioBackEndRestConnector.createService(serviceRequestDTOexpected)).thenReturn(serviceResponseDTOexpected);
+        when(ioTokenService.encrypt(anyString())).thenReturn(ANY_KEY_TOKEN_IO);
+        Mockito.doNothing().when(ioBackEndRestConnector).sendLogoIo(anyString(),anyString(),any());
 
         Initiative initiativeActual = initiativeService.sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(initiative, initiativeOrganizationInfoDTO);
         assertEquals(SERVICE_ID, initiativeActual.getAdditionalInfo().getServiceId());
