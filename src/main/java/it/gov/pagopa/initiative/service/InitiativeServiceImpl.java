@@ -419,6 +419,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
         String userId = null;
         if (CF != null) {
+            CF = CF.toUpperCase();
             try {
                 EncryptedCfDTO encryptedCfDTO = encryptRestConnector.upsertToken(
                         new CFDTO(CF));
