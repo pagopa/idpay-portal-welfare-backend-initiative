@@ -86,7 +86,6 @@ microservice-chart:
   envConfigMapExternals:
     idpay-common:
       TZ: TZ
-      JAVA_TOOL_OPTIONS: JAVA_TOOL_OPTIONS
     rest-client:
       IO_BACKEND_SERVICE_BASE_URL: io_backend_base_url
       GROUP_MS_HOST: idpay_group_host
