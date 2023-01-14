@@ -1,7 +1,7 @@
 package it.gov.pagopa.initiative.dto.rule.reward;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
+import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,12 +18,12 @@ import java.math.BigDecimal;
 @Builder
 public class RewardValueDTO implements InitiativeRewardRuleDTO {
 
-    @NotNull(groups = ValidationOnGroup.class)
+    @NotNull(groups = ValidationApiEnabledGroup.class)
     @JsonProperty("_type")
     private String type;
 
-    @Min(value = 0, message = "Reward value must be at least 0%", groups = ValidationOnGroup.class)
-    @Max(value = 100, message = "Reward value must be at most 100%", groups = ValidationOnGroup.class)
-    @NotNull(groups = ValidationOnGroup.class)
+    @Min(value = 0, message = "Reward value must be at least 0%", groups = ValidationApiEnabledGroup.class)
+    @Max(value = 100, message = "Reward value must be at most 100%", groups = ValidationApiEnabledGroup.class)
+    @NotNull(groups = ValidationApiEnabledGroup.class)
     private BigDecimal rewardValue;
 }

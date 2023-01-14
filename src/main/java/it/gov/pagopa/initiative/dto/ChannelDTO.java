@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
-import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
+import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
@@ -21,11 +21,11 @@ import javax.validation.constraints.NotNull;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ChannelDTO   {
   @JsonProperty("type")
-  @NotNull(groups = ValidationOnGroup.class)
+  @NotNull(groups = ValidationApiEnabledGroup.class)
   private TypeEnum type;
 
   @JsonProperty("contact")
-  @NotBlank(groups = ValidationOnGroup.class)
+  @NotBlank(groups = ValidationApiEnabledGroup.class)
   private String contact;
 
   /**

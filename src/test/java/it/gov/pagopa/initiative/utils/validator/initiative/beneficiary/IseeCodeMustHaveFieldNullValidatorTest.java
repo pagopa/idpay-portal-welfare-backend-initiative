@@ -2,7 +2,7 @@ package it.gov.pagopa.initiative.utils.validator.initiative.beneficiary;
 
 import it.gov.pagopa.initiative.dto.AutomatedCriteriaDTO;
 import it.gov.pagopa.initiative.dto.FilterOperatorEnum;
-import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
+import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +28,7 @@ class IseeCodeMustHaveFieldNullValidatorTest {
     @Test
     void automatedCriteriaDTOWithISEEAndField_thenValidationIsFailed(){
         AutomatedCriteriaDTO automatedCriteriaDTO = createAutomatedCriteriaDTOwithISEEAndField();
-        Set<ConstraintViolation<AutomatedCriteriaDTO>> violations = validator.validate(automatedCriteriaDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<AutomatedCriteriaDTO>> violations = validator.validate(automatedCriteriaDTO, ValidationApiEnabledGroup.class);
 
         assertThat(violations).hasSize(1);
     }
@@ -36,7 +36,7 @@ class IseeCodeMustHaveFieldNullValidatorTest {
     @Test
     void automatedCriteriaDTOValid_thenValidationIsPassed(){
         AutomatedCriteriaDTO automatedCriteriaDTO = createAutomatedCriteriaDTOValid();
-        Set<ConstraintViolation<AutomatedCriteriaDTO>> violations = validator.validate(automatedCriteriaDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<AutomatedCriteriaDTO>> violations = validator.validate(automatedCriteriaDTO, ValidationApiEnabledGroup.class);
 
         assertTrue(violations.isEmpty());
     }

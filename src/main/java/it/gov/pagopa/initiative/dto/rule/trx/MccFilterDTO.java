@@ -1,6 +1,6 @@
 package it.gov.pagopa.initiative.dto.rule.trx;
 
-import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
+import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
 import lombok.*;
 
 import javax.validation.constraints.NotEmpty;
@@ -14,10 +14,10 @@ import java.util.Set;
 @Builder
 public class MccFilterDTO {
 
-    @NotNull(groups = ValidationOnGroup.class)
+    @NotNull(groups = ValidationApiEnabledGroup.class)
     private boolean allowedList;
 
-    @NotNull(groups = ValidationOnGroup.class)
-    @NotEmpty(groups = ValidationOnGroup.class)
+    @NotNull(groups = ValidationApiEnabledGroup.class)
+    @NotEmpty(groups = ValidationApiEnabledGroup.class)
     private Set<String> values;
 }

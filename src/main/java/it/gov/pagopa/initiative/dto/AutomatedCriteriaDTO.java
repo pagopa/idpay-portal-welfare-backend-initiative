@@ -3,7 +3,7 @@ package it.gov.pagopa.initiative.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import it.gov.pagopa.initiative.utils.constraint.initiative.beneficiary.IseeCodeMustHaveFieldNullConstraint;
 import it.gov.pagopa.initiative.utils.constraint.SecondValueGreaterThanFirstWithBTW;
-import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
+import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
 import lombok.*;
 import org.springframework.lang.Nullable;
 
@@ -16,22 +16,22 @@ import javax.validation.constraints.NotNull;
 @Data @AllArgsConstructor @NoArgsConstructor
 @EqualsAndHashCode
 @Builder
-@SecondValueGreaterThanFirstWithBTW(groups = ValidationOnGroup.class)
-@IseeCodeMustHaveFieldNullConstraint(groups = ValidationOnGroup.class)
+@SecondValueGreaterThanFirstWithBTW(groups = ValidationApiEnabledGroup.class)
+@IseeCodeMustHaveFieldNullConstraint(groups = ValidationApiEnabledGroup.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AutomatedCriteriaDTO {
 
   private String authority;
 
-  @NotBlank(groups = ValidationOnGroup.class)
+  @NotBlank(groups = ValidationApiEnabledGroup.class)
   private String code;
 
   private String field;
 
-  @NotNull(groups = ValidationOnGroup.class)
+  @NotNull(groups = ValidationApiEnabledGroup.class)
   private FilterOperatorEnum operator;
 
-  @NotBlank(groups = ValidationOnGroup.class)
+  @NotBlank(groups = ValidationApiEnabledGroup.class)
   private String value;
 
   private String value2;

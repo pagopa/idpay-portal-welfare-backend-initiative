@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Set;
 import javax.validation.*;
 
-import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
+import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -36,7 +36,7 @@ class PDNDapiKeyMustExistForAtLeastOneAutoCriteriaValidatorTest {
         initiativeBeneficiaryRuleDTO.setApiKeyClientId(API_KEY_CLIENT_ID);
         initiativeBeneficiaryRuleDTO.setApiKeyClientAssertion(API_KEY_CLIENT_ASSERTION);
 
-        Set<ConstraintViolation<InitiativeBeneficiaryRuleDTO>> violations = validator.validate(initiativeBeneficiaryRuleDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeBeneficiaryRuleDTO>> violations = validator.validate(initiativeBeneficiaryRuleDTO, ValidationApiEnabledGroup.class);
         assertTrue(violations.stream().anyMatch(initiativeBeneficiaryRuleDTOConstraintViolation -> initiativeBeneficiaryRuleDTOConstraintViolation.getMessage().equals(MESSAGE)));
     }
 
@@ -49,7 +49,7 @@ class PDNDapiKeyMustExistForAtLeastOneAutoCriteriaValidatorTest {
 //        initiativeBeneficiaryRuleDTO.setApiKeyClientId(API_KEY_CLIENT_ID);
         initiativeBeneficiaryRuleDTO.setApiKeyClientAssertion(API_KEY_CLIENT_ASSERTION);
 
-        Set<ConstraintViolation<InitiativeBeneficiaryRuleDTO>> violations = validator.validate(initiativeBeneficiaryRuleDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeBeneficiaryRuleDTO>> violations = validator.validate(initiativeBeneficiaryRuleDTO, ValidationApiEnabledGroup.class);
         assertTrue(violations.stream().anyMatch(initiativeBeneficiaryRuleDTOConstraintViolation -> initiativeBeneficiaryRuleDTOConstraintViolation.getMessage().equals(MESSAGE)));
     }
 
@@ -62,7 +62,7 @@ class PDNDapiKeyMustExistForAtLeastOneAutoCriteriaValidatorTest {
         initiativeBeneficiaryRuleDTO.setApiKeyClientId(API_KEY_CLIENT_ID);
 //        initiativeBeneficiaryRuleDTO.setApiKeyClientAssertion(API_KEY_CLIENT_ASSERTION);
 
-        Set<ConstraintViolation<InitiativeBeneficiaryRuleDTO>> violations = validator.validate(initiativeBeneficiaryRuleDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeBeneficiaryRuleDTO>> violations = validator.validate(initiativeBeneficiaryRuleDTO, ValidationApiEnabledGroup.class);
         assertTrue(violations.stream().anyMatch(initiativeBeneficiaryRuleDTOConstraintViolation -> initiativeBeneficiaryRuleDTOConstraintViolation.getMessage().equals(MESSAGE)));
     }
 
@@ -75,7 +75,7 @@ class PDNDapiKeyMustExistForAtLeastOneAutoCriteriaValidatorTest {
 //        initiativeBeneficiaryRuleDTO.setApiKeyClientId(API_KEY_CLIENT_ID);
 //        initiativeBeneficiaryRuleDTO.setApiKeyClientAssertion(API_KEY_CLIENT_ASSERTION);
 
-        Set<ConstraintViolation<InitiativeBeneficiaryRuleDTO>> violations = validator.validate(initiativeBeneficiaryRuleDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeBeneficiaryRuleDTO>> violations = validator.validate(initiativeBeneficiaryRuleDTO, ValidationApiEnabledGroup.class);
         assertFalse(violations.stream().anyMatch(initiativeBeneficiaryRuleDTOConstraintViolation -> initiativeBeneficiaryRuleDTOConstraintViolation.getMessage().equals(MESSAGE)));
     }
 
@@ -92,7 +92,7 @@ class PDNDapiKeyMustExistForAtLeastOneAutoCriteriaValidatorTest {
         initiativeBeneficiaryRuleDTO.setApiKeyClientId(API_KEY_CLIENT_ID);
         initiativeBeneficiaryRuleDTO.setApiKeyClientAssertion(API_KEY_CLIENT_ASSERTION);
 
-        Set<ConstraintViolation<InitiativeBeneficiaryRuleDTO>> violations = validator.validate(initiativeBeneficiaryRuleDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeBeneficiaryRuleDTO>> violations = validator.validate(initiativeBeneficiaryRuleDTO, ValidationApiEnabledGroup.class);
 //        IsValid is True then it does not throw related error MESSAGE. Returned only with "false"
         assertFalse(violations.stream().anyMatch(initiativeBeneficiaryRuleDTOConstraintViolation -> initiativeBeneficiaryRuleDTOConstraintViolation.getMessage().equals(MESSAGE)));
     }
@@ -110,7 +110,7 @@ class PDNDapiKeyMustExistForAtLeastOneAutoCriteriaValidatorTest {
 //        initiativeBeneficiaryRuleDTO.setApiKeyClientId(API_KEY_CLIENT_ID);
 //        initiativeBeneficiaryRuleDTO.setApiKeyClientAssertion(API_KEY_CLIENT_ASSERTION);
 
-        Set<ConstraintViolation<InitiativeBeneficiaryRuleDTO>> violations = validator.validate(initiativeBeneficiaryRuleDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeBeneficiaryRuleDTO>> violations = validator.validate(initiativeBeneficiaryRuleDTO, ValidationApiEnabledGroup.class);
         assertTrue(violations.stream().anyMatch(initiativeBeneficiaryRuleDTOConstraintViolation -> initiativeBeneficiaryRuleDTOConstraintViolation.getMessage().equals(MESSAGE)));
     }
 
@@ -127,7 +127,7 @@ class PDNDapiKeyMustExistForAtLeastOneAutoCriteriaValidatorTest {
 //        initiativeBeneficiaryRuleDTO.setApiKeyClientId(API_KEY_CLIENT_ID);
         initiativeBeneficiaryRuleDTO.setApiKeyClientAssertion(API_KEY_CLIENT_ASSERTION);
 
-        Set<ConstraintViolation<InitiativeBeneficiaryRuleDTO>> violations = validator.validate(initiativeBeneficiaryRuleDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeBeneficiaryRuleDTO>> violations = validator.validate(initiativeBeneficiaryRuleDTO, ValidationApiEnabledGroup.class);
         assertTrue(violations.stream().anyMatch(initiativeBeneficiaryRuleDTOConstraintViolation -> initiativeBeneficiaryRuleDTOConstraintViolation.getMessage().equals(MESSAGE)));
     }
 
@@ -144,7 +144,7 @@ class PDNDapiKeyMustExistForAtLeastOneAutoCriteriaValidatorTest {
         initiativeBeneficiaryRuleDTO.setApiKeyClientId(API_KEY_CLIENT_ID);
 //        initiativeBeneficiaryRuleDTO.setApiKeyClientAssertion(API_KEY_CLIENT_ASSERTION);
 
-        Set<ConstraintViolation<InitiativeBeneficiaryRuleDTO>> violations = validator.validate(initiativeBeneficiaryRuleDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeBeneficiaryRuleDTO>> violations = validator.validate(initiativeBeneficiaryRuleDTO, ValidationApiEnabledGroup.class);
         assertTrue(violations.stream().anyMatch(initiativeBeneficiaryRuleDTOConstraintViolation -> initiativeBeneficiaryRuleDTOConstraintViolation.getMessage().equals(MESSAGE)));
     }
 }

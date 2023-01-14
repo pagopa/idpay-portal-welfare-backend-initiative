@@ -13,7 +13,7 @@ import it.gov.pagopa.initiative.model.FilterOperatorEnumModel;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeGeneral;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
-import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
+import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
@@ -80,7 +80,7 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
     }
 
     @Override
-    @Validated(value = ValidationOnGroup.class)
+    @Validated(value = ValidationApiEnabledGroup.class)
     public void checkAutomatedCriteriaOrderDirectionWithRanking(Initiative initiative, List<AutomatedCriteria> automatedCriteriaList) {
         InitiativeGeneral general = initiative.getGeneral();
         if (Boolean.TRUE.equals(general.getRankingEnabled())){
@@ -118,12 +118,12 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
 
     @Override
     public void validateAllWizardSteps(InitiativeDTO initiativeDTO) {
-        Set<ConstraintViolation<InitiativeAdditionalDTO>> violationsAdditional = validator.validate(initiativeDTO.getAdditionalInfo(), ValidationOnGroup.class);
-        Set<ConstraintViolation<InitiativeGeneralDTO>> violationsGeneral = validator.validate(initiativeDTO.getGeneral(), ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeAdditionalDTO>> violationsAdditional = validator.validate(initiativeDTO.getAdditionalInfo(), ValidationApiEnabledGroup.class);
+        Set<ConstraintViolation<InitiativeGeneralDTO>> violationsGeneral = validator.validate(initiativeDTO.getGeneral(), ValidationApiEnabledGroup.class);
         Set<ConstraintViolation<InitiativeBeneficiaryRuleDTO>> violationsBeneficiary =
-                validator.validate(initiativeDTO.getBeneficiaryRule(), ValidationOnGroup.class);
-        Set<ConstraintViolation<InitiativeRewardRuleDTO>> violationsReward = validator.validate(initiativeDTO.getRewardRule(), ValidationOnGroup.class);
-        Set<ConstraintViolation<InitiativeTrxConditionsDTO>> violationsTrx = validator.validate(initiativeDTO.getTrxRule(), ValidationOnGroup.class);
+                validator.validate(initiativeDTO.getBeneficiaryRule(), ValidationApiEnabledGroup.class);
+        Set<ConstraintViolation<InitiativeRewardRuleDTO>> violationsReward = validator.validate(initiativeDTO.getRewardRule(), ValidationApiEnabledGroup.class);
+        Set<ConstraintViolation<InitiativeTrxConditionsDTO>> violationsTrx = validator.validate(initiativeDTO.getTrxRule(), ValidationApiEnabledGroup.class);
         if(!violationsAdditional.isEmpty() ||
                 !violationsGeneral.isEmpty() ||
                 !violationsBeneficiary.isEmpty() ||
