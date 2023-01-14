@@ -16,9 +16,10 @@ import static org.mockito.Mockito.when;
                 "util.crypto.aes.secret-type.pbe.passphrase=PASSPHRASE"
         })
 @WebMvcTest(value= AESTokenService.class)
-class IOTokenServiceTest {
+class AESTokenServiceTest {
 
     private static final String PLAINTEXT = "PLAINTEXT";
+    private static final String CIPHERTEXT = "CIPHERTEXT";
     private static final String PASSPHRASE = "PASSPHRASE";
     private static final String PRIMARY_TOKEN_IO = "PRIMARY_TOKEN_IO";
 
@@ -31,8 +32,15 @@ class IOTokenServiceTest {
     @Test
     void givenPlainTextAndPassphrase_whenEncrypt_thenSuccess(){
         when(aesUtil.encrypt(PASSPHRASE, PLAINTEXT)).thenReturn(PRIMARY_TOKEN_IO);
-        String encryptedPrimaryToken = ioTokenService.encrypt(PLAINTEXT);
-        assertEquals(PRIMARY_TOKEN_IO, encryptedPrimaryToken);
+        String encryptedToken = ioTokenService.encrypt(PLAINTEXT);
+        assertEquals(PRIMARY_TOKEN_IO, encryptedToken);
+    }
+
+    @Test
+    void givenCipherTextAndPassphrase_whenDecrypt_thenSuccess(){
+        when(aesUtil.decrypt(PASSPHRASE, CIPHERTEXT)).thenReturn(PLAINTEXT);
+        String decryptedToken = ioTokenService.decrypt(CIPHERTEXT);
+        assertEquals(PLAINTEXT, decryptedToken);
     }
 
 }
