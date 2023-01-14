@@ -31,10 +31,12 @@ import it.gov.pagopa.initiative.model.rule.trx.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import it.gov.pagopa.initiative.service.AESTokenService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
@@ -44,6 +46,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -52,6 +55,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.doNothing;
@@ -64,8 +68,15 @@ import static org.mockito.Mockito.when;
 @WebMvcTest(value = {
         InitiativeDTOsToModelMapper.class})
 class InitiativeDTOsToModelMapperTest {
+    public static final String API_KEY_CLIENT_ID = "apiKeyClientId";
+    public static final String API_KEY_CLIENT_ASSERTION = "apiKeyClientAssertion";
+    public static final String ENCRYPTED_API_KEY_CLIENT_ID = "encryptedApiKeyClientId";
+    public static final String ENCRYPTED_API_KEY_CLIENT_ASSERTION = "encryptedApiKeyClientAssertion";
     @Autowired
     InitiativeDTOsToModelMapper initiativeDTOsToModelMapper;
+
+    @MockBean
+    AESTokenService aesTokenService;
 
     private Initiative initiativeOnlyInfoGeneral;
     private Initiative initiativeNoBaseFields;
@@ -159,6 +170,9 @@ class InitiativeDTOsToModelMapperTest {
 
         initiativeDTO = createStep5InitiativeDTO();
         initiativeExpected = createStep5Initiative();
+
+        Mockito.when(aesTokenService.encrypt(API_KEY_CLIENT_ID)).thenReturn(ENCRYPTED_API_KEY_CLIENT_ID);
+        Mockito.when(aesTokenService.encrypt(API_KEY_CLIENT_ASSERTION)).thenReturn(ENCRYPTED_API_KEY_CLIENT_ASSERTION);
     }
 
     @Test
@@ -244,6 +258,22 @@ class InitiativeDTOsToModelMapperTest {
     }
 
     @Test
+    void givenApiKeyCientIdNotPresent_toInitiative() {
+        initiativeDTO.getBeneficiaryRule().setApiKeyClientId(null);
+        Initiative initiativeActual = initiativeDTOsToModelMapper.toInitiative(initiativeDTO);
+        //Check the equality of the results
+        assertEquals(initiativeDTO.getBeneficiaryRule().getApiKeyClientId(), initiativeActual.getBeneficiaryRule().getApiKeyClientId());
+    }
+
+    @Test
+    void givenApiKeyCientAssertionNotPresent_toInitiative() {
+        initiativeDTO.getBeneficiaryRule().setApiKeyClientAssertion(null);
+        Initiative initiativeActual = initiativeDTOsToModelMapper.toInitiative(initiativeDTO);
+        //Check the equality of the results
+        assertEquals(initiativeDTO.getBeneficiaryRule().getApiKeyClientAssertion(), initiativeActual.getBeneficiaryRule().getApiKeyClientAssertion());
+    }
+
+    @Test
     void toInitiativeOnlyRefundRule_equals() {
         Initiative initiative = initiativeDTOsToModelMapper.toInitiative(initiativeRefundRuleDTOAmount);
         assertEquals(initiativeOnlyRefundRule, initiative);
@@ -276,7 +306,6 @@ class InitiativeDTOsToModelMapperTest {
         initiative.setInitiativeName("initiativeName1");
         initiative.setOrganizationId("organizationId1");
         initiative.setStatus("DRAFT");
-        initiative.setPdndToken("pdndToken1");
     }
 
     private Initiative createStep1Initiative() {
@@ -367,6 +396,8 @@ class InitiativeDTOsToModelMapperTest {
         List<AutomatedCriteria> automatedCriteriaList = new ArrayList<>();
         automatedCriteriaList.add(automatedCriteria);
         initiativeBeneficiaryRule.setAutomatedCriteria(automatedCriteriaList);
+        initiativeBeneficiaryRule.setApiKeyClientId(ENCRYPTED_API_KEY_CLIENT_ID);
+        initiativeBeneficiaryRule.setApiKeyClientAssertion(ENCRYPTED_API_KEY_CLIENT_ASSERTION);
         return initiativeBeneficiaryRule;
     }
 
@@ -378,8 +409,6 @@ class InitiativeDTOsToModelMapperTest {
                 .status("DRAFT")
                 .autocertificationCheck(true)
                 .beneficiaryRanking(true)
-                .pdndCheck(true)
-                .pdndToken("pdndToken1")
                 .additionalInfo(createInitiativeAdditionalDTO()).build();
     }
 
@@ -471,6 +500,8 @@ class InitiativeDTOsToModelMapperTest {
         List<AutomatedCriteriaDTO> automatedCriteriaList = new ArrayList<>();
         automatedCriteriaList.add(automatedCriteriaDTO);
         initiativeBeneficiaryRuleDTO.setAutomatedCriteria(automatedCriteriaList);
+        initiativeBeneficiaryRuleDTO.setApiKeyClientId(API_KEY_CLIENT_ID);
+        initiativeBeneficiaryRuleDTO.setApiKeyClientAssertion(API_KEY_CLIENT_ASSERTION);
         return initiativeBeneficiaryRuleDTO;
     }
 

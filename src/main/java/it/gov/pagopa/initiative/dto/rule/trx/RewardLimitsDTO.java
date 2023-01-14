@@ -1,6 +1,6 @@
 package it.gov.pagopa.initiative.dto.rule.trx;
 
-import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
+import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
 import lombok.*;
 
 import javax.validation.constraints.NotNull;
@@ -13,10 +13,10 @@ import java.math.BigDecimal;
 @Builder
 public class RewardLimitsDTO {
 
-    @NotNull(groups = ValidationOnGroup.class)
+    @NotNull(groups = ValidationApiEnabledGroup.class)
     private RewardLimitFrequency frequency;
 
-    @NotNull(groups = ValidationOnGroup.class)
+    @NotNull(groups = ValidationApiEnabledGroup.class)
     private BigDecimal rewardLimit;
 
     public enum RewardLimitFrequency {

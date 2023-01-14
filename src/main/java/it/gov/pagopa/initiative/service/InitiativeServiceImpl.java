@@ -61,7 +61,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     private final DecryptRestConnector decryptRestConnector;
     private final FileStorageConnector fileStorageConnector;
     private final EmailNotificationService emailNotificationService;
-    private final IOTokenService ioTokenService;
+    private final AESTokenService ioTokenService;
     private final InitiativeValidationService initiativeValidationService;
     private final InitiativeUtils initiativeUtils;
     private final Utilities utilities;
@@ -78,7 +78,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             DecryptRestConnector decryptRestConnector,
             FileStorageConnector fileStorageConnector,
             EmailNotificationService emailNotificationService,
-            IOTokenService ioTokenService,
+            AESTokenService ioTokenService,
             InitiativeValidationService initiativeValidationService,
             InitiativeUtils initiativeUtils,
             Utilities utilities){

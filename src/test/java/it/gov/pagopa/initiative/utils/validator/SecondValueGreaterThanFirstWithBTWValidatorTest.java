@@ -38,7 +38,7 @@ class SecondValueGreaterThanFirstWithBTWValidatorTest {
     @Test
     void whenAllValidationAreValid_AutomatedCriteriaDTO_thenValidationArePassed() {
         AutomatedCriteriaDTO automatedCriteriaDTO = createAutomatedCriteriaDTO(FilterOperatorEnum.LE, "Roma", null);
-        Set<ConstraintViolation<AutomatedCriteriaDTO>> violations = validator.validate(automatedCriteriaDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<AutomatedCriteriaDTO>> violations = validator.validate(automatedCriteriaDTO, ValidationApiEnabledGroup.class);
 
         assertTrue(violations.isEmpty());
     }
@@ -46,7 +46,7 @@ class SecondValueGreaterThanFirstWithBTWValidatorTest {
     @Test
     void whenSecondValueIsLessEqualThanFirst_AutomatedCriteriaDTO_thenValidationAreFailed() {
         AutomatedCriteriaDTO automatedCriteriaDTO = createAutomatedCriteriaDTO(FilterOperatorEnum.BTW_CLOSED, "10.56", "10.56");
-        Set<ConstraintViolation<AutomatedCriteriaDTO>> violations = validator.validate(automatedCriteriaDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<AutomatedCriteriaDTO>> violations = validator.validate(automatedCriteriaDTO, ValidationApiEnabledGroup.class);
 
         assertFalse(violations.isEmpty());
         //or
@@ -57,7 +57,7 @@ class SecondValueGreaterThanFirstWithBTWValidatorTest {
     @Test
     void whenSecondValueisGraterThanFirst_AutomatedCriteriaDTO_thenValidationArePassed(){
         AutomatedCriteriaDTO automatedCriteriaDTO = createAutomatedCriteriaDTO(FilterOperatorEnum.BTW_OPEN, "10.56", "25.65");
-        Set<ConstraintViolation<AutomatedCriteriaDTO>> violations = validator.validate(automatedCriteriaDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<AutomatedCriteriaDTO>> violations = validator.validate(automatedCriteriaDTO, ValidationApiEnabledGroup.class);
 
         assertTrue(violations.isEmpty());
     }

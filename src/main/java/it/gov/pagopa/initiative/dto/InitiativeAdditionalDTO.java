@@ -2,7 +2,7 @@ package it.gov.pagopa.initiative.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
+import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -35,22 +35,22 @@ public class InitiativeAdditionalDTO extends InitiativeOrganizationInfoDTO {
   }
 
   @JsonProperty("serviceIO")
-  @NotNull(groups = ValidationOnGroup.class)
+  @NotNull(groups = ValidationApiEnabledGroup.class)
   private Boolean serviceIO;
 
   @JsonProperty("serviceId")
   private String serviceId;
 
   @JsonProperty("serviceName")
-  @NotBlank(groups = ValidationOnGroup.class)
+  @NotBlank(groups = ValidationApiEnabledGroup.class)
   private String serviceName;
 
   @JsonProperty("serviceScope")
-  @NotNull(groups = ValidationOnGroup.class)
+  @NotNull(groups = ValidationApiEnabledGroup.class)
   private ServiceScope serviceScope;
 
   @JsonProperty("description")
-  @NotBlank(groups = ValidationOnGroup.class)
+  @NotBlank(groups = ValidationApiEnabledGroup.class)
   private String description;
 
   @JsonProperty("primaryTokenIO")
@@ -60,16 +60,16 @@ public class InitiativeAdditionalDTO extends InitiativeOrganizationInfoDTO {
   private String secondaryTokenIO;
 
   @JsonProperty("privacyLink")
-  @URL(protocol = "https", regexp = VALID_LINK, groups = ValidationOnGroup.class)
+  @URL(protocol = "https", regexp = VALID_LINK, groups = ValidationApiEnabledGroup.class)
   private String privacyLink;
 
   @JsonProperty("tcLink")
-  @URL(protocol = "https", regexp = VALID_LINK, groups = ValidationOnGroup.class)
+  @URL(protocol = "https", regexp = VALID_LINK, groups = ValidationApiEnabledGroup.class)
   private String tcLink;
 
   @JsonProperty("channels")
   @Valid
-  @NotEmpty(groups = ValidationOnGroup.class)
+  @NotEmpty(groups = ValidationApiEnabledGroup.class)
   private List<ChannelDTO> channels;
 
   @JsonProperty("logoFileName")

@@ -74,8 +74,9 @@ class RestResponseExceptionHandlerTest {
     @Test
     void testHandleGenericException() {
         RestResponseExceptionHandler restResponseExceptionHandler = new RestResponseExceptionHandler();
+        Exception exception = new Exception();
         ResponseEntity<ErrorDTO> actualHandleGenericExceptionResult = restResponseExceptionHandler
-                .handleGenericException(new Exception());
+                .handleGenericException(exception);
         assertTrue(actualHandleGenericExceptionResult.hasBody());
         assertTrue(actualHandleGenericExceptionResult.getHeaders().isEmpty());
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, actualHandleGenericExceptionResult.getStatusCode());

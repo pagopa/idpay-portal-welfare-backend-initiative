@@ -19,7 +19,9 @@ import it.gov.pagopa.initiative.model.rule.reward.InitiativeRewardRule;
 import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
 import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
 import it.gov.pagopa.initiative.model.rule.trx.*;
+import it.gov.pagopa.initiative.service.AESTokenService;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -29,6 +31,9 @@ import java.util.stream.Collectors;
 
 @Component
 public class InitiativeDTOsToModelMapper {
+
+    @Autowired
+    AESTokenService aesTokenService;
 
     public Initiative toInitiative(InitiativeAdditionalDTO initiativeAdditionalDTO) {
         Initiative initiative = new Initiative();
@@ -135,6 +140,10 @@ public class InitiativeDTOsToModelMapper {
                                 return null;
                             }
                     ).toList());
+        }
+        if(beneficiaryRuleDto.getApiKeyClientId() != null && beneficiaryRuleDto.getApiKeyClientAssertion() != null) {
+            beneficiaryRule.setApiKeyClientId(aesTokenService.encrypt(beneficiaryRuleDto.getApiKeyClientId()));
+            beneficiaryRule.setApiKeyClientAssertion(aesTokenService.encrypt(beneficiaryRuleDto.getApiKeyClientAssertion()));
         }
         return beneficiaryRule;
     }
@@ -286,7 +295,6 @@ public class InitiativeDTOsToModelMapper {
                 .initiativeId(initiativeDTO.getInitiativeId())
                 .initiativeName(initiativeDTO.getInitiativeName())
                 .organizationId(initiativeDTO.getOrganizationId())
-                .pdndToken(initiativeDTO.getPdndToken())
                 .creationDate(initiativeDTO.getCreationDate())
                 .updateDate(initiativeDTO.getUpdateDate())
                 .status(initiativeDTO.getStatus())
