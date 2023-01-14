@@ -1,7 +1,8 @@
 package it.gov.pagopa.initiative.service;
 
-public interface IOTokenService {
+public interface AESTokenService {
 
     String encrypt(String plainText);
+    String decrypt(String plainText);
 
 }

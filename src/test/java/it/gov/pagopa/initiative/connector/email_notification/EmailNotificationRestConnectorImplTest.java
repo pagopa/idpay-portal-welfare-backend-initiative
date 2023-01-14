@@ -49,7 +49,6 @@ class EmailNotificationRestConnectorImplTest {
         initiative.setInitiativeName("Initiative Name");
         initiative.setOrganizationId("42");
         initiative.setOrganizationName("Organization Name");
-        initiative.setPdndToken("ABC123");
         initiative.setRefundRule(new InitiativeRefundRule());
         initiative.setRewardRule(new RewardGroups());
         initiative.setStatus("Status");

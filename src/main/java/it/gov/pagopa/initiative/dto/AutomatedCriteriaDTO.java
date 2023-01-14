@@ -1,7 +1,7 @@
 package it.gov.pagopa.initiative.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import it.gov.pagopa.initiative.utils.constraint.IseeCodeMustHaveFieldNull;
+import it.gov.pagopa.initiative.utils.constraint.initiative.beneficiary.IseeCodeMustHaveFieldNullConstraint;
 import it.gov.pagopa.initiative.utils.constraint.SecondValueGreaterThanFirstWithBTW;
 import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
 import lombok.*;
@@ -17,7 +17,7 @@ import javax.validation.constraints.NotNull;
 @EqualsAndHashCode
 @Builder
 @SecondValueGreaterThanFirstWithBTW(groups = ValidationOnGroup.class)
-@IseeCodeMustHaveFieldNull(groups = ValidationOnGroup.class)
+@IseeCodeMustHaveFieldNullConstraint(groups = ValidationOnGroup.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AutomatedCriteriaDTO {
 

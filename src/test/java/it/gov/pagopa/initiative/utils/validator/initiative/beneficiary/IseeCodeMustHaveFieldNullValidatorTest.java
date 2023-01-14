@@ -1,7 +1,8 @@
-package it.gov.pagopa.initiative.utils.validator;
+package it.gov.pagopa.initiative.utils.validator.initiative.beneficiary;
 
 import it.gov.pagopa.initiative.dto.AutomatedCriteriaDTO;
 import it.gov.pagopa.initiative.dto.FilterOperatorEnum;
+import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +15,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class IseeCodeMustHaveFieldNullValidatorTest {
+class IseeCodeMustHaveFieldNullValidatorTest {
 
     private Validator validator;
 

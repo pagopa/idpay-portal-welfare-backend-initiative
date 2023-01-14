@@ -3,6 +3,8 @@ package it.gov.pagopa.initiative.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
+import it.gov.pagopa.initiative.utils.constraint.initiative.beneficiary.PDNDapiKeyMustExistForAtLeastOneAutoCriteriaConstraint;
+import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -18,6 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@PDNDapiKeyMustExistForAtLeastOneAutoCriteriaConstraint(groups = ValidationOnGroup.class)
 @SuperBuilder
 public class InitiativeBeneficiaryRuleDTO extends InitiativeOrganizationInfoDTO {
 
@@ -31,5 +34,15 @@ public class InitiativeBeneficiaryRuleDTO extends InitiativeOrganizationInfoDTO 
   @JsonProperty("automatedCriteria")
   @Valid
   private List<AutomatedCriteriaDTO> automatedCriteria;
+
+  /**
+   * PDND Key/Token Id
+   */
+  private String apiKeyClientId;
+
+  /**
+   * PDND Key/Token Assertion
+   */
+  private String apiKeyClientAssertion;
 
 }

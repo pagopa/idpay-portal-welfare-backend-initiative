@@ -2,12 +2,8 @@ package it.gov.pagopa.initiative.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
-import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
-import it.gov.pagopa.initiative.dto.rule.trx.InitiativeTrxConditionsDTO;
 import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Map;
 import javax.validation.Valid;
 import javax.validation.constraints.Future;
@@ -19,7 +15,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.URL;
 import org.springframework.validation.annotation.Validated;
 
 /**

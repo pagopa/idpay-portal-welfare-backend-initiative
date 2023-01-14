@@ -15,7 +15,7 @@ import static org.mockito.Mockito.when;
         properties = {
                 "util.crypto.aes.secret-type.pbe.passphrase=PASSPHRASE"
         })
-@WebMvcTest(value=IOTokenService.class)
+@WebMvcTest(value= AESTokenService.class)
 class IOTokenServiceTest {
 
     private static final String PLAINTEXT = "PLAINTEXT";
@@ -23,7 +23,7 @@ class IOTokenServiceTest {
     private static final String PRIMARY_TOKEN_IO = "PRIMARY_TOKEN_IO";
 
     @Autowired
-    private IOTokenService ioTokenService;
+    private AESTokenService ioTokenService;
 
     @MockBean
     AESUtil aesUtil;
