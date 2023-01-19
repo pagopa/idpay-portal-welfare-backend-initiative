@@ -31,7 +31,6 @@ public class Initiative {
     private LocalDateTime creationDate;
     @LastModifiedDate
     private LocalDateTime updateDate;
-    private String pdndToken;
     private String status;
     private InitiativeGeneral general;
     private InitiativeAdditional additionalInfo;

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
-import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
+import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
 import lombok.*;
 
 import javax.validation.constraints.NotNull;
@@ -50,7 +50,7 @@ public class TimeParameterDTO {
         }
     }
 
-    @NotNull(groups = ValidationOnGroup.class)
+    @NotNull(groups = ValidationApiEnabledGroup.class)
     @JsonProperty("timeType")
     private TimeTypeEnum timeType;
 }

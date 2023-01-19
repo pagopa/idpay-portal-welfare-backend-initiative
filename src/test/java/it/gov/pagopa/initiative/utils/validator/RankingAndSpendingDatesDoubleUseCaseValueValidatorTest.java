@@ -37,7 +37,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
     @Test
     void whenAllValidationAreValid_InitiativeGeneralDTO_thenValidationArePassed() {
         InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralDTO_ok();
-        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationApiEnabledGroup.class);
 
         assertTrue(violations.isEmpty());
     }
@@ -45,7 +45,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
     @Test
     void whenStartDateEndDateAreEqual_InitiativeGeneralDTO_thenValidationAreFailed() {
         InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralDTO_ko();
-        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationApiEnabledGroup.class);
 
         assertFalse(violations.isEmpty());
         //or
@@ -55,7 +55,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
     @Test
     void whenOnlyRankingStartIsNull_InitiativeGeneralDTO_thenValidationAreFailed(){
         InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralOnlyRankingStartIsNull_ko();
-        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationApiEnabledGroup.class);
 
         assertFalse(violations.isEmpty());
         //or
@@ -65,7 +65,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
     @Test
     void whenOnlyRankingEndIsNull_InitiativeGeneralDTO_thenValidationAreFailed(){
         InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralOnlyRankingEndIsNull_ko();
-        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationApiEnabledGroup.class);
 
         assertFalse(violations.isEmpty());
         //or
@@ -75,7 +75,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
     @Test
     void whenOnlyStartDateIsNull_InitiativeGeneralDTO_thenValidationAreFailed(){
         InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralOnlyStartDateIsNull_ko();
-        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationApiEnabledGroup.class);
 
         assertFalse(violations.isEmpty());
         //or
@@ -85,7 +85,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
     @Test
     void whenOnlyEndDateIsNull_InitiativeGeneralDTO_thenValidationAreFailed(){
         InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralOnlyEndDateIsNull_ko();
-        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationApiEnabledGroup.class);
 
         assertFalse(violations.isEmpty());
         //or
@@ -95,7 +95,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
     @Test
     void whenStartAndEndDatesAreNull_InitiativeGeneralDTO_thenValidationAreFailed(){
         InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralStartAndEndDateAreNull_ko();
-        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationApiEnabledGroup.class);
 
         assertFalse(violations.isEmpty());
         //or
@@ -105,7 +105,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
     @Test
     void whenTheRankingDatesAreNullAndStartAndEndDateAreNotValid_InitiativeGeneralDTO_thenValidationAreFailed(){
         InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralRankingStartAndEndDateAreNullButStartAndEndAreNotValid_ko();
-        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationApiEnabledGroup.class);
 
         assertFalse(violations.isEmpty());
         //or
@@ -114,7 +114,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
     @Test
     void whenTheRankingDatesAreNullButStartAndEndAreValid_InitiativeGeneralDTO_thenValidationArePassed(){
         InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralRankingStartAndEndDateAreNullAndStartAndEndAreValid_ok();
-        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationApiEnabledGroup.class);
 
         assertTrue(violations.isEmpty());
         //or
@@ -124,7 +124,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
     @Test
     void whenStartDateIsAfterEndDate_InitiativeGeneralDTO_thenValidationAreFailed(){
         InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralStartAfterEnd_ko();
-        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationApiEnabledGroup.class);
 
         assertFalse(violations.isEmpty());
         //or
@@ -133,7 +133,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
     @Test
     void whenRankingStartIsAfterRankingEnd_InitiativeGeneralDTO_thenValidationAreFailed(){
         InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralRankingStartAfterRankingEnd_ko();
-        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationApiEnabledGroup.class);
 
         assertFalse(violations.isEmpty());
         //or
@@ -142,7 +142,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
     @Test
     void whenRankingEndIsAfterStartDate_InitiativeGeneralDTO_thenValidationAreFailed(){
         InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralRankingEndAfterStartDate_ko();
-        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationApiEnabledGroup.class);
 
         assertFalse(violations.isEmpty());
         //or
@@ -151,7 +151,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
     @Test
     void whenStartDateBeforeRankingDates_InitiativeGeneralDTO_thenValidationAreFailed(){
         InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralStartDateBeforeRankingDates_ko();
-        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationApiEnabledGroup.class);
 
         assertFalse(violations.isEmpty());
         //or
@@ -161,7 +161,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
     @Test
     void when_DatesAreALLPresentAndValid_thenValidationArePassed(){
         InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralAllDatesValid_ok();
-        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationApiEnabledGroup.class);
 
         assertTrue(violations.isEmpty());
         //or
@@ -173,7 +173,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
         InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralBudgetValid_ok();
         initiativeGeneralDTO.setBudget(BigDecimal.valueOf(1000000));
         initiativeGeneralDTO.setBeneficiaryBudget(BigDecimal.valueOf(100));
-        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationApiEnabledGroup.class);
         assertTrue(violations.isEmpty());
         assertThat(0).isZero();
     }
@@ -181,7 +181,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
     @Test
     void when_beneficiaryBudgetIsNull_thenValidationFailed(){
         InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralBudgetNotValid_ko();
-        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationApiEnabledGroup.class);
         assertFalse(violations.isEmpty());
     }
 
@@ -190,7 +190,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
         InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralBudgetNotValid_ko();
         initiativeGeneralDTO.setBeneficiaryBudget(null);
         initiativeGeneralDTO.setBudget(null);
-        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationApiEnabledGroup.class);
         assertFalse(violations.isEmpty());
     }
 
@@ -199,7 +199,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
         InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralBudgetNotValid_ko();
         initiativeGeneralDTO.setBeneficiaryBudget(BigDecimal.valueOf(100000));
         initiativeGeneralDTO.setBudget(null);
-        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationApiEnabledGroup.class);
         assertFalse(violations.isEmpty());
     }
     private InitiativeGeneralDTO createInitiativeGeneralDTO_ok() {

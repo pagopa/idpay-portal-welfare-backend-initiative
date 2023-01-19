@@ -18,6 +18,7 @@ import it.gov.pagopa.initiative.model.rule.reward.InitiativeRewardRule;
 import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
 import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
 import it.gov.pagopa.initiative.model.rule.trx.*;
+import it.gov.pagopa.initiative.service.AESTokenService;
 import it.gov.pagopa.initiative.utils.InitiativeUtils;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +33,9 @@ import java.util.Locale;
 
 @Component
 public class InitiativeModelToDTOMapper {
+
+    @Autowired
+    AESTokenService aesTokenService;
 
     @Autowired
     InitiativeUtils initiativeUtils;
@@ -63,7 +67,6 @@ public class InitiativeModelToDTOMapper {
         initiativeDto.setOrganizationId(initiative.getOrganizationId());
         initiativeDto.setCreationDate(initiative.getCreationDate());
         initiativeDto.setUpdateDate(initiative.getUpdateDate());
-        initiativeDto.setPdndToken(initiative.getPdndToken());
         initiativeDto.setGeneral(this.toInitiativeGeneralDTO(initiative.getGeneral()));
         initiativeDto.setAdditionalInfo(this.toInitiativeAdditionalDTO(initiative.getAdditionalInfo()));
         if(initiativeDto.getAdditionalInfo() != null && initiativeDto.getAdditionalInfo().getLogoFileName() != null){
@@ -191,6 +194,10 @@ public class InitiativeModelToDTOMapper {
                                 return null;
                             }
                     ).toList());
+        }
+        if(beneficiaryRule.getApiKeyClientId() != null && beneficiaryRule.getApiKeyClientAssertion() != null) {
+            beneficiaryRuleDto.setApiKeyClientId(aesTokenService.decrypt(beneficiaryRule.getApiKeyClientId()));
+            beneficiaryRuleDto.setApiKeyClientAssertion(aesTokenService.decrypt(beneficiaryRule.getApiKeyClientAssertion()));
         }
         return beneficiaryRuleDto;
     }

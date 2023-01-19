@@ -41,6 +41,8 @@ class EmailNotificationServiceTest {
     private static final String TEMPLATE_NAME = "templateName";
     private static final String SUBJECT = "SUBJECT";
     private static final String EXCEPTION_MESSAGE = "Exception Message";
+    public static final String API_KEY_CLIENT_ID = "apiKeyClientId";
+    public static final String API_KEY_CLIENT_ASSERTION = "apiKeyClientAssertion";
 
     @MockBean
     private EmailNotificationRestConnector emailNotificationRestConnector;
@@ -172,7 +174,6 @@ class EmailNotificationServiceTest {
         initiative.setInitiativeName(INITIATIVE_NAME);
         initiative.setOrganizationId(ORGANIZATION_ID);
         initiative.setStatus("DRAFT");
-        initiative.setPdndToken("pdndToken1");
         initiative.setAdditionalInfo(createInitiativeAdditional());
         return initiative;
     }
@@ -221,8 +222,6 @@ class EmailNotificationServiceTest {
                 .status("DRAFT")
                 .autocertificationCheck(true)
                 .beneficiaryRanking(true)
-                .pdndCheck(true)
-                .pdndToken("pdndToken1")
                 .additionalInfo(createInitiativeAdditionalDTO()).build();
         return initiativeDTO;
     }
@@ -304,6 +303,8 @@ class EmailNotificationServiceTest {
         List<AutomatedCriteria> automatedCriteriaList = new ArrayList<>();
         automatedCriteriaList.add(automatedCriteria);
         initiativeBeneficiaryRule.setAutomatedCriteria(automatedCriteriaList);
+        initiativeBeneficiaryRule.setApiKeyClientId(API_KEY_CLIENT_ID);
+        initiativeBeneficiaryRule.setApiKeyClientAssertion(API_KEY_CLIENT_ASSERTION);
         return initiativeBeneficiaryRule;
     }
 
@@ -342,6 +343,8 @@ class EmailNotificationServiceTest {
         List<AutomatedCriteriaDTO> automatedCriteriaList = new ArrayList<>();
         automatedCriteriaList.add(automatedCriteriaDTO);
         initiativeBeneficiaryRuleDTO.setAutomatedCriteria(automatedCriteriaList);
+        initiativeBeneficiaryRuleDTO.setApiKeyClientId(API_KEY_CLIENT_ID);
+        initiativeBeneficiaryRuleDTO.setApiKeyClientAssertion(API_KEY_CLIENT_ASSERTION);
         return initiativeBeneficiaryRuleDTO;
     }
 }

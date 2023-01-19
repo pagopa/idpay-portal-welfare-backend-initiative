@@ -1,6 +1,6 @@
 package it.gov.pagopa.initiative.dto.rule.trx;
 
-import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
+import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
 import lombok.*;
 
 import javax.validation.Valid;
@@ -26,6 +26,6 @@ public class InitiativeTrxConditionsDTO {
     private MccFilterDTO mccFilter;
 
     @Valid
-    @Size(groups = ValidationOnGroup.class, message = "Reward limit must contain at least 1 element.")
+    @Size(groups = ValidationApiEnabledGroup.class, message = "Reward limit must contain at least 1 element.")
     private List<RewardLimitsDTO> rewardLimits; //TODO Validatore custom per verificare che non ci siano elementi uguali??
 }

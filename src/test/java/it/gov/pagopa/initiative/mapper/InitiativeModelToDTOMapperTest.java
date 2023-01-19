@@ -36,6 +36,7 @@ import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
 import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
 import it.gov.pagopa.initiative.model.rule.trx.*;
 import it.gov.pagopa.initiative.model.rule.trx.InitiativeTrxConditions;
+import it.gov.pagopa.initiative.service.AESTokenService;
 import it.gov.pagopa.initiative.utils.InitiativeUtils;
 
 import java.time.LocalDateTime;
@@ -50,6 +51,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
@@ -80,8 +82,15 @@ import static org.mockito.Mockito.when;
 @WebMvcTest(value = {
         InitiativeModelToDTOMapper.class})
 class InitiativeModelToDTOMapperTest {
+    public static final String API_KEY_CLIENT_ID = "apiKeyClientId";
+    public static final String API_KEY_CLIENT_ASSERTION = "apiKeyClientAssertion";
+    public static final String ENCRYPTED_API_KEY_CLIENT_ID = "encryptedApiKeyClientId";
+    public static final String ENCRYPTED_API_KEY_CLIENT_ASSERTION = "encryptedApiKeyClientAssertion";
     @Autowired
     InitiativeModelToDTOMapper initiativeModelToDTOMapper;
+    @MockBean
+    AESTokenService aesTokenService;
+
     private Initiative fullInitiative;
     private List<Initiative> initiativeList;
     private InitiativeDTO fullInitiativeDTO;
@@ -170,6 +179,9 @@ class InitiativeModelToDTOMapperTest {
         fullInitiativeDTOStep4ThresholdNull = createStep4InitiativeDTOThresholdNull();
         initiativeAdditionalOnlyTokens = createInitiativeAdditionalOnlyTokens();
         initiativeAdditionalDTOOnlyTokens = createInitiativeAdditionalDTOOnlyTokens();
+
+        Mockito.when(aesTokenService.decrypt(ENCRYPTED_API_KEY_CLIENT_ID)).thenReturn(API_KEY_CLIENT_ID);
+        Mockito.when(aesTokenService.decrypt(ENCRYPTED_API_KEY_CLIENT_ASSERTION)).thenReturn(API_KEY_CLIENT_ASSERTION);
     }
 
     @Test
@@ -281,11 +293,9 @@ class InitiativeModelToDTOMapperTest {
 
     @Test
     void toDtoOnlyId_equals() {
-        InitiativeDTO initiativeDTOonlyId = new InitiativeDTO();
-        initiativeDTOonlyId.setInitiativeId("Id1");
         InitiativeDTO initiativeDTOtoBeVerified = initiativeModelToDTOMapper.toDtoOnlyId(fullInitiative);
         //Check the equality of the results
-        assertEquals(initiativeDTOonlyId, initiativeDTOtoBeVerified);
+        assertEquals(fullInitiative.getInitiativeId(), initiativeDTOtoBeVerified.getInitiativeId());
     }
 
     @Test
@@ -298,6 +308,22 @@ class InitiativeModelToDTOMapperTest {
         InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTOtoBeVerified = initiativeModelToDTOMapper.toInitiativeBeneficiaryRuleDTO(initiativeBeneficiaryRule);
         //Check the equality of the results
         assertEquals(initiativeBeneficiaryRuleDTO, initiativeBeneficiaryRuleDTOtoBeVerified);
+    }
+
+    @Test
+    void givenApiKeyCientIdNotPresent_toInitiativeDTO() {
+        fullInitiative.getBeneficiaryRule().setApiKeyClientId(null);
+        InitiativeDTO initiativeDTOActual = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiative);
+        //Check the equality of the results
+        assertEquals(fullInitiative.getBeneficiaryRule().getApiKeyClientId(), initiativeDTOActual.getBeneficiaryRule().getApiKeyClientId());
+    }
+
+    @Test
+    void givenApiKeyCientAssertionNotPresent_toInitiativeDTO() {
+        fullInitiative.getBeneficiaryRule().setApiKeyClientAssertion(null);
+        InitiativeDTO initiativeDTOActual = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiative);
+        //Check the equality of the results
+        assertEquals(fullInitiative.getBeneficiaryRule().getApiKeyClientAssertion(), initiativeDTOActual.getBeneficiaryRule().getApiKeyClientAssertion());
     }
 
     @Test
@@ -363,12 +389,12 @@ class InitiativeModelToDTOMapperTest {
 
     private Initiative createFullInitiative() {
         //TODO Test onGoing for different steps. Must use Step6 at the end
-        return createStep2Initiative();
+        return createStep5Initiative();
     }
 
     private InitiativeDTO createFullInitiativeDTO() {
         //TODO Test onGoing for different steps. Must use Step6 at the end
-        return createStep2InitiativeDTO();
+        return createStep5InitiativeDTO();
     }
 
     private Initiative createStep1Initiative() {
@@ -377,7 +403,6 @@ class InitiativeModelToDTOMapperTest {
         initiative.setInitiativeName("initiativeName1");
         initiative.setOrganizationId("organizationId1");
         initiative.setStatus("DRAFT");
-        initiative.setPdndToken("pdndToken1");
 
         initiative.setAdditionalInfo(createInitiativeAdditional());
         return initiative;
@@ -462,6 +487,8 @@ class InitiativeModelToDTOMapperTest {
         List<AutomatedCriteria> automatedCriteriaList = new ArrayList<>();
         automatedCriteriaList.add(automatedCriteria);
         initiativeBeneficiaryRule.setAutomatedCriteria(automatedCriteriaList);
+        initiativeBeneficiaryRule.setApiKeyClientId(ENCRYPTED_API_KEY_CLIENT_ID);
+        initiativeBeneficiaryRule.setApiKeyClientAssertion((ENCRYPTED_API_KEY_CLIENT_ASSERTION));
         return initiativeBeneficiaryRule;
     }
 
@@ -471,7 +498,6 @@ class InitiativeModelToDTOMapperTest {
                 .initiativeName("initiativeName1")
                 .organizationId("organizationId1")
                 .status("DRAFT")
-                .pdndToken("pdndToken1")
                 .additionalInfo(createInitiativeAdditionalDTO()).build();
     }
 
@@ -552,6 +578,8 @@ class InitiativeModelToDTOMapperTest {
         List<AutomatedCriteriaDTO> automatedCriteriaList = new ArrayList<>();
         automatedCriteriaList.add(automatedCriteriaDTO);
         initiativeBeneficiaryRuleDTO.setAutomatedCriteria(automatedCriteriaList);
+        initiativeBeneficiaryRuleDTO.setApiKeyClientId(API_KEY_CLIENT_ID);
+        initiativeBeneficiaryRuleDTO.setApiKeyClientAssertion(API_KEY_CLIENT_ASSERTION);
         return initiativeBeneficiaryRuleDTO;
     }
 
@@ -564,14 +592,14 @@ class InitiativeModelToDTOMapperTest {
     }
 
     private Initiative createStep3Initiative() {
-        Initiative initiative = new Initiative();
+        Initiative initiative = createStep2Initiative();
         InitiativeBeneficiaryRule initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
         initiative.setBeneficiaryRule(initiativeBeneficiaryRule);
         return initiative;
     }
 
     private InitiativeDTO createStep3InitiativeDTO() {
-        InitiativeDTO initiativeDTO = new InitiativeDTO();
+        InitiativeDTO initiativeDTO = createStep2InitiativeDTO();
         InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
         initiativeDTO.setBeneficiaryRule(initiativeBeneficiaryRuleDTO);
         return initiativeDTO;
@@ -1475,19 +1503,11 @@ class InitiativeModelToDTOMapperTest {
 
 
     private Initiative createStep5Initiative() {
-        return new Initiative();
+        return createStep4Initiative();
     }
 
     private InitiativeDTO createStep5InitiativeDTO() {
-        return new InitiativeDTO();
-    }
-
-    private Initiative createStep6Initiative() {
-        return new Initiative();
-    }
-
-    private InitiativeDTO createStep6InitiativeDTO() {
-        return new InitiativeDTO();
+        return createStep4InitiativeDTO();
     }
 
 

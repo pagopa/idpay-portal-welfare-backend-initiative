@@ -1,6 +1,6 @@
-package it.gov.pagopa.initiative.utils.constraint;
+package it.gov.pagopa.initiative.utils.constraint.initiative.beneficiary;
 
-import it.gov.pagopa.initiative.utils.validator.IseeCodeMustHaveFieldNullValidator;
+import it.gov.pagopa.initiative.utils.validator.initiative.beneficiary.IseeCodeMustHaveFieldNullValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -10,7 +10,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Constraint(validatedBy = {IseeCodeMustHaveFieldNullValidator.class})
-public @interface IseeCodeMustHaveFieldNull {
+public @interface IseeCodeMustHaveFieldNullConstraint {
     String message() default "Fail: when 'code' is ISEE 'field' must be null.";
     Class<?>[] groups() default { };
     Class<? extends Payload>[] payload() default { };

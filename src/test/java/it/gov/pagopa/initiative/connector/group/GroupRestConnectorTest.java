@@ -49,7 +49,6 @@ class GroupRestConnectorTest {
         initiative.setOrganizationId("42");
         initiative.setOrganizationName("Organization Name");
         initiative.setOrganizationVat("Organization Vat");
-        initiative.setPdndToken("ABC123");
         initiative.setRefundRule(new InitiativeRefundRule());
         initiative.setRewardRule(new RewardGroups());
         initiative.setStatus("Status");

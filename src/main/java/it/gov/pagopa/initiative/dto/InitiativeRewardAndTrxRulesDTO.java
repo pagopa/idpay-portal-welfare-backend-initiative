@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.InitiativeTrxConditionsDTO;
-import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
+import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -24,11 +24,11 @@ public class InitiativeRewardAndTrxRulesDTO extends InitiativeOrganizationInfoDT
 
     @JsonProperty("rewardRule")
     @Valid
-    @NotNull(groups = ValidationOnGroup.class)
+    @NotNull(groups = ValidationApiEnabledGroup.class)
     private InitiativeRewardRuleDTO rewardRule;
 
     @JsonProperty("trxRule")
     @Valid
-    @NotNull(groups = ValidationOnGroup.class)
+    @NotNull(groups = ValidationApiEnabledGroup.class)
     private InitiativeTrxConditionsDTO trxRule;
 }

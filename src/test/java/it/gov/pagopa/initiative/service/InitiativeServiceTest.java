@@ -5,15 +5,12 @@ import feign.FeignException;
 import feign.Request;
 import feign.RequestTemplate;
 import it.gov.pagopa.initiative.connector.decrypt.DecryptRestConnector;
-import it.gov.pagopa.initiative.connector.email_notification.EmailNotificationRestConnector;
 import it.gov.pagopa.initiative.connector.encrypt.EncryptRestConnector;
 import it.gov.pagopa.initiative.connector.file_storage.FileStorageConnector;
 import it.gov.pagopa.initiative.connector.group.GroupRestConnector;
 import it.gov.pagopa.initiative.connector.io_service.IOBackEndRestConnector;
-import it.gov.pagopa.initiative.connector.io_service.IOBackEndRestConnectorImpl;
 import it.gov.pagopa.initiative.connector.onboarding.OnboardingRestConnector;
 import it.gov.pagopa.initiative.connector.ranking.RankingRestConnector;
-import it.gov.pagopa.initiative.connector.selc.SelcRestConnector;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.InternalServerError;
 import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.NotFound;
@@ -54,7 +51,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.validation.beanvalidation.CustomValidatorBean;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -110,6 +106,8 @@ class InitiativeServiceTest {
     private static final String LOGO_EXTENSION = "png";
     private static final String LOGO_MIME_TYPE = "image/png";
     private static final String FILE_NAME = "logo.png";
+    public static final String API_KEY_CLIENT_ID = "apiKeyClientId";
+    public static final String API_KEY_CLIENT_ASSERTION = "apiKeyClientAssertion";
 
     @Autowired
     InitiativeService initiativeService;
@@ -154,7 +152,7 @@ class InitiativeServiceTest {
     EmailNotificationService emailNotificationService;
 
     @MockBean
-    IOTokenService ioTokenService;
+    AESTokenService ioTokenService;
 
     @MockBean
     InitiativeValidationService initiativeValidationService;
@@ -543,6 +541,20 @@ class InitiativeServiceTest {
         } catch (InitiativeException e) {
             assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
         }
+    }
+
+    @Test
+    void updateInitiativeRefundRules_inRevision() {
+        Initiative fullInitiative = createFullInitiative();
+        Map<String, String> language = new HashMap<>();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
+        InitiativeGeneral initiativeGeneral = createInitiativeGeneral(true);
+        initiativeGeneral.setDescriptionMap(language);
+        fullInitiative.setGeneral(initiativeGeneral);
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(fullInitiative);
+        initiativeService.updateInitiativeRefundRules(ORGANIZATION_ID, INITIATIVE_ID, ROLE, fullInitiative, true);
+        assertEquals(Status.IN_REVISION, fullInitiative.getStatus());
+
     }
 
     @Test
@@ -1072,7 +1084,6 @@ class InitiativeServiceTest {
     }
 
     @Test
-        //Mancano i test con Exception
     void givenDTOsInitiativeAndInitiativeOrganizationInfo_whenIntegrationWithIOBackEndIsOK_thenReturnInitiativeUpdated() {
         //Instruct Initiative
         Initiative initiative = createStep5Initiative();
@@ -1091,6 +1102,34 @@ class InitiativeServiceTest {
         when(initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(initiativeAdditional, initiativeOrganizationInfoDTO)).thenReturn(serviceRequestDTOexpected);
         when(ioBackEndRestConnector.createService(serviceRequestDTOexpected)).thenReturn(serviceResponseDTOexpected);
         when(ioTokenService.encrypt(anyString())).thenReturn(ANY_KEY_TOKEN_IO);
+
+        Initiative initiativeActual = initiativeService.sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(initiative, initiativeOrganizationInfoDTO);
+        assertEquals(SERVICE_ID, initiativeActual.getAdditionalInfo().getServiceId());
+        assertEquals(ANY_KEY_TOKEN_IO, initiativeActual.getAdditionalInfo().getPrimaryTokenIO());
+
+        //Expecting connector to be called once with correct param
+        verify(ioBackEndRestConnector, times(1)).createService(serviceRequestDTOexpected);
+    }
+
+    @Test
+    void sendInitiativeInfoToIOBackEndServiceAndUpdateInitiativeWithLogo() {
+        Initiative initiative = createStep5Initiative();
+        InitiativeAdditional initiativeAdditional = createInitiativeAdditional();
+        initiativeAdditional.setLogoFileName("logo file name");
+        initiative.setAdditionalInfo(initiativeAdditional);
+        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = InitiativeOrganizationInfoDTO.builder()
+                .organizationName(ORGANIZATION_NAME)
+                .organizationVat(ORGANIZATION_VAT)
+                .organizationUserRole(ORGANIZATION_USER_ROLE)
+                .build();
+
+        ServiceRequestDTO serviceRequestDTOexpected = createServiceRequestDTO();
+        ServiceResponseDTO serviceResponseDTOexpected = createServiceResponseDTO();
+
+        when(initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(initiativeAdditional, initiativeOrganizationInfoDTO)).thenReturn(serviceRequestDTOexpected);
+        when(ioBackEndRestConnector.createService(serviceRequestDTOexpected)).thenReturn(serviceResponseDTOexpected);
+        when(ioTokenService.encrypt(anyString())).thenReturn(ANY_KEY_TOKEN_IO);
+        Mockito.doNothing().when(ioBackEndRestConnector).sendLogoIo(anyString(),anyString(),any());
 
         Initiative initiativeActual = initiativeService.sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(initiative, initiativeOrganizationInfoDTO);
         assertEquals(SERVICE_ID, initiativeActual.getAdditionalInfo().getServiceId());
@@ -1370,7 +1409,6 @@ class InitiativeServiceTest {
         initiative.setInitiativeName(INITIATIVE_NAME);
         initiative.setOrganizationId(ORGANIZATION_ID);
         initiative.setStatus("DRAFT");
-        initiative.setPdndToken("pdndToken1");
         initiative.setAdditionalInfo(createInitiativeAdditional());
         return initiative;
     }
@@ -1416,8 +1454,6 @@ class InitiativeServiceTest {
                 .status("DRAFT")
                 .autocertificationCheck(true)
                 .beneficiaryRanking(true)
-                .pdndCheck(true)
-                .pdndToken("pdndToken1")
                 .additionalInfo(createInitiativeAdditionalDTO()).build();
         return initiativeDTO;
     }
@@ -1499,6 +1535,8 @@ class InitiativeServiceTest {
         List<AutomatedCriteria> automatedCriteriaList = new ArrayList<>();
         automatedCriteriaList.add(automatedCriteria);
         initiativeBeneficiaryRule.setAutomatedCriteria(automatedCriteriaList);
+        initiativeBeneficiaryRule.setApiKeyClientId(API_KEY_CLIENT_ID);
+        initiativeBeneficiaryRule.setApiKeyClientAssertion(API_KEY_CLIENT_ASSERTION);
         return initiativeBeneficiaryRule;
     }
 
@@ -1537,6 +1575,8 @@ class InitiativeServiceTest {
         List<AutomatedCriteriaDTO> automatedCriteriaList = new ArrayList<>();
         automatedCriteriaList.add(automatedCriteriaDTO);
         initiativeBeneficiaryRuleDTO.setAutomatedCriteria(automatedCriteriaList);
+        initiativeBeneficiaryRuleDTO.setApiKeyClientId(API_KEY_CLIENT_ID);
+        initiativeBeneficiaryRuleDTO.setApiKeyClientAssertion(API_KEY_CLIENT_ASSERTION);
         return initiativeBeneficiaryRuleDTO;
     }
 
