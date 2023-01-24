@@ -244,6 +244,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         utilities.initiativeToCheck(this.getUserId(), initiativeId);
         log.info("[UPDATE_TO_CHECK_STATUS] - Initiative: {}. Status successfully changed", initiative.getInitiativeId());
         this.sendEmailToCurrentOrg(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
+        groupRestConnector.setGroupStatusToValidated(initiativeId);
     }
 
     @Override

@@ -23,4 +23,9 @@ public class GroupRestConnectorImpl implements GroupRestConnector {
         groupFeignRestClient.notifyInitiativeForCitizen(initiative.getInitiativeId(), initiativeNotificationDTO);
     }
 
+    @Override
+    public void setGroupStatusToValidated(String initiativeId) {
+        groupFeignRestClient.setGroupStatusToValidated(initiativeId);
+    }
+
 }
