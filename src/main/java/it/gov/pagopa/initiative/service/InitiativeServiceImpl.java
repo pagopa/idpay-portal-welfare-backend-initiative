@@ -210,6 +210,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             }
             initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
             utilities.initiativeInRevision(this.getUserId(),initiativeId);
+            groupRestConnector.setGroupStatusToValidated(initiativeId);
             log.info("[UPDATE_TO_IN_REVISION_STATUS] - Initiative: {}. Status successfully set to IN_REVISION.", initiativeId);
         }
         else{

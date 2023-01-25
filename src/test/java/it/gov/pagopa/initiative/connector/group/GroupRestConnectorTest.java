@@ -58,5 +58,14 @@ class GroupRestConnectorTest {
         groupRestConnectorImpl.notifyInitiativeToGroup(initiative);
         verify(groupFeignRestClient).notifyInitiativeForCitizen(any(), any());
     }
+
+    @Test
+    void testSetGroupStatusToValidated() {
+        when(groupFeignRestClient.notifyInitiativeForCitizen(any(), any()))
+            .thenReturn(new ResponseEntity<>(HttpStatus.CONTINUE));
+
+        groupRestConnectorImpl.setGroupStatusToValidated("id");
+        verify(groupFeignRestClient).setGroupStatusToValidated(any());
+    }
 }
 
