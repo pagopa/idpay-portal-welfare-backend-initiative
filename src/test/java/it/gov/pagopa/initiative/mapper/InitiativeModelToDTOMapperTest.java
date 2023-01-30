@@ -1,13 +1,6 @@
 package it.gov.pagopa.initiative.mapper;
 
 import it.gov.pagopa.initiative.dto.*;
-import it.gov.pagopa.initiative.dto.AnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems;
-import it.gov.pagopa.initiative.dto.AutomatedCriteriaDTO;
-import it.gov.pagopa.initiative.dto.InitiativeAdditionalDTO;
-import it.gov.pagopa.initiative.dto.InitiativeBeneficiaryRuleDTO;
-import it.gov.pagopa.initiative.dto.InitiativeDTO;
-import it.gov.pagopa.initiative.dto.InitiativeDataDTO;
-import it.gov.pagopa.initiative.dto.InitiativeGeneralDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.AccumulatedAmountDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.RefundAdditionalInfoDTO;
@@ -16,14 +9,6 @@ import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardGroupsDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardValueDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.*;
-import it.gov.pagopa.initiative.model.AutomatedCriteria;
-import it.gov.pagopa.initiative.model.FilterOperatorEnumModel;
-import it.gov.pagopa.initiative.model.ISelfDeclarationCriteria;
-import it.gov.pagopa.initiative.model.Initiative;
-import it.gov.pagopa.initiative.model.InitiativeAdditional;
-import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
-import it.gov.pagopa.initiative.model.InitiativeGeneral;
-import it.gov.pagopa.initiative.model.SelfCriteriaBool;
 import it.gov.pagopa.initiative.model.TypeBoolEnum;
 import it.gov.pagopa.initiative.model.TypeMultiEnum;
 import it.gov.pagopa.initiative.model.*;
@@ -35,25 +20,19 @@ import it.gov.pagopa.initiative.model.rule.reward.InitiativeRewardRule;
 import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
 import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
 import it.gov.pagopa.initiative.model.rule.trx.*;
-import it.gov.pagopa.initiative.model.rule.trx.InitiativeTrxConditions;
 import it.gov.pagopa.initiative.service.AESTokenService;
 import it.gov.pagopa.initiative.utils.InitiativeUtils;
-
-import java.time.LocalDateTime;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
@@ -61,21 +40,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ContextConfiguration(classes = {InitiativeModelToDTOMapper.class})
 @ExtendWith(SpringExtension.class)
@@ -97,49 +63,30 @@ class InitiativeModelToDTOMapperTest {
     private InitiativeBeneficiaryRule initiativeBeneficiaryRule;
     private InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO;
     private List<InitiativeSummaryDTO> initiativeSummaryDTOList;
-
     private InitiativeRefundRuleDTO refundRuleDTO1;
-
     private InitiativeRefundRule refundRule1;
-
     private InitiativeRefundRuleDTO refundRuleDTO2;
-
     private InitiativeRefundRule refundRule2;
-
     private InitiativeRefundRuleDTO refundRuleDTO3;
-
     private InitiativeRefundRule refundRule3;
-
     private InitiativeDTO fullInitiativeDTOStep4;
-
     private Initiative fullInitiativeStep4RewardAndTrxRules;
-
     private InitiativeDTO getFullInitiativeDTOStep4RewardGroup;
-
     private Initiative fullInitiativeStep4RewardAndTrxRulesRewardGroup;
-
     private InitiativeDTO fullInitiativeDTOStep4RewardLimitEmpty;
-
     private Initiative fullInitiativeStep4RewardLimitEmpty;
-
     private InitiativeDTO fullInitiativeDTOStep4DayOfWeekNull;
-
     private Initiative fullInitiativeStep4DayOfWeekNull;
-
     private InitiativeDTO fullInitiativeDTOStep4MccFilterNull;
-
     private Initiative fullInitiativeStep4MccFilterNull;
-
     private InitiativeDTO fullInitiativeDTOStep4TrxCountNull;
-
     private Initiative fullInitiativeStep4TrxCountNull;
-
     private InitiativeDTO fullInitiativeDTOStep4ThresholdNull;
-
     private Initiative fullInitiativeStep4ThresholdNull;
-
     private InitiativeAdditionalDTO initiativeAdditionalDTOOnlyTokens;
     private InitiativeAdditional initiativeAdditionalOnlyTokens;
+    private InitiativeIssuerDTO initiativeIssuerDTO;
+
     @MockBean
     InitiativeUtils initiativeUtils;
 
@@ -311,7 +258,7 @@ class InitiativeModelToDTOMapperTest {
     }
 
     @Test
-    void givenApiKeyCientIdNotPresent_toInitiativeDTO() {
+    void givenApiKeyClientIdNotPresent_toInitiativeDTO() {
         fullInitiative.getBeneficiaryRule().setApiKeyClientId(null);
         InitiativeDTO initiativeDTOActual = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiative);
         //Check the equality of the results
@@ -319,11 +266,34 @@ class InitiativeModelToDTOMapperTest {
     }
 
     @Test
-    void givenApiKeyCientAssertionNotPresent_toInitiativeDTO() {
+    void givenApiKeyClientAssertionNotPresent_toInitiativeDTO() {
         fullInitiative.getBeneficiaryRule().setApiKeyClientAssertion(null);
         InitiativeDTO initiativeDTOActual = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiative);
         //Check the equality of the results
         assertEquals(fullInitiative.getBeneficiaryRule().getApiKeyClientAssertion(), initiativeDTOActual.getBeneficiaryRule().getApiKeyClientAssertion());
+    }
+    
+    @Test
+    void toInitiativeAdditionalDTO() {
+        Initiative initiative = createStep1Initiative();
+
+        initiative.setAdditionalInfo(null);
+        assertNull(initiativeModelToDTOMapper.toInitiativeDTO(initiative).getAdditionalInfo());
+    }
+
+    @Test
+    void testToChannelsDTO_empty() {
+        Initiative initiative = createStep1Initiative();
+        InitiativeAdditional additionalInfo = new InitiativeAdditional();
+        List<Channel> channels = new ArrayList<>();
+        List<ChannelDTO> channelDTO = new ArrayList<>();
+        additionalInfo.setChannels(channels);
+        additionalInfo.setServiceScope(InitiativeAdditional.ServiceScope.LOCAL);
+        initiative.setAdditionalInfo(additionalInfo);
+        
+        assertTrue(channels.isEmpty());
+        assertTrue(CollectionUtils.isEmpty(channels));
+        assertEquals(initiativeModelToDTOMapper.toInitiativeDTO(initiative).getAdditionalInfo().getChannels(), channelDTO);
     }
 
     @Test
@@ -374,17 +344,38 @@ class InitiativeModelToDTOMapperTest {
     }
 
     @Test
-    void testToInitiativeIssuerDTOList() {
+    void testToInitiativeIssuerDTOList_empty() {
         assertTrue(initiativeModelToDTOMapper.toInitiativeIssuerDTOList(new ArrayList<>()).isEmpty());
     }
 
     @Test
-    void testToInitiativeIssuerDTOList2() {
+    void testToInitiativeIssuerDTOList_OK() {
         Initiative initiative = createFullInitiative();
 
         ArrayList<Initiative> initiativeList = new ArrayList<>();
         initiativeList.add(initiative);
         assertEquals(1, initiativeModelToDTOMapper.toInitiativeIssuerDTOList(initiativeList).size());
+    }
+
+    @Test
+    void testLanguageMap() {
+        Initiative initiative = createStep3Initiative();
+        Map<String, String> language = new HashMap<>();
+        language.put(Locale.ENGLISH.getLanguage(), "en");
+        initiative.getGeneral().setDescriptionMap(language);
+
+        ArrayList<Initiative> initiativeList = new ArrayList<>();
+        initiativeList.add(initiative);
+
+        assertEquals(language.isEmpty(),
+                initiativeModelToDTOMapper.toInitiativeIssuerDTOList(initiativeList).contains(initiative.getGeneral().getDescriptionMap()));
+    }
+
+    @Test
+    void testToRewardRuleDTO() {
+        Initiative initiative = createStep3Initiative();
+        Mockito.when(initiativeModelToDTOMapper.toInitiativeDTO(initiative).getRewardRule()).thenReturn(null);
+        assertNull(initiativeModelToDTOMapper.toInitiativeDTO(initiative).getRewardRule());
     }
 
     private Initiative createFullInitiative() {

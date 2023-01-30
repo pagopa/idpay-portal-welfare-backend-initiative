@@ -1,11 +1,6 @@
 package it.gov.pagopa.initiative.mapper;
 
 import it.gov.pagopa.initiative.dto.*;
-import it.gov.pagopa.initiative.dto.AnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems;
-import it.gov.pagopa.initiative.dto.AutomatedCriteriaDTO;
-import it.gov.pagopa.initiative.dto.FilterOperatorEnum;
-import it.gov.pagopa.initiative.dto.InitiativeBeneficiaryRuleDTO;
-import it.gov.pagopa.initiative.dto.SelfCriteriaBoolDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.AccumulatedAmountDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.RefundAdditionalInfoDTO;
@@ -14,8 +9,6 @@ import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardGroupsDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardValueDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.*;
-import it.gov.pagopa.initiative.model.AutomatedCriteria;
-import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
 import it.gov.pagopa.initiative.model.TypeBoolEnum;
 import it.gov.pagopa.initiative.model.TypeMultiEnum;
 import it.gov.pagopa.initiative.model.*;
@@ -27,18 +20,18 @@ import it.gov.pagopa.initiative.model.rule.reward.InitiativeRewardRule;
 import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
 import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
 import it.gov.pagopa.initiative.model.rule.trx.*;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import it.gov.pagopa.initiative.service.AESTokenService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
@@ -46,22 +39,9 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-
 import static com.mongodb.assertions.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ContextConfiguration(classes = {InitiativeDTOsToModelMapper.class})
 @ExtendWith(SpringExtension.class)
@@ -249,12 +229,72 @@ class InitiativeDTOsToModelMapperTest {
         //Check the equality of the results
         assertEquals(initiativeNoBaseFields, initiativeActual);
     }
+    
+    @Test
+    void testToInitiativeGeneral_null() {
+        Assertions.assertNull(initiativeDTOsToModelMapper.toInitiative((InitiativeGeneralDTO) null).getGeneral());
+    }
 
+    @Test
+    void testToInitiativeAdditional_null() {
+    Assertions.assertNull(initiativeDTOsToModelMapper.toInitiative((InitiativeAdditionalDTO) null).getAdditionalInfo());
+    }
+
+    @Test
+    void testToInitiativeAdditionalChannels_empty() {
+        Initiative initiative = createStep1Initiative();
+        InitiativeAdditional additionalInfo = createInitiativeAdditional();
+        InitiativeAdditionalDTO additionalDTO = new InitiativeAdditionalDTO();
+        List<Channel> channels = new ArrayList<>();
+        List<ChannelDTO> channelDTO = new ArrayList<>();
+        additionalDTO.setChannels(channelDTO);
+        additionalDTO.setServiceScope(InitiativeAdditionalDTO.ServiceScope.LOCAL);
+        initiative.setAdditionalInfo(additionalInfo);
+
+        assertTrue(CollectionUtils.isEmpty(channels));
+        assertEquals(initiativeDTOsToModelMapper.toInitiative(additionalDTO).getAdditionalInfo().getChannels(), channelDTO);
+    }
+    
+    @Test
+    void testToInitiativeRewardRule_exception() {
+        InitiativeRewardRuleDTO rewardRuleDTO = new InitiativeRewardRuleDTO() {};
+        InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = new InitiativeRewardAndTrxRulesDTO();
+        initiativeRewardAndTrxRulesDTO.setRewardRule(rewardRuleDTO);
+       try {
+           initiativeDTOsToModelMapper.toInitiative(initiativeRewardAndTrxRulesDTO).getRewardRule();
+       } catch (IllegalArgumentException exception) {
+           assertEquals("Initiative Reward Rule not handled: it.gov.pagopa.initiative.mapper.InitiativeDTOsToModelMapperTest$1", exception.getMessage());
+       }
+}
+    
     @Test
     void toBeneficiaryRule_equals() {
         InitiativeBeneficiaryRule initiativeBeneficiaryRuleActual = initiativeDTOsToModelMapper.toBeneficiaryRule(initiativeBeneficiaryRuleDTO);
         //Check the equality of the results
         assertEquals(initiativeBeneficiaryRule, initiativeBeneficiaryRuleActual);
+    }
+
+    @Test
+    void toBeneficiaryRule_null() {
+    assertNull(initiativeDTOsToModelMapper.toBeneficiaryRule(null));
+}
+    
+    @Test
+    void toBeneficiaryRule_setAutomatedCriteria() {
+        InitiativeBeneficiaryRuleDTO beneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
+        InitiativeBeneficiaryRule beneficiaryRule = new InitiativeBeneficiaryRule();
+        beneficiaryRuleDTO.setAutomatedCriteria(Collections.emptyList());
+        beneficiaryRule.setAutomatedCriteria(Collections.emptyList());
+        assertTrue(initiativeDTOsToModelMapper.toBeneficiaryRule(beneficiaryRuleDTO).getAutomatedCriteria().isEmpty());
+    }
+
+    @Test
+    void toBeneficiaryRule_setSelfDeclarationCriteria() {
+        InitiativeBeneficiaryRuleDTO beneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
+        InitiativeBeneficiaryRule beneficiaryRule = new InitiativeBeneficiaryRule();
+        beneficiaryRuleDTO.setSelfDeclarationCriteria(Collections.emptyList());
+        beneficiaryRule.setSelfDeclarationCriteria(Collections.emptyList());
+        assertTrue(initiativeDTOsToModelMapper.toBeneficiaryRule(beneficiaryRuleDTO).getSelfDeclarationCriteria().isEmpty());
     }
 
     @Test

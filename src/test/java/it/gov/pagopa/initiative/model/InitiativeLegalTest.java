@@ -61,6 +61,9 @@ class InitiativeLegalTest {
     @Test
     void testEquals() {
         assertNotEquals(null, new InitiativeLegal("Privacy Link", "Tc Link", "Regulation Link", "Dpia Link"));
+        assertNotEquals(null, new InitiativeLegal("Privacy Link", "Tc Link", "Regulation Link", "Dpia Link"));
+        assertNotEquals("Different type to InitiativeLegal",
+                new InitiativeLegal("Privacy Link", "Tc Link", "Regulation Link", "Dpia Link"));
     }
 
     @Test
@@ -83,6 +86,88 @@ class InitiativeLegalTest {
     void testEquals4() {
         InitiativeLegal initiativeLegal = new InitiativeLegal(null, "Tc Link", "Regulation Link", "Dpia Link");
         InitiativeLegal initiativeLegal1 = new InitiativeLegal(null, "Tc Link", "Regulation Link", "Dpia Link");
+
+        assertEquals(initiativeLegal, initiativeLegal1);
+        int expectedHashCodeResult = initiativeLegal.hashCode();
+        assertEquals(expectedHashCodeResult, initiativeLegal1.hashCode());
+    }
+
+    @Test
+    void testEquals5() {
+        InitiativeLegal initiativeLegal = new InitiativeLegal("Privacy Link", "Tc Link", "Regulation Link", "Dpia Link");
+        assertEquals(initiativeLegal, initiativeLegal);
+        int expectedHashCodeResult = initiativeLegal.hashCode();
+        assertEquals(expectedHashCodeResult, initiativeLegal.hashCode());
+    }
+
+    @Test
+    void testEquals6() {
+        InitiativeLegal initiativeLegal = new InitiativeLegal(null, "Tc Link", "Regulation Link", "Dpia Link");
+        assertNotEquals(initiativeLegal, new InitiativeLegal("Privacy Link", "Tc Link", "Regulation Link", "Dpia Link"));
+    }
+
+    @Test
+    void testEquals7() {
+        InitiativeLegal initiativeLegal = new InitiativeLegal("Privacy Link", "Privacy Link", "Regulation Link",
+                "Dpia Link");
+        assertNotEquals(initiativeLegal, new InitiativeLegal("Privacy Link", "Tc Link", "Regulation Link", "Dpia Link"));
+    }
+
+    @Test
+    void testEquals8() {
+        InitiativeLegal initiativeLegal = new InitiativeLegal("Privacy Link", null, "Regulation Link", "Dpia Link");
+        assertNotEquals(initiativeLegal, new InitiativeLegal("Privacy Link", "Tc Link", "Regulation Link", "Dpia Link"));
+    }
+
+    @Test
+    void testEquals9() {
+        InitiativeLegal initiativeLegal = new InitiativeLegal("Privacy Link", "Tc Link", "Privacy Link", "Dpia Link");
+        assertNotEquals(initiativeLegal, new InitiativeLegal("Privacy Link", "Tc Link", "Regulation Link", "Dpia Link"));
+    }
+
+    @Test
+    void testEquals10() {
+        InitiativeLegal initiativeLegal = new InitiativeLegal("Privacy Link", "Tc Link", null, "Dpia Link");
+        assertNotEquals(initiativeLegal, new InitiativeLegal("Privacy Link", "Tc Link", "Regulation Link", "Dpia Link"));
+    }
+
+    @Test
+    void testEquals11() {
+        InitiativeLegal initiativeLegal = new InitiativeLegal("Privacy Link", "Tc Link", "Regulation Link",
+                "Privacy Link");
+        assertNotEquals(initiativeLegal, new InitiativeLegal("Privacy Link", "Tc Link", "Regulation Link", "Dpia Link"));
+    }
+
+    @Test
+    void testEquals12() {
+        InitiativeLegal initiativeLegal = new InitiativeLegal("Privacy Link", "Tc Link", "Regulation Link", null);
+        assertNotEquals(initiativeLegal, new InitiativeLegal("Privacy Link", "Tc Link", "Regulation Link", "Dpia Link"));
+    }
+
+    @Test
+    void testEquals13() {
+        InitiativeLegal initiativeLegal = new InitiativeLegal("Privacy Link", null, "Regulation Link", "Dpia Link");
+        InitiativeLegal initiativeLegal1 = new InitiativeLegal("Privacy Link", null, "Regulation Link", "Dpia Link");
+
+        assertEquals(initiativeLegal, initiativeLegal1);
+        int expectedHashCodeResult = initiativeLegal.hashCode();
+        assertEquals(expectedHashCodeResult, initiativeLegal1.hashCode());
+    }
+
+    @Test
+    void testEquals14() {
+        InitiativeLegal initiativeLegal = new InitiativeLegal("Privacy Link", "Tc Link", null, "Dpia Link");
+        InitiativeLegal initiativeLegal1 = new InitiativeLegal("Privacy Link", "Tc Link", null, "Dpia Link");
+
+        assertEquals(initiativeLegal, initiativeLegal1);
+        int expectedHashCodeResult = initiativeLegal.hashCode();
+        assertEquals(expectedHashCodeResult, initiativeLegal1.hashCode());
+    }
+
+    @Test
+    void testEquals15() {
+        InitiativeLegal initiativeLegal = new InitiativeLegal("Privacy Link", "Tc Link", "Regulation Link", null);
+        InitiativeLegal initiativeLegal1 = new InitiativeLegal("Privacy Link", "Tc Link", "Regulation Link", null);
 
         assertEquals(initiativeLegal, initiativeLegal1);
         int expectedHashCodeResult = initiativeLegal.hashCode();

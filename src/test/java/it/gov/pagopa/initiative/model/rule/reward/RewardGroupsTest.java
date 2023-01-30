@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class RewardGroupsTest {
 
@@ -49,7 +50,8 @@ class RewardGroupsTest {
 
     @Test
     void testEquals() {
-        assertNotEquals(new RewardGroups(), null);
+        assertNotEquals(null, new RewardGroups());
+        assertNotEquals("Different type to RewardGroups", new RewardGroups());
     }
 
     @Test
@@ -92,6 +94,18 @@ class RewardGroupsTest {
         RewardGroups rewardGroups1 = new RewardGroups();
         rewardGroups1.setRewardGroups(new ArrayList<>());
         assertNotEquals(rewardGroups, rewardGroups1);
+    }
+    @Test
+    void testEquals7() {
+        RewardGroups rewardGroups = new RewardGroups();
+        assertNotEquals(rewardGroups, new RewardGroups("Type", new ArrayList<>()));
+    }
+
+    @Test
+    void testEquals8() {
+        RewardGroups rewardGroups = new RewardGroups();
+        rewardGroups.setRewardGroups(new ArrayList<>());
+        assertNotEquals(rewardGroups, new RewardGroups());
     }
 }
 

@@ -25,34 +25,29 @@ import it.gov.pagopa.initiative.model.rule.refund.AccumulatedAmount;
 import it.gov.pagopa.initiative.model.rule.refund.AdditionalInfo;
 import it.gov.pagopa.initiative.model.rule.refund.InitiativeRefundRule;
 import it.gov.pagopa.initiative.model.rule.refund.TimeParameter;
-import it.gov.pagopa.initiative.model.rule.reward.InitiativeRewardRule;
-import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
-import it.gov.pagopa.initiative.model.rule.trx.InitiativeTrxConditions;
 import it.gov.pagopa.initiative.service.InitiativeService;
-import org.apache.commons.lang3.LocaleUtils;
 import org.apache.kafka.common.KafkaException;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 
@@ -252,9 +247,26 @@ class InitiativeApiTest {
     }
 
     @Test
+    void testAddLogo() throws IOException {
+
+        InitiativeService initiativeService = mock(InitiativeService.class);
+        when(initiativeService.storeInitiativeLogo(any(), any(), any(), any(),
+                any())).thenReturn(new LogoDTO());
+        InitiativeModelToDTOMapper initiativeModelToDTOMapper = new InitiativeModelToDTOMapper();
+        InitiativeApiController initiativeApiController = new InitiativeApiController(true, true, true, initiativeService,
+                initiativeModelToDTOMapper, new InitiativeDTOsToModelMapper());
+        ResponseEntity<LogoDTO> actualAddLogoResult = initiativeApiController.addLogo("42", "42",
+                new MockMultipartFile("Name", new ByteArrayInputStream("AAAAAAAA".getBytes("UTF-8"))));
+        assertTrue(actualAddLogoResult.hasBody());
+        assertTrue(actualAddLogoResult.getHeaders().isEmpty());
+        assertEquals(HttpStatus.OK, actualAddLogoResult.getStatusCode());
+        verify(initiativeService).storeInitiativeLogo(any(), any(), any(), any(),
+                any());
+    }
+
+    @Test
     void getInitiativeIdFromServiceId_statusOk() throws Exception {
         Initiative step1Initiative = createStep1Initiative();
-        String string = GET_INITIATIVE_ID_FROM_SERVICE_ID + ORGANIZATION_ID + SERVICE_ID;
         when(initiativeService.getInitiativeIdFromServiceId(SERVICE_ID)).thenReturn(step1Initiative);
         Initiative initiative = initiativeService.getInitiativeIdFromServiceId(SERVICE_ID);
         assertThat("Reason of result", initiative, is(sameInstance(step1Initiative)));
@@ -267,20 +279,12 @@ class InitiativeApiTest {
     }
 
     @Test
-    void getInitiativeIdFromServiceId_Exception() throws Exception {
-        Initiative step1Initiative = createStep1Initiative();
-        InitiativeGeneral initiativeGeneral = createInitiativeGeneral(true);
-        step1Initiative.setGeneral(initiativeGeneral);
-        Map<String, String> acceptLanguage = new HashMap<>();
-        acceptLanguage.put(Locale.CHINA.getLanguage(), "ch");
-        step1Initiative.getGeneral().setDescriptionMap(acceptLanguage);
-        when(initiativeService.getInitiativeIdFromServiceId(SERVICE_ID)).thenReturn(step1Initiative);
-
+    void getInitiativeIdFromServiceId_Exception() {
         try {
-            initiativeService.getInitiativeIdFromServiceId(SERVICE_ID);
+            initiativeApiController.getInitiativeIdFromServiceId(Locale.forLanguageTag("xxxx"), SERVICE_ID);
         } catch (InitiativeException e) {
             assertEquals(CODE, e.getCode());
-            assertEquals(String.format(InitiativeConstants.Exception.BadRequest.INVALID_LOCALE_FORMAT, Locale.ITALIAN), e.getMessage());
+            assertEquals(String.format(InitiativeConstants.Exception.BadRequest.INVALID_LOCALE_FORMAT, "xxxx"), e.getMessage());
         }
     }
 
