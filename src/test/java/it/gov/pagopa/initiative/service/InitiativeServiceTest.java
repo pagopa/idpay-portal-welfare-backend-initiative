@@ -548,6 +548,20 @@ class InitiativeServiceTest {
         Initiative fullInitiative = createFullInitiative();
         Map<String, String> language = new HashMap<>();
         language.put(Locale.ITALIAN.getLanguage(), "it");
+        InitiativeGeneral initiativeGeneral = createInitiativeGeneral(false);
+        initiativeGeneral.setDescriptionMap(language);
+        fullInitiative.setGeneral(initiativeGeneral);
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(fullInitiative);
+        initiativeService.updateInitiativeRefundRules(ORGANIZATION_ID, INITIATIVE_ID, ROLE, fullInitiative, true);
+        assertEquals(Status.IN_REVISION, fullInitiative.getStatus());
+
+    }
+
+    @Test
+    void updateInitiativeRefundRules_inRevision_beneficiaryKnown() {
+        Initiative fullInitiative = createFullInitiative();
+        Map<String, String> language = new HashMap<>();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneral initiativeGeneral = createInitiativeGeneral(true);
         initiativeGeneral.setDescriptionMap(language);
         fullInitiative.setGeneral(initiativeGeneral);
