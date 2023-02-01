@@ -45,7 +45,7 @@ class InitiativeRepositoryExtendedImplTest {
 
 
     @ParameterizedTest
-    @ValueSource(strings = {InitiativeConstants.Role.ADMIN, InitiativeConstants.Role.OPE_BASE, "default"})
+    @ValueSource(strings = {InitiativeConstants.Role.ADMIN, InitiativeConstants.Role.PAGOPA_ADMIN, "default"})
     void test(String role) {
         List<OrganizationDTO> result = initiativeRepository.findAllBy(createStatusList(role));
 
@@ -80,8 +80,8 @@ class InitiativeRepositoryExtendedImplTest {
     private List<String> createStatusList(String role) {
         return switch (role) {
             case InitiativeConstants.Role.ADMIN -> InitiativeConstants.Status.INITIATIVE_STATUS_LIST_FOR_ADMIN_OPERATOR;
-            case InitiativeConstants.Role.OPE_BASE ->
-                    InitiativeConstants.Status.INITIATIVE_STATUS_LIST_FOR_PAGO_PA_OPERATOR;
+            case InitiativeConstants.Role.PAGOPA_ADMIN ->
+                    InitiativeConstants.Status.INITIATIVE_STATUS_LIST_FOR_PAGOPA_ADMIN_OPERATOR;
             default -> Collections.emptyList();
         };
     }
@@ -93,7 +93,7 @@ class InitiativeRepositoryExtendedImplTest {
 
         // Remove results that only ADMINs can see
         for (int i = list.size()-1; i >= 0; i--) {
-            if(role.equals(InitiativeConstants.Role.OPE_BASE) && i%2!=0) {
+            if(role.equals(InitiativeConstants.Role.PAGOPA_ADMIN) && i%2!=0) {
                 list.remove(list.get(i));
             }
         }

@@ -8,7 +8,7 @@ public class InitiativeConstants {
     private InitiativeConstants(){}
 
     public static final class Status {
-        public static final List<String> INITIATIVE_STATUS_LIST_FOR_PAGO_PA_OPERATOR = List.of(InitiativeConstants.Status.IN_REVISION, InitiativeConstants.Status.TO_CHECK, InitiativeConstants.Status.APPROVED, InitiativeConstants.Status.PUBLISHED);
+        public static final List<String> INITIATIVE_STATUS_LIST_FOR_PAGOPA_ADMIN_OPERATOR = List.of(InitiativeConstants.Status.IN_REVISION, InitiativeConstants.Status.TO_CHECK, InitiativeConstants.Status.APPROVED, InitiativeConstants.Status.PUBLISHED);
         public static final List<String> INITIATIVE_STATUS_LIST_FOR_ADMIN_OPERATOR = List.of(InitiativeConstants.Status.DRAFT, InitiativeConstants.Status.IN_REVISION, InitiativeConstants.Status.TO_CHECK, InitiativeConstants.Status.APPROVED, InitiativeConstants.Status.PUBLISHED, InitiativeConstants.Status.SUSPENDED, InitiativeConstants.Status.CLOSED);
         public static final String DRAFT = "DRAFT"; //In bozza
         public static final String IN_REVISION = "IN_REVISION"; //In revisione
@@ -31,7 +31,7 @@ public class InitiativeConstants {
 
     public static final class Role {
         public static final String ADMIN = "admin";
-        public static final String OPE_BASE = "ope_base";
+        public static final String PAGOPA_ADMIN = "pagopa_admin";
     }
 
     public static final class Email {

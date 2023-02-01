@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Status.INITIATIVE_STATUS_LIST_FOR_ADMIN_OPERATOR;
-import static it.gov.pagopa.initiative.constants.InitiativeConstants.Status.INITIATIVE_STATUS_LIST_FOR_PAGO_PA_OPERATOR;
+import static it.gov.pagopa.initiative.constants.InitiativeConstants.Status.INITIATIVE_STATUS_LIST_FOR_PAGOPA_ADMIN_OPERATOR;
 
 @Service
 public class OrganizationServiceImpl implements OrganizationService {
@@ -24,8 +24,8 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     public List<OrganizationDTO> getOrganizationList(String role) {
         return switch (role) {
-            case InitiativeConstants.Role.OPE_BASE ->
-                    initiativeRepository.findAllBy(INITIATIVE_STATUS_LIST_FOR_PAGO_PA_OPERATOR);
+            case InitiativeConstants.Role.PAGOPA_ADMIN ->
+                    initiativeRepository.findAllBy(INITIATIVE_STATUS_LIST_FOR_PAGOPA_ADMIN_OPERATOR);
             case InitiativeConstants.Role.ADMIN ->
                     initiativeRepository.findAllBy(INITIATIVE_STATUS_LIST_FOR_ADMIN_OPERATOR);
             default -> null;

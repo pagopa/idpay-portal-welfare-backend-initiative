@@ -57,7 +57,7 @@ import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.B
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.ErrorDtoDefaultMsg.ACCUMULATED_AMOUNT_TYPE;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.ErrorDtoDefaultMsg.SOMETHING_WRONG_WITH_THE_REFUND_TYPE;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.ADMIN;
-import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.OPE_BASE;
+import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.PAGOPA_ADMIN;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
@@ -180,10 +180,10 @@ class InitiativeApiTest {
         List<Initiative> initiatives = Arrays.asList(step2Initiative, step2Initiative2);
 
         // Returning something from Repo by using ServiceMock
-        when(initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, OPE_BASE)).thenReturn(initiatives);
+        when(initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, PAGOPA_ADMIN)).thenReturn(initiatives);
 
         // When
-        List<Initiative> retrieveInitiativeSummary = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, OPE_BASE);
+        List<Initiative> retrieveInitiativeSummary = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, PAGOPA_ADMIN);
 
         // Then
         // you are expecting service to return whatever returned by repo
@@ -916,7 +916,7 @@ class InitiativeApiTest {
     void getListOfOrganization() throws Exception {
         List<OrganizationDTO> organizationDTOList = createOrganizationDTOList();
         when(organizationService.getOrganizationList(ADMIN)).thenReturn(organizationDTOList);
-        when(organizationService.getOrganizationList(OPE_BASE)).thenReturn(organizationDTOList);
+        when(organizationService.getOrganizationList(PAGOPA_ADMIN)).thenReturn(organizationDTOList);
         when(organizationService.getOrganizationList("default")).thenReturn(null);
 
         MvcResult resultAdmin = mvc.perform(MockMvcRequestBuilders
@@ -928,7 +928,7 @@ class InitiativeApiTest {
 
         MvcResult resultOpeBase = mvc.perform(MockMvcRequestBuilders
                         .get(BASE_URL + "/organizations")
-                        .param("role", OPE_BASE)
+                        .param("role", PAGOPA_ADMIN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();

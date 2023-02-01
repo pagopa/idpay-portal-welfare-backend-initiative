@@ -52,7 +52,7 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
                         InitiativeConstants.Exception.NotFound.CODE,
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
                         HttpStatus.NOT_FOUND));
-        if (InitiativeConstants.Role.OPE_BASE.equals(role)){
+        if (InitiativeConstants.Role.PAGOPA_ADMIN.equals(role)){
             if (initiative.getStatus().equals(InitiativeConstants.Status.IN_REVISION) || initiative.getStatus().equals(InitiativeConstants.Status.TO_CHECK) || initiative.getStatus().equals(InitiativeConstants.Status.APPROVED)){
                 return initiative;
             }else {
@@ -70,7 +70,7 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
     @Override
     public void checkPermissionBeforeInsert(String role) {
         log.debug("[CHECK PERMISSION] role: {}", role);
-        if (InitiativeConstants.Role.OPE_BASE.equals(role)){
+        if (InitiativeConstants.Role.PAGOPA_ADMIN.equals(role)){
             throw new InitiativeException(
                         InitiativeConstants.Exception.BadRequest.CODE,
                         String.format(InitiativeConstants.Exception.BadRequest.PERMISSION_NOT_VALID, role),

@@ -16,8 +16,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @ExtendWith(MockitoExtension.class)
 class OrganizationServiceImplTest {
 
@@ -32,13 +30,13 @@ class OrganizationServiceImplTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {InitiativeConstants.Role.ADMIN, InitiativeConstants.Role.OPE_BASE, "default"})
+    @ValueSource(strings = {InitiativeConstants.Role.ADMIN, InitiativeConstants.Role.PAGOPA_ADMIN, "default"})
     void getListOrganization(String role) {
         List<String> statusList = switch (role) {
             case InitiativeConstants.Role.ADMIN ->
                     InitiativeConstants.Status.INITIATIVE_STATUS_LIST_FOR_ADMIN_OPERATOR;
-            case InitiativeConstants.Role.OPE_BASE ->
-                    InitiativeConstants.Status.INITIATIVE_STATUS_LIST_FOR_PAGO_PA_OPERATOR;
+            case InitiativeConstants.Role.PAGOPA_ADMIN ->
+                    InitiativeConstants.Status.INITIATIVE_STATUS_LIST_FOR_PAGOPA_ADMIN_OPERATOR;
             default -> null;
         };
 
