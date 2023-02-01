@@ -20,7 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@PDNDapiKeyMustExistForAtLeastOneAutoCriteriaConstraint(groups = ValidationApiEnabledGroup.class)
+//@PDNDapiKeyMustExistForAtLeastOneAutoCriteriaConstraint(groups = ValidationApiEnabledGroup.class)
 @SuperBuilder
 public class InitiativeBeneficiaryRuleDTO extends InitiativeOrganizationInfoDTO {
 
