@@ -1,6 +1,5 @@
 package it.gov.pagopa.initiative.repository;
 
-import de.flapdoodle.embed.mongo.MongodExecutable;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.OrganizationDTO;
 import it.gov.pagopa.initiative.model.Initiative;
@@ -23,13 +22,8 @@ class InitiativeRepositoryExtendedImplTest {
 
     private static final int DATA_LIST_SIZE = 4;
 
-    @Autowired(required = false)
-    private MongodExecutable embeddedMongoServer;
-
     @Autowired
     private InitiativeRepository initiativeRepository;
-    @Autowired
-    private InitiativeRepositoryExtendedImpl initiativeRepositoryExtended;
 
     List<Initiative> testData = createInitiativeList();
 
