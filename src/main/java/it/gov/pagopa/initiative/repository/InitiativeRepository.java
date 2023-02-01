@@ -1,5 +1,6 @@
 package it.gov.pagopa.initiative.repository;
 
+import it.gov.pagopa.initiative.dto.OrganizationDTO;
 import it.gov.pagopa.initiative.model.Initiative;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -7,7 +8,7 @@ import org.springframework.data.mongodb.repository.Query;
 import java.util.List;
 import java.util.Optional;
 
-public interface InitiativeRepository extends MongoRepository<Initiative, String> {
+public interface InitiativeRepository extends MongoRepository<Initiative, String>, InitiativeRepositoryExtended {
 
     @Query(value="{organizationId : ?0, enabled: ?1}", fields="{initiativeId : 1, initiativeName : 1, status : 1, 'additionalInfo.serviceName' : 1, creationDate : 1, updateDate : 1, 'general.rankingEnabled' : 1}")
     List<Initiative> retrieveInitiativeSummary(String organizationId, Boolean enabled);
@@ -35,4 +36,6 @@ public interface InitiativeRepository extends MongoRepository<Initiative, String
             fields = "{initiativeId : 1, 'general.descriptionMap' : 1}"
     )
     Optional<Initiative> retrieveServiceId(String serviceId);
+
+    OrganizationDTO findFirstByOrganizationId(String organizationId);
 }

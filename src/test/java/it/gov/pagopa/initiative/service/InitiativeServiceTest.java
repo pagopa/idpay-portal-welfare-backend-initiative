@@ -61,7 +61,7 @@ import java.time.LocalTime;
 import java.util.*;
 
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.ADMIN;
-import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.OPE_BASE;
+import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.PAGOPA_ADMIN;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -189,7 +189,7 @@ class InitiativeServiceTest {
         when(initiativeRepository.retrieveInitiativeSummary(ORGANIZATION_ID, true)).thenReturn(initiativeList);
 
         //Try to call the Real Service (which is using the instructed Repo)
-        List<Initiative> initiatives = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, OPE_BASE);
+        List<Initiative> initiatives = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, PAGOPA_ADMIN);
 
         //Check the equality of the results
         assertEquals(initiativeList, initiatives);
@@ -208,7 +208,7 @@ class InitiativeServiceTest {
         when(initiativeRepository.retrieveInitiativeSummary(ORGANIZATION_ID, true)).thenReturn(initiativeList);
 
         //Try to call the Real Service (which is using the instructed Repo)
-        List<Initiative> initiatives = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, OPE_BASE);
+        List<Initiative> initiatives = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, PAGOPA_ADMIN);
 
         //Check the equality of the results
         assertEquals(initiativeList, initiatives);
@@ -227,7 +227,7 @@ class InitiativeServiceTest {
         when(initiativeRepository.retrieveInitiativeSummary(ORGANIZATION_ID, true)).thenReturn(initiativeList);
 
         //Try to call the Real Service (which is using the instructed Repo)
-        List<Initiative> initiatives = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, OPE_BASE);
+        List<Initiative> initiatives = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, PAGOPA_ADMIN);
 
         //Check the equality of the results
         assertEquals(initiativeList, initiatives);
@@ -1063,7 +1063,7 @@ class InitiativeServiceTest {
 
         try {
             initiativeService.isInitiativeAllowedToBeNextStatusThenThrows(initiative, STATUS,
-                    InitiativeConstants.Role.OPE_BASE);
+                    InitiativeConstants.Role.PAGOPA_ADMIN);
         } catch (InitiativeException e) {
             assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
         }

@@ -2370,7 +2370,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrlInitiative}}/summary?role=ope_base",
+							"raw": "{{baseUrlInitiative}}/summary?role=pagopa_admin",
 							"host": [
 								"{{baseUrlInitiative}}"
 							],
@@ -2380,7 +2380,7 @@
 							"query": [
 								{
 									"key": "role",
-									"value": "ope_base"
+									"value": "pagopa_admin"
 								}
 							]
 						},
@@ -5530,7 +5530,7 @@
 								"exec": [
 									"let body;\r",
 									"baseUrlInitiative = pm.variables.get('baseUrlInitiative')\r",
-									"rawBody = '{\"organizationName\":\"Comune di Milano\",\"organizationVat\":\"11122233344\",\"organizationUserId\":\"a0a00000-0aaa-00aa-0000-0000000a0000\",\"organizationUserRole\":\"ope_base\"}';\r",
+									"rawBody = '{\"organizationName\":\"Comune di Milano\",\"organizationVat\":\"11122233344\",\"organizationUserId\":\"a0a00000-0aaa-00aa-0000-0000000a0000\",\"organizationUserRole\":\"pagopa_admin\"}';\r",
 									"if(baseUrlInitiative.includes('localhost')){\r",
 									"    body = {\r",
 									"        mode: 'raw',\r",
