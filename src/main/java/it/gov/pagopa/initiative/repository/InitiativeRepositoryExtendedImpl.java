@@ -22,8 +22,8 @@ public class InitiativeRepositoryExtendedImpl implements InitiativeRepositoryExt
     @Override
     public List<OrganizationDTO> findAllBy(List<String> statusList) {
         AggregationOperation match = Aggregation.match(getCriteria(statusList));
-        AggregationOperation group = Aggregation.group(Fields.fields("organizationId", "organizationName"));
-        AggregationOperation project = Aggregation.project(Fields.fields("organizationId", "organizationName"));
+        AggregationOperation group = Aggregation.group(Fields.fields(Initiative.Fields.organizationId, Initiative.Fields.organizationName));
+        AggregationOperation project = Aggregation.project(Fields.fields(Initiative.Fields.organizationId, Initiative.Fields.organizationName));
 
         Aggregation aggregation = Aggregation.newAggregation(match, group, project);
         AggregationResults<OrganizationDTO> results = mongoTemplate.aggregate(aggregation, Initiative.class, OrganizationDTO.class);
@@ -32,6 +32,9 @@ public class InitiativeRepositoryExtendedImpl implements InitiativeRepositoryExt
     }
 
     private Criteria getCriteria(List<String> statusList) {
-        return Criteria.where("status").in(statusList);
+        return Criteria.where(Initiative.Fields.enabled).is(true)
+                .andOperator(
+                        Criteria.where(Initiative.Fields.status).in(statusList)
+                );
     }
 }

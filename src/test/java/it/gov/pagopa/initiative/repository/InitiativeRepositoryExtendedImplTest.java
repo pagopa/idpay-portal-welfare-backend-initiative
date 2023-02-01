@@ -73,6 +73,7 @@ class InitiativeRepositoryExtendedImplTest {
                 .status(bias % 2 == 0
                         ? InitiativeConstants.Status.APPROVED
                         : InitiativeConstants.Status.DRAFT)
+                .enabled(true)
                 .build();
     }
 
