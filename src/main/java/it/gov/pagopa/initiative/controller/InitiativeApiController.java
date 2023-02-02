@@ -59,11 +59,13 @@ public class InitiativeApiController implements InitiativeApi {
 
     @Override
     public ResponseEntity<List<OrganizationDTO>> getListOfOrganization(String role) {
+        log.info("[{}][GET_ORGANIZATION_LIST] - Start processing...", role);
         return ResponseEntity.ok(organizationService.getOrganizationList(role));
     }
 
     @Override
     public ResponseEntity<OrganizationDTO> getOrganization(String organizationId) {
+        log.info("[GET_ORGANIZATION] - Start processing...");
         return ResponseEntity.ok(organizationService.getOrganization(organizationId));
     }
 
