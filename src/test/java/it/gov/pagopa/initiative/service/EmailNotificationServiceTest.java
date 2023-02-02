@@ -37,7 +37,7 @@ class EmailNotificationServiceTest {
     private static final String SERVICE_ID = "serviceId";
     private static final String ANY_ROLE = "ANY_ROLE";
     private static final String ADMIN_ROLE = "admin";
-    private static final String OPE_BASE_ROLE = "ope_base";
+    private static final String PAGOPA_ADMIN_ROLE = "pagopa_admin";
     private static final String TEMPLATE_NAME = "templateName";
     private static final String SUBJECT = "SUBJECT";
     private static final String EXCEPTION_MESSAGE = "Exception Message";

@@ -28,6 +28,29 @@ import java.util.Locale;
 
 public interface InitiativeApi {
 
+  @Operation(summary = "Returns list of Organizations for at least one initiative by each visible to the PagoPA operator", description = "", security = {
+          @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = OrganizationListDTO.class))),
+          @ApiResponse(responseCode = "401", description = "Authentication failed", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+          @ApiResponse(responseCode = "429", description = "Too many Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+          @ApiResponse(responseCode = "500", description = "Server ERROR", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))})
+  @GetMapping(value = "/idpay/organizations",
+          produces = {"application/json"})
+  ResponseEntity<List<OrganizationDTO>> getListOfOrganization(
+          @RequestParam String role);
+
+  @Operation(summary = "Returns specific Organization selected by the PagoPA operator", description = "")
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = OrganizationListDTO.class))),
+          @ApiResponse(responseCode = "401", description = "Authentication failed", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+          @ApiResponse(responseCode = "429", description = "Too many Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+          @ApiResponse(responseCode = "500", description = "Server ERROR", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))})
+  @GetMapping(value = "/idpay/organizations/{organizationId}",
+          produces = {"application/json"})
+  ResponseEntity<OrganizationDTO> getOrganization(
+          @PathVariable("organizationId") String organizationId);
+
   @Operation(summary = "Returns the list of initiatives names for a specific organization", description = "", security = {
       @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
   @ApiResponses(value = {

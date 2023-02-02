@@ -52,7 +52,7 @@ class InitiativeValidationServiceTest {
     private static final String SERVICE_ID = "serviceId";
     private static final String ANY_ROLE = "ANY_ROLE";
     private static final String ADMIN_ROLE = "admin";
-    private static final String OPE_BASE_ROLE = "ope_base";
+    private static final String PAGOPA_ADMIN_ROLE = "pagopa_admin";
     private static final String ISEE = "ISEE";
     public static final String API_KEY_CLIENT_ID = "apiKeyClientId";
     public static final String API_KEY_CLIENT_ASSERTION = "apiKeyClientAssertion";
@@ -103,7 +103,7 @@ class InitiativeValidationServiceTest {
         //Instruct the Repo Mock to return Dummy Initiatives
         when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(step2Initiative));
         //Try to call the Real Service (which is using the instructed Repo)
-        Initiative initiative = initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, OPE_BASE_ROLE);
+        Initiative initiative = initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, PAGOPA_ADMIN_ROLE);
         //Check the equality of the results
         assertEquals(Optional.of(step2Initiative).get(), initiative);
         // you are expecting repo to be called once with correct param
@@ -115,7 +115,7 @@ class InitiativeValidationServiceTest {
         //Instruct the Repo Mock to return Dummy Initiatives
         when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(step2Initiative));
         //Try to call the Real Service (which is using the instructed Repo)
-        initiative = initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, OPE_BASE_ROLE);
+        initiative = initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, PAGOPA_ADMIN_ROLE);
         //Check the equality of the results
         assertEquals(Optional.of(step2Initiative).get(), initiative);
         // you are expecting repo to be called once with correct param
@@ -127,7 +127,7 @@ class InitiativeValidationServiceTest {
         //Instruct the Repo Mock to return Dummy Initiatives
         when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(step2Initiative));
         //Try to call the Real Service (which is using the instructed Repo)
-        initiative = initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, OPE_BASE_ROLE);
+        initiative = initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, PAGOPA_ADMIN_ROLE);
         //Check the equality of the results
         assertEquals(Optional.of(step2Initiative).get(), initiative);
         // you are expecting repo to be called once with correct param
@@ -141,17 +141,17 @@ class InitiativeValidationServiceTest {
         //Instruct the Repo Mock to return Dummy Initiatives
         when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(step2Initiative));
 
-        InitiativeException exception = assertThrows(InitiativeException.class, () -> initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, OPE_BASE_ROLE));
+        InitiativeException exception = assertThrows(InitiativeException.class, () -> initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, PAGOPA_ADMIN_ROLE));
 
         assertEquals(HttpStatus.BAD_REQUEST, exception.getHttpStatus());
         assertEquals(InitiativeConstants.Exception.BadRequest.CODE, exception.getCode());
-        assertEquals(String.format(InitiativeConstants.Exception.BadRequest.PERMISSION_NOT_VALID, OPE_BASE_ROLE), exception.getMessage());
+        assertEquals(String.format(InitiativeConstants.Exception.BadRequest.PERMISSION_NOT_VALID, PAGOPA_ADMIN_ROLE), exception.getMessage());
     }
 
     @Test
     void testCheckPermissionBeforeInsert() {
         assertThrows(InitiativeException.class,
-                () -> initiativeValidationService.checkPermissionBeforeInsert("ope_base"));
+                () -> initiativeValidationService.checkPermissionBeforeInsert("pagopa_admin"));
     }
 
     @Test
@@ -457,7 +457,7 @@ class InitiativeValidationServiceTest {
     @Test
     void testCheckPermissionBeforeInsert2() {
         assertThrows(InitiativeException.class,
-                () -> initiativeValidationService.checkPermissionBeforeInsert("ope_base"));
+                () -> initiativeValidationService.checkPermissionBeforeInsert("pagopa_admin"));
     }
 
     /*

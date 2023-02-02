@@ -102,7 +102,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
     public List<Initiative> retrieveInitiativeSummary(String organizationId, String role) {
         List<Initiative> initiatives = initiativeRepository.retrieveInitiativeSummary(organizationId, true);
-        return InitiativeConstants.Role.OPE_BASE.equals(role) ? initiatives.stream().filter(
+        return InitiativeConstants.Role.PAGOPA_ADMIN.equals(role) ? initiatives.stream().filter(
                         initiative -> (
                                 initiative.getStatus().equals(InitiativeConstants.Status.IN_REVISION) ||
                                         initiative.getStatus().equals(InitiativeConstants.Status.TO_CHECK) ||
@@ -286,7 +286,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
     @Override
     public void isInitiativeAllowedToBeNextStatusThenThrows(Initiative initiative, String nextStatus, String role) {
-        if (InitiativeConstants.Role.OPE_BASE.equals(role)) {
+        if (InitiativeConstants.Role.PAGOPA_ADMIN.equals(role)) {
             log.info("[UPDATE_TO_{}_STATUS] - Initiative: {} Status: {}. Not processable status", nextStatus, initiative.getInitiativeId(), initiative.getStatus());
             throw new InitiativeException(
                     InitiativeConstants.Exception.BadRequest.CODE,

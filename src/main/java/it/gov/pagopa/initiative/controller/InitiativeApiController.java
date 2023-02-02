@@ -9,6 +9,7 @@ import it.gov.pagopa.initiative.mapper.InitiativeDTOsToModelMapper;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.service.InitiativeService;
+import it.gov.pagopa.initiative.service.OrganizationService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.LocaleUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,6 +36,7 @@ public class InitiativeApiController implements InitiativeApi {
     private final boolean notifyIO;
     private final boolean notifyInternal;
     private final InitiativeService initiativeService;
+    private final OrganizationService organizationService;
     private final InitiativeModelToDTOMapper initiativeModelToDTOMapper;
     private final InitiativeDTOsToModelMapper initiativeDTOsToModelMapper;
 
@@ -43,14 +45,28 @@ public class InitiativeApiController implements InitiativeApi {
             @Value("${app.initiative.conditions.notifyIO}") boolean notifyIO,
             @Value("${app.initiative.conditions.notifyInternal}") boolean notifyInternal,
             InitiativeService initiativeService,
+            OrganizationService organizationService,
             InitiativeModelToDTOMapper initiativeModelToDTOMapper,
             InitiativeDTOsToModelMapper initiativeDTOsToModelMapper) {
         this.notifyRE = notifyRE;
         this.notifyIO = notifyIO;
         this.notifyInternal = notifyInternal;
         this.initiativeService = initiativeService;
+        this.organizationService = organizationService;
         this.initiativeModelToDTOMapper = initiativeModelToDTOMapper;
         this.initiativeDTOsToModelMapper = initiativeDTOsToModelMapper;
+    }
+
+    @Override
+    public ResponseEntity<List<OrganizationDTO>> getListOfOrganization(String role) {
+        log.info("[{}][GET_ORGANIZATION_LIST] - Start processing...", role);
+        return ResponseEntity.ok(organizationService.getOrganizationList(role));
+    }
+
+    @Override
+    public ResponseEntity<OrganizationDTO> getOrganization(String organizationId) {
+        log.info("[GET_ORGANIZATION] - Start processing...");
+        return ResponseEntity.ok(organizationService.getOrganization(organizationId));
     }
 
     @ResponseStatus(HttpStatus.OK)
