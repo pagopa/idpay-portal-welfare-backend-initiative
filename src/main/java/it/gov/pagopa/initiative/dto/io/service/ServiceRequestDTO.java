@@ -30,6 +30,8 @@ public class ServiceRequestDTO {
     private Boolean requireSecureChannels;
     @JsonProperty("authorized_cidrs")
     private final List<String> authorizedCidrs = new ArrayList<>();
+    @JsonProperty("authorized_recipients")
+    private List<String> authorizedRecipients = new ArrayList<>();
     @JsonProperty("service_metadata")
     private ServiceMetadataDTO serviceMetadata;
 }
