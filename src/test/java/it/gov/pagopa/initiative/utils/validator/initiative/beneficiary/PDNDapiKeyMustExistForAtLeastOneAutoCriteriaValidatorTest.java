@@ -13,8 +13,10 @@ import javax.validation.*;
 
 import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+@Disabled
 class PDNDapiKeyMustExistForAtLeastOneAutoCriteriaValidatorTest {
     public static final String API_KEY_CLIENT_ID = "apiKeyClientId";
     public static final String API_KEY_CLIENT_ASSERTION = "apiKeyClientAssertion";

@@ -61,6 +61,7 @@ rest-client:
       request:
         departmentName: ${IO_BACKEND_SERVICE_DEPARTMENT_NAME:}
         isVisible: ${IO_BACKEND_SERVICE_IS_VISIBLE:false}
+        authorizedRecipients: ${IO_BACKEND_SERVICE_AUTHORIZED_RECIPIENTS:}
   onboarding:
     serviceCode: idpay-onboarding
     uri: ${ONBOARDING_URI:}
