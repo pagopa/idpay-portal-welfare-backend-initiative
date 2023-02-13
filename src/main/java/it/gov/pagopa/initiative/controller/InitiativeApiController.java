@@ -73,9 +73,8 @@ public class InitiativeApiController implements InitiativeApi {
     @Override
     public ResponseEntity<List<InitiativeSummaryDTO>> getInitiativeSummary(String organizationId, String role) {
         log.info("[{}][GET_INITIATIVES] - InitiativeSummary: Start processing...", role);
-        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeSummaryDTOList(
-                this.initiativeService.retrieveInitiativeSummary(organizationId, role)
-        ));
+        List<Initiative> initiatives = this.initiativeService.retrieveInitiativeSummary(organizationId, role);
+        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeSummaryDTOList(initiatives));
     }
 
     @Override
