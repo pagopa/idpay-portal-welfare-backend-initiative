@@ -202,6 +202,29 @@ class InitiativeServiceTest {
         verify(initiativeRepository).retrieveInitiativeSummary(ORGANIZATION_ID, true); // same as: verify(initiativeRepository, times(1)).retrieveInitiativeSummary(anyString());
     }
 
+    @Test
+    void givenInitiativeList_when_RolePagopa_then_ListOfRetrieveInitiativeSummary_isEmpty() {
+        Initiative step2Initiative2 = createStep2Initiative();
+        step2Initiative2.setStatus(Status.CLOSED);
+        Initiative step2Initiative3 = createStep2Initiative();
+        step2Initiative3.setStatus(Status.SUSPENDED);
+        Initiative step2Initiative4 = createStep2Initiative();
+        step2Initiative4.setStatus(Status.DRAFT);
+        List<Initiative> initiativeList = Arrays.asList(step2Initiative2,step2Initiative3,step2Initiative4);
+
+        //Instruct the Repo Mock to return Dummy Initiatives
+        when(initiativeRepository.retrieveInitiativeSummary(ORGANIZATION_ID, true)).thenReturn(initiativeList);
+
+        //Try to call the Real Service (which is using the instructed Repo)
+        List<Initiative> initiatives = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, PAGOPA_ADMIN);
+
+        //Check the equality of the results
+        assertEquals(0,initiatives.size());
+
+        // you are expecting repo to be called once with correct param
+        verify(initiativeRepository).retrieveInitiativeSummary(ORGANIZATION_ID, true); // same as: verify(initiativeRepository, times(1)).retrieveInitiativeSummary(anyString());
+    }
+
 
     @Test
     void retrieveInitiativeSummary_ko() {
