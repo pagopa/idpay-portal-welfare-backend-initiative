@@ -97,7 +97,7 @@ class InitiativeValidationServiceTest {
     }
 
     @Test
-    void givenOpeBaseRole_whenInitiativeStatusIsValid_thenOk() {
+    void givenPagoPaAdminRole_whenInitiativeStatusIsValid_thenOk() {
         Initiative step2Initiative = createStep2Initiative(true);
         step2Initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
         //Instruct the Repo Mock to return Dummy Initiatives
@@ -135,7 +135,7 @@ class InitiativeValidationServiceTest {
     }
 
     @Test
-    void givenOpeBase_whenInitiativeUnprocessableForStatusNotValid_then400isRaisedForInitiativeException() {
+    void givenPagoPaAdmin_whenInitiativeUnprocessableForStatusNotValid_then400isRaisedForInitiativeException() {
         Initiative step2Initiative = createStep2Initiative(true);
 
         //Instruct the Repo Mock to return Dummy Initiatives

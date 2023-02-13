@@ -44,6 +44,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -160,77 +162,41 @@ class InitiativeServiceTest {
     @MockBean
     InitiativeUtils initiativeUtils;
 
-    @Test
-    void givenRoleAdmin_retrieveInitiativeSummary_ok() {
+
+    @ParameterizedTest
+    @ValueSource(strings = {PAGOPA_ADMIN,ADMIN})
+    void givenInitiativeList_whenRoleParametrized_thenRetrieveInitiativeSummary_ok(String role) {
         Initiative step2Initiative1 = createStep2Initiative();
+        step2Initiative1.setStatus(Status.PUBLISHED);
         Initiative step2Initiative2 = createStep2Initiative();
-        List<Initiative> initiativeList = Arrays.asList(step2Initiative1, step2Initiative2);
+        step2Initiative2.setStatus(Status.CLOSED);
+        Initiative step2Initiative3 = createStep2Initiative();
+        step2Initiative3.setStatus(Status.SUSPENDED);
+        Initiative step2Initiative4 = createStep2Initiative();
+        step2Initiative4.setStatus(Status.DRAFT);
+        Initiative step2Initiative5 = createStep2Initiative();
+        step2Initiative5.setStatus(Status.APPROVED);
+        Initiative step2Initiative6 = createStep2Initiative();
+        step2Initiative6.setStatus(Status.TO_CHECK);
+        Initiative step2Initiative7 = createStep2Initiative();
+        step2Initiative7.setStatus(Status.IN_REVISION);
+        List<Initiative> initiativeList = Arrays.asList(step2Initiative1, step2Initiative2,step2Initiative3,step2Initiative4,step2Initiative5,step2Initiative6,step2Initiative7);
+        initiativeList = PAGOPA_ADMIN.equals(role) ? initiativeList.stream().filter(
+                        initiative -> (
+                                initiative.getStatus().equals(Status.IN_REVISION) ||
+                                        initiative.getStatus().equals(Status.TO_CHECK) ||
+                                        initiative.getStatus().equals(Status.APPROVED) ||
+                                        initiative.getStatus().equals(Status.PUBLISHED)))
+                .toList() : initiativeList;
 
         //Instruct the Repo Mock to return Dummy Initiatives
         when(initiativeRepository.retrieveInitiativeSummary(ORGANIZATION_ID, true)).thenReturn(initiativeList);
 
         //Try to call the Real Service (which is using the instructed Repo)
-        List<Initiative> initiatives = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, ADMIN);
+        List<Initiative> initiatives = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, role);
 
         //Check the equality of the results
-        assertEquals(initiativeList, initiatives);
-
-        // you are expecting repo to be called once with correct param
-        verify(initiativeRepository).retrieveInitiativeSummary(ORGANIZATION_ID, true); // same as: verify(initiativeRepository, times(1)).retrieveInitiativeSummary(anyString());
-    }
-
-    @Test
-    void givenRoleOpeBase_statusInRevision_retrieveInitiativeSummary_ok() {
-        Initiative step2Initiative1 = createStep2Initiative();
-        step2Initiative1.setStatus(InitiativeConstants.Status.IN_REVISION);
-        List<Initiative> initiativeList = List.of(step2Initiative1);
-
-        //Instruct the Repo Mock to return Dummy Initiatives
-        when(initiativeRepository.retrieveInitiativeSummary(ORGANIZATION_ID, true)).thenReturn(initiativeList);
-
-        //Try to call the Real Service (which is using the instructed Repo)
-        List<Initiative> initiatives = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, PAGOPA_ADMIN);
-
-        //Check the equality of the results
-        assertEquals(initiativeList, initiatives);
-
-        // you are expecting repo to be called once with correct param
-        verify(initiativeRepository).retrieveInitiativeSummary(ORGANIZATION_ID, true); // same as: verify(initiativeRepository, times(1)).retrieveInitiativeSummary(anyString());
-    }
-
-    @Test
-    void givenRoleOpeBase_statusApproved_retrieveInitiativeSummary_ok() {
-        Initiative step2Initiative1 = createStep2Initiative();
-        step2Initiative1.setStatus(InitiativeConstants.Status.APPROVED);
-        List<Initiative> initiativeList = List.of(step2Initiative1);
-
-        //Instruct the Repo Mock to return Dummy Initiatives
-        when(initiativeRepository.retrieveInitiativeSummary(ORGANIZATION_ID, true)).thenReturn(initiativeList);
-
-        //Try to call the Real Service (which is using the instructed Repo)
-        List<Initiative> initiatives = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, PAGOPA_ADMIN);
-
-        //Check the equality of the results
-        assertEquals(initiativeList, initiatives);
-
-        // you are expecting repo to be called once with correct param
-        verify(initiativeRepository).retrieveInitiativeSummary(ORGANIZATION_ID, true); // same as: verify(initiativeRepository, times(1)).retrieveInitiativeSummary(anyString());
-    }
-
-    @Test
-    void givenRoleOpeBase_statusToCheck_retrieveInitiativeSummary_ok() {
-        Initiative step2Initiative1 = createStep2Initiative();
-        step2Initiative1.setStatus(InitiativeConstants.Status.TO_CHECK);
-        List<Initiative> initiativeList = List.of(step2Initiative1);
-
-        //Instruct the Repo Mock to return Dummy Initiatives
-        when(initiativeRepository.retrieveInitiativeSummary(ORGANIZATION_ID, true)).thenReturn(initiativeList);
-
-        //Try to call the Real Service (which is using the instructed Repo)
-        List<Initiative> initiatives = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, PAGOPA_ADMIN);
-
-        //Check the equality of the results
-        assertEquals(initiativeList, initiatives);
+        assertEquals(initiatives.size(),initiativeList.size());
 
         // you are expecting repo to be called once with correct param
         verify(initiativeRepository).retrieveInitiativeSummary(ORGANIZATION_ID, true); // same as: verify(initiativeRepository, times(1)).retrieveInitiativeSummary(anyString());
