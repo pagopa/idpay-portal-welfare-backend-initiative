@@ -25,85 +25,68 @@ public class Utilities {
     }
   }
 
-  private static final String CEF = String.format("CEF|PagoPa|IDPAY|1.0|7|User interaction|2|event=Initiative srcip=%s srcport=17548 dstip=172.16.128.37 dstport=82",
-      SRCIP);
+  private static final String CEF = String.format("CEF:0|PagoPa|IDPAY|1.0|7|User interaction|2| event=Initiative dstip=%s", SRCIP);
   private static final String MSG = " msg=";
   private static final String USER = "suser=";
-  private static final String CS1 = "cs1Label=iniziativeId cs1=";
+  private static final String INITIATIVE_ID = "initiativeId=";
+  private static final String ORGANIZATION_ID = "organizationId=";
+
   final Logger logger = Logger.getLogger("AUDIT");
 
 
-  private String buildLog(String eventLog, String userId, String initiativeId) {
-    return CEF + MSG + eventLog + " " + USER + userId + " " + CS1 + initiativeId;
+  private String buildLog(String eventLog, String userId, String initiativeId, String organizationId) {
+    return CEF + MSG + eventLog + " " + USER + userId + " " + INITIATIVE_ID + initiativeId + " " + ORGANIZATION_ID + organizationId;
   }
 
-  public void newInitiative(String userId, String initiativeId) {
-    String testLog = this.buildLog("New initiative by the user ", userId,
-        initiativeId);
-    logger.info(testLog);
-  }
-
-  public void initiativeApproved(String userId, String initiativeId) {
-    String testLog = this.buildLog("Initiative approved by the user ", userId,
-            initiativeId);
-    logger.info(testLog);
-  }
-  public void initiativeToCheck(String userId, String initiativeId) {
-    String testLog = this.buildLog("Initiative to check by the user ", userId,
-            initiativeId);
+  public void logNewInitiative(String userId, String initiativeId, String organizationId) {
+    String testLog = this.buildLog("New initiative inserted by the user ", userId, initiativeId, organizationId);
     logger.info(testLog);
   }
 
-  public void initiativePublished(String userId, String initiativeId) {
-    String testLog = this.buildLog("Initiative published by the user ", userId,
-            initiativeId);
+  public void logInitiativeApproved(String userId, String initiativeId, String organizationId) {
+    String testLog = this.buildLog("Initiative approved by the user ", userId, initiativeId, organizationId);
+    logger.info(testLog);
+  }
+  public void logInitiativeToCheck(String userId, String initiativeId, String organizationId) {
+    String testLog = this.buildLog("Initiative has to be checked by the user ", userId, initiativeId, organizationId);
     logger.info(testLog);
   }
 
-  public void initiativeInRevision(String userId, String initiativeId) {
-    String testLog = this.buildLog("Initiative in revision by the user ", userId,
-            initiativeId);
+  public void logInitiativePublished(String userId, String initiativeId, String organizationId) {
+    String testLog = this.buildLog("Initiative published by the user ", userId, initiativeId, organizationId);
     logger.info(testLog);
   }
 
-  public void onboardingCitizen(String userId, String initiativeId) {
-    String testLog = this.buildLog("Get onboarding list by the user ", userId,
-            initiativeId);
+  public void logInitiativeInRevision(String userId, String initiativeId, String organizationId) {
+    String testLog = this.buildLog("Initiative in revision by the user ", userId, initiativeId, organizationId);
     logger.info(testLog);
   }
 
-  public void stats(String userId, String initiativeId) {
-    String testLog = this.buildLog("Get stats by the user ", userId,
-            initiativeId);
+  public void logOnboardingCitizen(String userId, String initiativeId, String organizationId) {
+    String testLog = this.buildLog("Get onboarding list by the user ", userId, initiativeId, organizationId);
+    logger.info(testLog);
+  }
+  public void logDetailUser(String userId, String initiativeId, String organizationId) {
+    String testLog = this.buildLog("Get detail user by the user ", userId, initiativeId, organizationId);
     logger.info(testLog);
   }
 
-  public void editInitiative(String userId, String initiativeId) {
-    String testLog = this.buildLog("Initiative edited by the user ", userId,
-            initiativeId);
+  public void logEditInitiative(String userId, String initiativeId, String organizationId) {
+    String testLog = this.buildLog("Initiative edited by the user ", userId, initiativeId, organizationId);
+    logger.info(testLog);
+  }
+  public void logGetInitiative(String userId, String initiativeId, String organizationId) {
+    String testLog = this.buildLog("Get initiative by the user ", userId, initiativeId, organizationId);
+    logger.info(testLog);
+  }
+  public void logInitiativeDeleted(String userId, String initiativeId, String organizationId) {
+    String testLog = this.buildLog("Initiative deleted by the user ", userId, initiativeId, organizationId);
+    logger.info(testLog);
+  }
+  public void logInitiativeError(String userId, String initiativeId, String organizationId, String msg){
+    String testLog = this.buildLog("Error: "+ msg, userId, initiativeId, organizationId);
     logger.info(testLog);
   }
 
-  public void uploadFile(String userId, String initiativeId) {
-    String testLog = this.buildLog("Upload file by the user ", userId,
-            initiativeId);
-    logger.info(testLog);
-  }
-
-  public void downloadFile(String userId, String initiativeId) {
-    String testLog = this.buildLog("Download file by the user ", userId,
-            initiativeId);
-    logger.info(testLog);
-  }
-  public void detailUser(String userId, String initiativeId) {
-    String testLog = this.buildLog("Get detail user by the user ", userId,
-            initiativeId);
-    logger.info(testLog);
-  }
-  public void getInitiative(String userId, String initiativeId) {
-    String testLog = this.buildLog("Get initiative by the user ", userId,
-            initiativeId);
-    logger.info(testLog);
-  }
 
 }
