@@ -31,4 +31,13 @@ public interface IOBackEndFeignRestClient {
           @PathVariable("serviceId") String serviceId,
           @RequestBody @Valid LogoIODTO logo,
           @RequestHeader("Ocp-Apim-Subscription-Key") String subscriptionKey);
+
+  @PutMapping(
+          value = "/services/{serviceId}",
+          produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseBody
+    ResponseEntity<ServiceResponseDTO> updateService(
+            @PathVariable("serviceId") String serviceId,
+            @RequestBody @Valid ServiceRequestDTO serviceRequestDTO,
+            @RequestHeader("Ocp-Apim-Subscription-Key") String subscriptionKey);
 }

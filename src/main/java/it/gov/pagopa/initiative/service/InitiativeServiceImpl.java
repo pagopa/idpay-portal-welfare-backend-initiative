@@ -385,6 +385,14 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         initiative.getAdditionalInfo().setPrimaryTokenIO(encryptedPrimaryToken);
         initiative.getAdditionalInfo().setSecondaryTokenIO(encryptedSecondaryToken);
         additionalInfo.setServiceId(serviceResponseDTO.getServiceId());
+
+        String serviceId = serviceResponseDTO.getServiceId();
+        serviceRequestDTO.getServiceMetadata().setCta(InitiativeConstants.Cta.CTA + InitiativeConstants.Cta.CTA_NIT + InitiativeConstants.Cta.CTA_1
+        + InitiativeConstants.Cta.CTA_TEXT + InitiativeConstants.Cta.CTA_ACTION + serviceId + InitiativeConstants.Cta.CTA_NEN
+        + InitiativeConstants.Cta.CTA + InitiativeConstants.Cta.CTA_NIT + InitiativeConstants.Cta.CTA_1
+                + InitiativeConstants.Cta.CTA_TEXT_ENGLISH + InitiativeConstants.Cta.CTA_ACTION + serviceId + InitiativeConstants.Cta.CTA_NEN + InitiativeConstants.Cta.CTA_END);
+        ioBackEndRestConnector.updateService(serviceId,serviceRequestDTO);
+
         utilities.logInitiativePublished(this.getUserId(),initiative.getInitiativeId(), initiative.getOrganizationId());
         return initiative;
     }

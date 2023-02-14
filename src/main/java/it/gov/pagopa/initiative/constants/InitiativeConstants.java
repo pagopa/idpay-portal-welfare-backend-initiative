@@ -1,6 +1,8 @@
 package it.gov.pagopa.initiative.constants;
 
 
+import org.apache.kafka.common.protocol.types.Field;
+
 import java.util.List;
 
 public class InitiativeConstants {
@@ -41,6 +43,17 @@ public class InitiativeConstants {
         public static final String SUBJECT_INITIATIVE_CREATED = "Nuova Iniziativa";
         public static final String RECIPIENT_ASSISTANCE = "Assistenza.IDPay@Pagopa.it";
 
+    }
+
+    public  static  final class Cta {
+        public  static final String CTA = "\"cta\": \"---\\";
+        public static final String CTA_NIT = "nit: \\n";
+        public static final String CTA_1 = "cta_1: \\n";
+        public static final String CTA_TEXT = "text: \\\"Richiedi il Bonus\\\"\\n";
+        public static final String CTA_ACTION = "action: ioit://idpay/onboarding/";
+        public static final String CTA_NEN = "\\nen: \\n";
+        public static final String CTA_TEXT_ENGLISH = "text: \\\"Request Bonus\\\"\\n";
+        public static final String CTA_END = "\\n---\"";
     }
 
     public static final class Exception extends AbstractConstant {
