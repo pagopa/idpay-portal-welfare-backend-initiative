@@ -1,0 +1,24 @@
+{
+  "request": {
+    "method": "PUT",
+    "urlPathPattern": "/services/SERVICE_ID_500",
+    "headers": {
+      "Ocp-Apim-Subscription-Key": {
+        "matches": ".*"
+      }
+    }
+  },
+  "response": {
+    "status": "500",
+    "jsonBody": {
+      "type": null,
+      "title": null,
+      "status": null,
+      "detail": null,
+      "instance": null
+    },
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

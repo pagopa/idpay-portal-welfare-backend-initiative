@@ -116,4 +116,24 @@ class IOBackEndRestConnectorTest {
         verify(ioBackEndFeignRestClient).sendLogo(any(), any(), any());
         assertEquals("Logo", logoIODTO.getLogo());
     }
+
+    @Test
+    void givenServiceFromInitiativePublished_whenUpdateService_thenReturnOkResponse() {
+        ServiceRequestDTO serviceRequestDTO = createServiceRequestDTO();
+        ServiceResponseDTO serviceResponseDTOexpected = createServiceResponseDTO();
+        String serviceId = serviceResponseDTOexpected.getServiceId();
+
+        ResponseEntity<ServiceResponseDTO> entityExpected = new ResponseEntity<>(serviceResponseDTOexpected, HttpStatus.OK);
+        Mockito.when(ioBackEndFeignRestClient.updateService(serviceId, serviceRequestDTO, "subscriptionKey")).thenReturn(entityExpected);
+
+        //Connector will call the fake server and expecting to reply what we Stub on src\resources\mappings (or can be done with wireMockServer.stubFor)
+        ServiceResponseDTO serviceResponseDTO = ioBackEndRestConnector.updateService(serviceId, serviceRequestDTO);
+
+        //Asserting if Client (FeignClient, WireMock client ecc.) responded properly
+        assertNotNull(serviceResponseDTO);
+        assertThat(serviceResponseDTO).isEqualTo(serviceResponseDTOexpected);
+        Assertions.assertEquals(entityExpected.getBody(), serviceResponseDTO);
+
+        Mockito.verify(ioBackEndFeignRestClient,times(1)).updateService(serviceId, serviceRequestDTO, "subscriptionKey");
+    }
 }
