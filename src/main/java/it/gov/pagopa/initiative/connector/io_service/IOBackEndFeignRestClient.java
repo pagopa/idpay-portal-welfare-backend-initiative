@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+/**
+ * <a href="https://developer.io.italia.it/openapi.html">Digital Citizenship API</a>
+ */
 @FeignClient(
     name = "${rest-client.backend-io.service.name}",
     url = "${rest-client.backend-io.service.base-url}")
@@ -38,6 +41,6 @@ public interface IOBackEndFeignRestClient {
   @ResponseBody
     ResponseEntity<ServiceResponseDTO> updateService(
             @PathVariable("serviceId") String serviceId,
-            @RequestBody @Valid ServiceRequestDTO serviceRequestDTO,
+            @RequestBody ServiceRequestDTO serviceRequestDTO,
             @RequestHeader("Ocp-Apim-Subscription-Key") String subscriptionKey);
 }

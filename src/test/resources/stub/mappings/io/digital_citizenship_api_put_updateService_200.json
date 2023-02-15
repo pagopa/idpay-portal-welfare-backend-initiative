@@ -1,0 +1,51 @@
+{
+  "request": {
+    "method": "PUT",
+    "urlPathPattern": "/services/.*",
+    "headers": {
+      "Ocp-Apim-Subscription-Key": {
+        "matches": ".*"
+      }
+    }
+  },
+  "response": {
+    "status": "200",
+    "jsonBody": {
+      "id": null,
+      "version": null,
+      "service_id": "serviceId",
+      "service_name": "serviceName",
+      "service_metadata": {
+        "description": "description",
+        "address": null,
+        "phone": "0123456789",
+        "email": "test@pagopa.it",
+        "pec": null,
+        "cta": "\"cta\": \"---\\nit: \\ncta_1: \\ntext: \\\"Richiedi il Bonus\\\"\\naction: ioit://idpay/onboarding/serviceId\\nen: \\n\"cta\": \"---\\nit: \\ncta_1: \\ntext: \\\"Request Bonus\\\"\\naction: ioit://idpay/onboarding/serviceId\\nen: \\n\\n---\"",
+        "scope": "LOCAL",
+        "category": null,
+        "require_secure_channels": null,
+        "app_ios": null,
+        "app_android": null,
+        "tos_url": "tos.url.it",
+        "privacy_url": "privacy.url.it",
+        "token_name": null,
+        "support_url": "support.url.it",
+        "custom_special_flow": null
+      },
+      "is_visible": false,
+      "department_name": "productDepartmentName",
+      "organization_name": "organizationName",
+      "organization_fiscal_code": "organizationVat",
+      "require_secure_channels": null,
+      "max_allowed_payment_amount": null,
+      "authorized_recipients": null,
+      "authorized_cidrs": null,
+      "primary_key": null,
+      "secondary_key": null
+    },
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

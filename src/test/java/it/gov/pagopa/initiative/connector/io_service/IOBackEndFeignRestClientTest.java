@@ -7,6 +7,7 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import feign.FeignException;
 import it.gov.pagopa.initiative.config.IOBackEndRestConnectorConfig;
+import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.io.service.ServiceMetadataDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceResponseDTO;
@@ -77,7 +78,10 @@ class IOBackEndFeignRestClientTest {
         @Override
         public void initialize(ConfigurableApplicationContext configurableApplicationContext) {
             //Instruct a Server to be the PDV Mock Server
-            wireMockServer = new WireMockServer(new WireMockConfiguration().dynamicPort());
+            wireMockServer = new WireMockServer(new WireMockConfiguration()
+                    .dynamicPort()
+                    .usingFilesUnderClasspath("src/test/resources/stub")
+            );
             wireMockServer.start();
 
             configurableApplicationContext.getBeanFactory().registerSingleton("wireMockServer", wireMockServer);
@@ -111,10 +115,11 @@ class IOBackEndFeignRestClientTest {
         ServiceRequestDTO serviceRequestDTO = createServiceRequestDTO();
         ServiceResponseDTO serviceResponseDTOexpected = createServiceResponseDTO();
 
-//        //Match json values and expect being done 1 external call
+        //Prepare json to be verified if it will be the same for call
         String serviceRequestDTOjson = new ObjectMapper().writeValueAsString(serviceRequestDTO);
+        //Prepare json to be returned
         String serviceResponseDTOjson = new ObjectMapper().writeValueAsString(serviceResponseDTOexpected);
-
+        
         wireMockServer.stubFor(post(urlEqualTo("/services"))
                 .withRequestBody(equalToJson(serviceRequestDTOjson))
                 .willReturn(aResponse()
@@ -124,14 +129,13 @@ class IOBackEndFeignRestClientTest {
                 )
         );
 
-
-        //Connector will call the fake server and expecting to reply what we Stub on src\resources\mappings (or can be done with wireMockServer.stubFor)
-//        ServiceResponseDTO serviceResponseDTO = ioBackEndRestConnector.createService(serviceRequestDTO);
+        //Connector will call the fake server and expecting to reply what we Stub previously with wireMockServer.stubFor (or also can be done with src\resources\stub\mappings)
         ResponseEntity<ServiceResponseDTO> responseEntity = ioBackEndFeignRestClient.createService(serviceRequestDTO, "subscriptionKey");
         ServiceResponseDTO serviceResponseDTO = responseEntity.getBody();
 
         //Asserting if Client (FeignClient, WireMock client ecc.) responded properly
         assertNotNull(serviceResponseDTO);
+        //Match json values and expect being done 1 external call
         assertThat(serviceResponseDTO).isEqualTo(serviceResponseDTOexpected);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -147,8 +151,9 @@ class IOBackEndFeignRestClientTest {
         ServiceRequestDTO serviceRequestDTO = createServiceRequestDTOnotValid();
         ServiceResponseErrorDTO serviceResponseErrorDTO = createServiceResponseErrorDTO(400);
 
-//        //Match json values and expect being done 1 external call
+        //Prepare json to be verified if it will be the same for call
         String serviceRequestDTOjson = new ObjectMapper().writeValueAsString(serviceRequestDTO);
+        //Prepare json to be returned
         String serviceResponseErrorDTOjson = new ObjectMapper().writeValueAsString(serviceResponseErrorDTO);
 
         wireMockServer.stubFor(post(urlEqualTo("/services"))
@@ -177,8 +182,9 @@ class IOBackEndFeignRestClientTest {
         ServiceRequestDTO serviceRequestDTO = createServiceRequestDTOnotValid();
         ServiceResponseErrorDTO serviceResponseErrorDTO = createServiceResponseErrorDTO(500);
 
-//        //Match json values and expect being done 1 external call
+        //Prepare json to be verified if it will be the same for call
         String serviceRequestDTOjson = new ObjectMapper().writeValueAsString(serviceRequestDTO);
+        //Prepare json to be returned
         String serviceResponseErrorDTOjson = new ObjectMapper().writeValueAsString(serviceResponseErrorDTO);
 
         wireMockServer.stubFor(post(urlEqualTo("/services"))
@@ -198,6 +204,63 @@ class IOBackEndFeignRestClientTest {
         //Verifying has been done 1 external call to IO BackEnd with our Request
         wireMockServer.verify(1,
                 WireMock.postRequestedFor(WireMock.urlEqualTo("/services"))
+                        .withRequestBody(equalToJson(serviceRequestDTOjson, true, false))
+        );
+    }
+
+    @Test
+    void givenServiceFromInitiativePublished_whenPutUpdateServiceCalled_thenReturnMatchingService_200() throws JsonProcessingException {
+        ServiceRequestDTO serviceRequestDTO = createServiceRequestDTO();
+        ServiceResponseDTO serviceResponseDTOexpected = createServiceResponseDTO();
+
+        String cta = InitiativeConstants.Cta.CTA + InitiativeConstants.Cta.CTA_NIT + InitiativeConstants.Cta.CTA_1
+                + InitiativeConstants.Cta.CTA_TEXT + InitiativeConstants.Cta.CTA_ACTION + SERVICE_ID + InitiativeConstants.Cta.CTA_NEN
+                + InitiativeConstants.Cta.CTA + InitiativeConstants.Cta.CTA_NIT + InitiativeConstants.Cta.CTA_1
+                + InitiativeConstants.Cta.CTA_TEXT_ENGLISH + InitiativeConstants.Cta.CTA_ACTION + SERVICE_ID + InitiativeConstants.Cta.CTA_NEN + InitiativeConstants.Cta.CTA_END;
+
+        serviceRequestDTO.getServiceMetadata().setCta(cta);
+        serviceResponseDTOexpected.getServiceMetadata().setCta(cta);
+
+        //Prepare json to be verified if it will be the same for call
+        String serviceRequestDTOjson = new ObjectMapper().writeValueAsString(serviceRequestDTO);
+        
+        //JSON to be returned placed here: src\resources\stub\mappings\io\digital_citizenship_api_put_updateService_200.json
+
+        //Connector will call the fake server and expecting to reply what we Stub on src\resources\stub\mappings (or can be done with wireMockServer.stubFor)
+        ResponseEntity<ServiceResponseDTO> responseEntity = ioBackEndFeignRestClient.updateService(SERVICE_ID, serviceRequestDTO, "subscriptionKey");
+        ServiceResponseDTO serviceResponseDTO = responseEntity.getBody();
+
+        //Asserting if Client (FeignClient, WireMock client ecc.) responded properly
+        assertNotNull(serviceResponseDTO);
+        //Match json values and expect being done 1 external call
+        assertThat(serviceResponseDTO).isEqualTo(serviceResponseDTOexpected);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        //Verifying has been done 1 external call to IO BackEnd with our Request
+        wireMockServer.verify(1,
+                WireMock.putRequestedFor(WireMock.urlEqualTo("/services/" + SERVICE_ID))
+                        .withRequestBody(equalToJson(serviceRequestDTOjson, true, false))
+        );
+    }
+
+    @Test
+    void givenServiceNotValid_FromInitiativePublished_whenPutUpdateServiceCalled_thenReturnException_500() throws JsonProcessingException {
+        ServiceRequestDTO serviceRequestDTO = createServiceRequestDTOnotValid();
+        ServiceResponseErrorDTO serviceResponseErrorDTO = createServiceResponseErrorDTO(500);
+
+        //Prepare json to be verified if it will be the same for call
+        String serviceRequestDTOjson = new ObjectMapper().writeValueAsString(serviceRequestDTO);
+
+        //JSON to be returned placed here: src\resources\stub\mappings\io\digital_citizenship_api_put_updateService_500.json
+
+        Executable executable = () -> ioBackEndFeignRestClient.updateService(SERVICE_ID, serviceRequestDTO, "subscriptionKey");
+        FeignException exception = Assertions.assertThrows(FeignException.class, executable);
+        assertThat(exception.getMessage()).contains("[500 Server Error]");
+        assertThat(exception.status()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+
+        //Verifying has been done 1 external call to IO BackEnd with our Request
+        wireMockServer.verify(1,
+                WireMock.putRequestedFor(WireMock.urlEqualTo("/services/" + SERVICE_ID))
                         .withRequestBody(equalToJson(serviceRequestDTOjson, true, false))
         );
     }
@@ -232,12 +295,12 @@ class IOBackEndFeignRestClientTest {
     private ServiceRequestDTO createServiceRequestDTO() {
         ServiceMetadataDTO serviceMetadataDTO = createServiceMetadataDTO();
         return ServiceRequestDTO.builder()
-                .serviceMetadata(serviceMetadataDTO)
                 .serviceName(SERVICE_NAME)
                 .departmentName(PRODUCT_DEPARTMENT_NAME)
                 .organizationName(ORGANIZATION_NAME)
                 .organizationFiscalCode(ORGANIZATION_VAT)
                 .isVisible(IS_VISIBLE)
+                .serviceMetadata(serviceMetadataDTO)
                 .build();
     }
 
@@ -254,8 +317,15 @@ class IOBackEndFeignRestClientTest {
     }
 
     private ServiceResponseDTO createServiceResponseDTO() {
+        ServiceMetadataDTO serviceMetadataDTO = createServiceMetadataDTO();
         return ServiceResponseDTO.builder()
                 .serviceId(SERVICE_ID)
+                .serviceName(SERVICE_NAME)
+                .departmentName(PRODUCT_DEPARTMENT_NAME)
+                .organizationName(ORGANIZATION_NAME)
+                .organizationFiscalCode(ORGANIZATION_VAT)
+                .isVisible(IS_VISIBLE)
+                .serviceMetadata(serviceMetadataDTO)
                 .build();
     }
 

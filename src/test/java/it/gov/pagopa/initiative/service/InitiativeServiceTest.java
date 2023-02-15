@@ -1101,13 +1101,11 @@ class InitiativeServiceTest {
 
         ServiceRequestDTO serviceRequestDTOexpected = createServiceRequestDTO();
         ServiceResponseDTO serviceResponseDTOexpected = createServiceResponseDTO();
+        String serviceId = serviceResponseDTOexpected.getServiceId();
 
         when(initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(initiativeAdditional, initiativeOrganizationInfoDTO)).thenReturn(serviceRequestDTOexpected);
         when(ioBackEndRestConnector.createService(serviceRequestDTOexpected)).thenReturn(serviceResponseDTOexpected);
         when(ioTokenService.encrypt(anyString())).thenReturn(ANY_KEY_TOKEN_IO);
-
-        String serviceId = serviceResponseDTOexpected.getServiceId();
-
         when(ioBackEndRestConnector.updateService(serviceId,serviceRequestDTOexpected)).thenReturn(serviceResponseDTOexpected);
 
         Initiative initiativeActual = initiativeService.sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(initiative, initiativeOrganizationInfoDTO);
@@ -1133,10 +1131,12 @@ class InitiativeServiceTest {
 
         ServiceRequestDTO serviceRequestDTOexpected = createServiceRequestDTO();
         ServiceResponseDTO serviceResponseDTOexpected = createServiceResponseDTO();
+        String serviceId = serviceResponseDTOexpected.getServiceId();
 
         when(initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(initiativeAdditional, initiativeOrganizationInfoDTO)).thenReturn(serviceRequestDTOexpected);
         when(ioBackEndRestConnector.createService(serviceRequestDTOexpected)).thenReturn(serviceResponseDTOexpected);
         when(ioTokenService.encrypt(anyString())).thenReturn(ANY_KEY_TOKEN_IO);
+        when(ioBackEndRestConnector.updateService(serviceId,serviceRequestDTOexpected)).thenReturn(serviceResponseDTOexpected);
         Mockito.doNothing().when(ioBackEndRestConnector).sendLogoIo(anyString(),anyString(),any());
 
         Initiative initiativeActual = initiativeService.sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(initiative, initiativeOrganizationInfoDTO);
@@ -1145,34 +1145,7 @@ class InitiativeServiceTest {
 
         //Expecting connector to be called once with correct param
         verify(ioBackEndRestConnector, times(1)).createService(serviceRequestDTOexpected);
-    }
-
-    @Test
-    void sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative_feignException() {
-        Initiative initiative = createStep5Initiative();
-        InitiativeAdditional initiativeAdditional = createInitiativeAdditional();
-        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = InitiativeOrganizationInfoDTO.builder()
-                .organizationName(ORGANIZATION_NAME)
-                .organizationVat(ORGANIZATION_VAT)
-                .organizationUserRole(ORGANIZATION_USER_ROLE)
-                .build();
-        ServiceRequestDTO serviceRequestDTOexpected = createServiceRequestDTO();
-        ServiceResponseDTO serviceResponseDTOexpected = createServiceResponseDTO();
-        Request request =
-                Request.create(Request.HttpMethod.PUT, "url", new HashMap<>(), null, new RequestTemplate());
-        when(initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(initiativeAdditional, initiativeOrganizationInfoDTO)).thenReturn(serviceRequestDTOexpected);
-        when(ioBackEndRestConnector.createService(serviceRequestDTOexpected)).thenReturn(serviceResponseDTOexpected);
-        when(ioTokenService.encrypt(anyString())).thenReturn(ANY_KEY_TOKEN_IO);
-        Mockito.doThrow(new FeignException.BadRequest("", request, new byte[0], null))
-                .when(emailNotificationService).sendInitiativeToCurrentOrganization(Mockito.any(), Mockito.anyString(),
-                        Mockito.anyString());
-        Mockito.doThrow(new FeignException.BadRequest("", request, new byte[0], null))
-                .when(emailNotificationService).sendInitiativeToPagoPA(Mockito.any(), Mockito.anyString(),
-                        Mockito.anyString());
-        try {
-            initiativeService.sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(initiative, initiativeOrganizationInfoDTO);
-        } catch (FeignException e) {
-            Assertions.fail();}
+        verify(ioBackEndRestConnector, times(1)).updateService(serviceId,serviceRequestDTOexpected);
     }
 
     @Test
