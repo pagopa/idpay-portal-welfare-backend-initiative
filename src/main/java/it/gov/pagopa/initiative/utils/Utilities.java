@@ -28,8 +28,8 @@ public class Utilities {
   private static final String CEF = String.format("CEF:0|PagoPa|IDPAY|1.0|7|User interaction|2| event=Initiative dstip=%s", SRCIP);
   private static final String MSG = " msg=";
   private static final String USER = "suser=";
-  private static final String INITIATIVE_ID = "initiativeId=";
-  private static final String ORGANIZATION_ID = "organizationId=";
+  private static final String INITIATIVE_ID = "cs1Label=initiativeId cs1=";
+  private static final String ORGANIZATION_ID = "cs2Label=organizationId cs2=";
 
   final Logger logger = Logger.getLogger("AUDIT");
 
