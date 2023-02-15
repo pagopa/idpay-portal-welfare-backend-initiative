@@ -387,10 +387,12 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         additionalInfo.setServiceId(serviceResponseDTO.getServiceId());
 
         String serviceId = serviceResponseDTO.getServiceId();
-        serviceRequestDTO.getServiceMetadata().setCta(InitiativeConstants.Cta.CTA + InitiativeConstants.Cta.CTA_NIT + InitiativeConstants.Cta.CTA_1
-        + InitiativeConstants.Cta.CTA_TEXT + InitiativeConstants.Cta.CTA_ACTION + serviceId + InitiativeConstants.Cta.CTA_NEN
-        + InitiativeConstants.Cta.CTA + InitiativeConstants.Cta.CTA_NIT + InitiativeConstants.Cta.CTA_1
-                + InitiativeConstants.Cta.CTA_TEXT_ENGLISH + InitiativeConstants.Cta.CTA_ACTION + serviceId + InitiativeConstants.Cta.CTA_NEN + InitiativeConstants.Cta.CTA_END);
+        serviceRequestDTO.getServiceMetadata().setCta(
+                InitiativeConstants.CtaConstant.START +
+                InitiativeConstants.CtaConstant.IT + InitiativeConstants.CtaConstant.CTA_1_IT + InitiativeConstants.CtaConstant.TEXT_IT + InitiativeConstants.CtaConstant.ACTION_IT + serviceId +
+                InitiativeConstants.CtaConstant.EN + InitiativeConstants.CtaConstant.CTA_1_EN + InitiativeConstants.CtaConstant.TEXT_EN + InitiativeConstants.CtaConstant.ACTION_EN + serviceId +
+                InitiativeConstants.CtaConstant.END
+        );
         ioBackEndRestConnector.updateService(serviceId,serviceRequestDTO);
 
         utilities.logInitiativePublished(this.getUserId(),initiative.getInitiativeId(), initiative.getOrganizationId());

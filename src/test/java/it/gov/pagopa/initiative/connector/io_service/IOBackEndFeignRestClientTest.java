@@ -71,7 +71,8 @@ class IOBackEndFeignRestClientTest {
     private static final boolean IS_VISIBLE = false;
     private static final String SERVICE_NAME = "serviceName";
     private static final String PRODUCT_DEPARTMENT_NAME = "productDepartmentName";
-    private static final String SERVICE_ID = "serviceId";
+    private static final String SERVICE_ID = "SERVICE_ID";
+    private static final String SERVICE_ID_500 = "SERVICE_ID_500";
 
     public static class WireMockInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
@@ -213,10 +214,10 @@ class IOBackEndFeignRestClientTest {
         ServiceRequestDTO serviceRequestDTO = createServiceRequestDTO();
         ServiceResponseDTO serviceResponseDTOexpected = createServiceResponseDTO();
 
-        String cta = InitiativeConstants.Cta.CTA + InitiativeConstants.Cta.CTA_NIT + InitiativeConstants.Cta.CTA_1
-                + InitiativeConstants.Cta.CTA_TEXT + InitiativeConstants.Cta.CTA_ACTION + SERVICE_ID + InitiativeConstants.Cta.CTA_NEN
-                + InitiativeConstants.Cta.CTA + InitiativeConstants.Cta.CTA_NIT + InitiativeConstants.Cta.CTA_1
-                + InitiativeConstants.Cta.CTA_TEXT_ENGLISH + InitiativeConstants.Cta.CTA_ACTION + SERVICE_ID + InitiativeConstants.Cta.CTA_NEN + InitiativeConstants.Cta.CTA_END;
+        String cta = InitiativeConstants.CtaConstant.START +
+                InitiativeConstants.CtaConstant.IT + InitiativeConstants.CtaConstant.CTA_1_IT + InitiativeConstants.CtaConstant.TEXT_IT + InitiativeConstants.CtaConstant.ACTION_IT + SERVICE_ID +
+                InitiativeConstants.CtaConstant.EN + InitiativeConstants.CtaConstant.CTA_1_EN + InitiativeConstants.CtaConstant.TEXT_EN + InitiativeConstants.CtaConstant.ACTION_EN + SERVICE_ID +
+                InitiativeConstants.CtaConstant.END;
 
         serviceRequestDTO.getServiceMetadata().setCta(cta);
         serviceResponseDTOexpected.getServiceMetadata().setCta(cta);
@@ -225,6 +226,17 @@ class IOBackEndFeignRestClientTest {
         String serviceRequestDTOjson = new ObjectMapper().writeValueAsString(serviceRequestDTO);
         
         //JSON to be returned placed here: src\resources\stub\mappings\io\digital_citizenship_api_put_updateService_200.json
+        //Prepare json to be returned
+        String serviceResponseDTOjson = new ObjectMapper().writeValueAsString(serviceResponseDTOexpected);
+
+        wireMockServer.stubFor(put(urlEqualTo("/services/"+SERVICE_ID))
+                .withRequestBody(equalToJson(serviceRequestDTOjson))
+                .willReturn(aResponse()
+                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .withBody(serviceResponseDTOjson)
+                        .withStatus(HttpStatus.OK.value())
+                )
+        );
 
         //Connector will call the fake server and expecting to reply what we Stub on src\resources\stub\mappings (or can be done with wireMockServer.stubFor)
         ResponseEntity<ServiceResponseDTO> responseEntity = ioBackEndFeignRestClient.updateService(SERVICE_ID, serviceRequestDTO, "subscriptionKey");
@@ -253,14 +265,14 @@ class IOBackEndFeignRestClientTest {
 
         //JSON to be returned placed here: src\resources\stub\mappings\io\digital_citizenship_api_put_updateService_500.json
 
-        Executable executable = () -> ioBackEndFeignRestClient.updateService(SERVICE_ID, serviceRequestDTO, "subscriptionKey");
+        Executable executable = () -> ioBackEndFeignRestClient.updateService(SERVICE_ID_500, serviceRequestDTO, "subscriptionKey");
         FeignException exception = Assertions.assertThrows(FeignException.class, executable);
         assertThat(exception.getMessage()).contains("[500 Server Error]");
         assertThat(exception.status()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
 
         //Verifying has been done 1 external call to IO BackEnd with our Request
         wireMockServer.verify(1,
-                WireMock.putRequestedFor(WireMock.urlEqualTo("/services/" + SERVICE_ID))
+                WireMock.putRequestedFor(WireMock.urlEqualTo("/services/" + SERVICE_ID_500))
                         .withRequestBody(equalToJson(serviceRequestDTOjson, true, false))
         );
     }
