@@ -117,6 +117,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
     @Override
     public Initiative insertInitiative(Initiative initiative, String organizationId, String organizationName, String role) {
+        long startTime = System.currentTimeMillis();
         initiativeValidationService.checkPermissionBeforeInsert(role);
         initiative.setOrganizationId(organizationId);
         initiative.setOrganizationName(organizationName);
@@ -127,12 +128,15 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         Initiative initiativeReturned = initiativeRepository.insert(initiative);
         this.sendEmailToCurrentOrg(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_CREATED, SUBJECT_INITIATIVE_CREATED);
         utilities.logNewInitiative(this.getUserId(), initiative.getInitiativeId(), organizationId);
+        performanceLog(startTime, "CREATE_INITIATIVE");
         return initiativeReturned;
     }
 
     @Override
     public Initiative getInitiative(String organizationId, String initiativeId, String role) {
+        long startTime = System.currentTimeMillis();
         utilities.logGetInitiative(this.getUserId(), initiativeId, organizationId);
+        performanceLog(startTime, "GET_INITIATIVE_DETAIL");
         return initiativeValidationService.getInitiative(organizationId, initiativeId, role);
     }
 
@@ -147,6 +151,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
     @Override
     public void updateInitiativeGeneralInfo(String organizationId, String initiativeId, Initiative initiativeInfoModel, String role) {
+        long startTime = System.currentTimeMillis();
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
 
         isInitiativeAllowedToBeEditableThenThrows(initiative);
@@ -157,10 +162,12 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         initiative.setStatus(InitiativeConstants.Status.DRAFT);
         this.initiativeRepository.save(initiative);
         utilities.logEditInitiative(this.getUserId(), initiativeId, organizationId);
+        performanceLog(startTime, "UPDATE_INITIATIVE_GENERAL_INFO");
     }
 
     @Override
     public void updateInitiativeAdditionalInfo(String organizationId, String initiativeId, Initiative initiativeAdditionalInfo, String role) {
+        long startTime = System.currentTimeMillis();
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
         isInitiativeAllowedToBeEditableThenThrows(initiative);
         InitiativeAdditional infoOriginal = initiative.getAdditionalInfo();
@@ -169,10 +176,12 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         initiative.setStatus(InitiativeConstants.Status.DRAFT);
         this.initiativeRepository.save(initiative);
         utilities.logEditInitiative(this.getUserId(), initiativeId, organizationId);
+        performanceLog(startTime, "UPDATE_INITIATIVE_ADDITIONAL_INFO");
     }
 
     @Override
     public void updateStep3InitiativeBeneficiary(String organizationId, String initiativeId, InitiativeBeneficiaryRule initiativeBeneficiaryRuleModel, String role){
+        long startTime = System.currentTimeMillis();
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
         List<AutomatedCriteria> automatedCriteriaList = initiativeBeneficiaryRuleModel.getAutomatedCriteria();
         initiativeValidationService.checkAutomatedCriteriaOrderDirectionWithRanking(initiative, automatedCriteriaList);
@@ -182,10 +191,12 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         initiative.setStatus(InitiativeConstants.Status.DRAFT);
         this.initiativeRepository.save(initiative);
         utilities.logEditInitiative(this.getUserId(), initiativeId, organizationId);
+        performanceLog(startTime, "UPDATE_INITIATIVE_BENEFICIARY_RULES");
     }
 
     @Override
     public void updateTrxAndRewardRules(String organizationId, String initiativeId, Initiative rewardAndTrxRules, String role) {
+        long startTime = System.currentTimeMillis();
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
         //Check Initiative Status
         isInitiativeAllowedToBeEditableThenThrows(initiative);
@@ -194,11 +205,13 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         initiative.setRewardRule(rewardAndTrxRules.getRewardRule());
         this.initiativeRepository.save(initiative);
         utilities.logEditInitiative(this.getUserId(), initiativeId, organizationId);
+        performanceLog(startTime, "UPDATE_INITIATIVE_TRX_REWARD_RULES");
     }
 
 
     @Override
     public void updateInitiativeRefundRules(String organizationId, String initiativeId, String role, Initiative refundRule, boolean changeInitiativeStatus) {
+        long startTime = System.currentTimeMillis();
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
         //Check Initiative Status
         isInitiativeAllowedToBeEditableThenThrows(initiative);
@@ -210,6 +223,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             if (initiative.getGeneral().getDescriptionMap().get(Locale.ITALIAN.getLanguage()) == null) {
                 utilities.logInitiativeError(this.getUserId(), initiativeId, organizationId,
                         InitiativeConstants.Exception.BadRequest.INITIATIVE_DESCRIPTION_LANGUAGE_MESSAGE);
+                performanceLog(startTime, "UPDATE_INITIATIVE_REFUND_RULES");
                 throw new InitiativeException(
                         InitiativeConstants.Exception.BadRequest.CODE,
                         InitiativeConstants.Exception.BadRequest.INITIATIVE_DESCRIPTION_LANGUAGE_MESSAGE,
@@ -231,12 +245,14 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             this.sendEmailToPagoPA(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
             this.sendEmailToCurrentOrg(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
         }
+        performanceLog(startTime, "UPDATE_INITIATIVE_REFUND_RULES");
     }
 
 
 
     @Override
     public void updateInitiativeApprovedStatus(String organizationId, String initiativeId, String role) {
+        long startTime = System.currentTimeMillis();
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
         isInitiativeStatusNotInRevisionThenThrow(initiative, InitiativeConstants.Status.APPROVED);
         initiative.setStatus(InitiativeConstants.Status.APPROVED);
@@ -244,10 +260,12 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         utilities.logInitiativeApproved(this.getUserId(),initiativeId, organizationId);
         log.info("[UPDATE_TO_APPROVED_STATUS] - Initiative: {}. Status successfully changed", initiative.getInitiativeId());
         this.sendEmailToCurrentOrg(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
+        performanceLog(startTime, "UPDATE_INITIATIVE_APPROVED");
     }
 
     @Override
     public void updateInitiativeToCheckStatus(String organizationId, String initiativeId, String role) {
+        long startTime = System.currentTimeMillis();
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
         isInitiativeStatusNotInRevisionThenThrow(initiative, InitiativeConstants.Status.TO_CHECK);
         initiative.setStatus(InitiativeConstants.Status.TO_CHECK);
@@ -255,10 +273,12 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         utilities.logInitiativeToCheck(this.getUserId(), initiativeId, organizationId);
         log.info("[UPDATE_TO_CHECK_STATUS] - Initiative: {}. Status successfully changed", initiative.getInitiativeId());
         this.sendEmailToCurrentOrg(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
+        performanceLog(startTime, "UPDATE_INITIATIVE_TO_CHECK");
     }
 
     @Override
     public void logicallyDeleteInitiative(String organizationId, String initiativeId, String role) {
+        long startTime = System.currentTimeMillis();
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
         if (
                 initiative.getStatus().equals(InitiativeConstants.Status.IN_REVISION) ||
@@ -268,6 +288,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         ) {
             log.error("[LOGICAL_DELETE_INITIATIVE] - Initiative: {}. Cannot be deleted. Current status is {}.", initiative.getInitiativeId(), initiative.getStatus());
             utilities.logInitiativeError(this.getUserId(), initiativeId, organizationId, "initiative cannot be deleted");
+            performanceLog(startTime, "DELETE_INITIATIVE");
             throw new InitiativeException(
                     InitiativeConstants.Exception.BadRequest.CODE,
                     String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_CANNOT_BE_DELETED, initiativeId),
@@ -280,6 +301,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             log.info("[LOGICAL_DELETE_INITIATIVE] - Initiative: {}. Successfully logical elimination.", initiative.getInitiativeId());
         }
         this.sendEmailToPagoPA(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
+        performanceLog(startTime, "DELETE_INITIATIVE");
     }
 
     @Override
@@ -334,7 +356,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     @Override
     public LogoDTO storeInitiativeLogo(String organizationId, String initiativeId, InputStream logo,
                                        String contentType, String fileName) {
-
+        long startTime = System.currentTimeMillis();
         Initiative initiative = initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(
                         organizationId, initiativeId, true)
                 .orElseThrow(() -> new InitiativeException(
@@ -352,8 +374,10 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             initiative.getAdditionalInfo().setLogoUploadDate(localDateTime);
             initiative.setUpdateDate(localDateTime);
             initiativeRepository.save(initiative);
+            performanceLog(startTime, "STORE_INITIATIVE_LOGO");
             return new LogoDTO(fileName, initiativeUtils.createLogoUrl(organizationId, initiativeId), localDateTime);
         } catch (Exception e) {
+            performanceLog(startTime, "STORE_INITIATIVE_LOGO");
             throw new RuntimeException(e);
         }
     }
@@ -575,5 +599,12 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                     RequestAttributes.SCOPE_REQUEST);
         }
         return userId;
+    }
+
+    private void performanceLog(long startTime, String service){
+        log.info(
+                "[PERFORMANCE_LOG] [{}] Time occurred to perform business logic: {} ms",
+                service,
+                System.currentTimeMillis() - startTime);
     }
 }
