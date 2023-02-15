@@ -43,6 +43,19 @@ public class InitiativeConstants {
 
     }
 
+    public static final class CtaConstant {
+        public static final String START = "---\n";
+        public static final String IT = "it:\n    ";
+        public static final String CTA_1_IT = "cta_1: \n        ";
+        public static final String TEXT_IT = "text: \"Richiedi il Bonus\"\n        ";
+        public static final String ACTION_IT = "action: \"ioit://idpay/onboarding/";
+        public static final String EN = "\"\nen:\n    ";
+        public static final String CTA_1_EN = "cta_1: \n        ";
+        public static final String TEXT_EN = "text: \"Request Bonus\"\n        ";
+        public static final String ACTION_EN = "action: \"ioit://idpay/onboarding/";
+        public static final String END = "\"\n---";
+    }
+
     public static final class Exception extends AbstractConstant {
 
         public static final class ErrorDtoDefaultMsg {
