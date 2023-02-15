@@ -1106,7 +1106,7 @@ class InitiativeServiceTest {
         when(initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(initiativeAdditional, initiativeOrganizationInfoDTO)).thenReturn(serviceRequestDTOexpected);
         when(ioBackEndRestConnector.createService(serviceRequestDTOexpected)).thenReturn(serviceResponseDTOexpected);
         when(ioTokenService.encrypt(anyString())).thenReturn(ANY_KEY_TOKEN_IO);
-        when(ioBackEndRestConnector.updateService(serviceId,serviceRequestDTOexpected)).thenReturn(serviceResponseDTOexpected);
+        when(ioBackEndRestConnector.updateService(serviceId,serviceRequestDTOexpected, serviceResponseDTOexpected.getPrimaryKey())).thenReturn(serviceResponseDTOexpected);
 
         Initiative initiativeActual = initiativeService.sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(initiative, initiativeOrganizationInfoDTO);
         assertEquals(SERVICE_ID, initiativeActual.getAdditionalInfo().getServiceId());
@@ -1114,7 +1114,7 @@ class InitiativeServiceTest {
 
         //Expecting connector to be called once with correct param
         verify(ioBackEndRestConnector, times(1)).createService(serviceRequestDTOexpected);
-        verify(ioBackEndRestConnector, times(1)).updateService(serviceId,serviceRequestDTOexpected);
+        verify(ioBackEndRestConnector, times(1)).updateService(serviceId,serviceRequestDTOexpected, serviceResponseDTOexpected.getPrimaryKey());
     }
 
     @Test
@@ -1136,7 +1136,7 @@ class InitiativeServiceTest {
         when(initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(initiativeAdditional, initiativeOrganizationInfoDTO)).thenReturn(serviceRequestDTOexpected);
         when(ioBackEndRestConnector.createService(serviceRequestDTOexpected)).thenReturn(serviceResponseDTOexpected);
         when(ioTokenService.encrypt(anyString())).thenReturn(ANY_KEY_TOKEN_IO);
-        when(ioBackEndRestConnector.updateService(serviceId,serviceRequestDTOexpected)).thenReturn(serviceResponseDTOexpected);
+        when(ioBackEndRestConnector.updateService(serviceId,serviceRequestDTOexpected, serviceResponseDTOexpected.getPrimaryKey())).thenReturn(serviceResponseDTOexpected);
         Mockito.doNothing().when(ioBackEndRestConnector).sendLogoIo(anyString(),anyString(),any());
 
         Initiative initiativeActual = initiativeService.sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(initiative, initiativeOrganizationInfoDTO);
@@ -1145,7 +1145,7 @@ class InitiativeServiceTest {
 
         //Expecting connector to be called once with correct param
         verify(ioBackEndRestConnector, times(1)).createService(serviceRequestDTOexpected);
-        verify(ioBackEndRestConnector, times(1)).updateService(serviceId,serviceRequestDTOexpected);
+        verify(ioBackEndRestConnector, times(1)).updateService(serviceId,serviceRequestDTOexpected, serviceResponseDTOexpected.getPrimaryKey());
     }
 
     @Test
