@@ -61,6 +61,7 @@ class IOBackEndFeignRestClientTest {
     private static final String ORGANIZATION_VAT_NOT_VALID = "organizationVatNotValid";
     private static final String ORGANIZATION_USER_ID = "organizationUserId";
     private static final String ORGANIZATION_USER_ROLE = "organizationUserRole";
+    private static final String ANY_KEY_TOKEN_IO = "ANY_KEY_TOKEN_IO";
     private static final String EMAIL = "test@pagopa.it";
     private static final String PHONE = "0123456789";
     private static final String SUPPORT_URL = "support.url.it";
@@ -239,7 +240,7 @@ class IOBackEndFeignRestClientTest {
         );
 
         //Connector will call the fake server and expecting to reply what we Stub on src\resources\stub\mappings (or can be done with wireMockServer.stubFor)
-        ResponseEntity<ServiceResponseDTO> responseEntity = ioBackEndFeignRestClient.updateService(SERVICE_ID, serviceRequestDTO, "subscriptionKey");
+        ResponseEntity<ServiceResponseDTO> responseEntity = ioBackEndFeignRestClient.updateService(SERVICE_ID, serviceRequestDTO, "primaryKey");
         ServiceResponseDTO serviceResponseDTO = responseEntity.getBody();
 
         //Asserting if Client (FeignClient, WireMock client ecc.) responded properly
@@ -265,7 +266,7 @@ class IOBackEndFeignRestClientTest {
 
         //JSON to be returned placed here: src\resources\stub\mappings\io\digital_citizenship_api_put_updateService_500.json
 
-        Executable executable = () -> ioBackEndFeignRestClient.updateService(SERVICE_ID_500, serviceRequestDTO, "subscriptionKey");
+        Executable executable = () -> ioBackEndFeignRestClient.updateService(SERVICE_ID_500, serviceRequestDTO, "primaryKey");
         FeignException exception = Assertions.assertThrows(FeignException.class, executable);
         assertThat(exception.getMessage()).contains("[500 Server Error]");
         assertThat(exception.status()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -337,6 +338,7 @@ class IOBackEndFeignRestClientTest {
                 .organizationName(ORGANIZATION_NAME)
                 .organizationFiscalCode(ORGANIZATION_VAT)
                 .isVisible(IS_VISIBLE)
+                .primaryKey(ANY_KEY_TOKEN_IO)
                 .serviceMetadata(serviceMetadataDTO)
                 .build();
     }

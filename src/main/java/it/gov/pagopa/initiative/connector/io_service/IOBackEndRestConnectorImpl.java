@@ -34,8 +34,8 @@ public class IOBackEndRestConnectorImpl implements IOBackEndRestConnector {
   }
 
   @Override
-  public ServiceResponseDTO updateService(String serviceId,ServiceRequestDTO serviceRequestDTO) {
-    ResponseEntity<ServiceResponseDTO> responseEntity = ioBackEndFeignRestClient.updateService(serviceId, serviceRequestDTO, subscriptionKey);
+  public ServiceResponseDTO updateService(String serviceId, ServiceRequestDTO serviceRequestDTO, String primaryKey) {
+    ResponseEntity<ServiceResponseDTO> responseEntity = ioBackEndFeignRestClient.updateService(serviceId, serviceRequestDTO, primaryKey);
     return responseEntity.getBody();
   }
 

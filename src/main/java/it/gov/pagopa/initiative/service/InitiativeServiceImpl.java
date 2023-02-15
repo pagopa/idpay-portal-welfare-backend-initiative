@@ -417,7 +417,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                 InitiativeConstants.CtaConstant.EN + InitiativeConstants.CtaConstant.CTA_1_EN + InitiativeConstants.CtaConstant.TEXT_EN + InitiativeConstants.CtaConstant.ACTION_EN + serviceId +
                 InitiativeConstants.CtaConstant.END
         );
-        ioBackEndRestConnector.updateService(serviceId,serviceRequestDTO);
+        ioBackEndRestConnector.updateService(serviceId, serviceRequestDTO, serviceResponseDTO.getPrimaryKey());
 
         utilities.logInitiativePublished(this.getUserId(),initiative.getInitiativeId(), initiative.getOrganizationId());
         return initiative;

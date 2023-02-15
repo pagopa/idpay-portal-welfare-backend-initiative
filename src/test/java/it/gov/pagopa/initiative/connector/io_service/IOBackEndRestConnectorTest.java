@@ -37,6 +37,7 @@ class IOBackEndRestConnectorTest {
     private static final String ORGANIZATION_VAT = "organizationVat";
     private static final String ORGANIZATION_USER_ID = "organizationUserId";
     private static final String ORGANIZATION_USER_ROLE = "organizationUserRole";
+    private static final String ANY_KEY_TOKEN_IO = "ANY_KEY_TOKEN_IO";
     private static final String EMAIL = "test@pagopa.it";
     private static final String PHONE = "0123456789";
     private static final String SUPPORT_URL = "support.url.it";
@@ -80,12 +81,12 @@ class IOBackEndRestConnectorTest {
     private ServiceRequestDTO createServiceRequestDTO() {
         ServiceMetadataDTO serviceMetadataDTO = createServiceMetadataDTO();
         return ServiceRequestDTO.builder()
-                .serviceMetadata(serviceMetadataDTO)
                 .serviceName(SERVICE_NAME)
                 .departmentName(PRODUCT_DEPARTMENT_NAME)
                 .organizationName(ORGANIZATION_NAME)
-                .organizationFiscalCode(ORGANIZATION_FISCAL_CODE)
+                .organizationFiscalCode(ORGANIZATION_VAT)
                 .isVisible(IS_VISIBLE)
+                .serviceMetadata(serviceMetadataDTO)
                 .build();
     }
 
@@ -102,8 +103,16 @@ class IOBackEndRestConnectorTest {
     }
 
     private ServiceResponseDTO createServiceResponseDTO() {
+        ServiceMetadataDTO serviceMetadataDTO = createServiceMetadataDTO();
         return ServiceResponseDTO.builder()
                 .serviceId(SERVICE_ID)
+                .serviceName(SERVICE_NAME)
+                .departmentName(PRODUCT_DEPARTMENT_NAME)
+                .organizationName(ORGANIZATION_NAME)
+                .organizationFiscalCode(ORGANIZATION_VAT)
+                .isVisible(IS_VISIBLE)
+                .primaryKey(ANY_KEY_TOKEN_IO)
+                .serviceMetadata(serviceMetadataDTO)
                 .build();
     }
 
@@ -124,16 +133,16 @@ class IOBackEndRestConnectorTest {
         String serviceId = serviceResponseDTOexpected.getServiceId();
 
         ResponseEntity<ServiceResponseDTO> entityExpected = new ResponseEntity<>(serviceResponseDTOexpected, HttpStatus.OK);
-        Mockito.when(ioBackEndFeignRestClient.updateService(serviceId, serviceRequestDTO, "subscriptionKey")).thenReturn(entityExpected);
+        Mockito.when(ioBackEndFeignRestClient.updateService(serviceId, serviceRequestDTO, ANY_KEY_TOKEN_IO)).thenReturn(entityExpected);
 
         //Connector will call the fake server and expecting to reply what we Stub on src\resources\mappings (or can be done with wireMockServer.stubFor)
-        ServiceResponseDTO serviceResponseDTO = ioBackEndRestConnector.updateService(serviceId, serviceRequestDTO);
+        ServiceResponseDTO serviceResponseDTO = ioBackEndRestConnector.updateService(serviceId, serviceRequestDTO, serviceResponseDTOexpected.getPrimaryKey());
 
         //Asserting if Client (FeignClient, WireMock client ecc.) responded properly
         assertNotNull(serviceResponseDTO);
         assertThat(serviceResponseDTO).isEqualTo(serviceResponseDTOexpected);
         Assertions.assertEquals(entityExpected.getBody(), serviceResponseDTO);
 
-        Mockito.verify(ioBackEndFeignRestClient,times(1)).updateService(serviceId, serviceRequestDTO, "subscriptionKey");
+        Mockito.verify(ioBackEndFeignRestClient,times(1)).updateService(serviceId, serviceRequestDTO, ANY_KEY_TOKEN_IO);
     }
 }
