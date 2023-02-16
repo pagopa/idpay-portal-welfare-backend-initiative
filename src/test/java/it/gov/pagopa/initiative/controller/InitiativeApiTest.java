@@ -29,6 +29,8 @@ import it.gov.pagopa.initiative.service.InitiativeService;
 import it.gov.pagopa.initiative.service.OrganizationService;
 import org.apache.kafka.common.KafkaException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -61,7 +63,8 @@ import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.PAGOPA
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
@@ -143,7 +146,7 @@ class InitiativeApiTest {
     @Autowired
     protected MockMvc mvc;
 
-    @Test
+    /* @Test
     void whenAdmin_getInitiativeSummary_statusOk() throws Exception {
 
         Boolean beneficiaryKnown = false;
@@ -169,32 +172,50 @@ class InitiativeApiTest {
                 .andDo(print())
                 .andReturn();
     }
+     */
 
-    @Test
-    void whenOpeBase_getInitiativeSummary_statusOk() throws Exception {
+    //@Test
+    @ParameterizedTest
+    @ValueSource(strings = {PAGOPA_ADMIN, ADMIN})
+
+    void whenPagoPaAdmin_getInitiativeSummary_statusOk(String role) throws Exception {
 
         Boolean beneficiaryKnown = false;
-        //create Dummy Initiative
-        Initiative step2Initiative = createStep2Initiative(beneficiaryKnown);
-        Initiative step2Initiative2 = createStep2Initiative(beneficiaryKnown);
-        List<Initiative> initiatives = Arrays.asList(step2Initiative, step2Initiative2);
 
-        // Returning something from Repo by using ServiceMock
-        when(initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, PAGOPA_ADMIN)).thenReturn(initiatives);
+        Initiative step1Initiative = createStep1Initiative();
+        Initiative step1Initiative2 = createStep1Initiative();
+        List<Initiative> initiatives = Arrays.asList(step1Initiative, step1Initiative2);
+
+        InitiativeSummaryDTO step1InitiativeSummaryDTO = createStep1InitiativeSummaryDTO();
+        InitiativeSummaryDTO step1InitiativeSummary2DTO = createStep1InitiativeSummaryDTO();
+        List<InitiativeSummaryDTO> initiativeSummaryDTOs = Arrays.asList(step1InitiativeSummaryDTO, step1InitiativeSummary2DTO);
+
+
+        when(initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, role)).thenReturn(initiatives);
 
         // When
-        List<Initiative> retrieveInitiativeSummary = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, PAGOPA_ADMIN);
-
+        List<Initiative> retrieveInitiativeSummary = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, role);
+        when(initiativeModelToDTOMapper.toInitiativeSummaryDTOList(retrieveInitiativeSummary)).thenReturn(initiativeSummaryDTOs);
         // Then
         // you are expecting service to return whatever returned by repo
         assertThat("Reason of result", retrieveInitiativeSummary, is(sameInstance(initiatives)));
 
-        mvc.perform(
+         mvc.perform(
                         MockMvcRequestBuilders.get(BASE_URL + String.format(GET_INITIATIVES_SUMMARY_URL, ORGANIZATION_ID))
+                                .queryParam("role",role)
                                 .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().json("[{\"initiativeId\":\"initiativeId\",\"initiativeName\":\"initiativeName\",\"status\":\"PUBLISHED\"},{\"initiativeId\":\"initiativeId\",\"initiativeName\":\"initiativeName\",\"status\":\"PUBLISHED\"}]"))
                 .andDo(print())
                 .andReturn();
+    }
+
+    private InitiativeSummaryDTO createStep1InitiativeSummaryDTO() {
+        return InitiativeSummaryDTO.builder()
+                .initiativeId("initiativeId")
+                .initiativeName("initiativeName")
+                .status(InitiativeConstants.Status.PUBLISHED)
+                .build();
     }
 
     @Test
@@ -926,7 +947,7 @@ class InitiativeApiTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
 
-        MvcResult resultOpeBase = mvc.perform(MockMvcRequestBuilders
+        MvcResult resultPagoPaAdmin = mvc.perform(MockMvcRequestBuilders
                         .get(BASE_URL + "/organizations")
                         .param("role", PAGOPA_ADMIN)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -942,7 +963,7 @@ class InitiativeApiTest {
 
         String expectedResultContent = "[{\"organizationId\":\"organizationId_0\",\"organizationName\":\"organizationName_0\"},{\"organizationId\":\"organizationId_1\",\"organizationName\":\"organizationName_1\"},{\"organizationId\":\"organizationId_2\",\"organizationName\":\"organizationName_2\"},{\"organizationId\":\"organizationId_3\",\"organizationName\":\"organizationName_3\"}]";
         assertEquals(expectedResultContent, resultAdmin.getResponse().getContentAsString());
-        assertEquals(expectedResultContent, resultOpeBase.getResponse().getContentAsString());
+        assertEquals(expectedResultContent, resultPagoPaAdmin.getResponse().getContentAsString());
         assertEquals("", resultDefault.getResponse().getContentAsString());
     }
 
@@ -955,6 +976,7 @@ class InitiativeApiTest {
                         .get(BASE_URL + "/organizations/{organizationId}", organization.getOrganizationId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
+                .andDo(print())
                 .andReturn();
 
         String expectedResultContent = "{\"organizationId\":\"organizationId_1\",\"organizationName\":\"organizationName_1\"}";

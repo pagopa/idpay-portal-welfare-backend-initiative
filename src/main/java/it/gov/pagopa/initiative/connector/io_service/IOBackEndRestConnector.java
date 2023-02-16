@@ -12,4 +12,5 @@ public interface IOBackEndRestConnector {
   ServiceResponseDTO createService(@RequestBody @Valid ServiceRequestDTO serviceRequestDTO);
   void sendLogoIo(String serviceId, String primaryKey,  LogoIODTO logo);
 
+  ServiceResponseDTO updateService(String serviceId, ServiceRequestDTO serviceRequestDTO, String primaryKey);
 }

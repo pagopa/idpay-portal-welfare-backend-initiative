@@ -73,9 +73,8 @@ public class InitiativeApiController implements InitiativeApi {
     @Override
     public ResponseEntity<List<InitiativeSummaryDTO>> getInitiativeSummary(String organizationId, String role) {
         log.info("[{}][GET_INITIATIVES] - InitiativeSummary: Start processing...", role);
-        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeSummaryDTOList(
-                this.initiativeService.retrieveInitiativeSummary(organizationId, role)
-        ));
+        List<Initiative> initiatives = this.initiativeService.retrieveInitiativeSummary(organizationId, role);
+        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeSummaryDTOList(initiatives));
     }
 
     @Override
@@ -230,6 +229,7 @@ public class InitiativeApiController implements InitiativeApi {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Override
     public ResponseEntity<Void> updateInitiativePublishedStatus(String organizationId, String initiativeId, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO, String role) {
+        long startTime = System.currentTimeMillis();
         role = initiativeOrganizationInfoDTO.getOrganizationUserRole();
         //Retrieve Initiative
         log.info("[{}][UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Start processing...", role, initiativeId);
@@ -277,8 +277,10 @@ public class InitiativeApiController implements InitiativeApi {
             initiative.setUpdateDate(updateDateTemp);
             initiativeService.updateInitiative(initiative);
             log.debug("Initiative Status has been roll-backed to {}", statusTemp);
+            performanceLog(startTime, "UPDATE_INITIATIVE_PUBLISHED");
             throw new IntegrationException(HttpStatus.BAD_REQUEST);
         }
+        performanceLog(startTime, "UPDATE_INITIATIVE_PUBLISHED");
         return ResponseEntity.noContent().build();
     }
 
@@ -323,4 +325,10 @@ public class InitiativeApiController implements InitiativeApi {
         return ResponseEntity.ok(this.initiativeService.getOnboardingStatusList(organizationId,initiativeId,beneficiary,dateFrom,dateTo,state,pageable));
     }
 
+    private void performanceLog(long startTime, String service){
+        log.info(
+                "[PERFORMANCE_LOG] [{}] Time occurred to perform business logic: {} ms",
+                service,
+                System.currentTimeMillis() - startTime);
+    }
 }
