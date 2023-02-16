@@ -39,7 +39,7 @@ import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
 import it.gov.pagopa.initiative.model.rule.trx.*;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
 import it.gov.pagopa.initiative.utils.InitiativeUtils;
-import it.gov.pagopa.initiative.utils.Utilities;
+import it.gov.pagopa.initiative.utils.AuditUtilities;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -124,7 +124,7 @@ class InitiativeServiceTest {
     InitiativeModelToDTOMapper initiativeModelToDTOMapper;
 
     @MockBean
-    Utilities utilities;
+    AuditUtilities auditUtilities;
 
     @MockBean
     InitiativeAdditionalDTOsToIOServiceRequestDTOMapper initiativeAdditionalDTOsToIOServiceRequestDTOMapper;

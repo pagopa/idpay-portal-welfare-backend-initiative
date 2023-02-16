@@ -27,8 +27,8 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
-@ContextConfiguration(classes = {Utilities.class, InetAddress.class})
-class UtilitiesTest {
+@ContextConfiguration(classes = {AuditUtilities.class, InetAddress.class})
+class AuditUtilitiesTest {
     private static final String SRCIP;
 
     static {
@@ -50,7 +50,7 @@ class UtilitiesTest {
     @MockBean
     Logger logger;
     @Autowired
-    Utilities utilities;
+    AuditUtilities auditUtilities;
     @MockBean
     InetAddress inetAddress;
     MemoryAppender memoryAppender;
@@ -67,60 +67,64 @@ class UtilitiesTest {
 
     @Test
     void testNewInitiative() {
-        utilities.logNewInitiative(USER_ID, INITIATIVE_ID, ORGANIZATION_ID);
+        auditUtilities.logNewInitiative(USER_ID, INITIATIVE_ID, ORGANIZATION_ID);
         assertThat(memoryAppender.contains(ch.qos.logback.classic.Level.DEBUG,MSG)).isFalse();
     }
 
     @Test
     void testInitiativeApproved() {
-        utilities.logInitiativeApproved(USER_ID, INITIATIVE_ID, ORGANIZATION_ID);
+        auditUtilities.logInitiativeApproved(USER_ID, INITIATIVE_ID, ORGANIZATION_ID);
         assertThat(memoryAppender.contains(ch.qos.logback.classic.Level.DEBUG,MSG)).isFalse();
     }
 
     @Test
     void testInitiativeToCheck() {
-        utilities.logInitiativeToCheck(USER_ID, INITIATIVE_ID, ORGANIZATION_ID);
+        auditUtilities.logInitiativeToCheck(USER_ID, INITIATIVE_ID, ORGANIZATION_ID);
         assertThat(memoryAppender.contains(ch.qos.logback.classic.Level.DEBUG,MSG)).isFalse();
     }
 
     @Test
     void testInitiativePublished() {
-        utilities.logInitiativePublished(USER_ID, INITIATIVE_ID, ORGANIZATION_ID);
+        auditUtilities.logInitiativePublished(USER_ID, INITIATIVE_ID, ORGANIZATION_ID);
         assertThat(memoryAppender.contains(ch.qos.logback.classic.Level.DEBUG,MSG)).isFalse();
     }
 
     @Test
-    void testInitiativeInRevision() {utilities.logInitiativeInRevision(USER_ID, INITIATIVE_ID, ORGANIZATION_ID);
+    void testInitiativeInRevision() {
+        auditUtilities.logInitiativeInRevision(USER_ID, INITIATIVE_ID, ORGANIZATION_ID);
         assertThat(memoryAppender.contains(ch.qos.logback.classic.Level.DEBUG,MSG)).isFalse();}
 
     @Test
-    void testOnboardingCitizen() {utilities.logOnboardingCitizen(USER_ID, INITIATIVE_ID, ORGANIZATION_ID);
+    void testOnboardingCitizen() {
+        auditUtilities.logOnboardingCitizen(USER_ID, INITIATIVE_ID, ORGANIZATION_ID);
         assertThat(memoryAppender.contains(ch.qos.logback.classic.Level.DEBUG,MSG)).isFalse();
     }
     @Test
-    void testDetailUser() {utilities.logDetailUser(USER_ID, INITIATIVE_ID, ORGANIZATION_ID);
+    void testDetailUser() {
+        auditUtilities.logDetailUser(USER_ID, INITIATIVE_ID, ORGANIZATION_ID);
         assertThat(memoryAppender.contains(ch.qos.logback.classic.Level.DEBUG,MSG)).isFalse();
     }
     @Test
-    void testEditInitiative() {utilities.logEditInitiative(USER_ID, INITIATIVE_ID, ORGANIZATION_ID);
+    void testEditInitiative() {
+        auditUtilities.logEditInitiative(USER_ID, INITIATIVE_ID, ORGANIZATION_ID);
         assertThat(memoryAppender.contains(ch.qos.logback.classic.Level.DEBUG,MSG)).isFalse();
     }
 
     @Test
     void testGetInitiative() {
-        utilities.logGetInitiative(USER_ID, INITIATIVE_ID, ORGANIZATION_ID);
+        auditUtilities.logGetInitiative(USER_ID, INITIATIVE_ID, ORGANIZATION_ID);
         assertThat(memoryAppender.contains(ch.qos.logback.classic.Level.DEBUG,MSG)).isFalse();
     }
 
     @Test
     void testInitiativeDeleted() {
-        utilities.logInitiativeDeleted(USER_ID, INITIATIVE_ID, ORGANIZATION_ID);
+        auditUtilities.logInitiativeDeleted(USER_ID, INITIATIVE_ID, ORGANIZATION_ID);
         assertThat(memoryAppender.contains(ch.qos.logback.classic.Level.DEBUG,MSG)).isFalse();
     }
 
     @Test
     void testInitiativeError() {
-        utilities.logInitiativeError(USER_ID, INITIATIVE_ID, ORGANIZATION_ID, MSG);
+        auditUtilities.logInitiativeError(USER_ID, INITIATIVE_ID, ORGANIZATION_ID, MSG);
         assertThat(memoryAppender.contains(ch.qos.logback.classic.Level.DEBUG,MSG)).isFalse();
     }
 
