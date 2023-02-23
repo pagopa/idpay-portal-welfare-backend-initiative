@@ -81,7 +81,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             AESTokenService ioTokenService,
             InitiativeValidationService initiativeValidationService,
             InitiativeUtils initiativeUtils,
-            Utilities utilities) {
+            Utilities utilities){
         this.notifyEmail = notifyEmail;
         this.initiativeRepository = initiativeRepository;
         this.initiativeProducer = initiativeProducer;
@@ -171,7 +171,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
         isInitiativeAllowedToBeEditableThenThrows(initiative);
         InitiativeAdditional infoOriginal = initiative.getAdditionalInfo();
-        InitiativeAdditional infoNew = initiativeAdditionalInfo.getAdditionalInfo();
+        InitiativeAdditional infoNew =  initiativeAdditionalInfo.getAdditionalInfo();
         BeanUtils.copyProperties(infoNew, infoOriginal, "logoFileName", "logoUploadDate", "serviceId", "primaryTokenIO", "secondaryTokenIO");
         initiative.setStatus(InitiativeConstants.Status.DRAFT);
         this.initiativeRepository.save(initiative);
@@ -180,7 +180,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     }
 
     @Override
-    public void updateStep3InitiativeBeneficiary(String organizationId, String initiativeId, InitiativeBeneficiaryRule initiativeBeneficiaryRuleModel, String role) {
+    public void updateStep3InitiativeBeneficiary(String organizationId, String initiativeId, InitiativeBeneficiaryRule initiativeBeneficiaryRuleModel, String role){
         long startTime = System.currentTimeMillis();
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
         List<AutomatedCriteria> automatedCriteriaList = initiativeBeneficiaryRuleModel.getAutomatedCriteria();
@@ -230,12 +230,13 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                         HttpStatus.BAD_REQUEST);
             }
             initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
-            utilities.logInitiativeInRevision(this.getUserId(), initiativeId, organizationId);
-            if (Boolean.TRUE.equals(initiative.getGeneral().getBeneficiaryKnown())) {
+            utilities.logInitiativeInRevision(this.getUserId(),initiativeId, organizationId);
+            if(Boolean.TRUE.equals(initiative.getGeneral().getBeneficiaryKnown())) {
                 groupRestConnector.setGroupStatusToValidated(initiativeId);
             }
             log.info("[UPDATE_TO_IN_REVISION_STATUS] - Initiative: {}. Status successfully set to IN_REVISION.", initiativeId);
-        } else {
+        }
+        else{
             initiative.setStatus(InitiativeConstants.Status.DRAFT);
             utilities.logEditInitiative(this.getUserId(), initiativeId, organizationId);
         }
@@ -248,6 +249,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     }
 
 
+
     @Override
     public void updateInitiativeApprovedStatus(String organizationId, String initiativeId, String role) {
         long startTime = System.currentTimeMillis();
@@ -255,7 +257,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         isInitiativeStatusNotInRevisionThenThrow(initiative, InitiativeConstants.Status.APPROVED);
         initiative.setStatus(InitiativeConstants.Status.APPROVED);
         this.initiativeRepository.save(initiative);
-        utilities.logInitiativeApproved(this.getUserId(), initiativeId, organizationId);
+        utilities.logInitiativeApproved(this.getUserId(),initiativeId, organizationId);
         log.info("[UPDATE_TO_APPROVED_STATUS] - Initiative: {}. Status successfully changed", initiative.getInitiativeId());
         this.sendEmailToCurrentOrg(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
         performanceLog(startTime, "UPDATE_INITIATIVE_APPROVED");
@@ -385,14 +387,11 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         InitiativeAdditional additionalInfo = initiative.getAdditionalInfo();
         ServiceRequestDTO serviceRequestDTO = initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(additionalInfo, initiativeOrganizationInfoDTO);
         ServiceResponseDTO serviceResponseDTO = ioBackEndRestConnector.createService(serviceRequestDTO);
-        log.debug("[DEBUG_TOKEN_IO_AFTER_CREATE] - Initiative: {}. Primary token IO: {}", initiative.getInitiativeId(), serviceResponseDTO.getPrimaryKey());
-        log.debug("[DEBUG_TOKEN_IO_AFTER_CREATE] - Initiative: {}. Secondary token IO: {}", initiative.getInitiativeId(), serviceResponseDTO.getSecondaryKey());
-        if (additionalInfo.getLogoFileName() != null) {
+        if(additionalInfo.getLogoFileName()!=null) {
             try {
                 ByteArrayOutputStream byteArrayOutputStream = fileStorageConnector.downloadInitiativeLogo(
                         initiativeUtils.getPathLogo(initiative.getOrganizationId(),
                                 initiative.getInitiativeId()));
-                log.debug("[DEBUG_TOKEN_IO_BEFORE_LOGO] - Initiative: {}. Primary token IO: {}", initiative.getInitiativeId(), serviceResponseDTO.getPrimaryKey());
                 ioBackEndRestConnector.sendLogoIo(serviceResponseDTO.getServiceId(),
                         serviceResponseDTO.getPrimaryKey(), LogoIODTO.builder().logo(new String(
                                         Base64.getEncoder().encode(byteArrayOutputStream.toByteArray())))
@@ -401,9 +400,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                 utilities.logInitiativeError(this.getUserId(), initiative.getInitiativeId(), initiative.getOrganizationId(), "upload logo failed");
                 log.error("[UPLOAD_LOGO] - Initiative: {}. Error: " + e.getMessage(),
                         initiative.getInitiativeId());
-                log.debug("[DEBUG_TOKEN_IO_ERROR_LOGO] - Initiative: {}. Primary token IO: {}", initiative.getInitiativeId(), serviceResponseDTO.getPrimaryKey());
             }
-            log.debug("[DEBUG_TOKEN_IO] - Initiative: {}. Primary token IO...", serviceResponseDTO.getServiceId());
         }
         log.debug("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Start ServiceIO Keys encryption...", initiative.getInitiativeId());
         String encryptedPrimaryToken = ioTokenService.encrypt(serviceResponseDTO.getPrimaryKey());
@@ -416,19 +413,19 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         String serviceId = serviceResponseDTO.getServiceId();
         serviceRequestDTO.getServiceMetadata().setCta(
                 InitiativeConstants.CtaConstant.START +
-                        InitiativeConstants.CtaConstant.IT + InitiativeConstants.CtaConstant.CTA_1_IT + InitiativeConstants.CtaConstant.TEXT_IT + InitiativeConstants.CtaConstant.ACTION_IT + serviceId +
-                        InitiativeConstants.CtaConstant.EN + InitiativeConstants.CtaConstant.CTA_1_EN + InitiativeConstants.CtaConstant.TEXT_EN + InitiativeConstants.CtaConstant.ACTION_EN + serviceId +
-                        InitiativeConstants.CtaConstant.END
+                InitiativeConstants.CtaConstant.IT + InitiativeConstants.CtaConstant.CTA_1_IT + InitiativeConstants.CtaConstant.TEXT_IT + InitiativeConstants.CtaConstant.ACTION_IT + serviceId +
+                InitiativeConstants.CtaConstant.EN + InitiativeConstants.CtaConstant.CTA_1_EN + InitiativeConstants.CtaConstant.TEXT_EN + InitiativeConstants.CtaConstant.ACTION_EN + serviceId +
+                InitiativeConstants.CtaConstant.END
         );
         ioBackEndRestConnector.updateService(serviceId, serviceRequestDTO, serviceResponseDTO.getPrimaryKey());
 
-        utilities.logInitiativePublished(this.getUserId(), initiative.getInitiativeId(), initiative.getOrganizationId());
+        utilities.logInitiativePublished(this.getUserId(),initiative.getInitiativeId(), initiative.getOrganizationId());
         return initiative;
     }
 
     @Override
-    public void sendEmailToCurrentOrg(Initiative initiative, String template, String subject) {
-        if (notifyEmail) {
+    public void sendEmailToCurrentOrg(Initiative initiative, String template,  String subject){
+        if(notifyEmail){
             try {
                 emailNotificationService.sendInitiativeToCurrentOrganization(initiative, template, subject);
             } catch (FeignException e) {
@@ -438,8 +435,8 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     }
 
     @Override
-    public void sendEmailToPagoPA(Initiative initiative, String template, String subject) {
-        if (notifyEmail) {
+    public void sendEmailToPagoPA(Initiative initiative, String template,  String subject){
+        if(notifyEmail){
             try {
                 emailNotificationService.sendInitiativeToPagoPA(initiative, template, subject);
             } catch (FeignException e) {
@@ -526,7 +523,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
     @Override
     public BeneficiaryRankingPageDTO getRankingList(String organizationId, String initiativeId,
-                                                    Pageable pageable, String beneficiary, String state) {
+            Pageable pageable, String beneficiary, String state) {
         log.info("start get ranking, initiative: " + initiativeId);
         Initiative initiative = initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(
                         organizationId, initiativeId, true)
@@ -536,7 +533,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                                 InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE,
                                 initiativeId),
                         HttpStatus.NOT_FOUND));
-        if (initiative.getGeneral() != null && !initiative.getGeneral().getRankingEnabled()) {
+        if(initiative.getGeneral() != null && !initiative.getGeneral().getRankingEnabled()){
             throw new InitiativeException(
                     InternalServerError.CODE,
                     InternalServerError.NO_RANKING,
@@ -557,7 +554,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         }
         RankingPageDTO rankingPageDTO = new RankingPageDTO();
         try {
-            rankingPageDTO = rankingRestConnector.getRankingList(organizationId, initiativeId, pageable, state, userId);
+            rankingPageDTO = rankingRestConnector.getRankingList(organizationId,initiativeId,pageable,state,userId);
             log.info("response ranking: " + rankingPageDTO);
         } catch (Exception e) {
             utilities.logInitiativeError(this.getUserId(), initiativeId, organizationId, "request for ranking list failed");
@@ -585,7 +582,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         utilities.logDetailUser(this.getUserId(), initiativeId, organizationId);
         return new BeneficiaryRankingPageDTO(beneficiaryRankingDTOS, rankingPageDTO.getPageNumber(),
                 rankingPageDTO.getPageSize(), rankingPageDTO.getTotalElements(),
-                rankingPageDTO.getTotalPages(), rankingPageDTO.getRankingStatus(), rankingPageDTO.getRankingPublishedTimestamp(), rankingPageDTO.getRankingGeneratedTimestamp(), rankingPageDTO.getTotalEligibleOk(), rankingPageDTO.getTotalEligibleKo(), rankingPageDTO.getTotalOnboardingKo(),
+                rankingPageDTO.getTotalPages(), rankingPageDTO.getRankingStatus(), rankingPageDTO.getRankingPublishedTimestamp(),rankingPageDTO.getRankingGeneratedTimestamp(),rankingPageDTO.getTotalEligibleOk(),rankingPageDTO.getTotalEligibleKo(),rankingPageDTO.getTotalOnboardingKo(),
                 rankingPageDTO.getRankingFilePath());
     }
 
@@ -604,9 +601,9 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         }
     }
 
-    private String getUserId() {
+    private String getUserId(){
         String userId = null;
-        if (RequestContextHolder.getRequestAttributes() != null) {
+        if(RequestContextHolder.getRequestAttributes()!=null) {
             RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
             userId = (String) requestAttributes.getAttribute("organizationUserId",
                     RequestAttributes.SCOPE_REQUEST);
@@ -614,7 +611,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         return userId;
     }
 
-    private void performanceLog(long startTime, String service) {
+    private void performanceLog(long startTime, String service){
         log.info(
                 "[PERFORMANCE_LOG] [{}] Time occurred to perform business logic: {} ms",
                 service,
