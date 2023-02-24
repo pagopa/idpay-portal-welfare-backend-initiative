@@ -50,6 +50,7 @@ import static it.gov.pagopa.initiative.constants.InitiativeConstants.Email.*;
 public class InitiativeServiceImpl extends InitiativeServiceRoot implements InitiativeService {
 
     private final boolean notifyEmail;
+    private final long delayIOAfterCreate;
     private final InitiativeRepository initiativeRepository;
     private final InitiativeAdditionalDTOsToIOServiceRequestDTOMapper initiativeAdditionalDTOsToIOServiceRequestDTOMapper;
     private final InitiativeProducer initiativeProducer;
@@ -68,6 +69,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
     public InitiativeServiceImpl(
             @Value("${app.initiative.conditions.notifyEmail}") boolean notifyEmail,
+            @Value("${app.initiative.publishing.delayIOAfterCreate}") long delayIOAfterCreate,
             InitiativeRepository initiativeRepository,
             InitiativeAdditionalDTOsToIOServiceRequestDTOMapper initiativeAdditionalDTOsToIOServiceRequestDTOMapper,
             InitiativeProducer initiativeProducer,
@@ -83,6 +85,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             InitiativeUtils initiativeUtils,
             AuditUtilities auditUtilities){
         this.notifyEmail = notifyEmail;
+        this.delayIOAfterCreate = delayIOAfterCreate;
         this.initiativeRepository = initiativeRepository;
         this.initiativeProducer = initiativeProducer;
         this.initiativeAdditionalDTOsToIOServiceRequestDTOMapper = initiativeAdditionalDTOsToIOServiceRequestDTOMapper;
@@ -388,6 +391,15 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         InitiativeAdditional additionalInfo = initiative.getAdditionalInfo();
         ServiceRequestDTO serviceRequestDTO = initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(additionalInfo, initiativeOrganizationInfoDTO);
         ServiceResponseDTO serviceResponseDTO = ioBackEndRestConnector.createService(serviceRequestDTO);
+        try {
+            log.info("[UPDATE_TO_PUBLISHED_STATUS] - Start Sleep time in {}[ms]...", delayIOAfterCreate);
+            Thread.sleep(delayIOAfterCreate);
+            log.info("[UPDATE_TO_PUBLISHED_STATUS] - End Sleep time in {}[ms]...", delayIOAfterCreate);
+        } catch (InterruptedException e) {
+            log.error("[UPDATE_TO_PUBLISHED_STATUS] - Error: " + e.getMessage());
+            // Restore interrupted state...
+            Thread.currentThread().interrupt();
+        }
         if(additionalInfo.getLogoFileName()!=null) {
             try {
                 ByteArrayOutputStream byteArrayOutputStream = fileStorageConnector.downloadInitiativeLogo(
