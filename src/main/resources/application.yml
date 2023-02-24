@@ -132,6 +132,8 @@ app:
       notifyRE: ${APP_INITIATIVE_CONDITIONS_NOTIFY_RE:true}
       notifyEmail: ${APP_INITIATIVE_CONDITIONS_NOTIFY_EMAIL:true}
       notifyInternal: ${APP_INITIATIVE_CONDITIONS_NOTIFY_INTERNAL:true}
+    publishing:
+      delayIOAfterCreate: ${APP_INITIATIVE_PUBLISHING_DELAY_IO_AFTER_CREATE:500} #Delay in MS
 
 util:
   crypto:
