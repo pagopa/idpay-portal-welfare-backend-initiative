@@ -53,7 +53,7 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
                         HttpStatus.NOT_FOUND));
         if (InitiativeConstants.Role.PAGOPA_ADMIN.equals(role)){
-            if (initiative.getStatus().equals(InitiativeConstants.Status.IN_REVISION) || initiative.getStatus().equals(InitiativeConstants.Status.TO_CHECK) || initiative.getStatus().equals(InitiativeConstants.Status.APPROVED)){
+            if (InitiativeConstants.Status.PUBLISHED.equals(initiative.getStatus()) || initiative.getStatus().equals(InitiativeConstants.Status.IN_REVISION) || initiative.getStatus().equals(InitiativeConstants.Status.TO_CHECK) || initiative.getStatus().equals(InitiativeConstants.Status.APPROVED)){
                 return initiative;
             }else {
                 throw new InitiativeException(
