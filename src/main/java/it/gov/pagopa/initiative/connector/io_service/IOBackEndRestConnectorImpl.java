@@ -29,13 +29,13 @@ public class IOBackEndRestConnectorImpl implements IOBackEndRestConnector {
   }
 
   @Override
-  public void sendLogoIo(String serviceId, String primaryKey, LogoIODTO logo) {
-    ioBackEndFeignRestClient.sendLogo(serviceId, logo, primaryKey);
+  public void sendLogoIo(String serviceId, LogoIODTO logo) {
+    ioBackEndFeignRestClient.sendLogo(serviceId, logo, subscriptionKey);
   }
 
   @Override
-  public ServiceResponseDTO updateService(String serviceId, ServiceRequestDTO serviceRequestDTO, String primaryKey) {
-    ResponseEntity<ServiceResponseDTO> responseEntity = ioBackEndFeignRestClient.updateService(serviceId, serviceRequestDTO, primaryKey);
+  public ServiceResponseDTO updateService(String serviceId, ServiceRequestDTO serviceRequestDTO) {
+    ResponseEntity<ServiceResponseDTO> responseEntity = ioBackEndFeignRestClient.updateService(serviceId, serviceRequestDTO, subscriptionKey);
     return responseEntity.getBody();
   }
 
