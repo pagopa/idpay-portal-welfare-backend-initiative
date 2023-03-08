@@ -260,7 +260,6 @@ public class InitiativeApiController implements InitiativeApi {
                     log.info("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Notification to IO BackEnd of the published Initiative", initiativeId);
                     initiative = initiativeService.sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(initiative, initiativeOrganizationInfoDTO);
                 }
-                initiativeService.updateInitiative(initiative);
                 //Send citizen to MS-Group via API
                 //This integration necessarily takes place in succession to having created the service with IO in order not to send "orphan" resources (not associated with any Initiative known by IO).
                 //2. BeneficiaryKnown is true -> Send to MS-Group via API about the publishing of Initiative. Then, MS Groups will send it via Topics to NotificationManager and Onboarding
