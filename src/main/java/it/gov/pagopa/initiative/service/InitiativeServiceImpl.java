@@ -386,40 +386,52 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     @Override
     public Initiative sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(Initiative initiative, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO) {
         InitiativeAdditional additionalInfo = initiative.getAdditionalInfo();
+        String serviceId = additionalInfo.getServiceId();
+
         ServiceRequestDTO serviceRequestDTO = initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(additionalInfo, initiativeOrganizationInfoDTO);
-        ServiceResponseDTO serviceResponseDTO = ioBackEndRestConnector.createService(serviceRequestDTO);
-        if(additionalInfo.getLogoFileName()!=null) {
+
+        if (StringUtils.isBlank(serviceId)) {
+            ServiceResponseDTO serviceResponseDTO = ioBackEndRestConnector.createService(serviceRequestDTO);
+            serviceId = serviceResponseDTO.getServiceId();
+            log.debug("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Created new service to ServiceIO", initiative.getInitiativeId());
+            additionalInfo.setServiceId(serviceId);
+
+            log.debug("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Start ServiceIO Keys encryption...", initiative.getInitiativeId());
+            String encryptedPrimaryToken = ioTokenService.encrypt(serviceResponseDTO.getPrimaryKey());
+            String encryptedSecondaryToken = ioTokenService.encrypt(serviceResponseDTO.getSecondaryKey());
+            log.debug("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Encryption completed.", initiative.getInitiativeId());
+            additionalInfo.setPrimaryTokenIO(encryptedPrimaryToken);
+            additionalInfo.setSecondaryTokenIO(encryptedSecondaryToken);
+
+            this.updateInitiative(initiative);
+        }
+
+        if (additionalInfo.getLogoFileName() != null) {
             try {
+                log.debug("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Update logo to ServiceIO", initiative.getInitiativeId());
                 ByteArrayOutputStream byteArrayOutputStream = fileStorageConnector.downloadInitiativeLogo(
                         initiativeUtils.getPathLogo(initiative.getOrganizationId(),
                                 initiative.getInitiativeId()));
-                ioBackEndRestConnector.sendLogoIo(serviceResponseDTO.getServiceId(), LogoIODTO.builder().logo(new String(
-                                        Base64.getEncoder().encode(byteArrayOutputStream.toByteArray())))
-                                .build());
+                ioBackEndRestConnector.sendLogoIo(serviceId, LogoIODTO.builder().logo(new String(
+                                Base64.getEncoder().encode(byteArrayOutputStream.toByteArray())))
+                        .build());
             } catch (Exception e) {
                 auditUtilities.logInitiativeError(this.getUserId(), initiative.getInitiativeId(), initiative.getOrganizationId(), "upload logo failed");
                 log.error("[UPLOAD_LOGO] - Initiative: {}. Error: " + e.getMessage(),
                         initiative.getInitiativeId());
             }
         }
-        log.debug("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Start ServiceIO Keys encryption...", initiative.getInitiativeId());
-        String encryptedPrimaryToken = ioTokenService.encrypt(serviceResponseDTO.getPrimaryKey());
-        String encryptedSecondaryToken = ioTokenService.encrypt(serviceResponseDTO.getSecondaryKey());
-        log.debug("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Encryption completed.", initiative.getInitiativeId());
-        initiative.getAdditionalInfo().setPrimaryTokenIO(encryptedPrimaryToken);
-        initiative.getAdditionalInfo().setSecondaryTokenIO(encryptedSecondaryToken);
-        additionalInfo.setServiceId(serviceResponseDTO.getServiceId());
 
-        String serviceId = serviceResponseDTO.getServiceId();
+        log.debug("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Update CTA to ServiceIO", initiative.getInitiativeId());
         serviceRequestDTO.getServiceMetadata().setCta(
                 InitiativeConstants.CtaConstant.START +
-                InitiativeConstants.CtaConstant.IT + InitiativeConstants.CtaConstant.CTA_1_IT + InitiativeConstants.CtaConstant.TEXT_IT + InitiativeConstants.CtaConstant.ACTION_IT + serviceId +
-                InitiativeConstants.CtaConstant.EN + InitiativeConstants.CtaConstant.CTA_1_EN + InitiativeConstants.CtaConstant.TEXT_EN + InitiativeConstants.CtaConstant.ACTION_EN + serviceId +
-                InitiativeConstants.CtaConstant.END
+                        InitiativeConstants.CtaConstant.IT + InitiativeConstants.CtaConstant.CTA_1_IT + InitiativeConstants.CtaConstant.TEXT_IT + InitiativeConstants.CtaConstant.ACTION_IT + serviceId +
+                        InitiativeConstants.CtaConstant.EN + InitiativeConstants.CtaConstant.CTA_1_EN + InitiativeConstants.CtaConstant.TEXT_EN + InitiativeConstants.CtaConstant.ACTION_EN + serviceId +
+                        InitiativeConstants.CtaConstant.END
         );
         ioBackEndRestConnector.updateService(serviceId, serviceRequestDTO);
 
-        auditUtilities.logInitiativePublished(this.getUserId(),initiative.getInitiativeId(), initiative.getOrganizationId());
+        auditUtilities.logInitiativePublished(this.getUserId(), initiative.getInitiativeId(), initiative.getOrganizationId());
         return initiative;
     }
 

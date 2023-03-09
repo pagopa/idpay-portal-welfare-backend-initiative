@@ -1118,10 +1118,13 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void sendInitiativeInfoToIOBackEndServiceAndUpdateInitiativeWithLogo() {
+    void sendInitiativeInfoToIOBackEndServiceAndUpdateInitiativeWithLogo_serviceIdAlreadyExisting() {
         Initiative initiative = createStep5Initiative();
         InitiativeAdditional initiativeAdditional = createInitiativeAdditional();
         initiativeAdditional.setLogoFileName("logo file name");
+        initiativeAdditional.setServiceId(SERVICE_ID);
+        initiativeAdditional.setPrimaryTokenIO(ANY_KEY_TOKEN_IO);
+        initiativeAdditional.setSecondaryTokenIO(ANY_KEY_TOKEN_IO);
         initiative.setAdditionalInfo(initiativeAdditional);
         InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = InitiativeOrganizationInfoDTO.builder()
                 .organizationName(ORGANIZATION_NAME)
@@ -1134,8 +1137,6 @@ class InitiativeServiceTest {
         String serviceId = serviceResponseDTOexpected.getServiceId();
 
         when(initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(initiativeAdditional, initiativeOrganizationInfoDTO)).thenReturn(serviceRequestDTOexpected);
-        when(ioBackEndRestConnector.createService(serviceRequestDTOexpected)).thenReturn(serviceResponseDTOexpected);
-        when(ioTokenService.encrypt(anyString())).thenReturn(ANY_KEY_TOKEN_IO);
         when(ioBackEndRestConnector.updateService(serviceId,serviceRequestDTOexpected)).thenReturn(serviceResponseDTOexpected);
         Mockito.doNothing().when(ioBackEndRestConnector).sendLogoIo(anyString(),any());
 
@@ -1143,8 +1144,6 @@ class InitiativeServiceTest {
         assertEquals(SERVICE_ID, initiativeActual.getAdditionalInfo().getServiceId());
         assertEquals(ANY_KEY_TOKEN_IO, initiativeActual.getAdditionalInfo().getPrimaryTokenIO());
 
-        //Expecting connector to be called once with correct param
-        verify(ioBackEndRestConnector, times(1)).createService(serviceRequestDTOexpected);
         verify(ioBackEndRestConnector, times(1)).updateService(serviceId,serviceRequestDTOexpected);
     }
 
@@ -1412,7 +1411,6 @@ class InitiativeServiceTest {
     private InitiativeAdditional createInitiativeAdditional() {
         InitiativeAdditional initiativeAdditional = new InitiativeAdditional();
         initiativeAdditional.setServiceIO(true);
-        initiativeAdditional.setServiceId(SERVICE_ID);
         initiativeAdditional.setServiceName("serviceName");
         initiativeAdditional.setServiceScope(InitiativeAdditional.ServiceScope.LOCAL);
         initiativeAdditional.setDescription("Description");
