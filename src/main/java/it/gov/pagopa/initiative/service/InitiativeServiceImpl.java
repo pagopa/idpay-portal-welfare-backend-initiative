@@ -426,7 +426,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             } catch (Exception e) {
                 auditUtilities.logInitiativeError(this.getUserId(), initiative.getInitiativeId(), initiative.getOrganizationId(), "upload logo failed");
                 log.error("[UPLOAD_LOGO] - Initiative: {}. Error: " + e.getMessage(),
-                        initiative.getInitiativeId());
+                        initiative.getInitiativeId(), e);
             }
         }
 
