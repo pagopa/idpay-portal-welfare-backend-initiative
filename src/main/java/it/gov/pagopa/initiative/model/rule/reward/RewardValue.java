@@ -15,5 +15,6 @@ import java.math.BigDecimal;
 public class RewardValue implements InitiativeRewardRule {
     @JsonProperty("_type")
     private String type;
+    private String rewardValueType;
     private BigDecimal rewardValue;
 }
