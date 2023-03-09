@@ -563,6 +563,7 @@ class InitiativeDTOsToModelMapperTest {
     private InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardValueDTO() {
         return RewardValueDTO.builder()
                 .rewardValue(BigDecimal.valueOf(50))
+                .rewardValueType("PERCENTAGE")
                 .type("rewardValue")
                 .build();
     }
@@ -985,6 +986,7 @@ class InitiativeDTOsToModelMapperTest {
     private InitiativeRewardRule createInitiativeRewardRuleRewardValue() {
         return RewardValue.builder()
                 .rewardValue(BigDecimal.valueOf(50))
+                .rewardValueType("PERCENTAGE")
                 .type("rewardValue")
                 .build();
     }

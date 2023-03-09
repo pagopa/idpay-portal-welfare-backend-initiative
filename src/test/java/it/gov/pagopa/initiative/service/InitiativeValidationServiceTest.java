@@ -487,6 +487,7 @@ class InitiativeValidationServiceTest {
         return RewardValueDTO.builder()
                 .rewardValue(BigDecimal.valueOf(50))
                 .type("rewardValue")
+                .rewardValueType("PERCENTAGE")
                 .build();
     }
 

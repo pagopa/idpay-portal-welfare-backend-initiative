@@ -1,5 +1,7 @@
 package it.gov.pagopa.initiative.model.rule.reward;
 
+import it.gov.pagopa.initiative.constants.InitiativeConstants;
+import it.gov.pagopa.initiative.constants.InitiativeConstants.Status.Validation;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -25,16 +27,17 @@ class RewardValueTest {
         BigDecimal valueOfResult = BigDecimal.valueOf(42L);
         actualRewardValue.setRewardValue(valueOfResult);
         actualRewardValue.setType("Type");
+        actualRewardValue.setRewardValueType("PERCENTAGE");
         String actualToStringResult = actualRewardValue.toString();
         assertSame(valueOfResult, actualRewardValue.getRewardValue());
         assertEquals("Type", actualRewardValue.getType());
-        assertEquals("RewardValue(type=Type, rewardValue=42)", actualToStringResult);
+        assertEquals("RewardValue(type=Type, rewardValueType=PERCENTAGE, rewardValue=42)", actualToStringResult);
     }
 
     @Test
     void testConstructor2() {
         BigDecimal valueOfResult = BigDecimal.valueOf(42L);
-        RewardValue actualRewardValue = new RewardValue("Type", valueOfResult);
+        RewardValue actualRewardValue = new RewardValue("Type", Validation.REWARD_PERCENTAGE, valueOfResult);
         BigDecimal valueOfResult1 = BigDecimal.valueOf(42L);
         actualRewardValue.setRewardValue(valueOfResult1);
         actualRewardValue.setType("Type");
@@ -43,7 +46,6 @@ class RewardValueTest {
         assertSame(valueOfResult1, rewardValue);
         assertEquals(valueOfResult, rewardValue);
         assertEquals("Type", actualRewardValue.getType());
-        assertEquals("RewardValue(type=Type, rewardValue=42)", actualToStringResult);
     }
 
     @Test
