@@ -10,11 +10,14 @@ import it.gov.pagopa.initiative.connector.io_service.IOBackEndRestConnector;
 import it.gov.pagopa.initiative.connector.onboarding.OnboardingRestConnector;
 import it.gov.pagopa.initiative.connector.ranking.RankingRestConnector;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
+import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest;
 import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.InternalServerError;
 import it.gov.pagopa.initiative.constants.InitiativeConstants.Status;
+import it.gov.pagopa.initiative.constants.InitiativeConstants.Status.Validation;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceResponseDTO;
+import it.gov.pagopa.initiative.dto.rule.reward.RewardValueDTO;
 import it.gov.pagopa.initiative.event.InitiativeProducer;
 import it.gov.pagopa.initiative.exception.InitiativeException;
 import it.gov.pagopa.initiative.mapper.InitiativeAdditionalDTOsToIOServiceRequestDTOMapper;
@@ -198,6 +201,11 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     @Override
     public void updateTrxAndRewardRules(String organizationId, String initiativeId, Initiative rewardAndTrxRules, String role) {
         long startTime = System.currentTimeMillis();
+        if(rewardAndTrxRules.getRewardRule() instanceof RewardValueDTO rewardValueInput){
+            if(rewardValueInput.getRewardValueType().equals(Validation.REWARD_ABSOLUTE) && rewardAndTrxRules.getTrxRule().getThreshold().getFrom().doubleValue()<rewardValueInput.getRewardValue().doubleValue()){
+                new InitiativeException(InitiativeConstants.Exception.BadRequest.CODE, BadRequest.REWARD_TYPE, HttpStatus.BAD_REQUEST);
+            }
+        }
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
         //Check Initiative Status
         isInitiativeAllowedToBeEditableThenThrows(initiative);
