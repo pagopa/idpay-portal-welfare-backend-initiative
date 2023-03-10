@@ -25,6 +25,7 @@ import it.gov.pagopa.initiative.model.AutomatedCriteria;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeAdditional;
 import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
+import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
 import it.gov.pagopa.initiative.utils.InitiativeUtils;
 import it.gov.pagopa.initiative.utils.AuditUtilities;
@@ -201,9 +202,9 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     @Override
     public void updateTrxAndRewardRules(String organizationId, String initiativeId, Initiative rewardAndTrxRules, String role) {
         long startTime = System.currentTimeMillis();
-        if(rewardAndTrxRules.getRewardRule() instanceof RewardValueDTO rewardValueInput){
-            if(rewardValueInput.getRewardValueType().equals(Validation.REWARD_ABSOLUTE) && rewardAndTrxRules.getTrxRule().getThreshold().getFrom().doubleValue()<rewardValueInput.getRewardValue().doubleValue()){
-                new InitiativeException(InitiativeConstants.Exception.BadRequest.CODE, BadRequest.REWARD_TYPE, HttpStatus.BAD_REQUEST);
+        if(rewardAndTrxRules.getRewardRule() instanceof RewardValue rewardValueInput){
+            if(rewardAndTrxRules.getTrxRule().getThreshold()==null || rewardAndTrxRules.getTrxRule().getThreshold().getFrom()==null || rewardValueInput.getRewardValueType().equals(Validation.REWARD_ABSOLUTE) && rewardAndTrxRules.getTrxRule().getThreshold().getFrom().doubleValue()<rewardValueInput.getRewardValue().doubleValue()){
+                throw new InitiativeException(InitiativeConstants.Exception.BadRequest.CODE, BadRequest.REWARD_TYPE, HttpStatus.BAD_REQUEST);
             }
         }
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
