@@ -202,8 +202,8 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     @Override
     public void updateTrxAndRewardRules(String organizationId, String initiativeId, Initiative rewardAndTrxRules, String role) {
         long startTime = System.currentTimeMillis();
-        if(rewardAndTrxRules.getRewardRule() instanceof RewardValue rewardValueInput){
-            if(rewardAndTrxRules.getTrxRule().getThreshold()==null || rewardAndTrxRules.getTrxRule().getThreshold().getFrom()==null || rewardValueInput.getRewardValueType().equals(Validation.REWARD_ABSOLUTE) && rewardAndTrxRules.getTrxRule().getThreshold().getFrom().doubleValue()<rewardValueInput.getRewardValue().doubleValue()){
+        if(rewardAndTrxRules.getRewardRule() instanceof RewardValue rewardValueInput && rewardValueInput.getRewardValueType().equals(Validation.REWARD_ABSOLUTE)){
+            if(rewardAndTrxRules.getTrxRule().getThreshold()==null || rewardAndTrxRules.getTrxRule().getThreshold().getFrom()==null || rewardAndTrxRules.getTrxRule().getThreshold().getFrom().doubleValue()<rewardValueInput.getRewardValue().doubleValue()){
                 throw new InitiativeException(InitiativeConstants.Exception.BadRequest.CODE, BadRequest.REWARD_TYPE, HttpStatus.BAD_REQUEST);
             }
         }
