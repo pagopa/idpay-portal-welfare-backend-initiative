@@ -3,7 +3,7 @@
 		"_postman_id": "b2c7f07e-dc6d-4478-96f6-0db1c75fd822",
 		"name": "Initiative with whitelist  FIXED_STEP_4 - e2e",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "26205209"
+		"_exporter_id": "26036679"
 	},
 	"item": [
 		{
@@ -404,7 +404,7 @@
 										{
 											"key": "file",
 											"type": "file",
-											"src": "{{basePath}}/example_fiscal_code.csv"
+											"src": "/C:/Users/ranaldoda/Desktop/Portale_enti_test/Initiative_with_whitelist/example_fiscal_code.csv"
 										}
 									]
 								},
@@ -933,7 +933,7 @@
 									"listen": "prerequest",
 									"script": {
 										"exec": [
-											"setTimeout(function(){}, 20000); //milliseconds"
+											"//setTimeout(function(){}, 20000); //milliseconds"
 										],
 										"type": "text/javascript"
 									}
@@ -962,20 +962,13 @@
 									}
 								],
 								"url": {
-									"raw": "{{baseUrlInitiative}}/:initiativeId/rejected",
+									"raw": "{{baseUrlInitiative}}/{{initiativeId}}/rejected",
 									"host": [
 										"{{baseUrlInitiative}}"
 									],
 									"path": [
-										":initiativeId",
+										"{{initiativeId}}",
 										"rejected"
-									],
-									"variable": [
-										{
-											"key": "initiativeId",
-											"value": "{{initiativeId}}",
-											"description": "(Required) The initiative ID"
-										}
 									]
 								}
 							},
@@ -1339,7 +1332,7 @@
 										{
 											"key": "file",
 											"type": "file",
-											"src": "{{basePath}}/example_fiscal_code.csv"
+											"src": "/C:/Users/ranaldoda/Desktop/Portale_enti_test/Initiative_with_whitelist/example_fiscal_code.csv"
 										}
 									]
 								},
@@ -1669,7 +1662,7 @@
 									"listen": "prerequest",
 									"script": {
 										"exec": [
-											"setTimeout(function(){}, 20000); //milliseconds"
+											"//setTimeout(function(){}, 20000); //milliseconds"
 										],
 										"type": "text/javascript"
 									}
@@ -1698,20 +1691,13 @@
 									}
 								],
 								"url": {
-									"raw": "{{baseUrlInitiative}}/:initiativeId/approved",
+									"raw": "{{baseUrlInitiative}}/{{initiativeId}}/approved",
 									"host": [
 										"{{baseUrlInitiative}}"
 									],
 									"path": [
-										":initiativeId",
+										"{{initiativeId}}",
 										"approved"
-									],
-									"variable": [
-										{
-											"key": "initiativeId",
-											"value": "{{initiativeId}}",
-											"description": "(Required) The initiative ID"
-										}
 									]
 								}
 							},
@@ -1795,7 +1781,7 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Status test 400\", function () {\r",
+											"pm.test(\"Status test\", function () {\r",
 											"    pm.response.to.have.status(204);\r",
 											"});\r",
 											""
@@ -1849,20 +1835,13 @@
 								"method": "PUT",
 								"header": [],
 								"url": {
-									"raw": "{{baseUrlInitiative}}/:initiativeId/published",
+									"raw": "{{baseUrlInitiative}}/{{initiativeId}}/published",
 									"host": [
 										"{{baseUrlInitiative}}"
 									],
 									"path": [
-										":initiativeId",
+										"{{initiativeId}}",
 										"published"
-									],
-									"variable": [
-										{
-											"key": "initiativeId",
-											"value": "{{initiativeId}}",
-											"description": "(Required) The initiative ID"
-										}
 									]
 								}
 							},
@@ -8634,7 +8613,7 @@
 											"listen": "prerequest",
 											"script": {
 												"exec": [
-													"setTimeout(function(){}, 20000); //milliseconds"
+													"//setTimeout(function(){}, 20000); //milliseconds"
 												],
 												"type": "text/javascript"
 											}
@@ -9340,7 +9319,7 @@
 													"listen": "prerequest",
 													"script": {
 														"exec": [
-															"setTimeout(function(){}, 20000); //milliseconds"
+															"//setTimeout(function(){}, 20000); //milliseconds"
 														],
 														"type": "text/javascript"
 													}
@@ -9369,20 +9348,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrlInitiative}}/:initiativeId/rejected",
+													"raw": "{{baseUrlInitiative}}/{{initiativeId}}/rejected",
 													"host": [
 														"{{baseUrlInitiative}}"
 													],
 													"path": [
-														":initiativeId",
+														"{{initiativeId}}",
 														"rejected"
-													],
-													"variable": [
-														{
-															"key": "initiativeId",
-															"value": "{{initiativeId}}",
-															"description": "(Required) The initiative ID"
-														}
 													]
 												}
 											},
@@ -9579,7 +9551,7 @@
 												{
 													"key": "logo",
 													"type": "file",
-													"src": "/C:/Users/fgrazian/Desktop/test_funzionali/too_large.png"
+													"src": "{{basePath}}/too_large.png"
 												}
 											]
 										},
@@ -9693,7 +9665,7 @@
 									"listen": "prerequest",
 									"script": {
 										"exec": [
-											"setTimeout(function(){}, 20000); //milliseconds"
+											"//setTimeout(function(){}, 20000); //milliseconds"
 										],
 										"type": "text/javascript"
 									}
@@ -10390,7 +10362,7 @@
 													"listen": "prerequest",
 													"script": {
 														"exec": [
-															"setTimeout(function(){}, 20000); //milliseconds"
+															"//setTimeout(function(){}, 20000); //milliseconds"
 														],
 														"type": "text/javascript"
 													}
@@ -11602,7 +11574,7 @@
 		},
 		{
 			"key": "basePath",
-			"value": "/C:/Users/fgrazian/Desktop/test_funzionali"
+			"value": "/C:/Users/ranaldoda/Desktop/Portale_enti_test/Initiative_with_whitelist"
 		}
 	]
 }
