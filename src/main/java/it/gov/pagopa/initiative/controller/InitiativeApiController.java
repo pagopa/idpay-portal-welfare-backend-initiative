@@ -264,6 +264,11 @@ public class InitiativeApiController implements InitiativeApi {
             throw new IntegrationException(HttpStatus.BAD_REQUEST);
         }
 
+        log.debug("Initiative saved in status PUBLISHED");
+        initiative.setStatus(InitiativeConstants.Status.PUBLISHED);
+        initiative.setUpdateDate(LocalDateTime.now());
+        initiativeService.updateInitiative(initiative);
+
         try {
             log.info("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Sending emails to PagoPA and Organization", initiativeId);
             initiativeService.sendEmailToPagoPA(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
@@ -272,10 +277,6 @@ public class InitiativeApiController implements InitiativeApi {
             log.error("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Error at sending mails: {}", initiativeId, e.getMessage(), e);
         }
 
-        log.debug("Initiative saved in status PUBLISHED");
-        initiative.setStatus(InitiativeConstants.Status.PUBLISHED);
-        initiative.setUpdateDate(LocalDateTime.now());
-        initiativeService.updateInitiative(initiative);
         performanceLog(startTime, "UPDATE_INITIATIVE_PUBLISHED");
         return ResponseEntity.noContent().build();
     }
