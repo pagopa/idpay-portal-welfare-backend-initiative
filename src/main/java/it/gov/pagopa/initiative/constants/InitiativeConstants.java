@@ -42,8 +42,6 @@ public class InitiativeConstants {
         public static final String TEMPLATE_NAME_EMAIL_INITIATIVE_CREATED = "Email_InitiativeCreated";
         public static final String SUBJECT_CHANGE_STATE = "Cambio stato iniziativa per il prodotto IdPay";
         public static final String SUBJECT_INITIATIVE_CREATED = "Nuova Iniziativa";
-        public static final String RECIPIENT_ASSISTANCE = "Assistenza.IDPay@Pagopa.it";
-
     }
 
     public static final class CtaConstant {

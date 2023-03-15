@@ -16,6 +16,9 @@ import it.gov.pagopa.initiative.model.*;
 import it.gov.pagopa.initiative.model.rule.refund.AdditionalInfo;
 import it.gov.pagopa.initiative.model.rule.refund.InitiativeRefundRule;
 import it.gov.pagopa.initiative.model.rule.refund.TimeParameter;
+import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
+import it.gov.pagopa.initiative.model.rule.trx.InitiativeTrxConditions;
+import it.gov.pagopa.initiative.model.rule.trx.Threshold;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
@@ -56,6 +59,9 @@ class InitiativeValidationServiceTest {
     private static final String ISEE = "ISEE";
     public static final String API_KEY_CLIENT_ID = "apiKeyClientId";
     public static final String API_KEY_CLIENT_ASSERTION = "apiKeyClientAssertion";
+    public static final String PERCENTAGE = "PERCENTAGE";
+    public static final String ABSOLUTE = "ABSOLUTE";
+
 
     @Autowired
     InitiativeValidationService initiativeValidationService;
@@ -208,6 +214,90 @@ class InitiativeValidationServiceTest {
         step5InitiativeDTO.getGeneral().setStartDate(startDate);
         step5InitiativeDTO.getGeneral().setEndDate(endDate);
         Executable executable = () -> initiativeValidationService.validateAllWizardSteps(step5InitiativeDTO);
+        assertDoesNotThrow(executable);
+    }
+
+    @Test
+    void checkRewardRuleAbsolute_noInstanceOf(){
+        Initiative step4Initiative = createStep4Initiative();
+        Executable executable = () -> initiativeValidationService.checkRewardRuleAbsolute(step4Initiative);
+        assertDoesNotThrow(executable);
+    }
+    @Test
+    void checkRewardRuleAbsolute_noRewardAbsolute(){
+        Initiative step4Initiative = createStep4Initiative();
+        RewardValue rewardValue = new RewardValue();
+        rewardValue.setRewardValueType(PERCENTAGE);
+        step4Initiative.setRewardRule(rewardValue);
+        Executable executable = () -> initiativeValidationService.checkRewardRuleAbsolute(step4Initiative);
+        assertDoesNotThrow(executable);
+    }
+    @Test
+    void checkRewardRuleAbsolute_thresholdNull(){
+        Initiative step4Initiative = createStep4Initiative();
+        RewardValue rewardValue = new RewardValue();
+        rewardValue.setRewardValueType(ABSOLUTE);
+        step4Initiative.setRewardRule(rewardValue);
+        InitiativeTrxConditions trxConditions = new InitiativeTrxConditions();
+        trxConditions.setThreshold(null);
+        step4Initiative.setTrxRule(trxConditions);
+        try {
+            initiativeValidationService.checkRewardRuleAbsolute(step4Initiative);
+        } catch (InitiativeException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
+            assertEquals(InitiativeConstants.Exception.BadRequest.REWARD_TYPE, e.getMessage());
+        }
+    }
+
+    @Test
+    void checkRewardRuleAbsolute_thresholdFromNull(){
+        Initiative step4Initiative = createStep4Initiative();
+        RewardValue rewardValue = new RewardValue();
+        rewardValue.setRewardValueType(ABSOLUTE);
+        step4Initiative.setRewardRule(rewardValue);
+        InitiativeTrxConditions trxConditions = new InitiativeTrxConditions();
+        trxConditions.setThreshold(new Threshold());
+        step4Initiative.setTrxRule(trxConditions);
+        try {
+            initiativeValidationService.checkRewardRuleAbsolute(step4Initiative);
+        } catch (InitiativeException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
+            assertEquals(InitiativeConstants.Exception.BadRequest.REWARD_TYPE, e.getMessage());
+        }
+    }
+    @Test
+    void checkRewardRuleAbsolute_thresholdFromWrong(){
+        Initiative step4Initiative = createStep4Initiative();
+        RewardValue rewardValue = new RewardValue();
+        rewardValue.setRewardValueType(ABSOLUTE);
+        rewardValue.setRewardValue(BigDecimal.valueOf(40));
+        step4Initiative.setRewardRule(rewardValue);
+        InitiativeTrxConditions trxConditions = new InitiativeTrxConditions();
+        Threshold threshold = new Threshold();
+        threshold.setFrom(BigDecimal.valueOf(30));
+        trxConditions.setThreshold(threshold);
+        step4Initiative.setTrxRule(trxConditions);
+        try {
+            initiativeValidationService.checkRewardRuleAbsolute(step4Initiative);
+        } catch (InitiativeException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
+            assertEquals(InitiativeConstants.Exception.BadRequest.REWARD_TYPE, e.getMessage());
+        }
+    }
+
+    @Test
+    void checkRewardRuleAbsolute_thresholdOK(){
+        Initiative step4Initiative = createStep4Initiative();
+        RewardValue rewardValue = new RewardValue();
+        rewardValue.setRewardValueType(ABSOLUTE);
+        rewardValue.setRewardValue(BigDecimal.valueOf(30));
+        step4Initiative.setRewardRule(rewardValue);
+        InitiativeTrxConditions trxConditions = new InitiativeTrxConditions();
+        Threshold threshold = new Threshold();
+        threshold.setFrom(BigDecimal.valueOf(40));
+        trxConditions.setThreshold(threshold);
+        step4Initiative.setTrxRule(trxConditions);
+        Executable executable = () -> initiativeValidationService.checkRewardRuleAbsolute(step4Initiative);
         assertDoesNotThrow(executable);
     }
 

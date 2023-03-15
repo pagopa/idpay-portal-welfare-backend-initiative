@@ -10,14 +10,11 @@ import it.gov.pagopa.initiative.connector.io_service.IOBackEndRestConnector;
 import it.gov.pagopa.initiative.connector.onboarding.OnboardingRestConnector;
 import it.gov.pagopa.initiative.connector.ranking.RankingRestConnector;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
-import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest;
 import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.InternalServerError;
 import it.gov.pagopa.initiative.constants.InitiativeConstants.Status;
-import it.gov.pagopa.initiative.constants.InitiativeConstants.Status.Validation;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceResponseDTO;
-import it.gov.pagopa.initiative.dto.rule.reward.RewardValueDTO;
 import it.gov.pagopa.initiative.event.InitiativeProducer;
 import it.gov.pagopa.initiative.exception.InitiativeException;
 import it.gov.pagopa.initiative.mapper.InitiativeAdditionalDTOsToIOServiceRequestDTOMapper;
@@ -25,10 +22,9 @@ import it.gov.pagopa.initiative.model.AutomatedCriteria;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeAdditional;
 import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
-import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
-import it.gov.pagopa.initiative.utils.InitiativeUtils;
 import it.gov.pagopa.initiative.utils.AuditUtilities;
+import it.gov.pagopa.initiative.utils.InitiativeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -202,12 +198,8 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     @Override
     public void updateTrxAndRewardRules(String organizationId, String initiativeId, Initiative rewardAndTrxRules, String role) {
         long startTime = System.currentTimeMillis();
-        if(rewardAndTrxRules.getRewardRule() instanceof RewardValue rewardValueInput && rewardValueInput.getRewardValueType().equals(Validation.REWARD_ABSOLUTE)){
-            if(rewardAndTrxRules.getTrxRule().getThreshold()==null || rewardAndTrxRules.getTrxRule().getThreshold().getFrom()==null || rewardAndTrxRules.getTrxRule().getThreshold().getFrom().doubleValue()<rewardValueInput.getRewardValue().doubleValue()){
-                throw new InitiativeException(InitiativeConstants.Exception.BadRequest.CODE, BadRequest.REWARD_TYPE, HttpStatus.BAD_REQUEST);
-            }
-        }
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
+        initiativeValidationService.checkRewardRuleAbsolute(initiative);
         //Check Initiative Status
         isInitiativeAllowedToBeEditableThenThrows(initiative);
         initiative.setTrxRule(rewardAndTrxRules.getTrxRule());

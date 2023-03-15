@@ -15,11 +15,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -56,13 +53,13 @@ class EmailNotificationServiceTest {
     @Test
     void testSendInitiativePagoPA_success() {
         doNothing().when(emailNotificationRestConnector)
-                .notifyInitiativeToEmailNotification(any(), any(), any(),
+                .notifyInitiativeToEmailNotification(any(), any(),
                         any(), any(), any());
 
         Initiative step2Initiative = createStep2Initiative();
         emailNotificationServiceImpl.sendInitiativeToPagoPA(step2Initiative, TEMPLATE_NAME, SUBJECT);
         verify(emailNotificationRestConnector, atLeast(1)).notifyInitiativeToEmailNotification(any(),
-                any(), any(), any(), any(), any());
+                any(), any(), any(), any());
     }
 
     @Test
@@ -72,24 +69,19 @@ class EmailNotificationServiceTest {
         //doThrow FeignException
         doThrow(new FeignException.InternalServerError(EXCEPTION_MESSAGE, request, null, null))
                 .when(emailNotificationRestConnector).notifyInitiativeToEmailNotification(any(), any(), any(),
-                        any(), any(), any());
+                        any(), any());
 
         emailNotificationServiceImpl.sendInitiativeToPagoPA(step2Initiative, TEMPLATE_NAME, SUBJECT);
 
         verify(emailNotificationRestConnector, atLeast(1)).notifyInitiativeToEmailNotification(any(),
-                any(), any(), any(), any(), any());
+                any(), any(), any(), any());
     }
 
     @Test
     void testSendInitiativeCurrentOrganization_success() {
-        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest();
-//        request.setAttribute("organization-user-id", "a0a00000-0aaa-00aa-0000-0000000a0000");
-        mockHttpServletRequest.setAttribute("organizationUserId", "a0a00000-0aaa-00aa-0000-0000000a0000");
-        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(mockHttpServletRequest));
-
         doNothing().when(emailNotificationRestConnector)
                 .notifyInitiativeToEmailNotification(any(), any(), any(),
-                        any(), any(), any());
+                        any(), any());
         UUID uuid = UUID.fromString("a0a00000-0aaa-00aa-0000-0000000a0000");
         List<UserResource> userResources = new ArrayList<>();
         List<String> roles = new ArrayList<>();
@@ -107,7 +99,7 @@ class EmailNotificationServiceTest {
         Initiative step2Initiative = createStep2Initiative();
         emailNotificationServiceImpl.sendInitiativeToCurrentOrganization(step2Initiative, TEMPLATE_NAME, SUBJECT);
         verify(emailNotificationRestConnector, atLeast(1)).notifyInitiativeToEmailNotification(any(),
-                any(), any(), any(), any(), any());
+                any(), any(), any(), any());
         verify(selcRestConnector, times(1)).getInstitutionProductUsers(any());
     }
 
@@ -115,6 +107,9 @@ class EmailNotificationServiceTest {
     void testSendInitiativeCurrentOrganization_IllegalStateException() {
         Initiative step2Initiative = createStep2Initiative();
         emailNotificationServiceImpl.sendInitiativeToCurrentOrganization(step2Initiative, TEMPLATE_NAME, SUBJECT);
+        verify(emailNotificationRestConnector, atLeast(1)).notifyInitiativeToEmailNotification(any(),
+                any(), any(), any(), any());
+        verify(selcRestConnector, times(1)).getInstitutionProductUsers(any());
     }
 
     /**
@@ -122,16 +117,11 @@ class EmailNotificationServiceTest {
      */
     @Test
     void testSendInitiativeCurrentOrganization_FeignException() {
-        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest();
-//        request.setAttribute("organization-user-id", "a0a00000-0aaa-00aa-0000-0000000a0000");
-        mockHttpServletRequest.setAttribute("organizationUserId", "a0a00000-0aaa-00aa-0000-0000000a0000");
-        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(mockHttpServletRequest));
-
         Request request = Request.create(Request.HttpMethod.POST, "url", Collections.emptyMap(), null, new RequestTemplate());
         //doThrow FeignException
         doThrow(new FeignException.InternalServerError(EXCEPTION_MESSAGE, request, null, null))
                 .when(emailNotificationRestConnector).notifyInitiativeToEmailNotification(any(), any(), any(),
-                        any(), any(), any());
+                        any(), any());
 
         UUID uuid = UUID.fromString("a0a00000-0aaa-00aa-0000-0000000a0000");
         List<UserResource> userResources = new ArrayList<>();
@@ -150,7 +140,7 @@ class EmailNotificationServiceTest {
         Initiative step2Initiative = createStep2Initiative();
         emailNotificationServiceImpl.sendInitiativeToCurrentOrganization(step2Initiative, TEMPLATE_NAME, SUBJECT);
         verify(emailNotificationRestConnector, atLeast(1)).notifyInitiativeToEmailNotification(any(),
-                any(), any(), any(), any(), any());
+                any(), any(), any(), any());
         verify(selcRestConnector, times(1)).getInstitutionProductUsers(any());
     }
 

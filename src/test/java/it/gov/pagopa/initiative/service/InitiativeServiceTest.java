@@ -72,8 +72,7 @@ import static org.mockito.Mockito.*;
 @TestPropertySource(
         locations = "classpath:application.yml",
         properties = {
-                "app.initiative.conditions.notifyEmail=true",
-                "app.initiative.publishing.delayIOAfterCreate=500"
+                "app.initiative.conditions.notifyEmail=true"
         })
 @WebMvcTest(value = {
         InitiativeService.class})
