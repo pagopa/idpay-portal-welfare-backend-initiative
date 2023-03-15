@@ -1,5 +1,6 @@
 package it.gov.pagopa.initiative.mapper;
 
+import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.rule.refund.AccumulatedAmountDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
@@ -9,6 +10,7 @@ import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardGroupsDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardValueDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.*;
+import it.gov.pagopa.initiative.exception.InitiativeException;
 import it.gov.pagopa.initiative.model.TypeBoolEnum;
 import it.gov.pagopa.initiative.model.TypeMultiEnum;
 import it.gov.pagopa.initiative.model.*;
@@ -25,6 +27,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -40,8 +43,7 @@ import java.time.LocalTime;
 import java.util.*;
 
 import static com.mongodb.assertions.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ContextConfiguration(classes = {InitiativeDTOsToModelMapper.class})
 @ExtendWith(SpringExtension.class)
@@ -114,6 +116,8 @@ class InitiativeDTOsToModelMapperTest {
     private Initiative initiativeExpected;
 
     private InitiativeDTO initiativeDTO;
+    private InitiativeRewardAndTrxRulesDTO initiativeOnlyRewardAbsolute;
+    private Initiative initiativeTrxNullRewardAbsolute;
 
     @BeforeEach
     public void setUp() {
@@ -147,6 +151,8 @@ class InitiativeDTOsToModelMapperTest {
         initiativeRewardAndTrxRulesDTOTrxCountNull = createInitiativeRewardAndTrxRulesDTOTrxCountNull();
         initiativeTrxRuleNull = createStep4InitiativeTrxNull();
         initiativeRewardAndTrxRuleDTOTrxRuleNull = createInitiativeRewardAndTrxRulesDTOTrxRuleNull();
+        initiativeOnlyRewardAbsolute = createInitiativeOnlyRewardAbsolute();
+        initiativeTrxNullRewardAbsolute = createStep4InitiativeTrxNullRewardAbsolute();
 
         initiativeDTO = createStep5InitiativeDTO();
         initiativeExpected = createStep5Initiative();
@@ -208,8 +214,39 @@ class InitiativeDTOsToModelMapperTest {
         Initiative initiative = initiativeDTOsToModelMapper.toInitiative(initiativeRewardAndTrxRulesDTOcomplete);
         assertEquals(initiativeOnlyRewardAndTrxRules, initiative);
     }
-
-
+    @Test
+    void toInitiative_withRewardAbsolute(){
+        Initiative initiative = initiativeDTOsToModelMapper.toInitiative(initiativeOnlyRewardAbsolute);
+        assertEquals(initiativeTrxNullRewardAbsolute, initiative);
+    }
+    @Test
+    void toInitiative_withRewardAbsolute2(){
+        InitiativeRewardRuleDTO rewardRule = RewardValueDTO.builder()
+                .rewardValue(BigDecimal.valueOf(120))
+                .rewardValueType("ABSOLUTE")
+                .type("rewardValue")
+                .build();
+        InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = new InitiativeRewardAndTrxRulesDTO();
+        initiativeRewardAndTrxRulesDTO.setRewardRule(rewardRule);
+        Executable executable = () -> initiativeDTOsToModelMapper.toInitiative(initiativeRewardAndTrxRulesDTO);
+        assertDoesNotThrow(executable);
+    }
+    @Test
+    void toInitiative_withRewardPercentageMoreThan100() {
+        InitiativeRewardRuleDTO rewardRule = RewardValueDTO.builder()
+                .rewardValue(BigDecimal.valueOf(120))
+                .rewardValueType("PERCENTAGE")
+                .type("rewardValue")
+                .build();
+        InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = new InitiativeRewardAndTrxRulesDTO();
+        initiativeRewardAndTrxRulesDTO.setRewardRule(rewardRule);
+        try {
+            initiativeDTOsToModelMapper.toInitiative(initiativeRewardAndTrxRulesDTO);
+        } catch (InitiativeException e){
+            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
+            assertEquals(InitiativeConstants.Exception.BadRequest.REWARD_TYPE, e.getMessage());
+        }
+    }
     @Test
     void toInitiativeOnlyRewardAndTrxRulesRewardRuleNull_equals() {
         Initiative initiative = initiativeDTOsToModelMapper.toInitiative(initiativeRewardAndTrxRulesDTORewardRuleNull);
@@ -564,6 +601,14 @@ class InitiativeDTOsToModelMapperTest {
         return RewardValueDTO.builder()
                 .rewardValue(BigDecimal.valueOf(50))
                 .rewardValueType("PERCENTAGE")
+                .type("rewardValue")
+                .build();
+    }
+
+    private InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardValueAbsoluteDTO() {
+        return RewardValueDTO.builder()
+                .rewardValue(BigDecimal.valueOf(50))
+                .rewardValueType("ABSOLUTE")
                 .type("rewardValue")
                 .build();
     }
@@ -974,6 +1019,11 @@ class InitiativeDTOsToModelMapperTest {
         initiativeRewardAndTrxRulesDTO.setTrxRule(null);
         return initiativeRewardAndTrxRulesDTO;
     }
+    private InitiativeRewardAndTrxRulesDTO createInitiativeOnlyRewardAbsolute() {
+        InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = new InitiativeRewardAndTrxRulesDTO();
+        initiativeRewardAndTrxRulesDTO.setRewardRule(createInitiativeRewardRuleDTORewardValueAbsoluteDTO());
+        return initiativeRewardAndTrxRulesDTO;
+    }
 
     private InitiativeDTO createStep4InitiativeDTO() {
         InitiativeDTO initiativeDTO = createStep3InitiativeDTO();
@@ -982,11 +1032,17 @@ class InitiativeDTOsToModelMapperTest {
         return initiativeDTO;
     }
 
-
     private InitiativeRewardRule createInitiativeRewardRuleRewardValue() {
         return RewardValue.builder()
                 .rewardValue(BigDecimal.valueOf(50))
                 .rewardValueType("PERCENTAGE")
+                .type("rewardValue")
+                .build();
+    }
+    private InitiativeRewardRule createInitiativeRewardRuleRewardAbsoluteValue() {
+        return RewardValue.builder()
+                .rewardValue(BigDecimal.valueOf(50))
+                .rewardValueType("ABSOLUTE")
                 .type("rewardValue")
                 .build();
     }
@@ -1342,6 +1398,13 @@ class InitiativeDTOsToModelMapperTest {
     private Initiative createStep4InitiativeTrxNull() {
         Initiative initiative = new Initiative();
         initiative.setRewardRule(createInitiativeRewardRuleRewardValue());
+        initiative.setTrxRule(null);
+        return initiative;
+    }
+
+    private Initiative createStep4InitiativeTrxNullRewardAbsolute() {
+        Initiative initiative = new Initiative();
+        initiative.setRewardRule(createInitiativeRewardRuleRewardAbsoluteValue());
         initiative.setTrxRule(null);
         return initiative;
     }

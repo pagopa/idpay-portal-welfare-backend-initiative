@@ -186,7 +186,7 @@ public class InitiativeDTOsToModelMapper {
 
     private void checkReward(RewardValueDTO rewardValueInput) {
         if(rewardValueInput.getRewardValueType().equals(Validation.REWARD_PERCENTAGE) && rewardValueInput.getRewardValue().intValue()>100){
-            new InitiativeException(InitiativeConstants.Exception.BadRequest.CODE, BadRequest.REWARD_TYPE, HttpStatus.BAD_REQUEST);
+            throw new InitiativeException(InitiativeConstants.Exception.BadRequest.CODE, BadRequest.REWARD_TYPE, HttpStatus.BAD_REQUEST);
         }
     }
 

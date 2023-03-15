@@ -4,7 +4,6 @@ import feign.FeignException;
 import feign.Response;
 import feign.RetryableException;
 import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +18,6 @@ class Custom5xxErrorDecoderTest {
     @Autowired
     private Custom5xxErrorDecoder custom5xxErrorDecoder;
 
-    @Test
     @Disabled
     void testDecode() throws Exception {
         Response response = Response.builder().build();
