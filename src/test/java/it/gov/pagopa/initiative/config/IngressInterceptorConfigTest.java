@@ -3,7 +3,6 @@ package it.gov.pagopa.initiative.config;
 import it.gov.pagopa.initiative.controller.filter.HeaderFilter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -19,7 +18,6 @@ class IngressInterceptorConfigTest {
     @Autowired
     private IngressInterceptorConfig ingressInterceptorConfig;
 
-    @Test
     @Disabled
     void testSessionLoginHeaderFilterRegistrationBean() {
         FilterRegistrationBean<HeaderFilter> registrationBean = new FilterRegistrationBean<>();

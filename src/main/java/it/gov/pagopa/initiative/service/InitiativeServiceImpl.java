@@ -23,8 +23,8 @@ import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeAdditional;
 import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
-import it.gov.pagopa.initiative.utils.InitiativeUtils;
 import it.gov.pagopa.initiative.utils.AuditUtilities;
+import it.gov.pagopa.initiative.utils.InitiativeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -50,7 +50,6 @@ import static it.gov.pagopa.initiative.constants.InitiativeConstants.Email.*;
 public class InitiativeServiceImpl extends InitiativeServiceRoot implements InitiativeService {
 
     private final boolean notifyEmail;
-    private final long delayIOAfterCreate;
     private final InitiativeRepository initiativeRepository;
     private final InitiativeAdditionalDTOsToIOServiceRequestDTOMapper initiativeAdditionalDTOsToIOServiceRequestDTOMapper;
     private final InitiativeProducer initiativeProducer;
@@ -69,7 +68,6 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
     public InitiativeServiceImpl(
             @Value("${app.initiative.conditions.notifyEmail}") boolean notifyEmail,
-            @Value("${app.initiative.publishing.delayIOAfterCreate}") long delayIOAfterCreate,
             InitiativeRepository initiativeRepository,
             InitiativeAdditionalDTOsToIOServiceRequestDTOMapper initiativeAdditionalDTOsToIOServiceRequestDTOMapper,
             InitiativeProducer initiativeProducer,
@@ -85,7 +83,6 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             InitiativeUtils initiativeUtils,
             AuditUtilities auditUtilities){
         this.notifyEmail = notifyEmail;
-        this.delayIOAfterCreate = delayIOAfterCreate;
         this.initiativeRepository = initiativeRepository;
         this.initiativeProducer = initiativeProducer;
         this.initiativeAdditionalDTOsToIOServiceRequestDTOMapper = initiativeAdditionalDTOsToIOServiceRequestDTOMapper;
@@ -202,6 +199,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     public void updateTrxAndRewardRules(String organizationId, String initiativeId, Initiative rewardAndTrxRules, String role) {
         long startTime = System.currentTimeMillis();
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
+        initiativeValidationService.checkRewardRuleAbsolute(initiative);
         //Check Initiative Status
         isInitiativeAllowedToBeEditableThenThrows(initiative);
         initiative.setTrxRule(rewardAndTrxRules.getTrxRule());
@@ -389,50 +387,52 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     @Override
     public Initiative sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(Initiative initiative, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO) {
         InitiativeAdditional additionalInfo = initiative.getAdditionalInfo();
+        String serviceId = additionalInfo.getServiceId();
+
         ServiceRequestDTO serviceRequestDTO = initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(additionalInfo, initiativeOrganizationInfoDTO);
-        ServiceResponseDTO serviceResponseDTO = ioBackEndRestConnector.createService(serviceRequestDTO);
-        try {
-            log.info("[UPDATE_TO_PUBLISHED_STATUS] - Start Sleep time in {}[ms]...", delayIOAfterCreate);
-            Thread.sleep(delayIOAfterCreate);
-            log.info("[UPDATE_TO_PUBLISHED_STATUS] - End Sleep time in {}[ms]...", delayIOAfterCreate);
-        } catch (InterruptedException e) {
-            log.error("[UPDATE_TO_PUBLISHED_STATUS] - Error: " + e.getMessage());
-            // Restore interrupted state...
-            Thread.currentThread().interrupt();
+
+        if (StringUtils.isBlank(serviceId)) {
+            ServiceResponseDTO serviceResponseDTO = ioBackEndRestConnector.createService(serviceRequestDTO);
+            serviceId = serviceResponseDTO.getServiceId();
+            log.debug("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Created new service to ServiceIO", initiative.getInitiativeId());
+            additionalInfo.setServiceId(serviceId);
+
+            log.debug("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Start ServiceIO Keys encryption...", initiative.getInitiativeId());
+            String encryptedPrimaryToken = ioTokenService.encrypt(serviceResponseDTO.getPrimaryKey());
+            String encryptedSecondaryToken = ioTokenService.encrypt(serviceResponseDTO.getSecondaryKey());
+            log.debug("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Encryption completed.", initiative.getInitiativeId());
+            additionalInfo.setPrimaryTokenIO(encryptedPrimaryToken);
+            additionalInfo.setSecondaryTokenIO(encryptedSecondaryToken);
+
+            this.updateInitiative(initiative);
         }
-        if(additionalInfo.getLogoFileName()!=null) {
+
+        if (additionalInfo.getLogoFileName() != null) {
             try {
+                log.debug("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Update logo to ServiceIO", initiative.getInitiativeId());
                 ByteArrayOutputStream byteArrayOutputStream = fileStorageConnector.downloadInitiativeLogo(
                         initiativeUtils.getPathLogo(initiative.getOrganizationId(),
                                 initiative.getInitiativeId()));
-                ioBackEndRestConnector.sendLogoIo(serviceResponseDTO.getServiceId(),
-                        serviceResponseDTO.getPrimaryKey(), LogoIODTO.builder().logo(new String(
-                                        Base64.getEncoder().encode(byteArrayOutputStream.toByteArray())))
-                                .build());
+                ioBackEndRestConnector.sendLogoIo(serviceId, LogoIODTO.builder().logo(new String(
+                                Base64.getEncoder().encode(byteArrayOutputStream.toByteArray())))
+                        .build());
             } catch (Exception e) {
                 auditUtilities.logInitiativeError(this.getUserId(), initiative.getInitiativeId(), initiative.getOrganizationId(), "upload logo failed");
                 log.error("[UPLOAD_LOGO] - Initiative: {}. Error: " + e.getMessage(),
-                        initiative.getInitiativeId());
+                        initiative.getInitiativeId(), e);
             }
         }
-        log.debug("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Start ServiceIO Keys encryption...", initiative.getInitiativeId());
-        String encryptedPrimaryToken = ioTokenService.encrypt(serviceResponseDTO.getPrimaryKey());
-        String encryptedSecondaryToken = ioTokenService.encrypt(serviceResponseDTO.getSecondaryKey());
-        log.debug("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Encryption completed.", initiative.getInitiativeId());
-        initiative.getAdditionalInfo().setPrimaryTokenIO(encryptedPrimaryToken);
-        initiative.getAdditionalInfo().setSecondaryTokenIO(encryptedSecondaryToken);
-        additionalInfo.setServiceId(serviceResponseDTO.getServiceId());
 
-        String serviceId = serviceResponseDTO.getServiceId();
+        log.debug("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Update CTA to ServiceIO", initiative.getInitiativeId());
         serviceRequestDTO.getServiceMetadata().setCta(
                 InitiativeConstants.CtaConstant.START +
-                InitiativeConstants.CtaConstant.IT + InitiativeConstants.CtaConstant.CTA_1_IT + InitiativeConstants.CtaConstant.TEXT_IT + InitiativeConstants.CtaConstant.ACTION_IT + serviceId +
-                InitiativeConstants.CtaConstant.EN + InitiativeConstants.CtaConstant.CTA_1_EN + InitiativeConstants.CtaConstant.TEXT_EN + InitiativeConstants.CtaConstant.ACTION_EN + serviceId +
-                InitiativeConstants.CtaConstant.END
+                        InitiativeConstants.CtaConstant.IT + InitiativeConstants.CtaConstant.CTA_1_IT + InitiativeConstants.CtaConstant.TEXT_IT + InitiativeConstants.CtaConstant.ACTION_IT + serviceId +
+                        InitiativeConstants.CtaConstant.EN + InitiativeConstants.CtaConstant.CTA_1_EN + InitiativeConstants.CtaConstant.TEXT_EN + InitiativeConstants.CtaConstant.ACTION_EN + serviceId +
+                        InitiativeConstants.CtaConstant.END
         );
-        ioBackEndRestConnector.updateService(serviceId, serviceRequestDTO, serviceResponseDTO.getPrimaryKey());
+        ioBackEndRestConnector.updateService(serviceId, serviceRequestDTO);
 
-        auditUtilities.logInitiativePublished(this.getUserId(),initiative.getInitiativeId(), initiative.getOrganizationId());
+        auditUtilities.logInitiativePublished(this.getUserId(), initiative.getInitiativeId(), initiative.getOrganizationId());
         return initiative;
     }
 
@@ -479,17 +479,17 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     }
 
     @Override
-    public OnboardingDTO getOnboardingStatusList(String organizationId, String initiativeId, String CF,
+    public OnboardingDTO getOnboardingStatusList(String organizationId, String initiativeId, String cf,
                                                  LocalDateTime startDate, LocalDateTime endDate, String status, Pageable pageable) {
 
         log.info("start get status onboarding, initiative: " + initiativeId);
 
         String userId = null;
-        if (CF != null) {
-            CF = CF.toUpperCase();
+        if (cf != null) {
+            cf = cf.toUpperCase();
             try {
                 EncryptedCfDTO encryptedCfDTO = encryptRestConnector.upsertToken(
-                        new CFDTO(CF));
+                        new CFDTO(cf));
                 userId = encryptedCfDTO.getToken();
             } catch (Exception e) {
                 throw new InitiativeException(

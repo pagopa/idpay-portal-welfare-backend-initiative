@@ -10,7 +10,7 @@ import javax.validation.Valid;
 public interface IOBackEndRestConnector {
 
   ServiceResponseDTO createService(@RequestBody @Valid ServiceRequestDTO serviceRequestDTO);
-  void sendLogoIo(String serviceId, String primaryKey,  LogoIODTO logo);
+  void sendLogoIo(String serviceId,  LogoIODTO logo);
 
-  ServiceResponseDTO updateService(String serviceId, ServiceRequestDTO serviceRequestDTO, String primaryKey);
+  ServiceResponseDTO updateService(String serviceId, ServiceRequestDTO serviceRequestDTO);
 }

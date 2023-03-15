@@ -271,12 +271,14 @@ class RewardAndTrxRuleValidatorTest {
     InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardValueDTO_ok(){
         return RewardValueDTO.builder()
                 .rewardValue(BigDecimal.valueOf(50))
+                .rewardValueType("PERCENTAGE")
                 .type("rewardValue")
                 .build();
     }
     InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardValueDTO_No_typeField(){
         return RewardValueDTO.builder()
                 .rewardValue(BigDecimal.valueOf(50))
+                .rewardValueType("PERCENTAGE")
                 .build();
     }
     InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardValueDTOvalueTooBig_ko(){
@@ -288,6 +290,7 @@ class RewardAndTrxRuleValidatorTest {
     InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardValueDTOvalueTooSmall_ko(){
         return RewardValueDTO.builder()
                 .rewardValue(BigDecimal.valueOf(-10))
+                .rewardValueType("PERCENTAGE")
                 .type("rewardValue")
                 .build();
     }

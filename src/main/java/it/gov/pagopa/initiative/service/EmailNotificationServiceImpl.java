@@ -6,14 +6,11 @@ import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.selc.UserResource;
 import it.gov.pagopa.initiative.model.Initiative;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static it.gov.pagopa.initiative.constants.InitiativeConstants.Email.RECIPIENT_ASSISTANCE;
 
 @Service
 @Slf4j
@@ -22,43 +19,33 @@ public class EmailNotificationServiceImpl implements EmailNotificationService {
     private static final String COMMA_DELIMITER = ",";
     private final EmailNotificationRestConnector emailNotificationRestConnector;
     private final SelcRestConnector selcRestConnector;
+    private final String emailAssistance;
+
 
     public EmailNotificationServiceImpl(
             EmailNotificationRestConnector emailNotificationRestConnector,
-            SelcRestConnector selcRestConnector) {
+            SelcRestConnector selcRestConnector,
+            @Value("${app.initiative.email-assistance}") String emailAssistance) {
         this.emailNotificationRestConnector = emailNotificationRestConnector;
         this.selcRestConnector = selcRestConnector;
+        this.emailAssistance = emailAssistance;
     }
 
     @Override
     public void sendInitiativeToCurrentOrganization(Initiative initiative, String templateName, String subject) {
         try {
-            log.info("[EMAIL-NOTIFICATION] Send Initiative info to current Organization by Email");
-            RequestAttributes requestAttributes = Optional.ofNullable(RequestContextHolder.getRequestAttributes())
-                    .orElseThrow(() -> new IllegalStateException("Request Attributes should not be null"));
-            Object organizationUserIdObject = Optional.ofNullable(requestAttributes.getAttribute("organizationUserId", RequestAttributes.SCOPE_REQUEST))
-                    .orElseThrow(() -> new IllegalStateException("[organizationUserId] Request Attribute should not be null"));
-            String organizationUserId = organizationUserIdObject.toString();
-            log.trace("[EMAIL-NOTIFICATION] organizationUserId: {}", organizationUserId);
-
             List<UserResource> institutionProductUsers = getInstitutionProductUsersEmailsByRole(initiative.getOrganizationId());
 
-            UserResource currentUserResource = institutionProductUsers.stream().filter(
-                    user -> user.getId().toString().equals(organizationUserId))
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalStateException("Current user not found from SelfCare institutional Users"));
             Set<String> institutionProductUsersEmailsByRoleSet = institutionProductUsers.stream().filter(
                             user -> user.getRoles().contains(InitiativeConstants.Role.ADMIN))
                     .map(UserResource::getEmail)
                     .collect(Collectors.toSet());
 
-            Map<String, String> templateValues = getMap(initiative, currentUserResource);
-            //Add current user to recipient Set
-            institutionProductUsersEmailsByRoleSet.add(currentUserResource.getEmail());
+            Map<String, String> templateValues = getMap(initiative);
             // Convert the Set of String to String
             String recipients = String.join(COMMA_DELIMITER, institutionProductUsersEmailsByRoleSet);
             emailNotificationRestConnector.notifyInitiativeToEmailNotification(
-                        initiative, templateName, templateValues, subject, null, recipients);
+                        templateName, templateValues, subject, null, recipients);
         } catch (IllegalStateException e) {
             log.error("[EMAIL-NOTIFICATION] Message: {}", e.getMessage());
         } catch (Exception exception) {
@@ -72,25 +59,17 @@ public class EmailNotificationServiceImpl implements EmailNotificationService {
         Map<String, String> templateValues = getMap(initiative);
         try {
             emailNotificationRestConnector.notifyInitiativeToEmailNotification(
-                    initiative, templateName, templateValues, subject, null, RECIPIENT_ASSISTANCE);
+                    templateName, templateValues, subject, null, emailAssistance);
         } catch (Exception exception) {
             log.error("[MS]-[NOTIFICATION-EMAIL] - Error sending email", exception);
         }
     }
 
     private Map<String, String> getMap(Initiative initiative) {
-        return getMap(initiative, null);
-    }
-
-    private Map<String, String> getMap(Initiative initiative, UserResource userResource) {
         Map<String, String> templateValues = new HashMap<>();
         templateValues.put("initiativeName", initiative.getInitiativeName());
         templateValues.put("orgName", initiative.getOrganizationName());
         templateValues.put("status", initiative.getStatus());
-        if (userResource != null) {
-            templateValues.put("requesterName", userResource.getName());
-            templateValues.put("requesterSurname", userResource.getSurname());
-        }
         return templateValues;
     }
 

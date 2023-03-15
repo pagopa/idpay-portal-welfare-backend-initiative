@@ -1,92 +1,90 @@
 package it.gov.pagopa.initiative.utils;
 
-import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest;
-import it.gov.pagopa.initiative.exception.InitiativeException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.logging.Logger;
+
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Component
 @AllArgsConstructor
+@Slf4j(topic = "AUDIT")
 public class AuditUtilities {
-  private static final String SRCIP;
+  public static final String SRCIP;
 
   static {
+    String srcIp;
     try {
-      SRCIP = InetAddress.getLocalHost().getHostAddress();
+      srcIp = InetAddress.getLocalHost().getHostAddress();
     } catch (UnknownHostException e) {
-      throw new InitiativeException(
-              BadRequest.CODE,
-              String.format(e.getMessage()),
-              HttpStatus.BAD_REQUEST);
+      log.error("Cannot determine the ip of the current host", e);
+      srcIp="UNKNOWN";
     }
+
+    SRCIP = srcIp;
   }
 
   private static final String CEF = String.format("CEF:0|PagoPa|IDPAY|1.0|7|User interaction|2| event=Initiative dstip=%s", SRCIP);
-  private static final String MSG = " msg=";
-  private static final String USER = "suser=";
-  private static final String INITIATIVE_ID = "cs1Label=initiativeId cs1=";
-  private static final String ORGANIZATION_ID = "cs2Label=organizationId cs2=";
+  private static final String CEF_PATTERN = CEF + " msg={} suser={} cs1Label=initiativeId cs1={} cs2Label=organizationId cs2={}";
 
-  final Logger logger = Logger.getLogger("AUDIT");
-
-
-  private String buildLog(String eventLog, String userId, String initiativeId, String organizationId) {
-    return CEF + MSG + eventLog + " " + USER + userId + " " + INITIATIVE_ID + initiativeId + " " + ORGANIZATION_ID + organizationId;
+  private void logAuditString(String... parameters) {
+    log.info(AuditUtilities.CEF_PATTERN, (Object[]) parameters);
   }
 
   public void logNewInitiative(String userId, String initiativeId, String organizationId) {
-    String testLog = this.buildLog("New initiative inserted by the user ", userId, initiativeId, organizationId);
-    logger.info(testLog);
+    logAuditString(
+            "New initiative inserted by the user", userId, initiativeId, organizationId
+    );
   }
-
   public void logInitiativeApproved(String userId, String initiativeId, String organizationId) {
-    String testLog = this.buildLog("Initiative approved by the user ", userId, initiativeId, organizationId);
-    logger.info(testLog);
+    logAuditString(
+            "Initiative approved by the user", userId, initiativeId, organizationId
+    );
   }
   public void logInitiativeToCheck(String userId, String initiativeId, String organizationId) {
-    String testLog = this.buildLog("Initiative has to be checked by the user ", userId, initiativeId, organizationId);
-    logger.info(testLog);
+    logAuditString(
+            "Initiative has to be checked by the user", userId, initiativeId, organizationId
+    );
   }
-
   public void logInitiativePublished(String userId, String initiativeId, String organizationId) {
-    String testLog = this.buildLog("Initiative published by the user ", userId, initiativeId, organizationId);
-    logger.info(testLog);
+    logAuditString(
+            "Initiative published by the user", userId, initiativeId, organizationId
+    );
   }
-
   public void logInitiativeInRevision(String userId, String initiativeId, String organizationId) {
-    String testLog = this.buildLog("Initiative in revision by the user ", userId, initiativeId, organizationId);
-    logger.info(testLog);
+    logAuditString(
+            "Initiative in revision by the user", userId, initiativeId, organizationId
+    );
   }
-
   public void logOnboardingCitizen(String userId, String initiativeId, String organizationId) {
-    String testLog = this.buildLog("Get onboarding list by the user ", userId, initiativeId, organizationId);
-    logger.info(testLog);
+    logAuditString(
+            "Get onboarding list by the user", userId, initiativeId, organizationId
+    );
   }
   public void logDetailUser(String userId, String initiativeId, String organizationId) {
-    String testLog = this.buildLog("Get detail user by the user ", userId, initiativeId, organizationId);
-    logger.info(testLog);
+    logAuditString(
+            "Get detail users by the user", userId, initiativeId, organizationId
+    );
   }
-
   public void logEditInitiative(String userId, String initiativeId, String organizationId) {
-    String testLog = this.buildLog("Initiative edited by the user ", userId, initiativeId, organizationId);
-    logger.info(testLog);
+    logAuditString(
+            "Initiative edited by the user", userId, initiativeId, organizationId
+    );
   }
   public void logGetInitiative(String userId, String initiativeId, String organizationId) {
-    String testLog = this.buildLog("Get initiative by the user ", userId, initiativeId, organizationId);
-    logger.info(testLog);
+    logAuditString(
+            "Get initiative by the user", userId, initiativeId, organizationId
+    );
   }
   public void logInitiativeDeleted(String userId, String initiativeId, String organizationId) {
-    String testLog = this.buildLog("Initiative deleted by the user ", userId, initiativeId, organizationId);
-    logger.info(testLog);
+    logAuditString(
+            "Initiative deleted by the user", userId, initiativeId, organizationId
+    );
   }
   public void logInitiativeError(String userId, String initiativeId, String organizationId, String msg){
-    String testLog = this.buildLog("Error: "+ msg, userId, initiativeId, organizationId);
-    logger.info(testLog);
+    logAuditString(
+            "Initiative error: " + msg, userId, initiativeId, organizationId
+    );
   }
-
-
 }

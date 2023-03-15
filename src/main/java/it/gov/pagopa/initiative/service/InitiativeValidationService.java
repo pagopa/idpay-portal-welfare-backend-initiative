@@ -15,4 +15,5 @@ public interface InitiativeValidationService {
     void checkAutomatedCriteriaOrderDirectionWithRanking(Initiative initiative, List<AutomatedCriteria> initiativeBeneficiaryRuleModel);
 
     void validateAllWizardSteps(InitiativeDTO initiativeDTO);
+    void checkRewardRuleAbsolute(Initiative initiative);
 }

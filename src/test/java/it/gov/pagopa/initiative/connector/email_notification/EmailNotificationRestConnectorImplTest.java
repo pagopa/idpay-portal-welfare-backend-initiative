@@ -1,12 +1,5 @@
 package it.gov.pagopa.initiative.connector.email_notification;
 
-import it.gov.pagopa.initiative.model.Initiative;
-import it.gov.pagopa.initiative.model.InitiativeAdditional;
-import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
-import it.gov.pagopa.initiative.model.InitiativeGeneral;
-import it.gov.pagopa.initiative.model.rule.refund.InitiativeRefundRule;
-import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
-import it.gov.pagopa.initiative.model.rule.trx.InitiativeTrxConditions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,29 +24,14 @@ class EmailNotificationRestConnectorImplTest {
     private EmailNotificationRestConnectorImpl emailNotificationRestConnectorImpl;
 
     /**
-     * Method under test: {@link EmailNotificationRestConnectorImpl#notifyInitiativeToEmailNotification(Initiative, String, Map, String, String, String)}
+     * Method under test: {@link EmailNotificationRestConnectorImpl#notifyInitiativeToEmailNotification(String, Map, String, String, String)}
      */
     @Test
     void testNotifyInitiativeToEmailNotification() {
         when(emailNotificationFeignRestClient.notifyInitiativeInfo(any()))
                 .thenReturn(new ResponseEntity<>(HttpStatus.CONTINUE));
 
-        Initiative initiative = new Initiative();
-        initiative.setAdditionalInfo(new InitiativeAdditional());
-        initiative.setBeneficiaryRule(new InitiativeBeneficiaryRule());
-        initiative.setCreationDate(LocalDateTime.of(1, 1, 1, 1, 1));
-        initiative.setEnabled(true);
-        initiative.setGeneral(new InitiativeGeneral());
-        initiative.setInitiativeId("42");
-        initiative.setInitiativeName("Initiative Name");
-        initiative.setOrganizationId("42");
-        initiative.setOrganizationName("Organization Name");
-        initiative.setRefundRule(new InitiativeRefundRule());
-        initiative.setRewardRule(new RewardGroups());
-        initiative.setStatus("Status");
-        initiative.setTrxRule(new InitiativeTrxConditions());
-        initiative.setUpdateDate(LocalDateTime.of(1, 1, 1, 1, 1));
-        emailNotificationRestConnectorImpl.notifyInitiativeToEmailNotification(initiative, "Template Name", new HashMap<>(),
+        emailNotificationRestConnectorImpl.notifyInitiativeToEmailNotification("Template Name", new HashMap<>(),
                 "Hello from the Dreaming Spires", "Sender", "Recipients");
         verify(emailNotificationFeignRestClient).notifyInitiativeInfo(any());
     }

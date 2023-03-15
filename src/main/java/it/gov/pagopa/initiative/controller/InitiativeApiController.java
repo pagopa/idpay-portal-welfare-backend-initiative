@@ -241,14 +241,6 @@ public class InitiativeApiController implements InitiativeApi {
         initiativeService.isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED, role);
         log.debug("Current Status validated");
 
-        log.debug("Retrieve current state and save it as TEMP");
-        String statusTemp = initiative.getStatus();
-        LocalDateTime updateDateTemp = initiative.getUpdateDate();
-
-        initiative.setStatus(InitiativeConstants.Status.PUBLISHED);
-        initiative.setUpdateDate(LocalDateTime.now());
-        initiativeService.updateInitiative(initiative);
-        log.debug("Initiative saved in status PUBLISHED");
         try {
             if(notifyRE) {
                 log.info("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Notification to Rule Engine of the published Initiative", initiativeId);
@@ -256,30 +248,35 @@ public class InitiativeApiController implements InitiativeApi {
             }
             //1. Only for the Initiatives to be provided to IO, the integration is carried out with the creation of the Initiative Service to IO BackEnd
             if(Boolean.TRUE.equals(initiative.getAdditionalInfo().getServiceIO())) {
-                if(notifyIO) {
+                if (notifyIO) {
                     log.info("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Notification to IO BackEnd of the published Initiative", initiativeId);
                     initiative = initiativeService.sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(initiative, initiativeOrganizationInfoDTO);
                 }
-                initiativeService.updateInitiative(initiative);
                 //Send citizen to MS-Group via API
                 //This integration necessarily takes place in succession to having created the service with IO in order not to send "orphan" resources (not associated with any Initiative known by IO).
                 //2. BeneficiaryKnown is true -> Send to MS-Group via API about the publishing of Initiative. Then, MS Groups will send it via Topics to NotificationManager and Onboarding
                 if (null != initiative.getGeneral() && initiative.getGeneral().getBeneficiaryKnown() && notifyInternal) {
-                        initiativeService.sendInitiativeInfoToNotificationManager(initiative);
+                    initiativeService.sendInitiativeInfoToNotificationManager(initiative);
                 }
             }
-            initiativeService.sendEmailToPagoPA(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
-            initiativeService.sendEmailToCurrentOrg(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
         } catch (Exception e) {
-            //In case one of the previous Integrations ends badly, the Initiative is rolled back to the initial TEMP state
-            log.error("[UPDATE_TO_PUBLISHED_STATUS] - [ROLLBACK STATUS] Initiative: {}. Generic Error: {}", initiativeId, e.getMessage());
-            initiative.setStatus(statusTemp);
-            initiative.setUpdateDate(updateDateTemp);
-            initiativeService.updateInitiative(initiative);
-            log.debug("Initiative Status has been roll-backed to {}", statusTemp);
             performanceLog(startTime, "UPDATE_INITIATIVE_PUBLISHED");
             throw new IntegrationException(HttpStatus.BAD_REQUEST);
         }
+
+        log.debug("Initiative saved in status PUBLISHED");
+        initiative.setStatus(InitiativeConstants.Status.PUBLISHED);
+        initiative.setUpdateDate(LocalDateTime.now());
+        initiativeService.updateInitiative(initiative);
+
+        try {
+            log.info("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Sending emails to PagoPA and Organization", initiativeId);
+            initiativeService.sendEmailToPagoPA(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
+            initiativeService.sendEmailToCurrentOrg(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
+        } catch (Exception e){
+            log.error("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Error at sending mails: {}", initiativeId, e.getMessage(), e);
+        }
+
         performanceLog(startTime, "UPDATE_INITIATIVE_PUBLISHED");
         return ResponseEntity.noContent().build();
     }

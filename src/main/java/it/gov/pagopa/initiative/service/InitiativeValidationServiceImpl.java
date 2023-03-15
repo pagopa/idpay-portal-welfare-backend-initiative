@@ -12,6 +12,9 @@ import it.gov.pagopa.initiative.model.AutomatedCriteria;
 import it.gov.pagopa.initiative.model.FilterOperatorEnumModel;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeGeneral;
+import it.gov.pagopa.initiative.model.rule.reward.InitiativeRewardRule;
+import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
+import it.gov.pagopa.initiative.model.rule.trx.Threshold;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
 import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
 import lombok.extern.slf4j.Slf4j;
@@ -145,4 +148,16 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
         }
     }
 
+    @Override
+    public void checkRewardRuleAbsolute(Initiative initiative) {
+        InitiativeRewardRule rewardRule = initiative.getRewardRule();
+        if (rewardRule instanceof RewardValue rewardValue &&
+                rewardValue.getRewardValueType().equals(InitiativeConstants.Status.Validation.REWARD_ABSOLUTE)) {
+            Threshold threshold = initiative.getTrxRule().getThreshold();
+            if (threshold==null || threshold.getFrom()==null || threshold.getFrom().compareTo(rewardValue.getRewardValue()) < 0){
+                throw new InitiativeException(InitiativeConstants.Exception.BadRequest.CODE,
+                        InitiativeConstants.Exception.BadRequest.REWARD_TYPE, HttpStatus.BAD_REQUEST);
+            }
+        }
+    }
 }

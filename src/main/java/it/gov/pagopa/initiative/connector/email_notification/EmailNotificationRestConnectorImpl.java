@@ -1,7 +1,6 @@
 package it.gov.pagopa.initiative.connector.email_notification;
 
 import it.gov.pagopa.initiative.dto.email_notification.EmailMessageDTO;
-import it.gov.pagopa.initiative.model.Initiative;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +18,7 @@ public class EmailNotificationRestConnectorImpl implements EmailNotificationRest
     }
 
     @Override
-    public void notifyInitiativeToEmailNotification(Initiative initiative, String templateName, Map<String, String> templateValues, String subject, String sender, String recipients) {
+    public void notifyInitiativeToEmailNotification(String templateName, Map<String, String> templateValues, String subject, String sender, String recipients) {
         log.info("[NOTIFICATION-EMAIL] Sending email is about to start...");
         EmailMessageDTO emailMessageDTO = EmailMessageDTO.builder()
                 .templateName(templateName)

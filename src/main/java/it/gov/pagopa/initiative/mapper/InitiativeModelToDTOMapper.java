@@ -274,6 +274,7 @@ public class InitiativeModelToDTOMapper {
         if (rewardRule instanceof RewardValue rewardValueInput) {
             dto = RewardValueDTO.builder()
                     .type(rewardValueInput.getType())
+                    .rewardValueType(rewardValueInput.getRewardValueType())
                     .rewardValue(rewardValueInput.getRewardValue())
                     .build();
         } else if (rewardRule instanceof RewardGroups rewardGroupsInput) {
