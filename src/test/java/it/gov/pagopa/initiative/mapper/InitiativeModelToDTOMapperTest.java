@@ -1,5 +1,6 @@
 package it.gov.pagopa.initiative.mapper;
 
+import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.rule.refund.AccumulatedAmountDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
@@ -141,16 +142,46 @@ class InitiativeModelToDTOMapperTest {
     }
 
     @Test
+    void toInitiativeDataDTO_ok() {
+        Initiative initiative = createStep4Initiative();
+        initiative.getAdditionalInfo().setLogoFileName("logo.png");
+        Locale acceptLanguage = Locale.ENGLISH;
+
+        Mockito.when(initiativeUtils.createLogoUrl(anyString(), anyString())).thenReturn("${app.initiative.logo.url}" + String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE,
+                initiative.getOrganizationId(),initiative.getInitiativeId(), InitiativeConstants.Logo.LOGO_NAME));
+
+        InitiativeDataDTO initiativeDataDTO = initiativeModelToDTOMapper.toInitiativeDataDTO(initiative, acceptLanguage);
+
+        String description = StringUtils.defaultString(
+                initiative.getGeneral().getDescriptionMap().get(acceptLanguage.getLanguage()),
+                initiative.getGeneral().getDescriptionMap().get(Locale.ITALIAN.getLanguage())
+        );
+
+        assertEquals(description, initiativeDataDTO.getDescription());
+        assertEquals("${app.initiative.logo.url}" + String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE,
+                initiative.getOrganizationId(),initiative.getInitiativeId(), InitiativeConstants.Logo.LOGO_NAME), initiativeDataDTO.getLogoURL());
+    }
+
+    @Test
     void toInitiativeDataDTO_getGeneralNull() {
         Initiative initiative = createStep4Initiative();
-        initiative.setGeneral(createInitiativeGeneral());
+        initiative.setGeneral(null);
         Locale language = Locale.ITALIAN;
-        Locale acceptLanguage = Locale.ENGLISH;
         String description = StringUtils.EMPTY;
 
         initiativeModelToDTOMapper.toInitiativeDataDTO(initiative, language);
-        assertEquals(description, StringUtils.defaultString(initiative.getGeneral().getDescriptionMap().get(language)));
-        assertEquals(description, StringUtils.defaultString(initiative.getGeneral().getDescriptionMap().get(acceptLanguage.getLanguage())));
+        assertEquals(StringUtils.EMPTY, description);
+    }
+
+    @Test
+    void toInitiativeDataDTO_LogoFileNameNull() {
+        Initiative initiative = createStep4Initiative();
+        initiative.getAdditionalInfo().setLogoFileName(null);
+        Locale language = Locale.ITALIAN;
+        String logoURL = StringUtils.EMPTY;
+
+        initiativeModelToDTOMapper.toInitiativeDataDTO(initiative, language);
+        assertEquals(StringUtils.EMPTY, logoURL);
     }
 
     @Test
