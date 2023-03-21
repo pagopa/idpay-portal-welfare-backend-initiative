@@ -39,11 +39,13 @@ public class InitiativeModelToDTOMapper {
 
     @Autowired
     InitiativeUtils initiativeUtils;
+
     public InitiativeDataDTO toInitiativeDataDTO(Initiative initiative, Locale acceptLanguage) {
         if (initiative == null) {
             return null;
         }
         String description = StringUtils.EMPTY;
+        String logoURL = StringUtils.EMPTY;
         if (initiative.getGeneral() != null && initiative.getGeneral().getDescriptionMap() != null) {
             //if no description for the given accepted language, try the default to italian
             description = StringUtils.defaultString(
@@ -51,9 +53,19 @@ public class InitiativeModelToDTOMapper {
                     initiative.getGeneral().getDescriptionMap().get(Locale.ITALIAN.getLanguage())
             );
         }
+        if(initiative.getAdditionalInfo() != null && initiative.getAdditionalInfo().getLogoFileName() != null){
+            logoURL = initiativeUtils.createLogoUrl(initiative.getOrganizationId(),
+                    initiative.getInitiativeId());
+        }
         return InitiativeDataDTO.builder()
                 .initiativeId(initiative.getInitiativeId())
+                .initiativeName(initiative.getInitiativeName())
                 .description(description)
+                .organizationId(initiative.getOrganizationId())
+                .organizationName(initiative.getOrganizationName())
+                .tcLink(initiative.getAdditionalInfo().getTcLink())
+                .privacyLink(initiative.getAdditionalInfo().getPrivacyLink())
+                .logoURL(logoURL)
                 .build();
     }
 

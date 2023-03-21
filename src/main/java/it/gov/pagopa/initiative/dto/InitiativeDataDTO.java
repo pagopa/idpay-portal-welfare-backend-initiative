@@ -20,7 +20,25 @@ public class InitiativeDataDTO {
   @JsonProperty("initiativeId")
   private String initiativeId;
 
+  @JsonProperty("initiativeName")
+  private String initiativeName;
+
   @JsonProperty("description")
   private String description;
+
+  @JsonProperty("organizationId")
+  private String organizationId;
+
+  @JsonProperty("organizationName")
+  private String organizationName;
+
+  @JsonProperty("tcLink")
+  private String tcLink;
+
+  @JsonProperty("privacyLink")
+  private String privacyLink;
+
+  @JsonProperty("logoURL")
+  private String logoURL;
 
 }
