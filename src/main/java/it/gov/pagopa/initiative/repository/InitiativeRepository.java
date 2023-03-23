@@ -46,5 +46,6 @@ public interface InitiativeRepository extends MongoRepository<Initiative, String
     Optional<Initiative> retrieveByServiceId(String serviceId);
 
     OrganizationDTO findFirstByOrganizationId(String organizationId);
-    Optional<Initiative> findByInitiativeId(String initiativeId);
+
+    Optional<Initiative> findByInitiativeIdAndStatusIn(String initiativeId, List<String> status);
 }

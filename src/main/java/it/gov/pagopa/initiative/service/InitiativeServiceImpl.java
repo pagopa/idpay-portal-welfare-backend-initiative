@@ -120,7 +120,8 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     }
     @Override
     public InitiativeDetailDTO getInitiativeBeneficiaryDetail(String initiativeId) {
-        Initiative initiativeDetail = initiativeRepository.findByInitiativeId(initiativeId).orElseThrow(() -> new InitiativeException(
+
+        Initiative initiativeDetail = initiativeRepository.findByInitiativeIdAndStatusIn(initiativeId, List.of(Status.PUBLISHED,Status.CLOSED)).orElseThrow(() -> new InitiativeException(
                 InitiativeConstants.Exception.NotFound.CODE,
                 String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
                 HttpStatus.NOT_FOUND));

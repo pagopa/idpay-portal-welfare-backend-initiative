@@ -439,7 +439,7 @@ class InitiativeServiceTest {
     void getInitiativeBeneficiaryDetail_ok() {
        Initiative fullInitiative = createFullInitiative();
 
-       when(initiativeRepository.findByInitiativeId(anyString())).thenReturn(Optional.of(fullInitiative));
+       when(initiativeRepository.findByInitiativeIdAndStatusIn(anyString(),anyList())).thenReturn(Optional.of(fullInitiative));
        InitiativeDetailDTO initiativeDetailDTO = createInitiativeDetailDTO();
        when(initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative)).thenReturn(initiativeDetailDTO);
        InitiativeDetailDTO initiativeDetailDTO1 = initiativeService.getInitiativeBeneficiaryDetail(INITIATIVE_ID);
@@ -451,7 +451,7 @@ class InitiativeServiceTest {
     @Test
     void getInitiativeBeneficiaryDetail_ko() {
 
-        when(initiativeRepository.findByInitiativeId(anyString())).thenReturn(Optional.empty());
+        when(initiativeRepository.findByInitiativeIdAndStatusIn(anyString(),anyList())).thenReturn(Optional.empty());
         try {
             initiativeService.getInitiativeBeneficiaryDetail(INITIATIVE_ID);
         } catch (InitiativeException e){
