@@ -56,6 +56,7 @@ class InitiativeModelToDTOMapperTest {
     public static final String ENCRYPTED_API_KEY_CLIENT_ASSERTION = "encryptedApiKeyClientAssertion";
     public static final String ITALIAN_LANGUAGE = "it";
     public static final String INITIATIVE_ID = "initiativeId";
+    
     @Autowired
     InitiativeModelToDTOMapper initiativeModelToDTOMapper;
     @MockBean
