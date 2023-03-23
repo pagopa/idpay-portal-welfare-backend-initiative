@@ -55,6 +55,8 @@ class InitiativeModelToDTOMapperTest {
     public static final String ENCRYPTED_API_KEY_CLIENT_ID = "encryptedApiKeyClientId";
     public static final String ENCRYPTED_API_KEY_CLIENT_ASSERTION = "encryptedApiKeyClientAssertion";
     public static final String ITALIAN_LANGUAGE = "it";
+    public static final String INITIATIVE_ID = "initiativeId";
+    
     @Autowired
     InitiativeModelToDTOMapper initiativeModelToDTOMapper;
     @MockBean
@@ -88,6 +90,8 @@ class InitiativeModelToDTOMapperTest {
     private Initiative fullInitiativeStep4ThresholdNull;
     private InitiativeAdditionalDTO initiativeAdditionalDTOOnlyTokens;
     private InitiativeAdditional initiativeAdditionalOnlyTokens;
+    private InitiativeIssuerDTO initiativeIssuerDTO;
+    private InitiativeDetailDTO fullInitiativeDetailDTO;
 
     @MockBean
     InitiativeUtils initiativeUtils;
@@ -128,6 +132,7 @@ class InitiativeModelToDTOMapperTest {
         fullInitiativeDTOStep4ThresholdNull = createStep4InitiativeDTOThresholdNull();
         initiativeAdditionalOnlyTokens = createInitiativeAdditionalOnlyTokens();
         initiativeAdditionalDTOOnlyTokens = createInitiativeAdditionalDTOOnlyTokens();
+        fullInitiativeDetailDTO = createInitiativeDetailDTO();
 
         Mockito.when(aesTokenService.decrypt(ENCRYPTED_API_KEY_CLIENT_ID)).thenReturn(API_KEY_CLIENT_ID);
         Mockito.when(aesTokenService.decrypt(ENCRYPTED_API_KEY_CLIENT_ASSERTION)).thenReturn(API_KEY_CLIENT_ASSERTION);
@@ -318,6 +323,22 @@ class InitiativeModelToDTOMapperTest {
     }
 
     @Test
+    void toInitiativeDetailDTO_equals() {
+        InitiativeDetailDTO initiativeDetailDTO = initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative);
+
+        assertEquals(fullInitiativeDetailDTO, initiativeDetailDTO);
+    }
+
+    @Test
+    void toInitiativeDetailDTO_Null() {
+        try {
+            initiativeModelToDTOMapper.toInitiativeDetailDTO(null);
+        } catch (Exception e) {
+            assertNull(null);
+        }
+    }
+
+    @Test
     void toInitiativeDTONull_equals() {
         assertNull(initiativeModelToDTOMapper.toInitiativeDTO(null));
     }
@@ -356,7 +377,7 @@ class InitiativeModelToDTOMapperTest {
         //Check the equality of the results
         assertEquals(fullInitiative.getBeneficiaryRule().getApiKeyClientAssertion(), initiativeDTOActual.getBeneficiaryRule().getApiKeyClientAssertion());
     }
-    
+
     @Test
     void toInitiativeAdditionalDTO() {
         Initiative initiative = createStep1Initiative();
@@ -374,7 +395,7 @@ class InitiativeModelToDTOMapperTest {
         additionalInfo.setChannels(channels);
         additionalInfo.setServiceScope(InitiativeAdditional.ServiceScope.LOCAL);
         initiative.setAdditionalInfo(additionalInfo);
-        
+
         assertTrue(channels.isEmpty());
         assertTrue(CollectionUtils.isEmpty(channels));
         assertEquals(initiativeModelToDTOMapper.toInitiativeDTO(initiative).getAdditionalInfo().getChannels(), channelDTO);
@@ -685,6 +706,11 @@ class InitiativeModelToDTOMapperTest {
         return RewardValueDTO.builder()
                 .rewardValue(BigDecimal.valueOf(50))
                 .type("rewardValue")
+                .build();
+    }
+    private InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardValueDTOWithoutType() {
+        return RewardValueDTO.builder()
+                .rewardValue(BigDecimal.valueOf(50))
                 .build();
     }
 
@@ -1585,5 +1611,24 @@ class InitiativeModelToDTOMapperTest {
         return createStep4InitiativeDTO();
     }
 
+    private InitiativeDetailDTO createInitiativeDetailDTO() {
+        InitiativeDetailDTO initiativeDetailDTO = new InitiativeDetailDTO();
+        initiativeDetailDTO.setInitiativeId("Id1");
+        initiativeDetailDTO.setInitiativeName("initiativeName1");
+        initiativeDetailDTO.setStatus("DRAFT");
+        initiativeDetailDTO.setDescription("Description");
+        LocalDate rankingStartDate = LocalDate.now();
+        LocalDate rankingEndDate = rankingStartDate.plusDays(1);
+        LocalDate startDate = rankingEndDate.plusDays(1);
+        LocalDate endDate = startDate.plusDays(1);
+        initiativeDetailDTO.setEndDate(endDate);
+        initiativeDetailDTO.setRewardRule(createInitiativeRewardRuleDTORewardGroupDTO());
+        initiativeDetailDTO.setRewardRule(createInitiativeRewardRuleDTORewardValueDTOWithoutType());
+        initiativeDetailDTO.setRefundRule(null);
+        initiativeDetailDTO.setPrivacyLink("privacyLink");
+        initiativeDetailDTO.setTcLink("tcLink");
+        initiativeDetailDTO.setLogoFileName(null);
+        return initiativeDetailDTO;
+    }
 
 }
