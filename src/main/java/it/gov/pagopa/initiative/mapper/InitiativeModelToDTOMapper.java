@@ -45,7 +45,7 @@ public class InitiativeModelToDTOMapper {
             return null;
         }
         String description = StringUtils.EMPTY;
-        String logoURL = StringUtils.EMPTY;
+        String logoURL = null;
         if (initiative.getGeneral() != null && initiative.getGeneral().getDescriptionMap() != null) {
             //if no description for the given accepted language, try the default to italian
             description = StringUtils.defaultString(
