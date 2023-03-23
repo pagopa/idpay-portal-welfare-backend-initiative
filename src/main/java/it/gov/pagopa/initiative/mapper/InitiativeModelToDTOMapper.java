@@ -57,6 +57,21 @@ public class InitiativeModelToDTOMapper {
                 .build();
     }
 
+    public  InitiativeDetailDTO toInitiativeDetailDTO(Initiative initiative) {
+        return InitiativeDetailDTO.builder()
+                .initiativeId(initiative.getInitiativeId())
+                .initiativeName(initiative.getInitiativeName())
+                .status(initiative.getStatus())
+                .description(initiative.getAdditionalInfo().getDescription())
+                .endDate(initiative.getGeneral().getEndDate())
+                .rewardRule(this.toRewardRuleDTOWithoutType(initiative.getRewardRule()))
+                .refundRule(this.toInitiativeRefundRuleDTO((initiative.getRefundRule())))
+                .privacyLink(initiative.getAdditionalInfo().getPrivacyLink())
+                .tcLink(initiative.getAdditionalInfo().getTcLink())
+                .logoFileName(initiative.getAdditionalInfo().getLogoFileName())
+                .build();
+    }
+
     public InitiativeDTO toInitiativeDTO(Initiative initiative) {
         if (initiative == null) {
             return null;
@@ -283,6 +298,26 @@ public class InitiativeModelToDTOMapper {
                     .rewardGroups(rewardGroupsInput.getRewardGroups().stream().map(
                     x -> RewardGroupsDTO.RewardGroupDTO.builder().from(x.getFrom()).to(x.getTo()).rewardValue(x.getRewardValue()).build()
             ).toList())
+                    .build();
+        }
+        return dto;
+    }
+
+    private InitiativeRewardRuleDTO toRewardRuleDTOWithoutType(InitiativeRewardRule rewardRule) {
+        if (rewardRule == null) {
+            return null;
+        }
+        InitiativeRewardRuleDTO dto = null;
+        if (rewardRule instanceof RewardValue rewardValueInput) {
+            dto = RewardValueDTO.builder()
+                    .rewardValueType(rewardValueInput.getRewardValueType())
+                    .rewardValue(rewardValueInput.getRewardValue())
+                    .build();
+        } else if (rewardRule instanceof RewardGroups rewardGroupsInput) {
+            dto = RewardGroupsDTO.builder()
+                    .rewardGroups(rewardGroupsInput.getRewardGroups().stream().map(
+                            x -> RewardGroupsDTO.RewardGroupDTO.builder().from(x.getFrom()).to(x.getTo()).rewardValue(x.getRewardValue()).build()
+                    ).toList())
                     .build();
         }
         return dto;

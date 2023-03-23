@@ -13,6 +13,7 @@ import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.RefundAdditionalInfoDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.TimeParameterDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
+import it.gov.pagopa.initiative.dto.rule.reward.RewardGroupsDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardValueDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.*;
 import it.gov.pagopa.initiative.exception.InitiativeException;
@@ -118,6 +119,7 @@ class InitiativeApiTest {
     private static final String PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/published" + ROLE_QUERY_PARAMETER_PLACEHOLDER + ROLE_PLACEHOLDER;
     private static final String LOGICALLY_DELETE_INITIATIVE_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER;
     //    private static final String ROLE = "TEST_ROLE";
+    private static final String GET_INITIATIVE_BENEFICIARY_DETAIL_URL = "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/detail";
     private static final String ORGANIZATION_NAME = "organizationName";
     private static final String ORGANIZATION_VAT = "organizationVat";
     public static final String API_KEY_CLIENT_ID = "apiKeyClientId";
@@ -1004,6 +1006,28 @@ class InitiativeApiTest {
                 .andReturn();
     }
 
+    @Test
+    void getInitiativeBeneficiaryDetail_statusOk() throws Exception {
+
+        //create Dummy Initiative
+        Initiative initiative = createStep5Initiative();
+        InitiativeDetailDTO initiativeDetailDTO = createInitiativeDetailDTO();
+
+        // Instruct the Service to insert a Dummy Initiative
+        when(initiativeModelToDTOMapper.toInitiativeDetailDTO(initiative)).thenReturn(initiativeDetailDTO);
+        // When
+        // With this instruction, I instruct the service (via Mockito's when) to always return the DummyInitiative to me anytime I call the same service's function
+        when(initiativeService.getInitiativeBeneficiaryDetail(anyString())).thenReturn(initiativeDetailDTO);
+
+        //The MVC perform should perform the API by returning the response based on the Service previously mocked.
+        mvc.perform(
+                        MockMvcRequestBuilders.get(BASE_URL + String.format(GET_INITIATIVE_BENEFICIARY_DETAIL_URL, INITIATIVE_ID))
+                                .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andDo(print())
+                .andReturn();
+    }
+
     private List<OrganizationDTO> createOrganizationDTOList() {
         return IntStream.range(0, 4).mapToObj(this::createOrganizationDTO).toList();
     }
@@ -1456,6 +1480,37 @@ class InitiativeApiTest {
         initiative.setOrganizationId(ORGANIZATION_ID);
         initiative.setRefundRule(createRefundRuleValidWithAccumulatedAmount());
         return initiative;
+    }
+
+    private InitiativeDetailDTO createInitiativeDetailDTO() {
+        InitiativeDetailDTO initiativeDetailDTO = new InitiativeDetailDTO();
+        initiativeDetailDTO.setInitiativeId(INITIATIVE_ID);
+        initiativeDetailDTO.setInitiativeName("TEST");
+        initiativeDetailDTO.setStatus("APPROVED");
+        initiativeDetailDTO.setDescription("test test");
+        initiativeDetailDTO.setEndDate(LocalDate.now());
+        initiativeDetailDTO.setRewardRule(createRewardRuleDTO(false));
+        initiativeDetailDTO.setRefundRule(null);
+        initiativeDetailDTO.setPrivacyLink("privacy.it");
+        initiativeDetailDTO.setTcLink("tc.it");
+        initiativeDetailDTO.setLogoFileName("logo.png");
+        return initiativeDetailDTO;
+    }
+
+    private InitiativeRewardRuleDTO createRewardRuleDTO(boolean isRewardFixedValue) {
+        if (isRewardFixedValue) {
+            //TODO Aggiungere RewardValue
+            return null;
+        } else {
+            RewardGroupsDTO rewardGroupsDTO = new RewardGroupsDTO();
+            RewardGroupsDTO.RewardGroupDTO rewardGroupDTO1 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(10), BigDecimal.valueOf(20), BigDecimal.valueOf(30));
+            RewardGroupsDTO.RewardGroupDTO rewardGroupDTO2 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(10), BigDecimal.valueOf(30), BigDecimal.valueOf(40));
+            List<RewardGroupsDTO.RewardGroupDTO> rewardGroupDTOList = new ArrayList<>();
+            rewardGroupDTOList.add(rewardGroupDTO1);
+            rewardGroupDTOList.add(rewardGroupDTO2);
+            rewardGroupsDTO.setRewardGroups(rewardGroupDTOList);
+            return rewardGroupsDTO;
+        }
     }
 
 }

@@ -439,5 +439,9 @@ public interface InitiativeApi {
           @PageableDefault(size = 10) Pageable pageable,
           @RequestParam(required = false) String beneficiary,
           @RequestParam(required = false) String state);
+
+  @GetMapping(value = "/idpay/initiative/{initiativeId}/detail")
+  ResponseEntity<InitiativeDetailDTO> getInitiativeBeneficiaryDetail(
+          @PathVariable("initiativeId") String initiativeId);
 }
 

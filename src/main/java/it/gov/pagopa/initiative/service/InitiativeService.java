@@ -1,9 +1,6 @@
 package it.gov.pagopa.initiative.service;
 
-import it.gov.pagopa.initiative.dto.BeneficiaryRankingPageDTO;
-import it.gov.pagopa.initiative.dto.InitiativeOrganizationInfoDTO;
-import it.gov.pagopa.initiative.dto.LogoDTO;
-import it.gov.pagopa.initiative.dto.OnboardingDTO;
+import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeAdditional;
 import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
@@ -20,7 +17,6 @@ public interface InitiativeService {
     List<Initiative> retrieveInitiativeSummary(String organizationId, String role);
     List<Initiative> getInitiativesIssuerList();
 
-//    Initiative insertInitiative(Initiative initiative, String organizationId);
     Initiative insertInitiative(Initiative initiative, String organizationId, String organizationName, String role);
 
     Initiative getInitiative(String organizationId, String initiativeId, String role);
@@ -63,4 +59,5 @@ public interface InitiativeService {
     OnboardingDTO getOnboardingStatusList(String organizationId, String initiativeId, String CF, LocalDateTime startDate, LocalDateTime endDate, String status, Pageable pageable);
     BeneficiaryRankingPageDTO getRankingList(String organizationId, String initiativeId,  Pageable pageable, String beneficiary, String state);
     void validate(String contentType, String fileName);
+    InitiativeDetailDTO getInitiativeBeneficiaryDetail(String initiativeId);
 }
