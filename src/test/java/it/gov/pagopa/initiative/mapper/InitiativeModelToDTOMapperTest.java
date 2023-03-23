@@ -1,5 +1,6 @@
 package it.gov.pagopa.initiative.mapper;
 
+import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.rule.refund.AccumulatedAmountDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
@@ -23,6 +24,7 @@ import it.gov.pagopa.initiative.model.rule.trx.*;
 import it.gov.pagopa.initiative.service.AESTokenService;
 import it.gov.pagopa.initiative.utils.InitiativeUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -52,7 +54,8 @@ class InitiativeModelToDTOMapperTest {
     public static final String API_KEY_CLIENT_ASSERTION = "apiKeyClientAssertion";
     public static final String ENCRYPTED_API_KEY_CLIENT_ID = "encryptedApiKeyClientId";
     public static final String ENCRYPTED_API_KEY_CLIENT_ASSERTION = "encryptedApiKeyClientAssertion";
-    public static final String INITIATIVE_ID = "initiativeId";
+    public static final String ITALIAN_LANGUAGE = "it";
+
     @Autowired
     InitiativeModelToDTOMapper initiativeModelToDTOMapper;
     @MockBean
@@ -86,7 +89,6 @@ class InitiativeModelToDTOMapperTest {
     private Initiative fullInitiativeStep4ThresholdNull;
     private InitiativeAdditionalDTO initiativeAdditionalDTOOnlyTokens;
     private InitiativeAdditional initiativeAdditionalOnlyTokens;
-    private InitiativeIssuerDTO initiativeIssuerDTO;
     private InitiativeDetailDTO fullInitiativeDetailDTO;
 
     @MockBean
@@ -135,25 +137,107 @@ class InitiativeModelToDTOMapperTest {
     }
 
     @Test
-    void toInitiativeDataDTO_returnNull() {
+    void toInitiativeDataDTO_Null() {
+
+        initiativeModelToDTOMapper.toInitiativeDataDTO(null, Locale.ITALIAN);
+        assertNull(null);
+    }
+
+    @Test
+    void toInitiativeDataDTO_ok() {
+        Initiative initiative = createStep4Initiative();
+        initiative.getAdditionalInfo().setLogoFileName("logo.png");
+        Locale acceptLanguage = Locale.ENGLISH;
+
+        Mockito.when(initiativeUtils.createLogoUrl(initiative.getOrganizationId(), initiative.getInitiativeId())).thenReturn("https://test" + String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE,
+                initiative.getOrganizationId(),initiative.getInitiativeId(), InitiativeConstants.Logo.LOGO_NAME));
+
+        InitiativeDataDTO initiativeDataDTO = initiativeModelToDTOMapper.toInitiativeDataDTO(initiative, acceptLanguage);
+
+        assertEquals(initiative.getInitiativeId(), initiativeDataDTO.getInitiativeId());
+        assertEquals(initiative.getInitiativeName(), initiativeDataDTO.getInitiativeName());
+        assertEquals(ITALIAN_LANGUAGE, initiativeDataDTO.getDescription());
+        assertEquals(initiative.getOrganizationId(), initiativeDataDTO.getOrganizationId());
+        assertEquals(initiative.getOrganizationName(), initiativeDataDTO.getOrganizationName());
+        assertEquals(initiative.getAdditionalInfo().getTcLink(), initiativeDataDTO.getTcLink());
+        assertEquals(initiative.getAdditionalInfo().getPrivacyLink(), initiativeDataDTO.getPrivacyLink());
+        assertEquals("https://test" + String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE,
+                initiative.getOrganizationId(),initiative.getInitiativeId(), InitiativeConstants.Logo.LOGO_NAME), initiativeDataDTO.getLogoURL());
+    }
+
+    @Test
+    void toInitiativeDataDTO_GeneralNullLogoFileNameNull() {
+        Initiative initiative = createStep4Initiative();
+        initiative.getAdditionalInfo().setLogoFileName(null);
+        initiative.setGeneral(null);
+        Locale acceptLanguage = Locale.ITALIAN;
+        String description = StringUtils.EMPTY;
+        String logoURL = StringUtils.EMPTY;
+
+        InitiativeDataDTO initiativeDataDTO = initiativeModelToDTOMapper.toInitiativeDataDTO(initiative, acceptLanguage);
+
+        assertEquals(initiative.getInitiativeId(), initiativeDataDTO.getInitiativeId());
+        assertEquals(initiative.getInitiativeName(), initiativeDataDTO.getInitiativeName());
+        assertEquals(description, initiativeDataDTO.getDescription());
+        assertEquals(initiative.getOrganizationId(), initiativeDataDTO.getOrganizationId());
+        assertEquals(initiative.getOrganizationName(), initiativeDataDTO.getOrganizationName());
+        assertEquals(initiative.getAdditionalInfo().getTcLink(), initiativeDataDTO.getTcLink());
+        assertEquals(initiative.getAdditionalInfo().getPrivacyLink(), initiativeDataDTO.getPrivacyLink());
+        assertEquals(logoURL, initiativeDataDTO.getLogoURL());
+
+    }
+
+    @Test
+    void toInitiativeDataDTO_DescriptionMapNull() {
+        Initiative initiative = createStep4Initiative();
+        initiative.getGeneral().setDescriptionMap(null);
+        Locale language = Locale.ITALIAN;
+        String description = StringUtils.EMPTY;
+        String logoURL = StringUtils.EMPTY;
+
+        InitiativeDataDTO initiativeDataDTO = initiativeModelToDTOMapper.toInitiativeDataDTO(initiative, language);
+
+        initiativeModelToDTOMapper.toInitiativeDataDTO(initiative, language);
+        assertEquals(initiative.getInitiativeId(), initiativeDataDTO.getInitiativeId());
+        assertEquals(initiative.getInitiativeName(), initiativeDataDTO.getInitiativeName());
+        assertEquals(description, initiativeDataDTO.getDescription());
+        assertEquals(initiative.getOrganizationId(), initiativeDataDTO.getOrganizationId());
+        assertEquals(initiative.getOrganizationName(), initiativeDataDTO.getOrganizationName());
+        assertEquals(initiative.getAdditionalInfo().getTcLink(), initiativeDataDTO.getTcLink());
+        assertEquals(initiative.getAdditionalInfo().getPrivacyLink(), initiativeDataDTO.getPrivacyLink());
+        assertEquals(logoURL, initiativeDataDTO.getLogoURL());
+    }
+
+    @Test
+    void toInitiativeDataDTO_AdditionalInfoNull() {
+        Initiative initiative = createStep4Initiative();
+        initiative.setAdditionalInfo(null);
+        Locale language = Locale.ITALIAN;
+
         try {
-            initiativeModelToDTOMapper.toInitiativeDataDTO(null, Locale.ITALIAN);
-        } catch (Exception e) {
-            assertNull(null);
+            initiativeModelToDTOMapper.toInitiativeDataDTO(initiative, language);
+        } catch (Exception e){
+            Assertions.assertTrue(e.getMessage().contains("null"));
         }
     }
 
     @Test
-    void toInitiativeDataDTO_getGeneralNull() {
+    void toInitiativeDataDTO_LogoFileNameNull() {
         Initiative initiative = createStep4Initiative();
-        initiative.setGeneral(createInitiativeGeneral());
+        initiative.getAdditionalInfo().setLogoFileName(null);
         Locale language = Locale.ITALIAN;
-        Locale acceptLanguage = Locale.ENGLISH;
-        String description = StringUtils.EMPTY;
+        String logoURL = StringUtils.EMPTY;
 
-        initiativeModelToDTOMapper.toInitiativeDataDTO(initiative, language);
-        assertEquals(description, StringUtils.defaultString(initiative.getGeneral().getDescriptionMap().get(language)));
-        assertEquals(description, StringUtils.defaultString(initiative.getGeneral().getDescriptionMap().get(acceptLanguage.getLanguage())));
+        InitiativeDataDTO initiativeDataDTO = initiativeModelToDTOMapper.toInitiativeDataDTO(initiative, language);
+        assertEquals(StringUtils.EMPTY, logoURL);
+        assertEquals(initiative.getInitiativeId(), initiativeDataDTO.getInitiativeId());
+        assertEquals(initiative.getInitiativeName(), initiativeDataDTO.getInitiativeName());
+        assertEquals(ITALIAN_LANGUAGE, initiativeDataDTO.getDescription());
+        assertEquals(initiative.getOrganizationId(), initiativeDataDTO.getOrganizationId());
+        assertEquals(initiative.getOrganizationName(), initiativeDataDTO.getOrganizationName());
+        assertEquals(initiative.getAdditionalInfo().getTcLink(), initiativeDataDTO.getTcLink());
+        assertEquals(initiative.getAdditionalInfo().getPrivacyLink(), initiativeDataDTO.getPrivacyLink());
+        assertEquals(logoURL, initiativeDataDTO.getLogoURL());
     }
 
     @Test
@@ -241,15 +325,6 @@ class InitiativeModelToDTOMapperTest {
         InitiativeDetailDTO initiativeDetailDTO = initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative);
 
         assertEquals(fullInitiativeDetailDTO, initiativeDetailDTO);
-    }
-
-    @Test
-    void toInitiativeDetailDTO_Null() {
-        try {
-            initiativeModelToDTOMapper.toInitiativeDetailDTO(null);
-        } catch (Exception e) {
-            assertNull(null);
-        }
     }
 
     @Test
@@ -420,7 +495,7 @@ class InitiativeModelToDTOMapperTest {
 
     private InitiativeGeneral createInitiativeGeneral() {
         Map<String, String> language = new HashMap<>();
-        language.put(Locale.ITALIAN.getLanguage(), "it");
+        language.put(Locale.ITALIAN.getLanguage(), ITALIAN_LANGUAGE);
         InitiativeGeneral initiativeGeneral = new InitiativeGeneral();
         initiativeGeneral.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneral.setBeneficiaryKnown(true);
@@ -513,7 +588,7 @@ class InitiativeModelToDTOMapperTest {
 
     private InitiativeGeneralDTO createInitiativeGeneralDTO() {
         Map<String, String> language = new HashMap<>();
-        language.put(Locale.ITALIAN.getLanguage(), "it");
+        language.put(Locale.ITALIAN.getLanguage(), ITALIAN_LANGUAGE);
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(true);

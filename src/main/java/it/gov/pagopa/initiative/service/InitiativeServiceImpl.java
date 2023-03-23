@@ -474,7 +474,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
     @Override
     public Initiative getInitiativeIdFromServiceId(String serviceId) {
-        return initiativeRepository.retrieveServiceId(serviceId)
+        return initiativeRepository.retrieveByServiceId(serviceId)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_ID_BY_SERVICE_ID_MESSAGE, serviceId),
