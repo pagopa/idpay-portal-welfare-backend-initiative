@@ -229,7 +229,7 @@ class InitiativeServiceTest {
     void retrieveInitiativeSummary_ko() {
         //Try to call the Real Service (which is using the instructed Repo)
         try {
-            List<Initiative> initiatives = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, ADMIN);
+            initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, ADMIN);
         } catch (InitiativeException e) {
             System.out.println("InitiativeException: " + e.getCode());
             assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
@@ -283,17 +283,17 @@ class InitiativeServiceTest {
     @Test
     void getInitiativeIdFromServiceId_thenValidationIsPassed() {
         Initiative step1Initiative = createStep1Initiative();
-        when(initiativeRepository.retrieveServiceId(SERVICE_ID)).thenReturn(Optional.ofNullable(step1Initiative));
+        when(initiativeRepository.retrieveByServiceId(SERVICE_ID)).thenReturn(Optional.ofNullable(step1Initiative));
         Initiative initiative = initiativeService.getInitiativeIdFromServiceId(SERVICE_ID);
         assertEquals(step1Initiative, initiative);
-        verify(initiativeRepository, times(1)).retrieveServiceId(SERVICE_ID);
+        verify(initiativeRepository, times(1)).retrieveByServiceId(SERVICE_ID);
     }
 
     @Test
     void getInitiativeIdFromServiceId_throwInitiativeException_thenValidationFailed() {
-        when(initiativeRepository.retrieveServiceId(SERVICE_ID)).thenReturn(Optional.empty());
+        when(initiativeRepository.retrieveByServiceId(SERVICE_ID)).thenReturn(Optional.empty());
         Mockito.doThrow(new InitiativeException(NotFound.CODE,
-                String.format(NotFound.INITIATIVE_ID_BY_SERVICE_ID_MESSAGE, SERVICE_ID),HttpStatus.NOT_FOUND)).when(initiativeRepository).retrieveServiceId("");
+                String.format(NotFound.INITIATIVE_ID_BY_SERVICE_ID_MESSAGE, SERVICE_ID),HttpStatus.NOT_FOUND)).when(initiativeRepository).retrieveByServiceId("");
         try {
             initiativeService.getInitiativeIdFromServiceId(SERVICE_ID);
         } catch (InitiativeException e) {
@@ -596,7 +596,7 @@ class InitiativeServiceTest {
         Mockito.when(initiativeUtils.getAllowedInitiativeLogoExtensions()).thenReturn(logoExtension);
         Mockito.when(initiativeUtils.getAllowedInitiativeLogoMimeTypes()).thenReturn(logoMimeTypes);
         try {
-            LogoDTO logoDTO = initiativeService.storeInitiativeLogo(ORGANIZATION_ID, INITIATIVE_ID, logo, LOGO_MIME_TYPE,
+            initiativeService.storeInitiativeLogo(ORGANIZATION_ID, INITIATIVE_ID, logo, LOGO_MIME_TYPE,
                     "logo.jpg");
         } catch(Exception e) {
             assertTrue(e.getMessage().contains("Invalid file extension"));
@@ -619,7 +619,7 @@ class InitiativeServiceTest {
         Mockito.when(initiativeUtils.getAllowedInitiativeLogoExtensions()).thenReturn(logoExtension);
         Mockito.when(initiativeUtils.getAllowedInitiativeLogoMimeTypes()).thenReturn(logoMimeTypes);
         try {
-            LogoDTO logoDTO = initiativeService.storeInitiativeLogo(ORGANIZATION_ID, INITIATIVE_ID, logo, "image/jpg",
+            initiativeService.storeInitiativeLogo(ORGANIZATION_ID, INITIATIVE_ID, logo, "image/jpg",
                     FILE_NAME);
         } catch(Exception e) {
             assertTrue(e.getMessage().contains("allowed only"));
@@ -1166,7 +1166,7 @@ class InitiativeServiceTest {
     @Test
     void getRankingList_initiative_not_found() {
         try {
-            BeneficiaryRankingPageDTO beneficiaryRankingDTO = initiativeService.getRankingList(ORGANIZATION_ID,INITIATIVE_ID,null, "",
+            initiativeService.getRankingList(ORGANIZATION_ID,INITIATIVE_ID,null, "",
                     Status.PUBLISHED);
             Assertions.fail();
         } catch (InitiativeException e) {
@@ -1181,7 +1181,7 @@ class InitiativeServiceTest {
         Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
         Mockito.doThrow(new InitiativeException(InternalServerError.CODE, "", HttpStatus.INTERNAL_SERVER_ERROR)).when(encryptRestConnector).upsertToken(Mockito.any());
         try {
-            BeneficiaryRankingPageDTO beneficiaryRankingDTO = initiativeService.getRankingList(ORGANIZATION_ID,INITIATIVE_ID,null, "",
+            initiativeService.getRankingList(ORGANIZATION_ID,INITIATIVE_ID,null, "",
                     Status.PUBLISHED);
             Assertions.fail();
         } catch (InitiativeException e) {
@@ -1201,7 +1201,7 @@ class InitiativeServiceTest {
         Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
         Mockito.doThrow(new InitiativeException(InternalServerError.CODE, "", HttpStatus.INTERNAL_SERVER_ERROR)).when(decryptRestConnector).getPiiByToken(Mockito.anyString());
         try {
-            BeneficiaryRankingPageDTO beneficiaryRankingDTO = initiativeService.getRankingList(ORGANIZATION_ID,INITIATIVE_ID,null, "",
+            initiativeService.getRankingList(ORGANIZATION_ID,INITIATIVE_ID,null, "",
                     Status.PUBLISHED);
             Assertions.fail();
         } catch (InitiativeException e) {
@@ -1217,7 +1217,7 @@ class InitiativeServiceTest {
         Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
         Mockito.doThrow(new InitiativeException(InternalServerError.CODE, "", HttpStatus.INTERNAL_SERVER_ERROR)).when(rankingRestConnector).getRankingList(Mockito.anyString(),Mockito.anyString(),Mockito.any(),Mockito.anyString(),Mockito.anyString());
         try {
-            BeneficiaryRankingPageDTO beneficiaryRankingDTO = initiativeService.getRankingList(ORGANIZATION_ID,INITIATIVE_ID,null, "",
+            initiativeService.getRankingList(ORGANIZATION_ID,INITIATIVE_ID,null, "",
                     Status.PUBLISHED);
             Assertions.fail();
         } catch (InitiativeException e) {
@@ -1232,7 +1232,7 @@ class InitiativeServiceTest {
         initiative.getGeneral().setRankingEnabled(false);
         Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
         try {
-            BeneficiaryRankingPageDTO beneficiaryRankingDTO = initiativeService.getRankingList(ORGANIZATION_ID,INITIATIVE_ID,null, "",
+            initiativeService.getRankingList(ORGANIZATION_ID,INITIATIVE_ID,null, "",
                     Status.PUBLISHED);
             Assertions.fail();
         } catch (InitiativeException e) {
@@ -1300,7 +1300,7 @@ class InitiativeServiceTest {
         Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
         Mockito.doThrow(new InitiativeException(InternalServerError.CODE, "", HttpStatus.INTERNAL_SERVER_ERROR)).when(onboardingRestConnector).getOnboarding(INITIATIVE_ID, null, USER_ID, STARTDATE, ENDDATE, STATUS);
         try {
-            OnboardingDTO onboardingDTO1 = initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID, CF, STARTDATE, ENDDATE, STATUS, null);
+            initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID, CF, STARTDATE, ENDDATE, STATUS, null);
             Assertions.fail();
         } catch (InitiativeException e) {
             assertEquals(InternalServerError.CODE,e.getCode());
@@ -1310,7 +1310,7 @@ class InitiativeServiceTest {
     @Test
     void getOnboardingStatusList_initiative_internal_server_error() {
         try {
-            OnboardingDTO onboardingDTO1 = initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID, CF, STARTDATE, ENDDATE, STATUS, null);
+            initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID, CF, STARTDATE, ENDDATE, STATUS, null);
             Assertions.fail();
         } catch (InitiativeException e) {
             assertEquals(InternalServerError.CODE,e.getCode());

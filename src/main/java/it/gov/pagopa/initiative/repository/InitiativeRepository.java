@@ -33,9 +33,17 @@ public interface InitiativeRepository extends MongoRepository<Initiative, String
 
     @Query(
             value = "{'additionalInfo.serviceId' : ?0}",
-            fields = "{initiativeId : 1, 'general.descriptionMap' : 1}"
+            fields = "{initiativeId : 1, " +
+                    "initiativeName : 1, " +
+                    "'general.descriptionMap' : 1, " +
+                    "organizationId : 1, " +
+                    "organizationName : 1, " +
+                    "'additionalInfo.tcLink' : 1, " +
+                    "'additionalInfo.privacyLink' : 1, " +
+                    "'additionalInfo.logoFileName' : 1" +
+                    "}"
     )
-    Optional<Initiative> retrieveServiceId(String serviceId);
+    Optional<Initiative> retrieveByServiceId(String serviceId);
 
     OrganizationDTO findFirstByOrganizationId(String organizationId);
 }
