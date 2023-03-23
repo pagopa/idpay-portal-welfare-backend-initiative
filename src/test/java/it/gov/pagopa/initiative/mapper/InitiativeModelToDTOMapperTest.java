@@ -55,8 +55,7 @@ class InitiativeModelToDTOMapperTest {
     public static final String ENCRYPTED_API_KEY_CLIENT_ID = "encryptedApiKeyClientId";
     public static final String ENCRYPTED_API_KEY_CLIENT_ASSERTION = "encryptedApiKeyClientAssertion";
     public static final String ITALIAN_LANGUAGE = "it";
-    public static final String INITIATIVE_ID = "initiativeId";
-    
+
     @Autowired
     InitiativeModelToDTOMapper initiativeModelToDTOMapper;
     @MockBean
@@ -131,6 +130,7 @@ class InitiativeModelToDTOMapperTest {
         fullInitiativeDTOStep4ThresholdNull = createStep4InitiativeDTOThresholdNull();
         initiativeAdditionalOnlyTokens = createInitiativeAdditionalOnlyTokens();
         initiativeAdditionalDTOOnlyTokens = createInitiativeAdditionalDTOOnlyTokens();
+        fullInitiativeDetailDTO = createInitiativeDetailDTO();
 
         Mockito.when(aesTokenService.decrypt(ENCRYPTED_API_KEY_CLIENT_ID)).thenReturn(API_KEY_CLIENT_ID);
         Mockito.when(aesTokenService.decrypt(ENCRYPTED_API_KEY_CLIENT_ASSERTION)).thenReturn(API_KEY_CLIENT_ASSERTION);
@@ -325,15 +325,6 @@ class InitiativeModelToDTOMapperTest {
         InitiativeDetailDTO initiativeDetailDTO = initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative);
 
         assertEquals(fullInitiativeDetailDTO, initiativeDetailDTO);
-    }
-
-    @Test
-    void toInitiativeDetailDTO_Null() {
-        try {
-            initiativeModelToDTOMapper.toInitiativeDetailDTO(null);
-        } catch (Exception e) {
-            assertNull(null);
-        }
     }
 
     @Test
