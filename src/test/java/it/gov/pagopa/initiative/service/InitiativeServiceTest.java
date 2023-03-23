@@ -436,6 +436,32 @@ class InitiativeServiceTest {
     }
 
     @Test
+    void getInitiativeBeneficiaryDetail_ok() {
+       Initiative fullInitiative = createFullInitiative();
+
+       when(initiativeRepository.findByInitiativeId(anyString())).thenReturn(Optional.of(fullInitiative));
+       InitiativeDetailDTO initiativeDetailDTO = createInitiativeDetailDTO();
+       when(initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative)).thenReturn(initiativeDetailDTO);
+       InitiativeDetailDTO initiativeDetailDTO1 = initiativeService.getInitiativeBeneficiaryDetail(INITIATIVE_ID);
+
+       assertEquals(initiativeDetailDTO,initiativeDetailDTO1);
+
+    }
+
+    @Test
+    void getInitiativeBeneficiaryDetail_ko() {
+
+        when(initiativeRepository.findByInitiativeId(anyString())).thenReturn(Optional.empty());
+        try {
+            initiativeService.getInitiativeBeneficiaryDetail(INITIATIVE_ID);
+        } catch (InitiativeException e){
+            assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
+            assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
+        }
+
+    }
+
+    @Test
     void getInitiativeBeneficiaryView_ok() {
         Initiative step2Initiative = createStep2Initiative();
 
@@ -451,6 +477,7 @@ class InitiativeServiceTest {
         // you are expecting repo to be called once with correct param
         verify(initiativeRepository).retrieveInitiativeBeneficiaryView(INITIATIVE_ID, true); // same as: verify(initiativeRepository, times(1)).retrieveInitiativeSummary(anyString());
     }
+
 
     @Test
     void getInitiativeBeneficiaryView_ko() {
@@ -1650,6 +1677,21 @@ class InitiativeServiceTest {
         initiativeDTO.setRewardRule(createRewardRuleDTO(false));
         initiativeDTO.setTrxRule(createTrxRuleConditionDTO());
         return initiativeDTO;
+    }
+
+    private InitiativeDetailDTO createInitiativeDetailDTO() {
+        InitiativeDetailDTO initiativeDetailDTO = new InitiativeDetailDTO();
+        initiativeDetailDTO.setInitiativeId(INITIATIVE_ID);
+        initiativeDetailDTO.setInitiativeName("TEST");
+        initiativeDetailDTO.setStatus("APPROVED");
+        initiativeDetailDTO.setDescription("test test");
+        initiativeDetailDTO.setEndDate(LocalDate.now());
+        initiativeDetailDTO.setRewardRule(createRewardRuleDTO(false));
+        initiativeDetailDTO.setRefundRule(null);
+        initiativeDetailDTO.setPrivacyLink("privacy.it");
+        initiativeDetailDTO.setTcLink("tc.it");
+        initiativeDetailDTO.setLogoFileName("logo.png");
+        return initiativeDetailDTO;
     }
 
     private InitiativeRewardRuleDTO createRewardRuleDTO(boolean isRewardFixedValue) {

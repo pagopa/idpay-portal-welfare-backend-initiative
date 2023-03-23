@@ -42,4 +42,7 @@ public class Initiative {
     private InitiativeRefundRule refundRule;
     private Boolean enabled;
 
+
+    public Initiative(String initiativeName, String status) {
+    }
 }
