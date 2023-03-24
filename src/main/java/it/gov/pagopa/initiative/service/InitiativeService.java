@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public interface InitiativeService {
@@ -59,5 +60,5 @@ public interface InitiativeService {
     OnboardingDTO getOnboardingStatusList(String organizationId, String initiativeId, String CF, LocalDateTime startDate, LocalDateTime endDate, String status, Pageable pageable);
     BeneficiaryRankingPageDTO getRankingList(String organizationId, String initiativeId,  Pageable pageable, String beneficiary, String state);
     void validate(String contentType, String fileName);
-    InitiativeDetailDTO getInitiativeBeneficiaryDetail(String initiativeId);
+    InitiativeDetailDTO getInitiativeBeneficiaryDetail(String initiativeId, Locale acceptLanguage);
 }

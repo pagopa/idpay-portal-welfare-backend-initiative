@@ -8,19 +8,24 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class InitiativeDetailDTO {
-    private String initiativeId;
     private String initiativeName;
     private String status;
     private String description;
+    private String ruleDescription;
     private LocalDate endDate;
+    private LocalDate rankingStartDate;
+    private LocalDate rankingEndDate;
     private InitiativeRewardRuleDTO rewardRule;
     private InitiativeRefundRuleDTO refundRule;
     private String privacyLink;
     private String tcLink;
-    private String logoFileName;
+    private String logoURL;
+    private LocalDateTime updateDate;
 }

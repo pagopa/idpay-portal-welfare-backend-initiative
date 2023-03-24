@@ -69,18 +69,34 @@ public class InitiativeModelToDTOMapper {
                 .build();
     }
 
-    public  InitiativeDetailDTO toInitiativeDetailDTO(Initiative initiative) {
+    public  InitiativeDetailDTO toInitiativeDetailDTO(Initiative initiative,Locale acceptLanguage) {
+        String ruleDescription = StringUtils.EMPTY;
+        String logoURL = null;
+        if (initiative.getGeneral() != null && initiative.getGeneral().getDescriptionMap() != null) {
+            //if no description for the given accepted language, try the default to italian
+            ruleDescription = StringUtils.defaultString(
+                    initiative.getGeneral().getDescriptionMap().get(acceptLanguage.getLanguage()),
+                    initiative.getGeneral().getDescriptionMap().get(Locale.ITALIAN.getLanguage())
+            );
+        }
+        if(initiative.getAdditionalInfo() != null && initiative.getAdditionalInfo().getLogoFileName() != null){
+            logoURL = initiativeUtils.createLogoUrl(initiative.getOrganizationId(),
+                    initiative.getInitiativeId());
+        }
         return InitiativeDetailDTO.builder()
-                .initiativeId(initiative.getInitiativeId())
                 .initiativeName(initiative.getInitiativeName())
                 .status(initiative.getStatus())
                 .description(initiative.getAdditionalInfo().getDescription())
+                .ruleDescription(ruleDescription)
                 .endDate(initiative.getGeneral().getEndDate())
+                .rankingStartDate(initiative.getGeneral().getRankingStartDate())
+                .rankingEndDate(initiative.getGeneral().getRankingEndDate())
                 .rewardRule(this.toRewardRuleDTOWithoutType(initiative.getRewardRule()))
-                .refundRule(this.toInitiativeRefundRuleDTO((initiative.getRefundRule())))
+                .refundRule(this.toInitiativeRefundRuleDTOWithoutAdditionalInfo((initiative.getRefundRule())))
                 .privacyLink(initiative.getAdditionalInfo().getPrivacyLink())
                 .tcLink(initiative.getAdditionalInfo().getTcLink())
-                .logoFileName(initiative.getAdditionalInfo().getLogoFileName())
+                .logoURL(logoURL)
+                .updateDate(initiative.getUpdateDate())
                 .build();
     }
 
@@ -412,6 +428,15 @@ public class InitiativeModelToDTOMapper {
         initiativeRefundRuleDTO.setAccumulatedAmount(toAccomulatedAmountDTO(refundRule.getAccumulatedAmount()));
         initiativeRefundRuleDTO.setTimeParameter(toTimeParameterDTO(refundRule.getTimeParameter()));
         initiativeRefundRuleDTO.setAdditionalInfo(toAdditionalInfoDTO(refundRule.getAdditionalInfo()));
+        return initiativeRefundRuleDTO;
+    }
+    public InitiativeRefundRuleDTO toInitiativeRefundRuleDTOWithoutAdditionalInfo(InitiativeRefundRule refundRule){
+        if (refundRule == null){
+            return null;
+        }
+        InitiativeRefundRuleDTO initiativeRefundRuleDTO = new InitiativeRefundRuleDTO();
+        initiativeRefundRuleDTO.setAccumulatedAmount(toAccomulatedAmountDTO(refundRule.getAccumulatedAmount()));
+        initiativeRefundRuleDTO.setTimeParameter(toTimeParameterDTO(refundRule.getTimeParameter()));
         return initiativeRefundRuleDTO;
     }
 

@@ -438,11 +438,12 @@ class InitiativeServiceTest {
     @Test
     void getInitiativeBeneficiaryDetail_ok() {
        Initiative fullInitiative = createFullInitiative();
+       Locale acceptLanguage = Locale.ITALIAN;
 
        when(initiativeRepository.findByInitiativeIdAndStatusIn(anyString(),anyList())).thenReturn(Optional.of(fullInitiative));
        InitiativeDetailDTO initiativeDetailDTO = createInitiativeDetailDTO();
-       when(initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative)).thenReturn(initiativeDetailDTO);
-       InitiativeDetailDTO initiativeDetailDTO1 = initiativeService.getInitiativeBeneficiaryDetail(INITIATIVE_ID);
+       when(initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative,acceptLanguage)).thenReturn(initiativeDetailDTO);
+       InitiativeDetailDTO initiativeDetailDTO1 = initiativeService.getInitiativeBeneficiaryDetail(INITIATIVE_ID,acceptLanguage);
 
        assertEquals(initiativeDetailDTO,initiativeDetailDTO1);
 
@@ -451,9 +452,11 @@ class InitiativeServiceTest {
     @Test
     void getInitiativeBeneficiaryDetail_ko() {
 
+        Locale acceptLanguage = Locale.ITALIAN;
+
         when(initiativeRepository.findByInitiativeIdAndStatusIn(anyString(),anyList())).thenReturn(Optional.empty());
         try {
-            initiativeService.getInitiativeBeneficiaryDetail(INITIATIVE_ID);
+            initiativeService.getInitiativeBeneficiaryDetail(INITIATIVE_ID,acceptLanguage);
         } catch (InitiativeException e){
             assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
             assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
@@ -1681,16 +1684,18 @@ class InitiativeServiceTest {
 
     private InitiativeDetailDTO createInitiativeDetailDTO() {
         InitiativeDetailDTO initiativeDetailDTO = new InitiativeDetailDTO();
-        initiativeDetailDTO.setInitiativeId(INITIATIVE_ID);
         initiativeDetailDTO.setInitiativeName("TEST");
         initiativeDetailDTO.setStatus("APPROVED");
         initiativeDetailDTO.setDescription("test test");
         initiativeDetailDTO.setEndDate(LocalDate.now());
+        initiativeDetailDTO.setRankingStartDate(LocalDate.now());
+        initiativeDetailDTO.setRankingEndDate(LocalDate.now().plusDays(40));
         initiativeDetailDTO.setRewardRule(createRewardRuleDTO(false));
         initiativeDetailDTO.setRefundRule(null);
         initiativeDetailDTO.setPrivacyLink("privacy.it");
         initiativeDetailDTO.setTcLink("tc.it");
-        initiativeDetailDTO.setLogoFileName("logo.png");
+        initiativeDetailDTO.setLogoURL("logo.png");
+        initiativeDetailDTO.setUpdateDate(LocalDateTime.now());
         return initiativeDetailDTO;
     }
 

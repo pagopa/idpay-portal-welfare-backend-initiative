@@ -442,6 +442,6 @@ public interface InitiativeApi {
 
   @GetMapping(value = "/idpay/initiative/{initiativeId}/detail")
   ResponseEntity<InitiativeDetailDTO> getInitiativeBeneficiaryDetail(
-          @PathVariable("initiativeId") String initiativeId);
+          @PathVariable("initiativeId") String initiativeId,@RequestHeader(value = "Accept-Language", defaultValue = "it_IT") Locale acceptLanguage);
 }
 

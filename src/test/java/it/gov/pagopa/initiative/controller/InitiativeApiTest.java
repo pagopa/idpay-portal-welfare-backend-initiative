@@ -52,6 +52,7 @@ import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.IntStream;
@@ -1012,12 +1013,13 @@ class InitiativeApiTest {
         //create Dummy Initiative
         Initiative initiative = createStep5Initiative();
         InitiativeDetailDTO initiativeDetailDTO = createInitiativeDetailDTO();
+        Locale acceptLanguage = Locale.ITALIAN;
 
         // Instruct the Service to insert a Dummy Initiative
-        when(initiativeModelToDTOMapper.toInitiativeDetailDTO(initiative)).thenReturn(initiativeDetailDTO);
+        when(initiativeModelToDTOMapper.toInitiativeDetailDTO(initiative,acceptLanguage)).thenReturn(initiativeDetailDTO);
         // When
         // With this instruction, I instruct the service (via Mockito's when) to always return the DummyInitiative to me anytime I call the same service's function
-        when(initiativeService.getInitiativeBeneficiaryDetail(anyString())).thenReturn(initiativeDetailDTO);
+        when(initiativeService.getInitiativeBeneficiaryDetail(anyString(),any())).thenReturn(initiativeDetailDTO);
 
         //The MVC perform should perform the API by returning the response based on the Service previously mocked.
         mvc.perform(
@@ -1484,16 +1486,18 @@ class InitiativeApiTest {
 
     private InitiativeDetailDTO createInitiativeDetailDTO() {
         InitiativeDetailDTO initiativeDetailDTO = new InitiativeDetailDTO();
-        initiativeDetailDTO.setInitiativeId(INITIATIVE_ID);
         initiativeDetailDTO.setInitiativeName("TEST");
         initiativeDetailDTO.setStatus("APPROVED");
         initiativeDetailDTO.setDescription("test test");
         initiativeDetailDTO.setEndDate(LocalDate.now());
+        initiativeDetailDTO.setRankingStartDate(LocalDate.now());
+        initiativeDetailDTO.setRankingEndDate(LocalDate.now().plusDays(40));
         initiativeDetailDTO.setRewardRule(createRewardRuleDTO(false));
         initiativeDetailDTO.setRefundRule(null);
         initiativeDetailDTO.setPrivacyLink("privacy.it");
         initiativeDetailDTO.setTcLink("tc.it");
-        initiativeDetailDTO.setLogoFileName("logo.png");
+        initiativeDetailDTO.setLogoURL("logo.png");
+        initiativeDetailDTO.setUpdateDate(LocalDateTime.now());
         return initiativeDetailDTO;
     }
 

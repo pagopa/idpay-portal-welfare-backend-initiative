@@ -39,6 +39,7 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 
@@ -172,7 +173,6 @@ class InitiativeModelToDTOMapperTest {
         initiative.setGeneral(null);
         Locale acceptLanguage = Locale.ITALIAN;
         String description = StringUtils.EMPTY;
-        String logoURL = StringUtils.EMPTY;
 
         InitiativeDataDTO initiativeDataDTO = initiativeModelToDTOMapper.toInitiativeDataDTO(initiative, acceptLanguage);
 
@@ -183,7 +183,7 @@ class InitiativeModelToDTOMapperTest {
         assertEquals(initiative.getOrganizationName(), initiativeDataDTO.getOrganizationName());
         assertEquals(initiative.getAdditionalInfo().getTcLink(), initiativeDataDTO.getTcLink());
         assertEquals(initiative.getAdditionalInfo().getPrivacyLink(), initiativeDataDTO.getPrivacyLink());
-        assertEquals(logoURL, initiativeDataDTO.getLogoURL());
+        assertNull(initiativeDataDTO.getLogoURL());
 
     }
 
@@ -193,7 +193,6 @@ class InitiativeModelToDTOMapperTest {
         initiative.getGeneral().setDescriptionMap(null);
         Locale language = Locale.ITALIAN;
         String description = StringUtils.EMPTY;
-        String logoURL = StringUtils.EMPTY;
 
         InitiativeDataDTO initiativeDataDTO = initiativeModelToDTOMapper.toInitiativeDataDTO(initiative, language);
 
@@ -205,7 +204,7 @@ class InitiativeModelToDTOMapperTest {
         assertEquals(initiative.getOrganizationName(), initiativeDataDTO.getOrganizationName());
         assertEquals(initiative.getAdditionalInfo().getTcLink(), initiativeDataDTO.getTcLink());
         assertEquals(initiative.getAdditionalInfo().getPrivacyLink(), initiativeDataDTO.getPrivacyLink());
-        assertEquals(logoURL, initiativeDataDTO.getLogoURL());
+        assertNull(initiativeDataDTO.getLogoURL());
     }
 
     @Test
@@ -226,10 +225,8 @@ class InitiativeModelToDTOMapperTest {
         Initiative initiative = createStep4Initiative();
         initiative.getAdditionalInfo().setLogoFileName(null);
         Locale language = Locale.ITALIAN;
-        String logoURL = StringUtils.EMPTY;
 
         InitiativeDataDTO initiativeDataDTO = initiativeModelToDTOMapper.toInitiativeDataDTO(initiative, language);
-        assertEquals(StringUtils.EMPTY, logoURL);
         assertEquals(initiative.getInitiativeId(), initiativeDataDTO.getInitiativeId());
         assertEquals(initiative.getInitiativeName(), initiativeDataDTO.getInitiativeName());
         assertEquals(ITALIAN_LANGUAGE, initiativeDataDTO.getDescription());
@@ -237,7 +234,7 @@ class InitiativeModelToDTOMapperTest {
         assertEquals(initiative.getOrganizationName(), initiativeDataDTO.getOrganizationName());
         assertEquals(initiative.getAdditionalInfo().getTcLink(), initiativeDataDTO.getTcLink());
         assertEquals(initiative.getAdditionalInfo().getPrivacyLink(), initiativeDataDTO.getPrivacyLink());
-        assertEquals(logoURL, initiativeDataDTO.getLogoURL());
+        assertNull(initiativeDataDTO.getLogoURL());
     }
 
     @Test
@@ -322,10 +319,57 @@ class InitiativeModelToDTOMapperTest {
 
     @Test
     void toInitiativeDetailDTO_equals() {
-        InitiativeDetailDTO initiativeDetailDTO = initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative);
+        Locale acceptLanguage = Locale.ITALIAN;
+        fullInitiative.setUpdateDate(LocalDateTime.of(2023,03,20,12,00));
+        InitiativeDetailDTO initiativeDetailDTO = initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative,acceptLanguage);
 
         assertEquals(fullInitiativeDetailDTO, initiativeDetailDTO);
     }
+    @Test
+    void toInitiativeDetailDTOAdditionalInfo_Null () {
+        Locale acceptLanguage = Locale.ITALIAN;
+        fullInitiative.setAdditionalInfo(null);
+        try {
+            initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative,acceptLanguage);
+        } catch (Exception e) {
+            Assertions.assertTrue(e.getMessage().contains("null"));
+        }
+    }
+    @Test
+    void toInitiativeDetailDTOWithLogoURL() {
+        Locale acceptLanguage = Locale.ITALIAN;
+        fullInitiative.getAdditionalInfo().setLogoFileName("test.png");
+
+        Mockito.when(initiativeUtils.createLogoUrl(anyString(),anyString())).thenReturn("test.it");
+
+        InitiativeDetailDTO initiativeDetailDTO = initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative,acceptLanguage);
+
+        assertEquals("test.it", initiativeDetailDTO.getLogoURL());
+    }
+    @Test
+    void toInitiativeDetailDTOWithGeneralInfo_Null() {
+        Locale acceptLanguage = Locale.ITALIAN;
+        fullInitiative.setUpdateDate(LocalDateTime.of(2023,03,20,12,00));
+        fullInitiative.setGeneral(null);
+        try {
+            initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative,acceptLanguage);
+        } catch (Exception e) {
+            Assertions.assertTrue(e.getMessage().contains("null"));
+        }
+    }
+    @Test
+    void toInitiativeDetailDTOWithRuleDescription_Null() {
+        Locale acceptLanguage = Locale.ITALIAN;
+        fullInitiative.setUpdateDate(LocalDateTime.of(2023,03,20,12,00));
+        fullInitiative.getGeneral().setDescriptionMap(null);
+        fullInitiativeDetailDTO.setRuleDescription(StringUtils.EMPTY);
+
+        InitiativeDetailDTO initiativeDetailDTO = initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative,acceptLanguage);
+
+        assertEquals(fullInitiativeDetailDTO, initiativeDetailDTO);
+
+    }
+
 
     @Test
     void toInitiativeDTONull_equals() {
@@ -1602,21 +1646,24 @@ class InitiativeModelToDTOMapperTest {
 
     private InitiativeDetailDTO createInitiativeDetailDTO() {
         InitiativeDetailDTO initiativeDetailDTO = new InitiativeDetailDTO();
-        initiativeDetailDTO.setInitiativeId("Id1");
         initiativeDetailDTO.setInitiativeName("initiativeName1");
         initiativeDetailDTO.setStatus("DRAFT");
         initiativeDetailDTO.setDescription("Description");
+        initiativeDetailDTO.setRuleDescription(ITALIAN_LANGUAGE);
         LocalDate rankingStartDate = LocalDate.now();
         LocalDate rankingEndDate = rankingStartDate.plusDays(1);
         LocalDate startDate = rankingEndDate.plusDays(1);
         LocalDate endDate = startDate.plusDays(1);
         initiativeDetailDTO.setEndDate(endDate);
+        initiativeDetailDTO.setRankingStartDate(rankingStartDate);
+        initiativeDetailDTO.setRankingEndDate(rankingEndDate);
         initiativeDetailDTO.setRewardRule(createInitiativeRewardRuleDTORewardGroupDTO());
         initiativeDetailDTO.setRewardRule(createInitiativeRewardRuleDTORewardValueDTOWithoutType());
         initiativeDetailDTO.setRefundRule(null);
         initiativeDetailDTO.setPrivacyLink("privacyLink");
         initiativeDetailDTO.setTcLink("tcLink");
-        initiativeDetailDTO.setLogoFileName(null);
+        initiativeDetailDTO.setLogoURL(null);
+        initiativeDetailDTO.setUpdateDate(LocalDateTime.of(2023,03,20,12,00));
         return initiativeDetailDTO;
     }
 
