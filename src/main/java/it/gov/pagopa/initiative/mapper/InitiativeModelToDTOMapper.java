@@ -39,11 +39,13 @@ public class InitiativeModelToDTOMapper {
 
     @Autowired
     InitiativeUtils initiativeUtils;
+
     public InitiativeDataDTO toInitiativeDataDTO(Initiative initiative, Locale acceptLanguage) {
         if (initiative == null) {
             return null;
         }
         String description = StringUtils.EMPTY;
+        String logoURL = null;
         if (initiative.getGeneral() != null && initiative.getGeneral().getDescriptionMap() != null) {
             //if no description for the given accepted language, try the default to italian
             description = StringUtils.defaultString(
@@ -51,9 +53,50 @@ public class InitiativeModelToDTOMapper {
                     initiative.getGeneral().getDescriptionMap().get(Locale.ITALIAN.getLanguage())
             );
         }
+        if(initiative.getAdditionalInfo() != null && initiative.getAdditionalInfo().getLogoFileName() != null){
+            logoURL = initiativeUtils.createLogoUrl(initiative.getOrganizationId(),
+                    initiative.getInitiativeId());
+        }
         return InitiativeDataDTO.builder()
                 .initiativeId(initiative.getInitiativeId())
+                .initiativeName(initiative.getInitiativeName())
                 .description(description)
+                .organizationId(initiative.getOrganizationId())
+                .organizationName(initiative.getOrganizationName())
+                .tcLink(initiative.getAdditionalInfo().getTcLink())
+                .privacyLink(initiative.getAdditionalInfo().getPrivacyLink())
+                .logoURL(logoURL)
+                .build();
+    }
+
+    public  InitiativeDetailDTO toInitiativeDetailDTO(Initiative initiative,Locale acceptLanguage) {
+        String ruleDescription = StringUtils.EMPTY;
+        String logoURL = null;
+        if (initiative.getGeneral() != null && initiative.getGeneral().getDescriptionMap() != null) {
+            //if no description for the given accepted language, try the default to italian
+            ruleDescription = StringUtils.defaultString(
+                    initiative.getGeneral().getDescriptionMap().get(acceptLanguage.getLanguage()),
+                    initiative.getGeneral().getDescriptionMap().get(Locale.ITALIAN.getLanguage())
+            );
+        }
+        if(initiative.getAdditionalInfo() != null && initiative.getAdditionalInfo().getLogoFileName() != null){
+            logoURL = initiativeUtils.createLogoUrl(initiative.getOrganizationId(),
+                    initiative.getInitiativeId());
+        }
+        return InitiativeDetailDTO.builder()
+                .initiativeName(initiative.getInitiativeName())
+                .status(initiative.getStatus())
+                .description(initiative.getAdditionalInfo().getDescription())
+                .ruleDescription(ruleDescription)
+                .endDate(initiative.getGeneral().getEndDate())
+                .rankingStartDate(initiative.getGeneral().getRankingStartDate())
+                .rankingEndDate(initiative.getGeneral().getRankingEndDate())
+                .rewardRule(this.toRewardRuleDTOWithoutType(initiative.getRewardRule()))
+                .refundRule(this.toInitiativeRefundRuleDTOWithoutAdditionalInfo((initiative.getRefundRule())))
+                .privacyLink(initiative.getAdditionalInfo().getPrivacyLink())
+                .tcLink(initiative.getAdditionalInfo().getTcLink())
+                .logoURL(logoURL)
+                .updateDate(initiative.getUpdateDate())
                 .build();
     }
 
@@ -288,6 +331,26 @@ public class InitiativeModelToDTOMapper {
         return dto;
     }
 
+    private InitiativeRewardRuleDTO toRewardRuleDTOWithoutType(InitiativeRewardRule rewardRule) {
+        if (rewardRule == null) {
+            return null;
+        }
+        InitiativeRewardRuleDTO dto = null;
+        if (rewardRule instanceof RewardValue rewardValueInput) {
+            dto = RewardValueDTO.builder()
+                    .rewardValueType(rewardValueInput.getRewardValueType())
+                    .rewardValue(rewardValueInput.getRewardValue())
+                    .build();
+        } else if (rewardRule instanceof RewardGroups rewardGroupsInput) {
+            dto = RewardGroupsDTO.builder()
+                    .rewardGroups(rewardGroupsInput.getRewardGroups().stream().map(
+                            x -> RewardGroupsDTO.RewardGroupDTO.builder().from(x.getFrom()).to(x.getTo()).rewardValue(x.getRewardValue()).build()
+                    ).toList())
+                    .build();
+        }
+        return dto;
+    }
+
     private InitiativeTrxConditionsDTO toTrxRuleDTO(InitiativeTrxConditions trxRules) {
         if (trxRules == null) {
             return null;
@@ -365,6 +428,15 @@ public class InitiativeModelToDTOMapper {
         initiativeRefundRuleDTO.setAccumulatedAmount(toAccomulatedAmountDTO(refundRule.getAccumulatedAmount()));
         initiativeRefundRuleDTO.setTimeParameter(toTimeParameterDTO(refundRule.getTimeParameter()));
         initiativeRefundRuleDTO.setAdditionalInfo(toAdditionalInfoDTO(refundRule.getAdditionalInfo()));
+        return initiativeRefundRuleDTO;
+    }
+    public InitiativeRefundRuleDTO toInitiativeRefundRuleDTOWithoutAdditionalInfo(InitiativeRefundRule refundRule){
+        if (refundRule == null){
+            return null;
+        }
+        InitiativeRefundRuleDTO initiativeRefundRuleDTO = new InitiativeRefundRuleDTO();
+        initiativeRefundRuleDTO.setAccumulatedAmount(toAccomulatedAmountDTO(refundRule.getAccumulatedAmount()));
+        initiativeRefundRuleDTO.setTimeParameter(toTimeParameterDTO(refundRule.getTimeParameter()));
         return initiativeRefundRuleDTO;
     }
 

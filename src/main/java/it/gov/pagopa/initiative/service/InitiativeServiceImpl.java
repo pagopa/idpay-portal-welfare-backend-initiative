@@ -18,6 +18,7 @@ import it.gov.pagopa.initiative.dto.io.service.ServiceResponseDTO;
 import it.gov.pagopa.initiative.event.InitiativeProducer;
 import it.gov.pagopa.initiative.exception.InitiativeException;
 import it.gov.pagopa.initiative.mapper.InitiativeAdditionalDTOsToIOServiceRequestDTOMapper;
+import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.AutomatedCriteria;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeAdditional;
@@ -66,6 +67,8 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     private final InitiativeUtils initiativeUtils;
     private final AuditUtilities auditUtilities;
 
+    private final InitiativeModelToDTOMapper initiativeModelToDTOMapper;
+
     public InitiativeServiceImpl(
             @Value("${app.initiative.conditions.notifyEmail}") boolean notifyEmail,
             InitiativeRepository initiativeRepository,
@@ -81,7 +84,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             AESTokenService ioTokenService,
             InitiativeValidationService initiativeValidationService,
             InitiativeUtils initiativeUtils,
-            AuditUtilities auditUtilities){
+            AuditUtilities auditUtilities, InitiativeModelToDTOMapper initiativeModelToDTOMapper){
         this.notifyEmail = notifyEmail;
         this.initiativeRepository = initiativeRepository;
         this.initiativeProducer = initiativeProducer;
@@ -98,6 +101,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         this.initiativeValidationService = initiativeValidationService;
         this.initiativeUtils = initiativeUtils;
         this.auditUtilities = auditUtilities;
+        this.initiativeModelToDTOMapper = initiativeModelToDTOMapper;
     }
 
     public List<Initiative> retrieveInitiativeSummary(String organizationId, String role) {
@@ -114,7 +118,18 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     public List<Initiative> getInitiativesIssuerList() {
         return initiativeRepository.findByEnabledAndStatus(true, Status.PUBLISHED);
     }
+    @Override
+    public InitiativeDetailDTO getInitiativeBeneficiaryDetail(String initiativeId, Locale acceptLanguage) {
 
+        Initiative initiativeDetail = initiativeRepository.findByInitiativeIdAndStatusIn(initiativeId, List.of(Status.PUBLISHED,Status.CLOSED)).orElseThrow(() -> new InitiativeException(
+                InitiativeConstants.Exception.NotFound.CODE,
+                String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
+                HttpStatus.NOT_FOUND));
+
+
+        return initiativeModelToDTOMapper.toInitiativeDetailDTO(initiativeDetail,acceptLanguage);
+
+    }
     @Override
     public Initiative insertInitiative(Initiative initiative, String organizationId, String organizationName, String role) {
         long startTime = System.currentTimeMillis();
@@ -461,7 +476,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
     @Override
     public Initiative getInitiativeIdFromServiceId(String serviceId) {
-        return initiativeRepository.retrieveServiceId(serviceId)
+        return initiativeRepository.retrieveByServiceId(serviceId)
                 .orElseThrow(() -> new InitiativeException(
                         InitiativeConstants.Exception.NotFound.CODE,
                         String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_ID_BY_SERVICE_ID_MESSAGE, serviceId),

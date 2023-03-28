@@ -31,7 +31,6 @@ import static it.gov.pagopa.initiative.constants.InitiativeConstants.Email.TEMPL
 @RestController
 @Slf4j
 public class InitiativeApiController implements InitiativeApi {
-
     private final boolean notifyRE;
     private final boolean notifyIO;
     private final boolean notifyInternal;
@@ -56,7 +55,11 @@ public class InitiativeApiController implements InitiativeApi {
         this.initiativeModelToDTOMapper = initiativeModelToDTOMapper;
         this.initiativeDTOsToModelMapper = initiativeDTOsToModelMapper;
     }
-
+    @Override
+    public ResponseEntity<InitiativeDetailDTO> getInitiativeBeneficiaryDetail(String initiativeId, Locale acceptLanguage) {
+        InitiativeDetailDTO initiativeDetailDTO = initiativeService.getInitiativeBeneficiaryDetail(initiativeId,acceptLanguage);
+        return new ResponseEntity<>(initiativeDetailDTO,HttpStatus.OK);
+    }
     @Override
     public ResponseEntity<List<OrganizationDTO>> getListOfOrganization(String role) {
         log.info("[{}][GET_ORGANIZATION_LIST] - Start processing...", role);

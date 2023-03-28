@@ -16,6 +16,8 @@ import java.util.List;
 @EqualsAndHashCode
 @Builder
 public class InitiativeAdditional {
+
+
   public enum ServiceScope{
     LOCAL,
     NATIONAL
