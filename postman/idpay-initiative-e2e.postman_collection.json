@@ -17668,66 +17668,6 @@
 												}
 											},
 											"response": []
-										},
-										{
-											"name": "Status Onboarding",
-											"event": [
-												{
-													"listen": "test",
-													"script": {
-														"exec": [
-															"pm.test(\"Initiative with ranking - Happy case - Onboarding - Status Onboarding - return status 200\", function () {\r",
-															"    pm.response.to.have.status(200);\r",
-															"});\r",
-															"\r",
-															"setTimeout(()=>{ \r",
-															"\r",
-															"pm.test(\"Initiative with ranking - Happy case - Onboarding - Status Onboarding - status ON_EVALUATION\", function () {\r",
-															"    let jsonResponse = pm.response.json()\r",
-															"    pm.expect(jsonResponse.status).equals('ON_EVALUATION');\r",
-															"});\r",
-															" },2000)"
-														],
-														"type": "text/javascript"
-													}
-												},
-												{
-													"listen": "prerequest",
-													"script": {
-														"exec": [
-															"setTimeout(()=> {}, 15000)"
-														],
-														"type": "text/javascript"
-													}
-												}
-											],
-											"request": {
-												"auth": {
-													"type": "bearer",
-													"bearer": [
-														{
-															"key": "token",
-															"value": "{{tokenIO}}",
-															"type": "string"
-														}
-													]
-												},
-												"method": "GET",
-												"header": [],
-												"url": {
-													"raw": "{{baseUrl}}/idpay/onboarding/{{initiativeId}}/status",
-													"host": [
-														"{{baseUrl}}"
-													],
-													"path": [
-														"idpay",
-														"onboarding",
-														"{{initiativeId}}",
-														"status"
-													]
-												}
-											},
-											"response": []
 										}
 									]
 								},
@@ -17974,66 +17914,6 @@
 												}
 											},
 											"response": []
-										},
-										{
-											"name": "Status Onboarding",
-											"event": [
-												{
-													"listen": "test",
-													"script": {
-														"exec": [
-															"pm.test(\"Initiative with ranking - Happy case - Onboarding - Status Onboarding - return status 200\", function () {\r",
-															"    pm.response.to.have.status(200);\r",
-															"});\r",
-															"\r",
-															"setTimeout(()=>{ \r",
-															"\r",
-															"pm.test(\"Initiative with ranking - Happy case - Onboarding - Status Onboarding - status ON_EVALUATION\", function () {\r",
-															"    let jsonResponse = pm.response.json()\r",
-															"    pm.expect(jsonResponse.status).equals('ON_EVALUATION');\r",
-															"});\r",
-															" },2000)"
-														],
-														"type": "text/javascript"
-													}
-												},
-												{
-													"listen": "prerequest",
-													"script": {
-														"exec": [
-															"setTimeout(()=> {}, 15000)"
-														],
-														"type": "text/javascript"
-													}
-												}
-											],
-											"request": {
-												"auth": {
-													"type": "bearer",
-													"bearer": [
-														{
-															"key": "token",
-															"value": "{{tokenIO}}",
-															"type": "string"
-														}
-													]
-												},
-												"method": "GET",
-												"header": [],
-												"url": {
-													"raw": "{{baseUrl}}/idpay/onboarding/{{initiativeId}}/status",
-													"host": [
-														"{{baseUrl}}"
-													],
-													"path": [
-														"idpay",
-														"onboarding",
-														"{{initiativeId}}",
-														"status"
-													]
-												}
-											},
-											"response": []
 										}
 									]
 								},
@@ -18276,66 +18156,6 @@
 														"idpay",
 														"onboarding",
 														"consent"
-													]
-												}
-											},
-											"response": []
-										},
-										{
-											"name": "Status Onboarding",
-											"event": [
-												{
-													"listen": "test",
-													"script": {
-														"exec": [
-															"pm.test(\"Initiative with ranking - Happy case - Onboarding - Status Onboarding - return status 200\", function () {\r",
-															"    pm.response.to.have.status(200);\r",
-															"});\r",
-															"\r",
-															"setTimeout(()=>{ \r",
-															"\r",
-															"pm.test(\"Initiative with ranking - Happy case - Onboarding - Status Onboarding - status ON_EVALUATION\", function () {\r",
-															"    let jsonResponse = pm.response.json()\r",
-															"    pm.expect(jsonResponse.status).equals('ON_EVALUATION');\r",
-															"});\r",
-															" },2000)"
-														],
-														"type": "text/javascript"
-													}
-												},
-												{
-													"listen": "prerequest",
-													"script": {
-														"exec": [
-															"setTimeout(()=> {}, 15000)"
-														],
-														"type": "text/javascript"
-													}
-												}
-											],
-											"request": {
-												"auth": {
-													"type": "bearer",
-													"bearer": [
-														{
-															"key": "token",
-															"value": "{{tokenIO}}",
-															"type": "string"
-														}
-													]
-												},
-												"method": "GET",
-												"header": [],
-												"url": {
-													"raw": "{{baseUrl}}/idpay/onboarding/{{initiativeId}}/status",
-													"host": [
-														"{{baseUrl}}"
-													],
-													"path": [
-														"idpay",
-														"onboarding",
-														"{{initiativeId}}",
-														"status"
 													]
 												}
 											},
