@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "b2c7f07e-dc6d-4478-96f6-0db1c75fd822",
-		"name": "idpay-initiative-e2e",
+		"_postman_id": "e880dddf-8206-439a-8f3f-0f738118dffa",
+		"name": "idpay-initiative-e2e new",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "26036736"
 	},
@@ -14564,9 +14564,9 @@
 										"method": "PUT",
 										"header": [],
 										"url": {
-											"raw": "{{IP_POD}}/idpay/initiative/:initiativeId/reset-status-set-ranking-end-date?rankingEndDate={{yesterday}}",
+											"raw": "{{AKSAPIServerUrl}}/idpay/initiative/:initiativeId/reset-status-set-ranking-end-date?rankingEndDate={{yesterday}}",
 											"host": [
-												"{{IP_POD}}"
+												"{{AKSAPIServerUrl}}"
 											],
 											"path": [
 												"idpay",
@@ -14632,9 +14632,9 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{IP_POD}}/idpay/ranking/build/file/start",
+											"raw": "{{AKSAPIServerUrl}}/idpay/ranking/build/file/start",
 											"host": [
-												"{{IP_POD}}"
+												"{{AKSAPIServerUrl}}"
 											],
 											"path": [
 												"idpay",
@@ -14798,9 +14798,9 @@
 										"method": "PUT",
 										"header": [],
 										"url": {
-											"raw": "{{IP_POD}}/idpay/initiative/:initiativeId/reset-status-set-ranking-end-date?rankingEndDate={{rankingEndDate}}",
+											"raw": "{{AKSAPIServerUrl}}/idpay/initiative/:initiativeId/reset-status-set-ranking-end-date?rankingEndDate={{rankingEndDate}}",
 											"host": [
-												"{{IP_POD}}"
+												"{{AKSAPIServerUrl}}"
 											],
 											"path": [
 												"idpay",
@@ -14868,9 +14868,9 @@
 												"method": "PUT",
 												"header": [],
 												"url": {
-													"raw": "{{IP_POD}}/idpay/initiative/{{initiativeId-fake}}/reset-status-set-ranking-end-date?rankingEndDate={{yesterday}}",
+													"raw": "{{AKSAPIServerUrl}}/idpay/initiative/{{initiativeId-fake}}/reset-status-set-ranking-end-date?rankingEndDate={{yesterday}}",
 													"host": [
-														"{{IP_POD}}"
+														"{{AKSAPIServerUrl}}"
 													],
 													"path": [
 														"idpay",
@@ -17066,9 +17066,9 @@
 												"method": "PUT",
 												"header": [],
 												"url": {
-													"raw": "{{IP_POD}}/idpay/initiative/:initiativeId/reset-status-set-ranking-end-date?rankingEndDate={{yesterday}}",
+													"raw": "{{AKSAPIServerUrl}}/idpay/initiative/:initiativeId/reset-status-set-ranking-end-date?rankingEndDate={{yesterday}}",
 													"host": [
-														"{{IP_POD}}"
+														"{{AKSAPIServerUrl}}"
 													],
 													"path": [
 														"idpay",
@@ -17125,9 +17125,9 @@
 												"method": "GET",
 												"header": [],
 												"url": {
-													"raw": "{{IP_POD}}/idpay/ranking/build/file/start",
+													"raw": "{{AKSAPIServerUrl}}/idpay/ranking/build/file/start",
 													"host": [
-														"{{IP_POD}}"
+														"{{AKSAPIServerUrl}}"
 													],
 													"path": [
 														"idpay",
@@ -18309,9 +18309,9 @@
 												"method": "PUT",
 												"header": [],
 												"url": {
-													"raw": "{{IP_POD}}/idpay/initiative/:initiativeId/reset-status-set-ranking-end-date?rankingEndDate={{yesterday}}",
+													"raw": "{{AKSAPIServerUrl}}/idpay/initiative/:initiativeId/reset-status-set-ranking-end-date?rankingEndDate={{yesterday}}",
 													"host": [
-														"{{IP_POD}}"
+														"{{AKSAPIServerUrl}}"
 													],
 													"path": [
 														"idpay",
@@ -18368,9 +18368,9 @@
 												"method": "GET",
 												"header": [],
 												"url": {
-													"raw": "{{IP_POD}}/idpay/ranking/build/file/start",
+													"raw": "{{AKSAPIServerUrl}}/idpay/ranking/build/file/start",
 													"host": [
-														"{{IP_POD}}"
+														"{{AKSAPIServerUrl}}"
 													],
 													"path": [
 														"idpay",
