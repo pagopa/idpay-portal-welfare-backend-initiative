@@ -5,9 +5,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.InitiativeTrxConditionsDTO;
+import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.time.LocalDateTime;
 
 /**
@@ -54,6 +57,10 @@ public class InitiativeDTO   {
 
   @JsonProperty("beneficiaryRule")
   private InitiativeBeneficiaryRuleDTO beneficiaryRule;
+
+  @Pattern(regexp = "REFUND|DISCOUNT", flags = Pattern.Flag.CASE_INSENSITIVE)
+  @NotNull(groups = ValidationApiEnabledGroup.class)
+  private String initiativeRewardType;
 
   @JsonProperty("rewardRule")
   private InitiativeRewardRuleDTO rewardRule;

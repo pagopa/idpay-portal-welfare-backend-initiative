@@ -24,6 +24,9 @@ public class InitiativeConstants {
             public static final String [] INITIATIVES_ALLOWED_STATES_TO_BE_EDITABLE_ARRAY = {Status.DRAFT, Status.TO_CHECK, Status.APPROVED};
             public static final String [] INITIATIVE_ALLOWED_STATES_TO_BECOME_PUBLISHED_ARRAY = {Status.APPROVED};
             public static final String [] INITIATIVE_REWARD_TYPE = {Validation.REWARD_ABSOLUTE,Validation.REWARD_PERCENTAGE};
+            public static final String REWARD_DISCOUNT = "DISCOUNT";
+            public static final String REWARD_REFUND = "REFUND";
+
         }
     }
 
@@ -83,6 +86,7 @@ public class InitiativeConstants {
             public static final String INITIATIVE_DESCRIPTION_LANGUAGE_MESSAGE = "Italian language is required for initiative description";
             public static final String WIZARD_VALIDATION = "Error on Validation caused by: %s";
             public static final String REWARD_TYPE = "REWARD INVALID";
+            public static final String REFUND_RULE_INVALID = "REFUND RULE INVALID";
         }
         public static final class Publish {
             public static final String PUBLISH_CODE = BASE_CODE + ".published";

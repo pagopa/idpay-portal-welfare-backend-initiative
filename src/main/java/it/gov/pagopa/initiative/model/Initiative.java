@@ -37,12 +37,10 @@ public class Initiative {
     private InitiativeGeneral general;
     private InitiativeAdditional additionalInfo;
     private InitiativeBeneficiaryRule beneficiaryRule;
+    private String initiativeRewardType;
     private InitiativeRewardRule rewardRule;
     private InitiativeTrxConditions trxRule;
     private InitiativeRefundRule refundRule;
     private Boolean enabled;
 
-
-    public Initiative(String initiativeName, String status) {
-    }
 }

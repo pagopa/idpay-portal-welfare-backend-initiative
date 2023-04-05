@@ -117,6 +117,7 @@ public class InitiativeModelToDTOMapper {
                     initiative.getInitiativeId()));
         }
         initiativeDto.setBeneficiaryRule(this.toInitiativeBeneficiaryRuleDTO(initiative.getBeneficiaryRule()));
+        initiativeDto.setInitiativeRewardType(initiative.getInitiativeRewardType());
         initiativeDto.setRewardRule(this.toRewardRuleDTO(initiative.getRewardRule()));
         initiativeDto.setTrxRule(this.toTrxRuleDTO(initiative.getTrxRule()));
         initiativeDto.setRefundRule(this.toInitiativeRefundRuleDTO(initiative.getRefundRule()));

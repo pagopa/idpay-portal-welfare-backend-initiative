@@ -155,6 +155,7 @@ public class InitiativeDTOsToModelMapper {
 
     public Initiative toInitiative(InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDto) {
         Initiative initiative = new Initiative();
+        initiative.setInitiativeRewardType(initiativeRewardAndTrxRulesDto.getInitiativeRewardType());
         initiative.setTrxRule(this.toInitiativeTrxRule(initiativeRewardAndTrxRulesDto.getTrxRule()));
         initiative.setRewardRule(this.toInitiativeRewardRule(initiativeRewardAndTrxRulesDto.getRewardRule()));
         return initiative;

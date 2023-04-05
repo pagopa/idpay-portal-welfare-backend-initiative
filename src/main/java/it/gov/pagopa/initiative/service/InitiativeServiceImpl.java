@@ -220,6 +220,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         initiative.setTrxRule(rewardAndTrxRules.getTrxRule());
         initiative.setStatus(InitiativeConstants.Status.DRAFT);
         initiative.setRewardRule(rewardAndTrxRules.getRewardRule());
+        initiative.setInitiativeRewardType(rewardAndTrxRules.getInitiativeRewardType());
         this.initiativeRepository.save(initiative);
         auditUtilities.logEditInitiative(this.getUserId(), initiativeId, organizationId);
         performanceLog(startTime, "UPDATE_INITIATIVE_TRX_REWARD_RULES");
@@ -230,6 +231,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     public void updateInitiativeRefundRules(String organizationId, String initiativeId, String role, Initiative refundRule, boolean changeInitiativeStatus) {
         long startTime = System.currentTimeMillis();
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
+        initiativeValidationService.checkRefundRuleDiscountInitiative(initiative);
         //Check Initiative Status
         isInitiativeAllowedToBeEditableThenThrows(initiative);
         initiative.setRefundRule(refundRule.getRefundRule());

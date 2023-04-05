@@ -13,6 +13,7 @@ import it.gov.pagopa.initiative.exception.InitiativeException;
 import it.gov.pagopa.initiative.model.TypeBoolEnum;
 import it.gov.pagopa.initiative.model.TypeMultiEnum;
 import it.gov.pagopa.initiative.model.*;
+import it.gov.pagopa.initiative.model.rule.refund.AccumulatedAmount;
 import it.gov.pagopa.initiative.model.rule.refund.AdditionalInfo;
 import it.gov.pagopa.initiative.model.rule.refund.InitiativeRefundRule;
 import it.gov.pagopa.initiative.model.rule.refund.TimeParameter;
@@ -300,7 +301,34 @@ class InitiativeValidationServiceTest {
         Executable executable = () -> initiativeValidationService.checkRewardRuleAbsolute(step4Initiative);
         assertDoesNotThrow(executable);
     }
-
+    @Test
+    void checkRefundRuleDiscountInitiative_RefundType(){
+        Initiative step4Initiative = createStep4Initiative();
+        step4Initiative.setInitiativeRewardType(InitiativeConstants.Status.Validation.REWARD_REFUND);
+        Executable executable = () -> initiativeValidationService.checkRefundRuleDiscountInitiative(step4Initiative);
+        assertDoesNotThrow(executable);
+    }
+    @Test
+    void checkRefundRuleDiscountInitiative_discountType_noAccumulatedAmount(){
+        Initiative step5Initiative = createStep5Initiative();
+        step5Initiative.setInitiativeRewardType(InitiativeConstants.Status.Validation.REWARD_DISCOUNT);
+        Executable executable = () -> initiativeValidationService.checkRefundRuleDiscountInitiative(step5Initiative);
+        assertDoesNotThrow(executable);
+    }
+    @Test
+    void checkRefundRuleDiscountInitiative_discountType_withAccumulatedAmount(){
+        Initiative step5Initiative = createStep5Initiative();
+        step5Initiative.setInitiativeRewardType(InitiativeConstants.Status.Validation.REWARD_DISCOUNT);
+        AccumulatedAmount accumulatedAmount = new AccumulatedAmount();
+        accumulatedAmount.setAccumulatedType(AccumulatedAmount.AccumulatedTypeEnum.THRESHOLD_REACHED);
+        step5Initiative.getRefundRule().setAccumulatedAmount(new AccumulatedAmount());
+        try {
+            initiativeValidationService.checkRefundRuleDiscountInitiative(step5Initiative);
+        } catch (InitiativeException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
+            assertEquals(InitiativeConstants.Exception.BadRequest.REFUND_RULE_INVALID, e.getMessage());
+        }
+    }
     /*
      * ############### Step 1 ###############
      */
