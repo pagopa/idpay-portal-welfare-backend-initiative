@@ -329,6 +329,18 @@ class InitiativeValidationServiceTest {
             assertEquals(InitiativeConstants.Exception.BadRequest.REFUND_RULE_INVALID, e.getMessage());
         }
     }
+    @Test
+    void checkRefundRuleDiscountInitiative_discountType_noTimeParameter(){
+        Initiative step4Initiative = createStep4Initiative();
+        step4Initiative.setInitiativeRewardType(InitiativeConstants.Status.Validation.REWARD_DISCOUNT);
+        step4Initiative.setRefundRule(new InitiativeRefundRule());
+        try {
+            initiativeValidationService.checkRefundRuleDiscountInitiative(step4Initiative);
+        } catch (InitiativeException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
+            assertEquals(InitiativeConstants.Exception.BadRequest.REFUND_RULE_INVALID, e.getMessage());
+        }
+    }
     /*
      * ############### Step 1 ###############
      */
