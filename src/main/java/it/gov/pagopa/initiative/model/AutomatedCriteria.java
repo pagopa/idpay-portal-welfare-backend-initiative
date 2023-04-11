@@ -1,7 +1,10 @@
 package it.gov.pagopa.initiative.model;
 
+import it.gov.pagopa.initiative.dto.AutomatedCriteriaDTO;
 import lombok.*;
 import org.springframework.lang.Nullable;
+
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -18,6 +21,7 @@ public class AutomatedCriteria {
   private String value2;
   @Nullable
   private OrderDirection orderDirection;
+  private List<IseeTypologyEnum> typology;
 
   public enum OrderDirection {
     ASC,
