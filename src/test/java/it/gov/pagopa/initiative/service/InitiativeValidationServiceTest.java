@@ -303,16 +303,20 @@ class InitiativeValidationServiceTest {
     }
     @Test
     void checkRefundRuleDiscountInitiative_RefundType(){
-        Initiative step4Initiative = createStep4Initiative();
-        step4Initiative.setInitiativeRewardType(InitiativeConstants.Status.Validation.REWARD_REFUND);
-        Executable executable = () -> initiativeValidationService.checkRefundRuleDiscountInitiative(step4Initiative);
+        Initiative step5Initiative = createStep5Initiative();
+        step5Initiative.setInitiativeRewardType(InitiativeConstants.Status.Validation.REWARD_REFUND);
+        Executable executable = () -> initiativeValidationService.checkRefundRuleDiscountInitiative(step5Initiative.getInitiativeRewardType(),
+                new InitiativeRefundRule());
         assertDoesNotThrow(executable);
     }
     @Test
     void checkRefundRuleDiscountInitiative_discountType_noAccumulatedAmount(){
         Initiative step5Initiative = createStep5Initiative();
         step5Initiative.setInitiativeRewardType(InitiativeConstants.Status.Validation.REWARD_DISCOUNT);
-        Executable executable = () -> initiativeValidationService.checkRefundRuleDiscountInitiative(step5Initiative);
+        InitiativeRefundRule refundRule = new InitiativeRefundRule();
+        refundRule.setTimeParameter(new TimeParameter(TimeParameter.TimeTypeEnum.DAILY));
+        Executable executable = () -> initiativeValidationService.checkRefundRuleDiscountInitiative(step5Initiative.getInitiativeRewardType(),
+                refundRule);
         assertDoesNotThrow(executable);
     }
     @Test
@@ -321,9 +325,11 @@ class InitiativeValidationServiceTest {
         step5Initiative.setInitiativeRewardType(InitiativeConstants.Status.Validation.REWARD_DISCOUNT);
         AccumulatedAmount accumulatedAmount = new AccumulatedAmount();
         accumulatedAmount.setAccumulatedType(AccumulatedAmount.AccumulatedTypeEnum.THRESHOLD_REACHED);
-        step5Initiative.getRefundRule().setAccumulatedAmount(new AccumulatedAmount());
+        InitiativeRefundRule refundRule = new InitiativeRefundRule();
+        refundRule.setAccumulatedAmount(accumulatedAmount);
         try {
-            initiativeValidationService.checkRefundRuleDiscountInitiative(step5Initiative);
+            initiativeValidationService.checkRefundRuleDiscountInitiative(step5Initiative.getInitiativeRewardType(),
+                    refundRule);
         } catch (InitiativeException e) {
             assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
             assertEquals(InitiativeConstants.Exception.BadRequest.REFUND_RULE_INVALID, e.getMessage());
@@ -333,9 +339,9 @@ class InitiativeValidationServiceTest {
     void checkRefundRuleDiscountInitiative_discountType_noTimeParameter(){
         Initiative step4Initiative = createStep4Initiative();
         step4Initiative.setInitiativeRewardType(InitiativeConstants.Status.Validation.REWARD_DISCOUNT);
-        step4Initiative.setRefundRule(new InitiativeRefundRule());
         try {
-            initiativeValidationService.checkRefundRuleDiscountInitiative(step4Initiative);
+            initiativeValidationService.checkRefundRuleDiscountInitiative(step4Initiative.getInitiativeRewardType(),
+                    new InitiativeRefundRule());
         } catch (InitiativeException e) {
             assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
             assertEquals(InitiativeConstants.Exception.BadRequest.REFUND_RULE_INVALID, e.getMessage());

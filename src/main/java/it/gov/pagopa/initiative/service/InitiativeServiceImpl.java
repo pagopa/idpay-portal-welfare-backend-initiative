@@ -231,7 +231,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     public void updateInitiativeRefundRules(String organizationId, String initiativeId, String role, Initiative refundRule, boolean changeInitiativeStatus) {
         long startTime = System.currentTimeMillis();
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
-        initiativeValidationService.checkRefundRuleDiscountInitiative(initiative);
+        initiativeValidationService.checkRefundRuleDiscountInitiative(initiative.getInitiativeRewardType(), refundRule.getRefundRule());
         //Check Initiative Status
         isInitiativeAllowedToBeEditableThenThrows(initiative);
         initiative.setRefundRule(refundRule.getRefundRule());
