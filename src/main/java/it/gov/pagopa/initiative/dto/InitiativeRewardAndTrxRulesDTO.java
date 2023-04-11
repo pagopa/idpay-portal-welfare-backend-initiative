@@ -13,6 +13,7 @@ import lombok.experimental.SuperBuilder;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 @Data
 @NoArgsConstructor
@@ -22,6 +23,9 @@ import javax.validation.constraints.NotNull;
 @SuperBuilder
 public class InitiativeRewardAndTrxRulesDTO extends InitiativeOrganizationInfoDTO {
 
+    @Pattern(regexp = "REFUND|DISCOUNT", flags = Pattern.Flag.CASE_INSENSITIVE)
+    @NotNull(groups = ValidationApiEnabledGroup.class)
+    private String initiativeRewardType;
     @JsonProperty("rewardRule")
     @Valid
     @NotNull(groups = ValidationApiEnabledGroup.class)

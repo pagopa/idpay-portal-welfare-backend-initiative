@@ -1119,6 +1119,7 @@ class InitiativeApiTest {
 
     private InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTO() {
         InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = new InitiativeRewardAndTrxRulesDTO();
+        initiativeRewardAndTrxRulesDTO.setInitiativeRewardType(InitiativeConstants.Status.Validation.REWARD_REFUND);
         InitiativeRewardRuleDTO initiativeRewardRuleDTO = createInitiativeRewardRuleDTORewardValueDTO();
         initiativeRewardAndTrxRulesDTO.setRewardRule(initiativeRewardRuleDTO);
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = createInitiativeTrxConditionsDTOValid();

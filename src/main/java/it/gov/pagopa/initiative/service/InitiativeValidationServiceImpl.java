@@ -12,6 +12,7 @@ import it.gov.pagopa.initiative.model.AutomatedCriteria;
 import it.gov.pagopa.initiative.model.FilterOperatorEnumModel;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeGeneral;
+import it.gov.pagopa.initiative.model.rule.refund.InitiativeRefundRule;
 import it.gov.pagopa.initiative.model.rule.reward.InitiativeRewardRule;
 import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
 import it.gov.pagopa.initiative.model.rule.trx.Threshold;
@@ -157,6 +158,17 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
             if (threshold==null || threshold.getFrom()==null || threshold.getFrom().compareTo(rewardValue.getRewardValue()) < 0){
                 throw new InitiativeException(InitiativeConstants.Exception.BadRequest.CODE,
                         InitiativeConstants.Exception.BadRequest.REWARD_TYPE, HttpStatus.BAD_REQUEST);
+            }
+        }
+    }
+
+    @Override
+    public void checkRefundRuleDiscountInitiative(Initiative initiative){
+        if (initiative.getInitiativeRewardType().equals(InitiativeConstants.Status.Validation.REWARD_DISCOUNT)){
+            InitiativeRefundRule refundRule = initiative.getRefundRule();
+            if(refundRule.getAccumulatedAmount() != null || refundRule.getTimeParameter() == null){
+                throw new InitiativeException(InitiativeConstants.Exception.BadRequest.CODE,
+                        InitiativeConstants.Exception.BadRequest.REFUND_RULE_INVALID, HttpStatus.BAD_REQUEST);
             }
         }
     }
