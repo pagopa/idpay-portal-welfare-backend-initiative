@@ -452,7 +452,7 @@ class InitiativeModelToDTOMapperTest {
     void testToInitiativeBeneficiaryRuleDTO_mapIfs() {
         ArrayList<AutomatedCriteria> automatedCriteriaList = new ArrayList<>();
         automatedCriteriaList.add(new AutomatedCriteria("JaneDoe", "Code", "Field", FilterOperatorEnumModel.EQ, "42",
-                "42", AutomatedCriteria.OrderDirection.ASC));
+                "42", AutomatedCriteria.OrderDirection.ASC, List.of(IseeTypologyEnum.CORRENTE, IseeTypologyEnum.MINORENNE)));
         InitiativeBeneficiaryRule initiativeBeneficiaryRule = mock(InitiativeBeneficiaryRule.class);
         when(initiativeBeneficiaryRule.getAutomatedCriteria()).thenReturn(automatedCriteriaList);
         when(initiativeBeneficiaryRule.getSelfDeclarationCriteria()).thenReturn(new ArrayList<>());
@@ -613,6 +613,7 @@ class InitiativeModelToDTOMapperTest {
         automatedCriteria.setField("true");
         automatedCriteria.setOperator(FilterOperatorEnumModel.EQ);
         automatedCriteria.setValue("value");
+        automatedCriteria.setTypology(List.of(IseeTypologyEnum.CORRENTE, IseeTypologyEnum.SOCIOSANITARIO));
         List<AutomatedCriteria> automatedCriteriaList = new ArrayList<>();
         automatedCriteriaList.add(automatedCriteria);
         initiativeBeneficiaryRule.setAutomatedCriteria(automatedCriteriaList);
@@ -704,6 +705,7 @@ class InitiativeModelToDTOMapperTest {
         automatedCriteriaDTO.setField("true");
         automatedCriteriaDTO.setOperator(FilterOperatorEnum.EQ);
         automatedCriteriaDTO.setValue("value");
+        automatedCriteriaDTO.setTypology(List.of(IseeTypologyEnum.CORRENTE, IseeTypologyEnum.SOCIOSANITARIO));
         List<AutomatedCriteriaDTO> automatedCriteriaList = new ArrayList<>();
         automatedCriteriaList.add(automatedCriteriaDTO);
         initiativeBeneficiaryRuleDTO.setAutomatedCriteria(automatedCriteriaList);

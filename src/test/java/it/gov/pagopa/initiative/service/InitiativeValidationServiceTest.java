@@ -465,6 +465,7 @@ class InitiativeValidationServiceTest {
         automatedCriteria.setField("true");
         automatedCriteria.setOperator(FilterOperatorEnumModel.EQ);
         automatedCriteria.setValue("value");
+        automatedCriteria.setTypology(List.of(IseeTypologyEnum.CORRENTE, IseeTypologyEnum.DOTTORATO, IseeTypologyEnum.RESIDENZIALE));
         List<AutomatedCriteria> automatedCriteriaList = new ArrayList<>();
         automatedCriteriaList.add(automatedCriteria);
         initiativeBeneficiaryRule.setAutomatedCriteria(automatedCriteriaList);
@@ -497,6 +498,7 @@ class InitiativeValidationServiceTest {
         automatedCriteria.setOperator(FilterOperatorEnumModel.EQ);
         automatedCriteria.setValue("value");
         automatedCriteria.setOrderDirection(AutomatedCriteria.OrderDirection.ASC);
+        automatedCriteria.setTypology(List.of(IseeTypologyEnum.CORRENTE, IseeTypologyEnum.MINORENNE));
         List<AutomatedCriteria> automatedCriteriaList = new ArrayList<>();
         automatedCriteriaList.add(automatedCriteria);
         initiativeBeneficiaryRule.setAutomatedCriteria(automatedCriteriaList);
