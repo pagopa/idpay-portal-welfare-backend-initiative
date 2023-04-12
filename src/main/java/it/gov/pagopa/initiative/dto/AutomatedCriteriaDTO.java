@@ -1,6 +1,7 @@
 package it.gov.pagopa.initiative.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import it.gov.pagopa.initiative.model.IseeTypologyEnum;
 import it.gov.pagopa.initiative.utils.constraint.initiative.beneficiary.IseeCodeMustHaveFieldNullConstraint;
 import it.gov.pagopa.initiative.utils.constraint.SecondValueGreaterThanFirstWithBTW;
 import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
@@ -9,6 +10,7 @@ import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * AutomatedCriteriaDTO
@@ -38,6 +40,7 @@ public class AutomatedCriteriaDTO {
 
   @Nullable
   private OrderDirection orderDirection;
+  private List<IseeTypologyEnum> typology;
 
   public enum OrderDirection {
     ASC,
@@ -54,4 +57,5 @@ public class AutomatedCriteriaDTO {
       return this.equals(DESC);
     }
   }
+
 }

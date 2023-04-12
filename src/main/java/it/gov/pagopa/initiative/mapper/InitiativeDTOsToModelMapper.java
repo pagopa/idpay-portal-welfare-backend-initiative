@@ -118,6 +118,7 @@ public class InitiativeDTOsToModelMapper {
                             .orderDirection(automatedCriteriaDTO.getOrderDirection() != null
                                     ? AutomatedCriteria.OrderDirection.valueOf(automatedCriteriaDTO.getOrderDirection().name())
                                     : null)
+                            .typology(automatedCriteriaDTO.getTypology())
                             .build()
             ).toList());
         }

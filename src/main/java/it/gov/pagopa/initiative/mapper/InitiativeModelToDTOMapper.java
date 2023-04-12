@@ -211,6 +211,7 @@ public class InitiativeModelToDTOMapper {
                             .orderDirection(modelAC.getOrderDirection() != null
                                     ? AutomatedCriteriaDTO.OrderDirection.valueOf(modelAC.getOrderDirection().name())
                                     : null)
+                            .typology(modelAC.getTypology())
                             .build()
             ).toList());
         }
