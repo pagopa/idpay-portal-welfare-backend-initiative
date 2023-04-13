@@ -13,7 +13,7 @@ public interface InitiativeValidationService {
 
     void checkPermissionBeforeInsert(String role);
 
-    void checkAutomatedCriteriaOrderDirectionWithRanking(Initiative initiative, List<AutomatedCriteria> initiativeBeneficiaryRuleModel);
+    void checkAutomatedCriteria(Initiative initiative, List<AutomatedCriteria> initiativeBeneficiaryRuleModel);
 
     void validateAllWizardSteps(InitiativeDTO initiativeDTO);
     void checkRewardRuleAbsolute(Initiative initiative);

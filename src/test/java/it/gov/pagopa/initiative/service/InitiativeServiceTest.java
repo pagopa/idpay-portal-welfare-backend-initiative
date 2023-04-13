@@ -703,7 +703,7 @@ class InitiativeServiceTest {
 
         List<AutomatedCriteria> automatedCriteriaList = new ArrayList<>();
         //Instruct the initiativeValidationService Mock to do nothing for checkAutomatedCriteriaOrderDirectionWithRanking
-        doNothing().when(initiativeValidationService).checkAutomatedCriteriaOrderDirectionWithRanking(step2Initiative,automatedCriteriaList);
+        doNothing().when(initiativeValidationService).checkAutomatedCriteria(step2Initiative,automatedCriteriaList);
 
         //Try to call the Real Service (which is using the instructed Repo)
         initiativeService.updateStep3InitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule, ROLE);

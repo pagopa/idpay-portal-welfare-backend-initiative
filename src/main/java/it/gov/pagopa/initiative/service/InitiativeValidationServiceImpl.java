@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.ConstraintViolation;
@@ -85,8 +86,16 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
 
     @Override
     @Validated(value = ValidationApiEnabledGroup.class)
-    public void checkAutomatedCriteriaOrderDirectionWithRanking(Initiative initiative, List<AutomatedCriteria> automatedCriteriaList) {
+    public void checkAutomatedCriteria(Initiative initiative, List<AutomatedCriteria> automatedCriteriaList) {
         InitiativeGeneral general = initiative.getGeneral();
+        for(AutomatedCriteria automatedCriteria : automatedCriteriaList){
+            if(automatedCriteria.getCode().equals(ISEE) && CollectionUtils.isEmpty(automatedCriteria.getTypology())){
+                throw new InitiativeException(
+                        InitiativeConstants.Exception.BadRequest.CODE,
+                        InitiativeConstants.Exception.BadRequest.ISEE_TYPOLOGY_NOT_VALID,
+                        HttpStatus.BAD_REQUEST);
+            }
+        }
         if (Boolean.TRUE.equals(general.getRankingEnabled())){
             boolean checkIsee = false;
             for(AutomatedCriteria automatedCriteria : automatedCriteriaList){

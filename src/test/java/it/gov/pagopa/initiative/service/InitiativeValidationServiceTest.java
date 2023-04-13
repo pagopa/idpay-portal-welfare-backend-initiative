@@ -30,6 +30,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
@@ -165,7 +166,7 @@ class InitiativeValidationServiceTest {
     void testCheckAutomatedCriteriaOrderDirectionWithRanking() {
         Initiative step3Initiative = createStep3Initiative(false);
         List<AutomatedCriteria> automatedCriteriaList = step3Initiative.getBeneficiaryRule().getAutomatedCriteria();
-        Executable executable = () -> initiativeValidationService.checkAutomatedCriteriaOrderDirectionWithRanking(step3Initiative, automatedCriteriaList);
+        Executable executable = () -> initiativeValidationService.checkAutomatedCriteria(step3Initiative, automatedCriteriaList);
         assertDoesNotThrow(executable);
     }
 
@@ -173,14 +174,14 @@ class InitiativeValidationServiceTest {
     void testCheckAutomatedCriteriaOrderDirectionWithRanking2() {
         Initiative step3Initiative = createStep3Initiative(true);
         List<AutomatedCriteria> automatedCriteriaList = step3Initiative.getBeneficiaryRule().getAutomatedCriteria();
-        assertThrows(InitiativeException.class, () -> initiativeValidationService.checkAutomatedCriteriaOrderDirectionWithRanking(step3Initiative, automatedCriteriaList));
+        assertThrows(InitiativeException.class, () -> initiativeValidationService.checkAutomatedCriteria(step3Initiative, automatedCriteriaList));
     }
 
     @Test
     void testCheckAutomatedCriteriaOrderDirectionWithRanking3() {
         Initiative step3Initiative = createStep3Initiative_EQ();
         List<AutomatedCriteria> automatedCriteriaList = step3Initiative.getBeneficiaryRule().getAutomatedCriteria();
-        assertThrows(InitiativeException.class, () -> initiativeValidationService.checkAutomatedCriteriaOrderDirectionWithRanking(step3Initiative, automatedCriteriaList));
+        assertThrows(InitiativeException.class, () -> initiativeValidationService.checkAutomatedCriteria(step3Initiative, automatedCriteriaList));
     }
 
     @Test
@@ -192,7 +193,7 @@ class InitiativeValidationServiceTest {
         automatedCriteriaList.add(automatedCriteria);
 
         try {
-            initiativeValidationService.checkAutomatedCriteriaOrderDirectionWithRanking(step3Initiative,
+            initiativeValidationService.checkAutomatedCriteria(step3Initiative,
                     automatedCriteriaList);
         } catch (InitiativeException e) {
             assertEquals(InitiativeConstants.Exception.BadRequest.CODE , e.getCode());
