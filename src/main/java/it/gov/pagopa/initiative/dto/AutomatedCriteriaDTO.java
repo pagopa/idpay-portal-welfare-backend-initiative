@@ -40,7 +40,7 @@ public class AutomatedCriteriaDTO {
 
   @Nullable
   private OrderDirection orderDirection;
-  private List<IseeTypologyEnum> typology;
+  private List<IseeTypologyEnum> iseeTypes;
 
   public enum OrderDirection {
     ASC,

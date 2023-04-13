@@ -89,10 +89,10 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
     public void checkAutomatedCriteria(Initiative initiative, List<AutomatedCriteria> automatedCriteriaList) {
         InitiativeGeneral general = initiative.getGeneral();
         for(AutomatedCriteria automatedCriteria : automatedCriteriaList){
-            if(automatedCriteria.getCode().equals(ISEE) && CollectionUtils.isEmpty(automatedCriteria.getTypology())){
+            if(automatedCriteria.getCode().equals(ISEE) && CollectionUtils.isEmpty(automatedCriteria.getIseeTypes())){
                 throw new InitiativeException(
                         InitiativeConstants.Exception.BadRequest.CODE,
-                        InitiativeConstants.Exception.BadRequest.ISEE_TYPOLOGY_NOT_VALID,
+                        InitiativeConstants.Exception.BadRequest.ISEE_TYPES_NOT_VALID,
                         HttpStatus.BAD_REQUEST);
             }
         }

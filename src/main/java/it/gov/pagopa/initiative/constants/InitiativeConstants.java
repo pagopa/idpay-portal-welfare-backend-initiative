@@ -87,7 +87,7 @@ public class InitiativeConstants {
             public static final String WIZARD_VALIDATION = "Error on Validation caused by: %s";
             public static final String REWARD_TYPE = "REWARD INVALID";
             public static final String REFUND_RULE_INVALID = "REFUND RULE INVALID";
-            public static final String ISEE_TYPOLOGY_NOT_VALID = "Automated criteria not valid. ISEE typology is missing.";
+            public static final String ISEE_TYPES_NOT_VALID = "Automated criteria not valid. ISEE typology is missing.";
         }
         public static final class Publish {
             public static final String PUBLISH_CODE = BASE_CODE + ".published";
