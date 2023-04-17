@@ -173,7 +173,7 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
 
     @Override
     public void checkRefundRuleDiscountInitiative(String initiativeRewardType, InitiativeRefundRule refundRule){
-        if (initiativeRewardType.equals(InitiativeConstants.Status.Validation.REWARD_DISCOUNT)){
+        if (InitiativeConstants.Status.Validation.REWARD_DISCOUNT.equals(initiativeRewardType)){
             if(refundRule.getAccumulatedAmount() != null || refundRule.getTimeParameter() == null){
                 throw new InitiativeException(InitiativeConstants.Exception.BadRequest.CODE,
                         InitiativeConstants.Exception.BadRequest.REFUND_RULE_INVALID, HttpStatus.BAD_REQUEST);

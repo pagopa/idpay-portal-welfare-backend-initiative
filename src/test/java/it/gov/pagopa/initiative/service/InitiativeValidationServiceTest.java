@@ -198,6 +198,22 @@ class InitiativeValidationServiceTest {
             assertEquals(InitiativeConstants.Exception.BadRequest.CODE , e.getCode());
         }
     }
+    @Test
+    void testCheckAutomatedCriteria_iseeTypeNotValid() {
+        Initiative step3Initiative = createStep3Initiative(false);
+        AutomatedCriteria automatedCriteria = new AutomatedCriteria();
+        automatedCriteria.setCode(ISEE);
+        automatedCriteria.setIseeTypes(null);
+        List<AutomatedCriteria> automatedCriteriaList = new ArrayList<>();
+        automatedCriteriaList.add(automatedCriteria);
+        try {
+            initiativeValidationService.checkAutomatedCriteria(step3Initiative,
+                    automatedCriteriaList);
+        } catch (InitiativeException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.CODE , e.getCode());
+            assertEquals(InitiativeConstants.Exception.BadRequest.ISEE_TYPES_NOT_VALID, e.getMessage());
+        }
+    }
 
     @Test
     void givenRankingEndDateAndStartDateNotValid_whenValidateAllWizardSteps_thenExceptionThrown() {
