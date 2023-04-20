@@ -95,6 +95,13 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
                         InitiativeConstants.Exception.BadRequest.ISEE_TYPES_NOT_VALID,
                         HttpStatus.BAD_REQUEST);
             }
+            if(!automatedCriteria.getCode().equals(ISEE) && initiative.getGeneral().getBeneficiaryType()
+                    .equals(InitiativeGeneral.BeneficiaryTypeEnum.NF)){
+                throw new InitiativeException(
+                        InitiativeConstants.Exception.BadRequest.CODE,
+                        InitiativeConstants.Exception.BadRequest.INITIATIVE_BENEFICIARY_TYPE_NF_ENABLED_AUTOMATED_CRITERIA_ISEE_MISSING_NOT_VALID,
+                        HttpStatus.BAD_REQUEST);
+            }
         }
         if (Boolean.TRUE.equals(general.getRankingEnabled())){
             boolean checkIsee = false;

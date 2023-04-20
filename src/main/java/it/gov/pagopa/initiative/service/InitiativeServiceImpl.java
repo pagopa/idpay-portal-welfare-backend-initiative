@@ -19,10 +19,7 @@ import it.gov.pagopa.initiative.event.InitiativeProducer;
 import it.gov.pagopa.initiative.exception.InitiativeException;
 import it.gov.pagopa.initiative.mapper.InitiativeAdditionalDTOsToIOServiceRequestDTOMapper;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
-import it.gov.pagopa.initiative.model.AutomatedCriteria;
-import it.gov.pagopa.initiative.model.Initiative;
-import it.gov.pagopa.initiative.model.InitiativeAdditional;
-import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
+import it.gov.pagopa.initiative.model.*;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
 import it.gov.pagopa.initiative.utils.AuditUtilities;
 import it.gov.pagopa.initiative.utils.InitiativeUtils;
@@ -171,6 +168,14 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
         isInitiativeAllowedToBeEditableThenThrows(initiative);
         initiative.setGeneral(initiativeInfoModel.getGeneral());
+        if (initiative.getGeneral().getBeneficiaryType().equals(InitiativeGeneral.BeneficiaryTypeEnum.NF) &&
+                !List.of(InitiativeGeneral.FamilyUnitCompositionEnum.ANPR,InitiativeGeneral.FamilyUnitCompositionEnum.INPS)
+                        .contains(initiative.getGeneral().getFamilyUnitComposition())) {
+            throw new InitiativeException(
+                    InitiativeConstants.Exception.BadRequest.CODE,
+                    InitiativeConstants.Exception.BadRequest.INITIATIVE_GENERAL_FAMILY_COMPOSITION_MESSAGE,
+                    HttpStatus.BAD_REQUEST);
+        }
         if (!initiative.getAdditionalInfo().getServiceName().equals(initiative.getInitiativeName())) {
             initiative.setInitiativeName(initiative.getAdditionalInfo().getServiceName());
         }

@@ -18,6 +18,7 @@ public class InitiativeGeneral {
 
     private BigDecimal budget;
     private BeneficiaryTypeEnum beneficiaryType;
+    private FamilyUnitCompositionEnum familyUnitComposition;
     private Boolean beneficiaryKnown;
     private BigDecimal beneficiaryBudget;
     /**
@@ -44,7 +45,7 @@ public class InitiativeGeneral {
      */
     public enum BeneficiaryTypeEnum {
 
-        PF("PF"), PG("PG");
+        PF("PF"), PG("PG"), NF("NF");
 
         private final String value;
 
@@ -61,6 +62,36 @@ public class InitiativeGeneral {
         @JsonCreator
         public static BeneficiaryTypeEnum fromValue(String text) {
             for (BeneficiaryTypeEnum b : BeneficiaryTypeEnum.values()) {
+                if (String.valueOf(b.value).equals(text)) {
+                    return b;
+                }
+            }
+            return null;
+        }
+    }
+
+    /**
+     * Gets or Sets familyUnitComposition
+     */
+    public enum FamilyUnitCompositionEnum {
+
+        INPS("INPS"), ANPR("ANPR");
+
+        private final String value;
+
+        FamilyUnitCompositionEnum(String value) {
+            this.value = value;
+        }
+
+        @Override
+        @JsonValue
+        public String toString() {
+            return String.valueOf(value);
+        }
+
+        @JsonCreator
+        public static FamilyUnitCompositionEnum fromValue(String text) {
+            for (FamilyUnitCompositionEnum b : FamilyUnitCompositionEnum.values()) {
                 if (String.valueOf(b.value).equals(text)) {
                     return b;
                 }

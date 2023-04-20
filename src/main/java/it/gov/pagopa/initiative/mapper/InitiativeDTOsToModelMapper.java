@@ -61,6 +61,7 @@ public class InitiativeDTOsToModelMapper {
         return InitiativeGeneral.builder().beneficiaryBudget(generalDTO.getBeneficiaryBudget())
                 .beneficiaryKnown(generalDTO.getBeneficiaryKnown())
                 .beneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.valueOf(generalDTO.getBeneficiaryType().name()))
+                .familyUnitComposition(InitiativeGeneral.FamilyUnitCompositionEnum.valueOf(generalDTO.getFamilyUnitComposition().name()))
                 .budget(generalDTO.getBudget())
                 .endDate(generalDTO.getEndDate())
                 .startDate(generalDTO.getStartDate())

@@ -46,7 +46,7 @@ public class InitiativeGeneralDTO extends InitiativeOrganizationInfoDTO {
      * Gets or Sets beneficiaryType
      */
     public enum BeneficiaryTypeEnum {
-        PF("PF"), PG("PG");
+        PF("PF"), PG("PG"), NF("NF");
 
         private final String value;
 
@@ -71,9 +71,42 @@ public class InitiativeGeneralDTO extends InitiativeOrganizationInfoDTO {
         }
     }
 
+    /**
+     * Gets or Sets beneficiaryType
+     */
+    public enum FamilyUnitCompositionEnum {
+        INPS("INPS"), ANPR("ANPR");
+
+        private final String value;
+
+        FamilyUnitCompositionEnum(String value) {
+            this.value = value;
+        }
+
+        @Override
+        @JsonValue
+        public String toString() {
+            return String.valueOf(value);
+        }
+
+        @JsonCreator
+        public static FamilyUnitCompositionEnum fromValue(String text) {
+            for (FamilyUnitCompositionEnum b : FamilyUnitCompositionEnum.values()) {
+                if (String.valueOf(b.value).equals(text)) {
+                    return b;
+                }
+            }
+            return null;
+        }
+    }
+
     @JsonProperty("beneficiaryType")
     @NotNull(groups = ValidationApiEnabledGroup.class)
     private BeneficiaryTypeEnum beneficiaryType;
+
+    @JsonProperty("familyUnitComposition")
+    @NotNull(groups = ValidationApiEnabledGroup.class)
+    private FamilyUnitCompositionEnum familyUnitComposition;
 
     @JsonProperty("beneficiaryKnown")
     @NotNull(groups = ValidationApiEnabledGroup.class)

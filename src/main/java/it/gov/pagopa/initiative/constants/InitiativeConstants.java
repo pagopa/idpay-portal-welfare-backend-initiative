@@ -76,6 +76,7 @@ public class InitiativeConstants {
             public static final String INITIATIVE_BENEFICIARY_RANKING_ENABLED_AUTOMATED_CRITERIA_ORDER_OPERATION_ISEE_EQ_OP_NOT_VALID = "Automated criteria not valid. OrderDirection not feasible. When Ranking enabled, It must be used ISEE only with non 'Equals' operator";
             public static final String INITIATIVE_BENEFICIARY_RANKING_ENABLED_AUTOMATED_CRITERIA_ORDER_OPERATION_MISSING_NOT_VALID = "Automated criteria not valid. OrderDirection is Missing. Please check it when Ranking is enabled";
             public static final String INITIATIVE_BENEFICIARY_RANKING_ENABLED_AUTOMATED_CRITERIA_ISEE_MISSING_NOT_VALID = "Automated criteria not valid. ISEE is Missing. Please check it when Ranking is enabled";
+            public static final String INITIATIVE_BENEFICIARY_TYPE_NF_ENABLED_AUTOMATED_CRITERIA_ISEE_MISSING_NOT_VALID = "Automated criteria not valid. ISEE is Missing. Please check it when beneficiary type 'NF' is selected";
             public static final String INITIATIVE_STATUS_NOT_IN_REVISION = "The status of initiative [%s] is not IN_REVISION";
             public static final String INITIATIVE_BY_INITIATIVE_ID_PROPERTIES_NOT_VALID = "Initiative %s properties are not valid for this request";
             public static final String INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_STATUS_NOT_VALID = "Initiative %s unprocessable for status not valid";
@@ -84,6 +85,7 @@ public class InitiativeConstants {
             public static final String INITIATIVE_CANNOT_BE_DELETED = "Initiative %s cannot be deleted";
             public static final String PERMISSION_NOT_VALID= "Permission not valid for [%s]";
             public static final String INITIATIVE_DESCRIPTION_LANGUAGE_MESSAGE = "Italian language is required for initiative description";
+            public static final String INITIATIVE_GENERAL_FAMILY_COMPOSITION_MESSAGE = "Family unit composition must be set as \"INPS\" or \"ANPR\"";
             public static final String WIZARD_VALIDATION = "Error on Validation caused by: %s";
             public static final String REWARD_TYPE = "REWARD INVALID";
             public static final String REFUND_RULE_INVALID = "REFUND RULE INVALID";
