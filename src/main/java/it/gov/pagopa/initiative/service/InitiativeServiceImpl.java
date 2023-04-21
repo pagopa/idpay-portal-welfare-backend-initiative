@@ -167,15 +167,8 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
 
         isInitiativeAllowedToBeEditableThenThrows(initiative);
+        initiativeValidationService.checkBeneficiaryTypeAndFamilyUnit(initiativeInfoModel);
         initiative.setGeneral(initiativeInfoModel.getGeneral());
-        if (initiative.getGeneral().getBeneficiaryType().equals(InitiativeGeneral.BeneficiaryTypeEnum.NF) &&
-                !List.of(InitiativeGeneral.FamilyUnitCompositionEnum.ANPR,InitiativeGeneral.FamilyUnitCompositionEnum.INPS)
-                        .contains(initiative.getGeneral().getFamilyUnitComposition())) {
-            throw new InitiativeException(
-                    InitiativeConstants.Exception.BadRequest.CODE,
-                    InitiativeConstants.Exception.BadRequest.INITIATIVE_GENERAL_FAMILY_COMPOSITION_MESSAGE,
-                    HttpStatus.BAD_REQUEST);
-        }
         if (!initiative.getAdditionalInfo().getServiceName().equals(initiative.getInitiativeName())) {
             initiative.setInitiativeName(initiative.getAdditionalInfo().getServiceName());
         }
@@ -236,7 +229,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     public void updateInitiativeRefundRules(String organizationId, String initiativeId, String role, Initiative refundRule, boolean changeInitiativeStatus) {
         long startTime = System.currentTimeMillis();
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
-        initiativeValidationService.checkRefundRuleDiscountInitiative(initiative.getInitiativeRewardType(), refundRule.getRefundRule());
+        initiativeValidationService.checkRefundRuleDiscountInitiative(initiative.getInitiativeRewardType().name(), refundRule.getRefundRule());
         //Check Initiative Status
         isInitiativeAllowedToBeEditableThenThrows(initiative);
         initiative.setRefundRule(refundRule.getRefundRule());

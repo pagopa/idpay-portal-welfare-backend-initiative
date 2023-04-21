@@ -60,8 +60,7 @@ class InitiativeValidationServiceTest {
     private static final String ISEE = "ISEE";
     public static final String API_KEY_CLIENT_ID = "apiKeyClientId";
     public static final String API_KEY_CLIENT_ASSERTION = "apiKeyClientAssertion";
-    public static final String PERCENTAGE = "PERCENTAGE";
-    public static final String ABSOLUTE = "ABSOLUTE";
+    private static final String ROLE = "ROLE";
 
 
     @Autowired
@@ -154,6 +153,74 @@ class InitiativeValidationServiceTest {
         assertEquals(InitiativeConstants.Exception.BadRequest.CODE, exception.getCode());
         assertEquals(String.format(InitiativeConstants.Exception.BadRequest.PERMISSION_NOT_VALID, PAGOPA_ADMIN_ROLE), exception.getMessage());
     }
+    @Test
+    void updateGeneralInfoWhenBeneficiaryTypeIsNF_ok() {
+        Initiative fullInitiative = createStep2Initiative(true);
+        InitiativeGeneral generalInfoInitiative = createInitiativeGeneralFamilyUnitComposition();
+        fullInitiative.setGeneral(generalInfoInitiative);
+
+        Executable executable = () -> initiativeValidationService.checkBeneficiaryTypeAndFamilyUnit(fullInitiative);
+        assertDoesNotThrow(executable);
+    }
+    @Test
+    void updateGeneralInfoWhenBeneficiaryTypeIsNFAndFamilyUnitCompositionIsNull_ko() {
+        Initiative fullInitiative = createFullInitiative();
+        InitiativeGeneral generalInfoInitiative = createInitiativeGeneralFamilyUnitComposition();
+        fullInitiative.setGeneral(generalInfoInitiative);
+        fullInitiative.getGeneral().setFamilyUnitComposition(null);
+
+        try {
+            initiativeValidationService.checkBeneficiaryTypeAndFamilyUnit(fullInitiative);
+        } catch (InitiativeException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
+            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_GENERAL_FAMILY_COMPOSITION_MESSAGE, e.getMessage());
+        }
+    }
+    @Test
+    void updateGeneralInfoWhenBeneficiaryTypeIsNFAndFamilyUnitCompositionIsNotInpsOrAnpr_ko() {
+        Initiative fullInitiative = createFullInitiative();
+        InitiativeGeneral generalInfoInitiative = createInitiativeGeneralFamilyUnitComposition();
+        fullInitiative.setGeneral(generalInfoInitiative);
+        fullInitiative.getGeneral().setFamilyUnitComposition("TEST");
+
+        try {
+            initiativeValidationService.checkBeneficiaryTypeAndFamilyUnit(fullInitiative);
+        } catch (InitiativeException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
+            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_GENERAL_FAMILY_COMPOSITION_MESSAGE, e.getMessage());
+        }
+    }
+    @Test
+    void updateGeneralInfoWhenBeneficiaryTypeIsPFAndFamilyUnitCompositionIsNotNull_ko() {
+        Initiative fullInitiative = createFullInitiative();
+        InitiativeGeneral generalInfoInitiative = createInitiativeGeneralFamilyUnitComposition();
+        fullInitiative.setGeneral(generalInfoInitiative);
+        fullInitiative.getGeneral().setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF);
+
+
+        try {
+            initiativeValidationService.checkBeneficiaryTypeAndFamilyUnit(fullInitiative);
+        } catch (InitiativeException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
+            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_GENERAL_FAMILY_COMPOSITION_WRONG_BENEFICIARY_TYPE, e.getMessage());
+        }
+    }
+    @Test
+    void updateGeneralInfoWhenBeneficiaryTypeIsPFAndISeeIsMissing_ko() {
+        Initiative fullInitiative = createFullInitiative();
+        InitiativeGeneral generalInfoInitiative = createInitiativeGeneralFamilyUnitComposition();
+        fullInitiative.setGeneral(generalInfoInitiative);
+        InitiativeBeneficiaryRule beneficiaryInfoInitiative = createInitiativeBeneficiaryRule();
+        fullInitiative.setBeneficiaryRule(beneficiaryInfoInitiative);
+        fullInitiative.getBeneficiaryRule().setAutomatedCriteria(null);
+
+        try {
+            initiativeValidationService.checkBeneficiaryTypeAndFamilyUnit(fullInitiative);
+        } catch (InitiativeException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
+            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_BENEFICIARY_TYPE_NF_ENABLED_AUTOMATED_CRITERIA_ISEE_MISSING_NOT_VALID, e.getMessage());
+        }
+    }
 
     @Test
     void testCheckPermissionBeforeInsert() {
@@ -244,7 +311,7 @@ class InitiativeValidationServiceTest {
     void checkRewardRuleAbsolute_noRewardAbsolute(){
         Initiative step4Initiative = createStep4Initiative();
         RewardValue rewardValue = new RewardValue();
-        rewardValue.setRewardValueType(PERCENTAGE);
+        rewardValue.setRewardValueType(RewardValue.RewardValueTypeEnum.PERCENTAGE);
         step4Initiative.setRewardRule(rewardValue);
         Executable executable = () -> initiativeValidationService.checkRewardRuleAbsolute(step4Initiative);
         assertDoesNotThrow(executable);
@@ -253,7 +320,7 @@ class InitiativeValidationServiceTest {
     void checkRewardRuleAbsolute_thresholdNull(){
         Initiative step4Initiative = createStep4Initiative();
         RewardValue rewardValue = new RewardValue();
-        rewardValue.setRewardValueType(ABSOLUTE);
+        rewardValue.setRewardValueType(RewardValue.RewardValueTypeEnum.ABSOLUTE);
         step4Initiative.setRewardRule(rewardValue);
         InitiativeTrxConditions trxConditions = new InitiativeTrxConditions();
         trxConditions.setThreshold(null);
@@ -270,7 +337,7 @@ class InitiativeValidationServiceTest {
     void checkRewardRuleAbsolute_thresholdFromNull(){
         Initiative step4Initiative = createStep4Initiative();
         RewardValue rewardValue = new RewardValue();
-        rewardValue.setRewardValueType(ABSOLUTE);
+        rewardValue.setRewardValueType(RewardValue.RewardValueTypeEnum.ABSOLUTE);
         step4Initiative.setRewardRule(rewardValue);
         InitiativeTrxConditions trxConditions = new InitiativeTrxConditions();
         trxConditions.setThreshold(new Threshold());
@@ -286,7 +353,7 @@ class InitiativeValidationServiceTest {
     void checkRewardRuleAbsolute_thresholdFromWrong(){
         Initiative step4Initiative = createStep4Initiative();
         RewardValue rewardValue = new RewardValue();
-        rewardValue.setRewardValueType(ABSOLUTE);
+        rewardValue.setRewardValueType(RewardValue.RewardValueTypeEnum.ABSOLUTE);
         rewardValue.setRewardValue(BigDecimal.valueOf(40));
         step4Initiative.setRewardRule(rewardValue);
         InitiativeTrxConditions trxConditions = new InitiativeTrxConditions();
@@ -306,7 +373,7 @@ class InitiativeValidationServiceTest {
     void checkRewardRuleAbsolute_thresholdOK(){
         Initiative step4Initiative = createStep4Initiative();
         RewardValue rewardValue = new RewardValue();
-        rewardValue.setRewardValueType(ABSOLUTE);
+        rewardValue.setRewardValueType(RewardValue.RewardValueTypeEnum.ABSOLUTE);
         rewardValue.setRewardValue(BigDecimal.valueOf(30));
         step4Initiative.setRewardRule(rewardValue);
         InitiativeTrxConditions trxConditions = new InitiativeTrxConditions();
@@ -320,31 +387,31 @@ class InitiativeValidationServiceTest {
     @Test
     void checkRefundRuleDiscountInitiative_RefundType(){
         Initiative step5Initiative = createStep5Initiative();
-        step5Initiative.setInitiativeRewardType(InitiativeConstants.Status.Validation.REWARD_REFUND);
-        Executable executable = () -> initiativeValidationService.checkRefundRuleDiscountInitiative(step5Initiative.getInitiativeRewardType(),
+        step5Initiative.setInitiativeRewardType(InitiativeDTO.InitiativeRewardTypeEnum.REFUND);
+        Executable executable = () -> initiativeValidationService.checkRefundRuleDiscountInitiative(step5Initiative.getInitiativeRewardType().name(),
                 new InitiativeRefundRule());
         assertDoesNotThrow(executable);
     }
     @Test
     void checkRefundRuleDiscountInitiative_discountType_noAccumulatedAmount(){
         Initiative step5Initiative = createStep5Initiative();
-        step5Initiative.setInitiativeRewardType(InitiativeConstants.Status.Validation.REWARD_DISCOUNT);
+        step5Initiative.setInitiativeRewardType(InitiativeDTO.InitiativeRewardTypeEnum.DISCOUNT);
         InitiativeRefundRule refundRule = new InitiativeRefundRule();
         refundRule.setTimeParameter(new TimeParameter(TimeParameter.TimeTypeEnum.DAILY));
-        Executable executable = () -> initiativeValidationService.checkRefundRuleDiscountInitiative(step5Initiative.getInitiativeRewardType(),
+        Executable executable = () -> initiativeValidationService.checkRefundRuleDiscountInitiative(step5Initiative.getInitiativeRewardType().name(),
                 refundRule);
         assertDoesNotThrow(executable);
     }
     @Test
     void checkRefundRuleDiscountInitiative_discountType_withAccumulatedAmount(){
         Initiative step5Initiative = createStep5Initiative();
-        step5Initiative.setInitiativeRewardType(InitiativeConstants.Status.Validation.REWARD_DISCOUNT);
+        step5Initiative.setInitiativeRewardType(InitiativeDTO.InitiativeRewardTypeEnum.DISCOUNT);
         AccumulatedAmount accumulatedAmount = new AccumulatedAmount();
         accumulatedAmount.setAccumulatedType(AccumulatedAmount.AccumulatedTypeEnum.THRESHOLD_REACHED);
         InitiativeRefundRule refundRule = new InitiativeRefundRule();
         refundRule.setAccumulatedAmount(accumulatedAmount);
         try {
-            initiativeValidationService.checkRefundRuleDiscountInitiative(step5Initiative.getInitiativeRewardType(),
+            initiativeValidationService.checkRefundRuleDiscountInitiative(step5Initiative.getInitiativeRewardType().name(),
                     refundRule);
         } catch (InitiativeException e) {
             assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
@@ -354,15 +421,16 @@ class InitiativeValidationServiceTest {
     @Test
     void checkRefundRuleDiscountInitiative_discountType_noTimeParameter(){
         Initiative step4Initiative = createStep4Initiative();
-        step4Initiative.setInitiativeRewardType(InitiativeConstants.Status.Validation.REWARD_DISCOUNT);
+        step4Initiative.setInitiativeRewardType(InitiativeDTO.InitiativeRewardTypeEnum.DISCOUNT);
         try {
-            initiativeValidationService.checkRefundRuleDiscountInitiative(step4Initiative.getInitiativeRewardType(),
+            initiativeValidationService.checkRefundRuleDiscountInitiative(step4Initiative.getInitiativeRewardType().name(),
                     new InitiativeRefundRule());
         } catch (InitiativeException e) {
             assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
             assertEquals(InitiativeConstants.Exception.BadRequest.REFUND_RULE_INVALID, e.getMessage());
         }
     }
+
     /*
      * ############### Step 1 ###############
      */
@@ -641,7 +709,7 @@ class InitiativeValidationServiceTest {
         return RewardValueDTO.builder()
                 .rewardValue(BigDecimal.valueOf(50))
                 .type("rewardValue")
-                .rewardValueType("PERCENTAGE")
+                .rewardValueType(RewardValueDTO.RewardValueTypeEnum.PERCENTAGE)
                 .build();
     }
 
@@ -770,5 +838,24 @@ class InitiativeValidationServiceTest {
         InitiativeDTO initiativeDTO = createStep4InitiativeDTO(rankingEnabled);
         initiativeDTO.setRefundRule(createRefundRuleDTOValidWithTimeParameter());
         return initiativeDTO;
+    }
+    Initiative createFullInitiative() {
+        return createStep5Initiative();
+    }
+    private InitiativeGeneral createInitiativeGeneralFamilyUnitComposition() {
+        Map<String, String> language = new HashMap<>();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
+        InitiativeGeneral initiativeGeneral = new InitiativeGeneral();
+        initiativeGeneral.setBeneficiaryBudget(new BigDecimal(10));
+        initiativeGeneral.setBeneficiaryKnown(true);
+        initiativeGeneral.setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.NF);
+        initiativeGeneral.setFamilyUnitComposition(InitiativeConstants.FamilyUnitCompositionConstant.INPS);
+        initiativeGeneral.setBudget(new BigDecimal(1000000000));
+        initiativeGeneral.setEndDate(LocalDate.of(2022, 9, 8));
+        initiativeGeneral.setStartDate(LocalDate.of(2022, 8, 8));
+        initiativeGeneral.setRankingStartDate(LocalDate.of(2022, 9, 18));
+        initiativeGeneral.setRankingEndDate(LocalDate.of(2022, 8, 18));
+        initiativeGeneral.setDescriptionMap(language);
+        return initiativeGeneral;
     }
 }

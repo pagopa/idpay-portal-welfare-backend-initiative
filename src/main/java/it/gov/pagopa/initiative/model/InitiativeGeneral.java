@@ -18,7 +18,7 @@ public class InitiativeGeneral {
 
     private BigDecimal budget;
     private BeneficiaryTypeEnum beneficiaryType;
-    private FamilyUnitCompositionEnum familyUnitComposition;
+    private String familyUnitComposition;
     private Boolean beneficiaryKnown;
     private BigDecimal beneficiaryBudget;
     /**
@@ -69,35 +69,4 @@ public class InitiativeGeneral {
             return null;
         }
     }
-
-    /**
-     * Gets or Sets familyUnitComposition
-     */
-    public enum FamilyUnitCompositionEnum {
-
-        INPS("INPS"), ANPR("ANPR");
-
-        private final String value;
-
-        FamilyUnitCompositionEnum(String value) {
-            this.value = value;
-        }
-
-        @Override
-        @JsonValue
-        public String toString() {
-            return String.valueOf(value);
-        }
-
-        @JsonCreator
-        public static FamilyUnitCompositionEnum fromValue(String text) {
-            for (FamilyUnitCompositionEnum b : FamilyUnitCompositionEnum.values()) {
-                if (String.valueOf(b.value).equals(text)) {
-                    return b;
-                }
-            }
-            return null;
-        }
-    }
-
 }

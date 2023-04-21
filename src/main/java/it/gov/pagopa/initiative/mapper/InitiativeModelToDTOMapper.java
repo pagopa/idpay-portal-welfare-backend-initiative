@@ -152,6 +152,7 @@ public class InitiativeModelToDTOMapper {
         return InitiativeGeneralDTO.builder().beneficiaryBudget(general.getBeneficiaryBudget())
                 .beneficiaryKnown(general.getBeneficiaryKnown())
                 .beneficiaryType(general.getBeneficiaryType()!=null?InitiativeGeneralDTO.BeneficiaryTypeEnum.valueOf(general.getBeneficiaryType().name()):null)
+                .familyUnitComposition(general.getFamilyUnitComposition()!=null?general.getFamilyUnitComposition():null)
                 .budget(general.getBudget())
                 .endDate(general.getEndDate())
                 .startDate(general.getStartDate())
@@ -320,7 +321,7 @@ public class InitiativeModelToDTOMapper {
         if (rewardRule instanceof RewardValue rewardValueInput) {
             dto = RewardValueDTO.builder()
                     .type(rewardValueInput.getType())
-                    .rewardValueType(rewardValueInput.getRewardValueType())
+                    .rewardValueType(RewardValueDTO.RewardValueTypeEnum.valueOf(rewardValueInput.getRewardValueType().name()))
                     .rewardValue(rewardValueInput.getRewardValue())
                     .build();
         } else if (rewardRule instanceof RewardGroups rewardGroupsInput) {
@@ -341,7 +342,7 @@ public class InitiativeModelToDTOMapper {
         InitiativeRewardRuleDTO dto = null;
         if (rewardRule instanceof RewardValue rewardValueInput) {
             dto = RewardValueDTO.builder()
-                    .rewardValueType(rewardValueInput.getRewardValueType())
+                    .rewardValueType(RewardValueDTO.RewardValueTypeEnum.valueOf(rewardValueInput.getRewardValueType().name()))
                     .rewardValue(rewardValueInput.getRewardValue())
                     .build();
         } else if (rewardRule instanceof RewardGroups rewardGroupsInput) {

@@ -1052,7 +1052,7 @@ class InitiativeApiTest {
     private InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardValueDTO() {
         return RewardValueDTO.builder()
                 .rewardValue(BigDecimal.valueOf(50))
-                .rewardValueType("PERCENTAGE")
+                .rewardValueType(RewardValueDTO.RewardValueTypeEnum.PERCENTAGE)
                 .type("rewardValue")
                 .build();
     }
@@ -1119,7 +1119,7 @@ class InitiativeApiTest {
 
     private InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTO() {
         InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = new InitiativeRewardAndTrxRulesDTO();
-        initiativeRewardAndTrxRulesDTO.setInitiativeRewardType(InitiativeConstants.Status.Validation.REWARD_REFUND);
+        initiativeRewardAndTrxRulesDTO.setInitiativeRewardType(InitiativeRewardAndTrxRulesDTO.InitiativeRewardTypeEnum.REFUND);
         InitiativeRewardRuleDTO initiativeRewardRuleDTO = createInitiativeRewardRuleDTORewardValueDTO();
         initiativeRewardAndTrxRulesDTO.setRewardRule(initiativeRewardRuleDTO);
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = createInitiativeTrxConditionsDTOValid();
