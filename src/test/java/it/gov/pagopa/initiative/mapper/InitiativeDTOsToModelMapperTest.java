@@ -118,14 +118,18 @@ class InitiativeDTOsToModelMapperTest {
     private InitiativeDTO initiativeDTO;
     private InitiativeRewardAndTrxRulesDTO initiativeOnlyRewardAbsolute;
     private Initiative initiativeTrxNullRewardAbsolute;
+    private InitiativeGeneralDTO initiativeInfoOnlyInfoGeneralDTOFamilyUnitNotNull;
+    private Initiative initiativeInfoOnlyInfoGeneralFamilyUnitNotNull;
 
     @BeforeEach
     public void setUp() {
         initiativeOnlyInfoGeneral = createStep1InitiativeOnlyInfoGeneral();
+        initiativeInfoOnlyInfoGeneralFamilyUnitNotNull = createStep1InitiativeOnlyInfoGeneralFamilyUnitNotNull();
         initiativeNoBaseFields = createStep1InitiativeNoBaseFields();
         initiativeBeneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
         initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
         initiativeInfoOnlyInfoGeneralDTO = createStep1InitiativeInfoDTOonlyInfoGeneral();
+        initiativeInfoOnlyInfoGeneralDTOFamilyUnitNotNull = createStep1InitiativeInfoDTOonlyInfoGeneralFamilyUnitNotNull();
         initiativeInfoDTOnoBaseFields = createStep1InitiativeInfoDTOnoBaseFields();
         initiativeRefundRuleDTOAmount = createRefundRuleDTOValidWithAccumulatedAmount();
         initiativeOnlyRefundRule = createInitiativeOnlyRefundRule();
@@ -273,6 +277,12 @@ class InitiativeDTOsToModelMapperTest {
     void testToInitiativeGeneral_null() {
         Assertions.assertNull(initiativeDTOsToModelMapper.toInitiative((InitiativeGeneralDTO) null).getGeneral());
     }
+    @Test
+    void testToInitiativeGeneralFamilyUnitIsNotNull_ok() {
+        Initiative initiativeActual = initiativeDTOsToModelMapper.toInitiative(initiativeInfoOnlyInfoGeneralDTOFamilyUnitNotNull);
+
+        assertEquals(initiativeInfoOnlyInfoGeneralFamilyUnitNotNull,initiativeActual);
+    }
 
     @Test
     void testToInitiativeAdditional_null() {
@@ -401,6 +411,13 @@ class InitiativeDTOsToModelMapperTest {
         initiative.setGeneral(createInitiativeGeneral());
         return initiative;
     }
+    private Initiative createStep1InitiativeOnlyInfoGeneralFamilyUnitNotNull() {
+        Initiative initiative = new Initiative();
+        initiative.setGeneral(createInitiativeGeneral());
+        initiative.getGeneral().setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.NF);
+        initiative.getGeneral().setFamilyUnitComposition("INPS");
+        return initiative;
+    }
 
     private Initiative createStep1InitiativeNoBaseFields() {
         Initiative initiative = new Initiative();
@@ -499,6 +516,9 @@ class InitiativeDTOsToModelMapperTest {
     private InitiativeGeneralDTO createStep1InitiativeInfoDTOonlyInfoGeneral() {
         return createInitiativeGeneralDTO();
     }
+    private InitiativeGeneralDTO createStep1InitiativeInfoDTOonlyInfoGeneralFamilyUnitNotNull() {
+        return createInitiativeGeneralDTOFamilyUnitNotNull();
+    }
 
     private InitiativeGeneralDTO createInitiativeGeneralDTO() {
         Map<String, String> language = new HashMap<>();
@@ -507,6 +527,26 @@ class InitiativeDTOsToModelMapperTest {
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
+        initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
+        LocalDate rankingStartDate = LocalDate.now();
+        LocalDate rankingEndDate = rankingStartDate.plusDays(1);
+        LocalDate startDate = rankingEndDate.plusDays(1);
+        LocalDate endDate = startDate.plusDays(1);
+        initiativeGeneralDTO.setRankingStartDate(rankingStartDate);
+        initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
+        initiativeGeneralDTO.setStartDate(startDate);
+        initiativeGeneralDTO.setEndDate(endDate);
+        initiativeGeneralDTO.setDescriptionMap(language);
+        return initiativeGeneralDTO;
+    }
+    private InitiativeGeneralDTO createInitiativeGeneralDTOFamilyUnitNotNull() {
+        Map<String, String> language = new HashMap<>();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
+        InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
+        initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
+        initiativeGeneralDTO.setBeneficiaryKnown(true);
+        initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.NF);
+        initiativeGeneralDTO.setFamilyUnitComposition("INPS");
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
         LocalDate rankingStartDate = LocalDate.now();
         LocalDate rankingEndDate = rankingStartDate.plusDays(1);

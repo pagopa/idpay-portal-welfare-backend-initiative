@@ -91,6 +91,10 @@ class InitiativeModelToDTOMapperTest {
     private InitiativeAdditionalDTO initiativeAdditionalDTOOnlyTokens;
     private InitiativeAdditional initiativeAdditionalOnlyTokens;
     private InitiativeDetailDTO fullInitiativeDetailDTO;
+    private Initiative initiativeStep2BeneficiaryTypeNull;
+    private InitiativeDTO initiativeStep2DTOBeneficiaryTypeNull;
+    private Initiative initiativeStep2FamilyUnitNotNull;
+    private InitiativeDTO initiativeStep2DTOFamilyUnitNotNull;
 
     @MockBean
     InitiativeUtils initiativeUtils;
@@ -132,6 +136,10 @@ class InitiativeModelToDTOMapperTest {
         initiativeAdditionalOnlyTokens = createInitiativeAdditionalOnlyTokens();
         initiativeAdditionalDTOOnlyTokens = createInitiativeAdditionalDTOOnlyTokens();
         fullInitiativeDetailDTO = createInitiativeDetailDTO();
+        initiativeStep2BeneficiaryTypeNull = createStep2InitiativeBeneficiaryTypeNull();
+        initiativeStep2DTOBeneficiaryTypeNull = createStep2InitiativeDTOBeneficiaryTypeNull();
+        initiativeStep2FamilyUnitNotNull = createStep2InitiativeFamilyUnitNotNull();
+        initiativeStep2DTOFamilyUnitNotNull = createStep2InitiativeDTOFamilyUnitNotNull();
 
         Mockito.when(aesTokenService.decrypt(ENCRYPTED_API_KEY_CLIENT_ID)).thenReturn(API_KEY_CLIENT_ID);
         Mockito.when(aesTokenService.decrypt(ENCRYPTED_API_KEY_CLIENT_ASSERTION)).thenReturn(API_KEY_CLIENT_ASSERTION);
@@ -235,6 +243,18 @@ class InitiativeModelToDTOMapperTest {
         assertEquals(initiative.getAdditionalInfo().getTcLink(), initiativeDataDTO.getTcLink());
         assertEquals(initiative.getAdditionalInfo().getPrivacyLink(), initiativeDataDTO.getPrivacyLink());
         assertNull(initiativeDataDTO.getLogoURL());
+    }
+    @Test
+    void toInitiativeGeneralDTOBeneficiaryTypeNull() {
+        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(initiativeStep2BeneficiaryTypeNull);
+        assertEquals(initiativeStep2DTOBeneficiaryTypeNull, initiativeDTO);
+
+    }
+    @Test
+    void toInitiativeGeneralDTOFamilyUnitNotNull() {
+        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(initiativeStep2FamilyUnitNotNull);
+        assertEquals(initiativeStep2DTOFamilyUnitNotNull, initiativeDTO);
+
     }
 
     @Test
@@ -385,7 +405,6 @@ class InitiativeModelToDTOMapperTest {
         assertEquals(fullInitiativeDetailDTO, initiativeDetailDTO);
 
     }
-
 
     @Test
     void toInitiativeDTONull_equals() {
@@ -689,10 +708,38 @@ class InitiativeModelToDTOMapperTest {
         initiative.setGeneral(createInitiativeGeneral());
         return initiative;
     }
+    private Initiative createStep2InitiativeBeneficiaryTypeNull() {
+        Initiative initiative = createStep1Initiative();
+        initiative.setGeneral(createInitiativeGeneral());
+        initiative.getGeneral().setBeneficiaryType(null);
+        return initiative;
+    }
+    private Initiative createStep2InitiativeFamilyUnitNotNull() {
+        Initiative initiative = createStep1Initiative();
+        initiative.setGeneral(createInitiativeGeneral());
+        initiative.getGeneral().setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.NF);
+        initiative.getGeneral().setFamilyUnitComposition("INPS");
+        return initiative;
+    }
 
     private InitiativeDTO createStep2InitiativeDTO() {
         InitiativeDTO initiativeDTO = createStep1InitiativeDTO();
         initiativeDTO.setGeneral(createInitiativeGeneralDTO());
+        return initiativeDTO;
+    }
+    private InitiativeDTO createStep2InitiativeDTOBeneficiaryTypeNull() {
+        InitiativeDTO initiativeDTO = createStep1InitiativeDTO();
+        initiativeDTO.setGeneral(createInitiativeGeneralDTO());
+        initiativeDTO.getGeneral().setBeneficiaryType(null);
+        initiativeDTO.setIsLogoPresent(false);
+        return initiativeDTO;
+    }
+    private InitiativeDTO createStep2InitiativeDTOFamilyUnitNotNull() {
+        InitiativeDTO initiativeDTO = createStep1InitiativeDTO();
+        initiativeDTO.setGeneral(createInitiativeGeneralDTO());
+        initiativeDTO.getGeneral().setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.NF);
+        initiativeDTO.getGeneral().setFamilyUnitComposition("INPS");
+        initiativeDTO.setIsLogoPresent(false);
         return initiativeDTO;
     }
 

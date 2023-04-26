@@ -2,7 +2,6 @@ package it.gov.pagopa.initiative.mapper;
 
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest;
-import it.gov.pagopa.initiative.constants.InitiativeConstants.Status.Validation;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.rule.refund.AccumulatedAmountDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
