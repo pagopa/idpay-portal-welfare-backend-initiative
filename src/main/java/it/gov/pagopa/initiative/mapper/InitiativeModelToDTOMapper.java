@@ -108,20 +108,22 @@ public class InitiativeModelToDTOMapper {
         initiativeDto.setInitiativeName(initiative.getInitiativeName());
         initiativeDto.setStatus(initiative.getStatus());
         initiativeDto.setOrganizationId(initiative.getOrganizationId());
+        initiativeDto.setOrganizationName(initiative.getOrganizationName());
         initiativeDto.setCreationDate(initiative.getCreationDate());
         initiativeDto.setUpdateDate(initiative.getUpdateDate());
         initiativeDto.setGeneral(this.toInitiativeGeneralDTO(initiative.getGeneral()));
         initiativeDto.setAdditionalInfo(this.toInitiativeAdditionalDTO(initiative.getAdditionalInfo()));
+        initiativeDto.setIsLogoPresent(false);
         if(initiativeDto.getAdditionalInfo() != null && initiativeDto.getAdditionalInfo().getLogoFileName() != null){
             initiativeDto.getAdditionalInfo().setLogoURL(initiativeUtils.createLogoUrl(initiative.getOrganizationId(),
                     initiative.getInitiativeId()));
+            initiativeDto.setIsLogoPresent(true);
         }
         initiativeDto.setBeneficiaryRule(this.toInitiativeBeneficiaryRuleDTO(initiative.getBeneficiaryRule()));
         initiativeDto.setInitiativeRewardType(initiative.getInitiativeRewardType());
         initiativeDto.setRewardRule(this.toRewardRuleDTO(initiative.getRewardRule()));
         initiativeDto.setTrxRule(this.toTrxRuleDTO(initiative.getTrxRule()));
         initiativeDto.setRefundRule(this.toInitiativeRefundRuleDTO(initiative.getRefundRule()));
-        initiativeDto.setOrganizationName(initiative.getOrganizationName());
         return initiativeDto;
     }
 

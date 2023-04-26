@@ -60,7 +60,6 @@ class InitiativeValidationServiceTest {
     private static final String ISEE = "ISEE";
     public static final String API_KEY_CLIENT_ID = "apiKeyClientId";
     public static final String API_KEY_CLIENT_ASSERTION = "apiKeyClientAssertion";
-    private static final String ROLE = "ROLE";
 
 
     @Autowired
@@ -206,16 +205,61 @@ class InitiativeValidationServiceTest {
         }
     }
     @Test
-    void updateGeneralInfoWhenBeneficiaryTypeIsPFAndISeeIsMissing_ko() {
+    void updateGeneralInfoWhenBeneficiaryTypeIsNFAndFieldISeeExist_ok() {
         Initiative fullInitiative = createFullInitiative();
         InitiativeGeneral generalInfoInitiative = createInitiativeGeneralFamilyUnitComposition();
         fullInitiative.setGeneral(generalInfoInitiative);
         InitiativeBeneficiaryRule beneficiaryInfoInitiative = createInitiativeBeneficiaryRule();
         fullInitiative.setBeneficiaryRule(beneficiaryInfoInitiative);
-        fullInitiative.getBeneficiaryRule().setAutomatedCriteria(null);
+        List<AutomatedCriteria> automatedCriteriaList = fullInitiative.getBeneficiaryRule().getAutomatedCriteria();
+
+        Executable executable = () -> initiativeValidationService.checkAutomatedCriteria(fullInitiative, automatedCriteriaList);
+        assertDoesNotThrow(executable);
+
+    }
+    @Test
+    void updateGeneralInfoWhenBeneficiaryTypeIsPFAndFamilyUnitCompositionIsNull_ko() {
+        Initiative fullInitiative = createFullInitiative();
+        InitiativeGeneral generalInfoInitiative = createInitiativeGeneralFamilyUnitComposition();
+        fullInitiative.setGeneral(generalInfoInitiative);
+        fullInitiative.getGeneral().setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF);
+        fullInitiative.getGeneral().setFamilyUnitComposition(null);
 
         try {
             initiativeValidationService.checkBeneficiaryTypeAndFamilyUnit(fullInitiative);
+        } catch (InitiativeException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
+            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_GENERAL_FAMILY_COMPOSITION_MESSAGE, e.getMessage());
+        }
+    }
+    @Test
+    void updateGeneralInfoWhenBeneficiaryTypeIsNFAndISeeIsMissing_ko() {
+        Initiative fullInitiative = createFullInitiative();
+        InitiativeGeneral generalInfoInitiative = createInitiativeGeneralFamilyUnitComposition();
+        fullInitiative.setGeneral(generalInfoInitiative);
+        InitiativeBeneficiaryRule beneficiaryInfoInitiative = createInitiativeBeneficiaryRuleWithoutISEE();
+        fullInitiative.setBeneficiaryRule(beneficiaryInfoInitiative);
+        List<AutomatedCriteria> automatedCriteriaList = fullInitiative.getBeneficiaryRule().getAutomatedCriteria();
+
+        try {
+            initiativeValidationService.checkAutomatedCriteria(fullInitiative,automatedCriteriaList);
+        } catch (InitiativeException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
+            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_BENEFICIARY_TYPE_NF_ENABLED_AUTOMATED_CRITERIA_ISEE_MISSING_NOT_VALID, e.getMessage());
+        }
+    }
+    @Test
+    void updateGeneralInfoWhenBeneficiaryTypeIsPFAndISeeIsMissing_ko() {
+        Initiative fullInitiative = createFullInitiative();
+        InitiativeGeneral generalInfoInitiative = createInitiativeGeneralFamilyUnitComposition();
+        fullInitiative.setGeneral(generalInfoInitiative);
+        fullInitiative.getGeneral().setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF);
+        InitiativeBeneficiaryRule beneficiaryInfoInitiative = createInitiativeBeneficiaryRuleWithoutISEE();
+        fullInitiative.setBeneficiaryRule(beneficiaryInfoInitiative);
+        List<AutomatedCriteria> automatedCriteriaList = fullInitiative.getBeneficiaryRule().getAutomatedCriteria();
+
+        try {
+            initiativeValidationService.checkAutomatedCriteria(fullInitiative,automatedCriteriaList);
         } catch (InitiativeException e) {
             assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
             assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_BENEFICIARY_TYPE_NF_ENABLED_AUTOMATED_CRITERIA_ISEE_MISSING_NOT_VALID, e.getMessage());
@@ -592,6 +636,36 @@ class InitiativeValidationServiceTest {
         AutomatedCriteria automatedCriteria = new AutomatedCriteria();
         automatedCriteria.setAuthority("INPS");
         automatedCriteria.setCode(ISEE);
+        automatedCriteria.setField("true");
+        automatedCriteria.setOperator(FilterOperatorEnumModel.EQ);
+        automatedCriteria.setValue("value");
+        automatedCriteria.setIseeTypes(List.of(IseeTypologyEnum.CORRENTE, IseeTypologyEnum.DOTTORATO, IseeTypologyEnum.RESIDENZIALE));
+        List<AutomatedCriteria> automatedCriteriaList = new ArrayList<>();
+        automatedCriteriaList.add(automatedCriteria);
+        initiativeBeneficiaryRule.setAutomatedCriteria(automatedCriteriaList);
+        return initiativeBeneficiaryRule;
+    }
+    private InitiativeBeneficiaryRule createInitiativeBeneficiaryRuleWithoutISEE() {
+        InitiativeBeneficiaryRule initiativeBeneficiaryRule = new InitiativeBeneficiaryRule();
+        SelfCriteriaBool selfCriteriaBool = new SelfCriteriaBool();
+        selfCriteriaBool.set_type(TypeBoolEnum.BOOLEAN);
+        selfCriteriaBool.setCode("B001");
+        selfCriteriaBool.setDescription("Desc_bool");
+        selfCriteriaBool.setValue(true);
+        SelfCriteriaMulti selfCriteriaMulti = new SelfCriteriaMulti();
+        selfCriteriaMulti.set_type(TypeMultiEnum.MULTI);
+        selfCriteriaMulti.setCode("B001");
+        selfCriteriaMulti.setDescription("Desc_Multi");
+        List<String> values = new ArrayList<>();
+        values.add("valore1");
+        values.add("valore2");
+        selfCriteriaMulti.setValue(values);
+        List<ISelfDeclarationCriteria> iSelfDeclarationCriteriaList = new ArrayList<>();
+        iSelfDeclarationCriteriaList.add(selfCriteriaBool);
+        iSelfDeclarationCriteriaList.add(selfCriteriaMulti);
+        initiativeBeneficiaryRule.setSelfDeclarationCriteria(iSelfDeclarationCriteriaList);
+        AutomatedCriteria automatedCriteria = new AutomatedCriteria();
+        automatedCriteria.setCode("BIRTHDAY");
         automatedCriteria.setField("true");
         automatedCriteria.setOperator(FilterOperatorEnumModel.EQ);
         automatedCriteria.setValue("value");

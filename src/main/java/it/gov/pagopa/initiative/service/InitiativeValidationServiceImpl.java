@@ -93,7 +93,7 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
                         HttpStatus.BAD_REQUEST);
             }
         }
-        if(initiative.getGeneral().getBeneficiaryType().equals(InitiativeGeneral.BeneficiaryTypeEnum.NF) &&
+        if(InitiativeGeneral.BeneficiaryTypeEnum.NF.equals(initiative.getGeneral().getBeneficiaryType()) &&
                 automatedCriteriaList.stream().noneMatch(a -> a.getCode().equals(ISEE))){
             throw new InitiativeException(
                     InitiativeConstants.Exception.BadRequest.CODE,
@@ -166,7 +166,7 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
     public void checkRewardRuleAbsolute(Initiative initiative) {
         InitiativeRewardRule rewardRule = initiative.getRewardRule();
         if (rewardRule instanceof RewardValue rewardValue &&
-                rewardValue.getRewardValueType().equals(RewardValue.RewardValueTypeEnum.ABSOLUTE)) {
+                RewardValue.RewardValueTypeEnum.ABSOLUTE.equals(rewardValue.getRewardValueType())) {
             Threshold threshold = initiative.getTrxRule().getThreshold();
             if (threshold==null || threshold.getFrom()==null || threshold.getFrom().compareTo(rewardValue.getRewardValue()) < 0){
                 throw new InitiativeException(InitiativeConstants.Exception.BadRequest.CODE,

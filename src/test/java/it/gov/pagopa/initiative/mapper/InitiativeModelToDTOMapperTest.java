@@ -316,11 +316,27 @@ class InitiativeModelToDTOMapperTest {
         //Check the equality of the results
         assertEquals(fullInitiativeDTO, initiativeDTOtoBeVerified);
     }
+    @Test
+    void toInitiativeDTOIsLogoPresent_true() {
+        InitiativeDTO initiativeDTO = createFullInitiativeDTO();
+        initiativeDTO.setAdditionalInfo(createInitiativeAdditionalDTO());
+        initiativeDTO.getAdditionalInfo().setLogoFileName("test.png");
+        initiativeDTO.getAdditionalInfo().setLogoURL("test.it");
+        initiativeDTO.setIsLogoPresent(true);
+        fullInitiative.setAdditionalInfo(createInitiativeAdditional());
+        fullInitiative.getAdditionalInfo().setLogoFileName("test.png");
+
+        Mockito.when(initiativeUtils.createLogoUrl(anyString(),anyString())).thenReturn("test.it");
+
+        InitiativeDTO initiativeDTOExpected = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiative);
+
+        assertEquals(initiativeDTO,initiativeDTOExpected);
+    }
 
     @Test
     void toInitiativeDetailDTO_equals() {
         Locale acceptLanguage = Locale.ITALIAN;
-        fullInitiative.setUpdateDate(LocalDateTime.of(2023,03,20,12,00));
+        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0));
         InitiativeDetailDTO initiativeDetailDTO = initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative,acceptLanguage);
 
         assertEquals(fullInitiativeDetailDTO, initiativeDetailDTO);
@@ -349,7 +365,7 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void toInitiativeDetailDTOWithGeneralInfo_Null() {
         Locale acceptLanguage = Locale.ITALIAN;
-        fullInitiative.setUpdateDate(LocalDateTime.of(2023,03,20,12,00));
+        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0));
         fullInitiative.setGeneral(null);
         try {
             initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative,acceptLanguage);
@@ -360,7 +376,7 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void toInitiativeDetailDTOWithRuleDescription_Null() {
         Locale acceptLanguage = Locale.ITALIAN;
-        fullInitiative.setUpdateDate(LocalDateTime.of(2023,03,20,12,00));
+        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0));
         fullInitiative.getGeneral().setDescriptionMap(null);
         fullInitiativeDetailDTO.setRuleDescription(StringUtils.EMPTY);
 
@@ -733,6 +749,7 @@ class InitiativeModelToDTOMapperTest {
         InitiativeDTO initiativeDTO = createStep2InitiativeDTO();
         InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
         initiativeDTO.setBeneficiaryRule(initiativeBeneficiaryRuleDTO);
+        initiativeDTO.setIsLogoPresent(false);
         return initiativeDTO;
     }
 
@@ -1682,7 +1699,7 @@ class InitiativeModelToDTOMapperTest {
         initiativeDetailDTO.setPrivacyLink("privacyLink");
         initiativeDetailDTO.setTcLink("tcLink");
         initiativeDetailDTO.setLogoURL(null);
-        initiativeDetailDTO.setUpdateDate(LocalDateTime.of(2023,03,20,12,00));
+        initiativeDetailDTO.setUpdateDate(LocalDateTime.of(2023,3,20,12,0));
         return initiativeDetailDTO;
     }
 
