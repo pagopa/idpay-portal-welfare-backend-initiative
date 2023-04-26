@@ -18,4 +18,5 @@ public interface InitiativeValidationService {
     void validateAllWizardSteps(InitiativeDTO initiativeDTO);
     void checkRewardRuleAbsolute(Initiative initiative);
     void checkRefundRuleDiscountInitiative(String initiativeRewardType, InitiativeRefundRule refundRule);
+    void checkBeneficiaryTypeAndFamilyUnit(Initiative initiative);
 }

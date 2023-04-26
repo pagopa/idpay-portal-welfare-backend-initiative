@@ -46,7 +46,7 @@ public class InitiativeGeneralDTO extends InitiativeOrganizationInfoDTO {
      * Gets or Sets beneficiaryType
      */
     public enum BeneficiaryTypeEnum {
-        PF("PF"), PG("PG");
+        PF("PF"), PG("PG"), NF("NF");
 
         private final String value;
 
@@ -74,6 +74,9 @@ public class InitiativeGeneralDTO extends InitiativeOrganizationInfoDTO {
     @JsonProperty("beneficiaryType")
     @NotNull(groups = ValidationApiEnabledGroup.class)
     private BeneficiaryTypeEnum beneficiaryType;
+
+    @JsonProperty("familyUnitComposition")
+    private String familyUnitComposition;
 
     @JsonProperty("beneficiaryKnown")
     @NotNull(groups = ValidationApiEnabledGroup.class)

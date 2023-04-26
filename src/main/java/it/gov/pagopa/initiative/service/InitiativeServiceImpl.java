@@ -19,10 +19,7 @@ import it.gov.pagopa.initiative.event.InitiativeProducer;
 import it.gov.pagopa.initiative.exception.InitiativeException;
 import it.gov.pagopa.initiative.mapper.InitiativeAdditionalDTOsToIOServiceRequestDTOMapper;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
-import it.gov.pagopa.initiative.model.AutomatedCriteria;
-import it.gov.pagopa.initiative.model.Initiative;
-import it.gov.pagopa.initiative.model.InitiativeAdditional;
-import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
+import it.gov.pagopa.initiative.model.*;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
 import it.gov.pagopa.initiative.utils.AuditUtilities;
 import it.gov.pagopa.initiative.utils.InitiativeUtils;
@@ -170,6 +167,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
 
         isInitiativeAllowedToBeEditableThenThrows(initiative);
+        initiativeValidationService.checkBeneficiaryTypeAndFamilyUnit(initiativeInfoModel);
         initiative.setGeneral(initiativeInfoModel.getGeneral());
         if (!initiative.getAdditionalInfo().getServiceName().equals(initiative.getInitiativeName())) {
             initiative.setInitiativeName(initiative.getAdditionalInfo().getServiceName());
@@ -231,7 +229,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     public void updateInitiativeRefundRules(String organizationId, String initiativeId, String role, Initiative refundRule, boolean changeInitiativeStatus) {
         long startTime = System.currentTimeMillis();
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
-        initiativeValidationService.checkRefundRuleDiscountInitiative(initiative.getInitiativeRewardType(), refundRule.getRefundRule());
+        initiativeValidationService.checkRefundRuleDiscountInitiative(initiative.getInitiativeRewardType().name(), refundRule.getRefundRule());
         //Check Initiative Status
         isInitiativeAllowedToBeEditableThenThrows(initiative);
         initiative.setRefundRule(refundRule.getRefundRule());

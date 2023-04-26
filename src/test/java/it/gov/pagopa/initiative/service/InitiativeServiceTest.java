@@ -541,6 +541,76 @@ class InitiativeServiceTest {
         assertEquals(InitiativeConstants.Exception.NotFound.CODE, exception.getCode());
         assertEquals(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE.formatted(INITIATIVE_ID), exception.getMessage());
     }
+    @Test
+    void updateGeneralInfoWhenBeneficiaryTypeIsNF_ok() {
+        Initiative fullInitiative = createStep2Initiative();
+        InitiativeGeneral generalInfoInitiative = createInitiativeGeneralFamilyUnitComposition();
+        fullInitiative.setGeneral(generalInfoInitiative);
+        Initiative initiative = createStep2Initiative();
+        initiative.setGeneral(generalInfoInitiative);
+        initiative.setInitiativeName("serviceName");
+
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID,INITIATIVE_ID,ROLE)).thenReturn(fullInitiative);
+
+
+        initiativeService.updateInitiativeGeneralInfo(ORGANIZATION_ID,INITIATIVE_ID,initiative,ROLE);
+
+        assertEquals(fullInitiative,initiative);
+}
+    @Test
+    void updateGeneralInfoWhenBeneficiaryTypeIsNFAndFamilyUnitCompositionIsNull_ko() {
+        Initiative fullInitiative = createFullInitiative();
+        InitiativeGeneral generalInfoInitiative = createInitiativeGeneralFamilyUnitComposition();
+        fullInitiative.setGeneral(generalInfoInitiative);
+        fullInitiative.getGeneral().setFamilyUnitComposition(null);
+        Initiative step2Initiative = createStep2Initiative();
+        step2Initiative.setGeneral(generalInfoInitiative);
+
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID,INITIATIVE_ID,ROLE)).thenReturn(fullInitiative);
+
+        try {
+            initiativeService.updateInitiativeGeneralInfo(ORGANIZATION_ID,INITIATIVE_ID,step2Initiative,ROLE);
+        } catch (InitiativeException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
+            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_GENERAL_FAMILY_COMPOSITION_MESSAGE, e.getMessage());
+        }
+    }
+    @Test
+    void updateGeneralInfoWhenBeneficiaryTypeIsNFAndFamilyUnitCompositionIsNotInpsOrAnpr_ko() {
+        Initiative fullInitiative = createFullInitiative();
+        InitiativeGeneral generalInfoInitiative = createInitiativeGeneralFamilyUnitComposition();
+        fullInitiative.setGeneral(generalInfoInitiative);
+        fullInitiative.getGeneral().setFamilyUnitComposition("TEST");
+        Initiative step2Initiative = createStep2Initiative();
+        step2Initiative.setGeneral(generalInfoInitiative);
+
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID,INITIATIVE_ID,ROLE)).thenReturn(fullInitiative);
+
+        try {
+            initiativeService.updateInitiativeGeneralInfo(ORGANIZATION_ID,INITIATIVE_ID,step2Initiative,ROLE);
+        } catch (InitiativeException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
+            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_GENERAL_FAMILY_COMPOSITION_MESSAGE, e.getMessage());
+        }
+    }
+    @Test
+    void updateGeneralInfoWhenBeneficiaryTypeIsPFAndFamilyUnitCompositionIsNotNull_ko() {
+        Initiative fullInitiative = createFullInitiative();
+        InitiativeGeneral generalInfoInitiative = createInitiativeGeneralFamilyUnitComposition();
+        fullInitiative.setGeneral(generalInfoInitiative);
+        fullInitiative.getGeneral().setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF);
+        Initiative step2Initiative = createStep2Initiative();
+        step2Initiative.setGeneral(generalInfoInitiative);
+
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID,INITIATIVE_ID,ROLE)).thenReturn(fullInitiative);
+
+        try {
+            initiativeService.updateInitiativeGeneralInfo(ORGANIZATION_ID,INITIATIVE_ID,step2Initiative,ROLE);
+        } catch (InitiativeException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
+            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_GENERAL_FAMILY_COMPOSITION_WRONG_BENEFICIARY_TYPE, e.getMessage());
+        }
+    }
 
     @Test
     void updateInitiativeRefundRules_languageException() {
@@ -728,6 +798,26 @@ class InitiativeServiceTest {
         InitiativeException exception = Assertions.assertThrows(InitiativeException.class, executable);
         assertEquals(InitiativeConstants.Exception.NotFound.CODE, exception.getCode());
         assertEquals(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE.formatted(INITIATIVE_ID), exception.getMessage());
+    }
+    @Test
+    void updateGeneralInfoWhenBeneficiaryTypeIsPFAndISeeIsMissing_ko() {
+        Initiative fullInitiative = createFullInitiative();
+        InitiativeGeneral generalInfoInitiative = createInitiativeGeneralFamilyUnitComposition();
+        fullInitiative.setGeneral(generalInfoInitiative);
+        InitiativeBeneficiaryRule beneficiaryInfoInitiative = createInitiativeBeneficiaryRule();
+        fullInitiative.setBeneficiaryRule(beneficiaryInfoInitiative);
+        fullInitiative.getBeneficiaryRule().setAutomatedCriteria(null);
+        Initiative step2Initiative = createStep2Initiative();
+        step2Initiative.setGeneral(generalInfoInitiative);
+
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID,INITIATIVE_ID,ROLE)).thenReturn(fullInitiative);
+
+        try {
+            initiativeService.updateInitiativeGeneralInfo(ORGANIZATION_ID,INITIATIVE_ID,step2Initiative,ROLE);
+        } catch (InitiativeException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
+            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_BENEFICIARY_TYPE_NF_ENABLED_AUTOMATED_CRITERIA_ISEE_MISSING_NOT_VALID, e.getMessage());
+        }
     }
 
     @Test
@@ -1437,6 +1527,22 @@ class InitiativeServiceTest {
         initiativeGeneral.setDescriptionMap(language);
         return initiativeGeneral;
     }
+    private InitiativeGeneral createInitiativeGeneralFamilyUnitComposition() {
+        Map<String, String> language = new HashMap<>();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
+        InitiativeGeneral initiativeGeneral = new InitiativeGeneral();
+        initiativeGeneral.setBeneficiaryBudget(new BigDecimal(10));
+        initiativeGeneral.setBeneficiaryKnown(true);
+        initiativeGeneral.setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.NF);
+        initiativeGeneral.setFamilyUnitComposition(InitiativeConstants.FamilyUnitCompositionConstant.INPS);
+        initiativeGeneral.setBudget(new BigDecimal(1000000000));
+        initiativeGeneral.setEndDate(LocalDate.of(2022, 9, 8));
+        initiativeGeneral.setStartDate(LocalDate.of(2022, 8, 8));
+        initiativeGeneral.setRankingStartDate(LocalDate.of(2022, 9, 18));
+        initiativeGeneral.setRankingEndDate(LocalDate.of(2022, 8, 18));
+        initiativeGeneral.setDescriptionMap(language);
+        return initiativeGeneral;
+    }
     private InitiativeAdditional createInitiativeAdditional() {
         InitiativeAdditional initiativeAdditional = new InitiativeAdditional();
         initiativeAdditional.setServiceIO(true);
@@ -1596,6 +1702,7 @@ class InitiativeServiceTest {
         Initiative initiative = createStep2Initiative();
         //TODO ora settato con l'utilizzo dei RewardGroups. Associare un faker booleano per i casi OK, altrimenti separare i 2 casi
         initiative.setRewardRule(createRewardRule(false));
+        initiative.setInitiativeRewardType(InitiativeDTO.InitiativeRewardTypeEnum.REFUND);
         initiative.setTrxRule(createTrxRuleCondition());
         return initiative;
     }
@@ -1827,6 +1934,7 @@ class InitiativeServiceTest {
     Initiative createInitiativeOnlyRefundRule() {
         Initiative initiative = createStep1Initiative();
         initiative.setRefundRule(createRefundRuleValidWithAccumulatedAmount());
+        initiative.setInitiativeRewardType(InitiativeDTO.InitiativeRewardTypeEnum.REFUND);
         return initiative;
     }
 }

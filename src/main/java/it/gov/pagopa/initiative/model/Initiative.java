@@ -1,5 +1,6 @@
 package it.gov.pagopa.initiative.model;
 
+import it.gov.pagopa.initiative.dto.InitiativeDTO;
 import it.gov.pagopa.initiative.model.rule.refund.InitiativeRefundRule;
 import it.gov.pagopa.initiative.model.rule.reward.InitiativeRewardRule;
 import it.gov.pagopa.initiative.model.rule.trx.InitiativeTrxConditions;
@@ -37,7 +38,7 @@ public class Initiative {
     private InitiativeGeneral general;
     private InitiativeAdditional additionalInfo;
     private InitiativeBeneficiaryRule beneficiaryRule;
-    private String initiativeRewardType;
+    private InitiativeDTO.InitiativeRewardTypeEnum initiativeRewardType;
     private InitiativeRewardRule rewardRule;
     private InitiativeTrxConditions trxRule;
     private InitiativeRefundRule refundRule;

@@ -18,6 +18,7 @@ public class InitiativeGeneral {
 
     private BigDecimal budget;
     private BeneficiaryTypeEnum beneficiaryType;
+    private String familyUnitComposition;
     private Boolean beneficiaryKnown;
     private BigDecimal beneficiaryBudget;
     /**
@@ -44,7 +45,7 @@ public class InitiativeGeneral {
      */
     public enum BeneficiaryTypeEnum {
 
-        PF("PF"), PG("PG");
+        PF("PF"), PG("PG"), NF("NF");
 
         private final String value;
 
@@ -68,5 +69,4 @@ public class InitiativeGeneral {
             return null;
         }
     }
-
 }
