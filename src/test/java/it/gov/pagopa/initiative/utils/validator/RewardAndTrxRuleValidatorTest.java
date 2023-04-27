@@ -1,6 +1,5 @@
 package it.gov.pagopa.initiative.utils.validator;
 
-import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.InitiativeRewardAndTrxRulesDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardGroupsDTO;
@@ -271,14 +270,14 @@ class RewardAndTrxRuleValidatorTest {
     InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardValueDTO_ok(){
         return RewardValueDTO.builder()
                 .rewardValue(BigDecimal.valueOf(50))
-                .rewardValueType("PERCENTAGE")
+                .rewardValueType(RewardValueDTO.RewardValueTypeEnum.PERCENTAGE)
                 .type("rewardValue")
                 .build();
     }
     InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardValueDTO_No_typeField(){
         return RewardValueDTO.builder()
                 .rewardValue(BigDecimal.valueOf(50))
-                .rewardValueType("PERCENTAGE")
+                .rewardValueType(RewardValueDTO.RewardValueTypeEnum.PERCENTAGE)
                 .build();
     }
     InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardValueDTOvalueTooBig_ko(){
@@ -290,7 +289,7 @@ class RewardAndTrxRuleValidatorTest {
     InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardValueDTOvalueTooSmall_ko(){
         return RewardValueDTO.builder()
                 .rewardValue(BigDecimal.valueOf(-10))
-                .rewardValueType("PERCENTAGE")
+                .rewardValueType(RewardValueDTO.RewardValueTypeEnum.PERCENTAGE)
                 .type("rewardValue")
                 .build();
     }
@@ -600,7 +599,7 @@ class RewardAndTrxRuleValidatorTest {
     InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTOWithRewardRuleNull_ko(){
         InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = new InitiativeRewardAndTrxRulesDTO();
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = creatInitiativeTrxConditionsDTOValid_ok();
-        initiativeRewardAndTrxRulesDTO.setInitiativeRewardType(InitiativeConstants.Status.Validation.REWARD_DISCOUNT);
+        initiativeRewardAndTrxRulesDTO.setInitiativeRewardType(InitiativeRewardAndTrxRulesDTO.InitiativeRewardTypeEnum.DISCOUNT);
         initiativeRewardAndTrxRulesDTO.setRewardRule(null);
         initiativeRewardAndTrxRulesDTO.setTrxRule(initiativeTrxConditionsDTO);
         return initiativeRewardAndTrxRulesDTO;
@@ -608,7 +607,7 @@ class RewardAndTrxRuleValidatorTest {
     InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTOWithTrxRuleNull_ko(){
         InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = new InitiativeRewardAndTrxRulesDTO();
         InitiativeRewardRuleDTO initiativeRewardRuleDTO = createInitiativeRewardRuleDTORewardValueDTO_ok();
-        initiativeRewardAndTrxRulesDTO.setInitiativeRewardType(InitiativeConstants.Status.Validation.REWARD_DISCOUNT);
+        initiativeRewardAndTrxRulesDTO.setInitiativeRewardType(InitiativeRewardAndTrxRulesDTO.InitiativeRewardTypeEnum.DISCOUNT);
         initiativeRewardAndTrxRulesDTO.setRewardRule(initiativeRewardRuleDTO);
         initiativeRewardAndTrxRulesDTO.setTrxRule(null);
         return initiativeRewardAndTrxRulesDTO;
@@ -616,7 +615,7 @@ class RewardAndTrxRuleValidatorTest {
 
     InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTO_ok(){
         InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = new InitiativeRewardAndTrxRulesDTO();
-        initiativeRewardAndTrxRulesDTO.setInitiativeRewardType(InitiativeConstants.Status.Validation.REWARD_REFUND);
+        initiativeRewardAndTrxRulesDTO.setInitiativeRewardType(InitiativeRewardAndTrxRulesDTO.InitiativeRewardTypeEnum.REFUND);
         InitiativeRewardRuleDTO initiativeRewardRuleDTO = createInitiativeRewardRuleDTORewardValueDTO_ok();
         initiativeRewardAndTrxRulesDTO.setRewardRule(initiativeRewardRuleDTO);
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = creatInitiativeTrxConditionsDTOValid_ok();

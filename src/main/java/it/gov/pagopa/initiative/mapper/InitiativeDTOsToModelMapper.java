@@ -2,7 +2,6 @@ package it.gov.pagopa.initiative.mapper;
 
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest;
-import it.gov.pagopa.initiative.constants.InitiativeConstants.Status.Validation;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.rule.refund.AccumulatedAmountDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
@@ -61,6 +60,7 @@ public class InitiativeDTOsToModelMapper {
         return InitiativeGeneral.builder().beneficiaryBudget(generalDTO.getBeneficiaryBudget())
                 .beneficiaryKnown(generalDTO.getBeneficiaryKnown())
                 .beneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.valueOf(generalDTO.getBeneficiaryType().name()))
+                .familyUnitComposition(generalDTO.getFamilyUnitComposition()!=null?generalDTO.getFamilyUnitComposition():null)
                 .budget(generalDTO.getBudget())
                 .endDate(generalDTO.getEndDate())
                 .startDate(generalDTO.getStartDate())
@@ -156,7 +156,7 @@ public class InitiativeDTOsToModelMapper {
 
     public Initiative toInitiative(InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDto) {
         Initiative initiative = new Initiative();
-        initiative.setInitiativeRewardType(initiativeRewardAndTrxRulesDto.getInitiativeRewardType());
+        initiative.setInitiativeRewardType(InitiativeDTO.InitiativeRewardTypeEnum.valueOf(initiativeRewardAndTrxRulesDto.getInitiativeRewardType().name()));
         initiative.setTrxRule(this.toInitiativeTrxRule(initiativeRewardAndTrxRulesDto.getTrxRule()));
         initiative.setRewardRule(this.toInitiativeRewardRule(initiativeRewardAndTrxRulesDto.getRewardRule()));
         return initiative;
@@ -171,7 +171,7 @@ public class InitiativeDTOsToModelMapper {
             checkReward(rewardValueInput);
             ret = RewardValue.builder()
                     .type(rewardValueInput.getType())
-                    .rewardValueType(rewardValueInput.getRewardValueType())
+                    .rewardValueType(RewardValue.RewardValueTypeEnum.valueOf(rewardValueInput.getRewardValueType().name()))
                     .rewardValue(rewardValueInput.getRewardValue())
                     .build();
         } else if (rewardRuleDTO instanceof RewardGroupsDTO rewardGroupsInput) {
@@ -187,7 +187,7 @@ public class InitiativeDTOsToModelMapper {
     }
 
     private void checkReward(RewardValueDTO rewardValueInput) {
-        if(rewardValueInput.getRewardValueType().equals(Validation.REWARD_PERCENTAGE) && rewardValueInput.getRewardValue().intValue()>100){
+        if(rewardValueInput.getRewardValueType().equals(RewardValueDTO.RewardValueTypeEnum.PERCENTAGE) && rewardValueInput.getRewardValue().intValue()>100){
             throw new InitiativeException(InitiativeConstants.Exception.BadRequest.CODE, BadRequest.REWARD_TYPE, HttpStatus.BAD_REQUEST);
         }
     }
@@ -319,6 +319,7 @@ public class InitiativeDTOsToModelMapper {
                 .rewardRule(initiativeRewardRule)
                 .trxRule(initiativeTrxConditions)
                 .refundRule(initiativeRefundRule)
+                .initiativeRewardType(initiativeDTO.getInitiativeRewardType())
                 .build();
     }
 }

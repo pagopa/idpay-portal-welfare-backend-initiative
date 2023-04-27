@@ -91,6 +91,10 @@ class InitiativeModelToDTOMapperTest {
     private InitiativeAdditionalDTO initiativeAdditionalDTOOnlyTokens;
     private InitiativeAdditional initiativeAdditionalOnlyTokens;
     private InitiativeDetailDTO fullInitiativeDetailDTO;
+    private Initiative initiativeStep2BeneficiaryTypeNull;
+    private InitiativeDTO initiativeStep2DTOBeneficiaryTypeNull;
+    private Initiative initiativeStep2FamilyUnitNotNull;
+    private InitiativeDTO initiativeStep2DTOFamilyUnitNotNull;
 
     @MockBean
     InitiativeUtils initiativeUtils;
@@ -132,6 +136,10 @@ class InitiativeModelToDTOMapperTest {
         initiativeAdditionalOnlyTokens = createInitiativeAdditionalOnlyTokens();
         initiativeAdditionalDTOOnlyTokens = createInitiativeAdditionalDTOOnlyTokens();
         fullInitiativeDetailDTO = createInitiativeDetailDTO();
+        initiativeStep2BeneficiaryTypeNull = createStep2InitiativeBeneficiaryTypeNull();
+        initiativeStep2DTOBeneficiaryTypeNull = createStep2InitiativeDTOBeneficiaryTypeNull();
+        initiativeStep2FamilyUnitNotNull = createStep2InitiativeFamilyUnitNotNull();
+        initiativeStep2DTOFamilyUnitNotNull = createStep2InitiativeDTOFamilyUnitNotNull();
 
         Mockito.when(aesTokenService.decrypt(ENCRYPTED_API_KEY_CLIENT_ID)).thenReturn(API_KEY_CLIENT_ID);
         Mockito.when(aesTokenService.decrypt(ENCRYPTED_API_KEY_CLIENT_ASSERTION)).thenReturn(API_KEY_CLIENT_ASSERTION);
@@ -236,6 +244,18 @@ class InitiativeModelToDTOMapperTest {
         assertEquals(initiative.getAdditionalInfo().getPrivacyLink(), initiativeDataDTO.getPrivacyLink());
         assertNull(initiativeDataDTO.getLogoURL());
     }
+    @Test
+    void toInitiativeGeneralDTOBeneficiaryTypeNull() {
+        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(initiativeStep2BeneficiaryTypeNull);
+        assertEquals(initiativeStep2DTOBeneficiaryTypeNull, initiativeDTO);
+
+    }
+    @Test
+    void toInitiativeGeneralDTOFamilyUnitNotNull() {
+        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(initiativeStep2FamilyUnitNotNull);
+        assertEquals(initiativeStep2DTOFamilyUnitNotNull, initiativeDTO);
+
+    }
 
     @Test
     void toInitiativeAdditionalDTOOnlyTokens() {
@@ -316,11 +336,27 @@ class InitiativeModelToDTOMapperTest {
         //Check the equality of the results
         assertEquals(fullInitiativeDTO, initiativeDTOtoBeVerified);
     }
+    @Test
+    void toInitiativeDTOIsLogoPresent_true() {
+        InitiativeDTO initiativeDTO = createFullInitiativeDTO();
+        initiativeDTO.setAdditionalInfo(createInitiativeAdditionalDTO());
+        initiativeDTO.getAdditionalInfo().setLogoFileName("test.png");
+        initiativeDTO.getAdditionalInfo().setLogoURL("test.it");
+        initiativeDTO.setIsLogoPresent(true);
+        fullInitiative.setAdditionalInfo(createInitiativeAdditional());
+        fullInitiative.getAdditionalInfo().setLogoFileName("test.png");
+
+        Mockito.when(initiativeUtils.createLogoUrl(anyString(),anyString())).thenReturn("test.it");
+
+        InitiativeDTO initiativeDTOExpected = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiative);
+
+        assertEquals(initiativeDTO,initiativeDTOExpected);
+    }
 
     @Test
     void toInitiativeDetailDTO_equals() {
         Locale acceptLanguage = Locale.ITALIAN;
-        fullInitiative.setUpdateDate(LocalDateTime.of(2023,03,20,12,00));
+        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0));
         InitiativeDetailDTO initiativeDetailDTO = initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative,acceptLanguage);
 
         assertEquals(fullInitiativeDetailDTO, initiativeDetailDTO);
@@ -349,7 +385,7 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void toInitiativeDetailDTOWithGeneralInfo_Null() {
         Locale acceptLanguage = Locale.ITALIAN;
-        fullInitiative.setUpdateDate(LocalDateTime.of(2023,03,20,12,00));
+        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0));
         fullInitiative.setGeneral(null);
         try {
             initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative,acceptLanguage);
@@ -360,7 +396,7 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void toInitiativeDetailDTOWithRuleDescription_Null() {
         Locale acceptLanguage = Locale.ITALIAN;
-        fullInitiative.setUpdateDate(LocalDateTime.of(2023,03,20,12,00));
+        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0));
         fullInitiative.getGeneral().setDescriptionMap(null);
         fullInitiativeDetailDTO.setRuleDescription(StringUtils.EMPTY);
 
@@ -369,7 +405,6 @@ class InitiativeModelToDTOMapperTest {
         assertEquals(fullInitiativeDetailDTO, initiativeDetailDTO);
 
     }
-
 
     @Test
     void toInitiativeDTONull_equals() {
@@ -673,10 +708,38 @@ class InitiativeModelToDTOMapperTest {
         initiative.setGeneral(createInitiativeGeneral());
         return initiative;
     }
+    private Initiative createStep2InitiativeBeneficiaryTypeNull() {
+        Initiative initiative = createStep1Initiative();
+        initiative.setGeneral(createInitiativeGeneral());
+        initiative.getGeneral().setBeneficiaryType(null);
+        return initiative;
+    }
+    private Initiative createStep2InitiativeFamilyUnitNotNull() {
+        Initiative initiative = createStep1Initiative();
+        initiative.setGeneral(createInitiativeGeneral());
+        initiative.getGeneral().setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.NF);
+        initiative.getGeneral().setFamilyUnitComposition("INPS");
+        return initiative;
+    }
 
     private InitiativeDTO createStep2InitiativeDTO() {
         InitiativeDTO initiativeDTO = createStep1InitiativeDTO();
         initiativeDTO.setGeneral(createInitiativeGeneralDTO());
+        return initiativeDTO;
+    }
+    private InitiativeDTO createStep2InitiativeDTOBeneficiaryTypeNull() {
+        InitiativeDTO initiativeDTO = createStep1InitiativeDTO();
+        initiativeDTO.setGeneral(createInitiativeGeneralDTO());
+        initiativeDTO.getGeneral().setBeneficiaryType(null);
+        initiativeDTO.setIsLogoPresent(false);
+        return initiativeDTO;
+    }
+    private InitiativeDTO createStep2InitiativeDTOFamilyUnitNotNull() {
+        InitiativeDTO initiativeDTO = createStep1InitiativeDTO();
+        initiativeDTO.setGeneral(createInitiativeGeneralDTO());
+        initiativeDTO.getGeneral().setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.NF);
+        initiativeDTO.getGeneral().setFamilyUnitComposition("INPS");
+        initiativeDTO.setIsLogoPresent(false);
         return initiativeDTO;
     }
 
@@ -733,6 +796,7 @@ class InitiativeModelToDTOMapperTest {
         InitiativeDTO initiativeDTO = createStep2InitiativeDTO();
         InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
         initiativeDTO.setBeneficiaryRule(initiativeBeneficiaryRuleDTO);
+        initiativeDTO.setIsLogoPresent(false);
         return initiativeDTO;
     }
 
@@ -741,11 +805,13 @@ class InitiativeModelToDTOMapperTest {
         return RewardValueDTO.builder()
                 .rewardValue(BigDecimal.valueOf(50))
                 .type("rewardValue")
+                .rewardValueType(RewardValueDTO.RewardValueTypeEnum.PERCENTAGE)
                 .build();
     }
     private InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardValueDTOWithoutType() {
         return RewardValueDTO.builder()
                 .rewardValue(BigDecimal.valueOf(50))
+                .rewardValueType(RewardValueDTO.RewardValueTypeEnum.PERCENTAGE)
                 .build();
     }
 
@@ -1091,6 +1157,7 @@ class InitiativeModelToDTOMapperTest {
     private InitiativeDTO createStep4InitiativeDTO() {
         InitiativeDTO initiativeDTO = createStep3InitiativeDTO();
         initiativeDTO.setRewardRule(createInitiativeRewardRuleDTORewardValueDTO());
+        initiativeDTO.setInitiativeRewardType(InitiativeDTO.InitiativeRewardTypeEnum.REFUND);
         initiativeDTO.setTrxRule(createInitiativeTrxConditionsDTOValid());
         return initiativeDTO;
     }
@@ -1099,6 +1166,7 @@ class InitiativeModelToDTOMapperTest {
     private InitiativeDTO createStep4InitiativeDTORewardLimitEmpty() {
         InitiativeDTO initiativeDTO = createStep3InitiativeDTO();
         initiativeDTO.setRewardRule(createInitiativeRewardRuleDTORewardValueDTO());
+        initiativeDTO.setInitiativeRewardType(InitiativeDTO.InitiativeRewardTypeEnum.REFUND);
         initiativeDTO.setTrxRule(createInitiativeTrxConditionsDTORewardLimitEmpty());
         return initiativeDTO;
     }
@@ -1106,6 +1174,7 @@ class InitiativeModelToDTOMapperTest {
     private InitiativeDTO createStep4InitiativeDTODayOfWeekNull() {
         InitiativeDTO initiativeDTO = createStep3InitiativeDTO();
         initiativeDTO.setRewardRule(createInitiativeRewardRuleDTORewardValueDTO());
+        initiativeDTO.setInitiativeRewardType(InitiativeDTO.InitiativeRewardTypeEnum.REFUND);
         initiativeDTO.setTrxRule(createInitiativeTrxConditionsDTODayOfWeekNull());
         return initiativeDTO;
     }
@@ -1113,6 +1182,7 @@ class InitiativeModelToDTOMapperTest {
     private InitiativeDTO createStep4InitiativeDTOMccFilterNull() {
         InitiativeDTO initiativeDTO = createStep3InitiativeDTO();
         initiativeDTO.setRewardRule(createInitiativeRewardRuleDTORewardValueDTO());
+        initiativeDTO.setInitiativeRewardType(InitiativeDTO.InitiativeRewardTypeEnum.REFUND);
         initiativeDTO.setTrxRule(createInitiativeTrxConditionsDTOMccFilterNull());
         return initiativeDTO;
     }
@@ -1120,6 +1190,7 @@ class InitiativeModelToDTOMapperTest {
     private InitiativeDTO createStep4InitiativeDTOTrxCountNull() {
         InitiativeDTO initiativeDTO = createStep3InitiativeDTO();
         initiativeDTO.setRewardRule(createInitiativeRewardRuleDTORewardValueDTO());
+        initiativeDTO.setInitiativeRewardType(InitiativeDTO.InitiativeRewardTypeEnum.REFUND);
         initiativeDTO.setTrxRule(createInitiativeTrxConditionsDTOTrxCountNull());
         return initiativeDTO;
     }
@@ -1127,6 +1198,7 @@ class InitiativeModelToDTOMapperTest {
     private InitiativeDTO createStep4InitiativeDTOThresholdNull() {
         InitiativeDTO initiativeDTO = createStep3InitiativeDTO();
         initiativeDTO.setRewardRule(createInitiativeRewardRuleDTORewardValueDTO());
+        initiativeDTO.setInitiativeRewardType(InitiativeDTO.InitiativeRewardTypeEnum.REFUND);
         initiativeDTO.setTrxRule(createInitiativeTrxConditionsDTOThresholdNull());
         return initiativeDTO;
     }
@@ -1134,6 +1206,7 @@ class InitiativeModelToDTOMapperTest {
     private InitiativeDTO createStep4InitiativeDTORewardGroup() {
         InitiativeDTO initiativeDTO = createStep3InitiativeDTO();
         initiativeDTO.setRewardRule(createInitiativeRewardRuleDTORewardGroupDTO());
+        initiativeDTO.setInitiativeRewardType(InitiativeDTO.InitiativeRewardTypeEnum.REFUND);
         initiativeDTO.setTrxRule(createInitiativeTrxConditionsDTOValid());
         return initiativeDTO;
     }
@@ -1143,6 +1216,7 @@ class InitiativeModelToDTOMapperTest {
         return RewardValue.builder()
                 .rewardValue(BigDecimal.valueOf(50))
                 .type("rewardValue")
+                .rewardValueType(RewardValue.RewardValueTypeEnum.PERCENTAGE)
                 .build();
     }
 
@@ -1490,6 +1564,7 @@ class InitiativeModelToDTOMapperTest {
         InitiativeRewardRule initiativeRewardRule = createInitiativeRewardRuleRewardValue();
         InitiativeTrxConditions initiativeTrxConditions = createInitiativeTrxConditionsValid();
         initiative.setRewardRule(initiativeRewardRule);
+        initiative.setInitiativeRewardType(InitiativeDTO.InitiativeRewardTypeEnum.REFUND);
         initiative.setTrxRule(initiativeTrxConditions);
         return initiative;
     }
@@ -1499,6 +1574,7 @@ class InitiativeModelToDTOMapperTest {
         InitiativeRewardRule initiativeRewardRule = createInitiativeRewardRuleRewardValue();
         InitiativeTrxConditions initiativeTrxConditions = createInitiativeTrxConditionsRewardLimitEmpty();
         initiative.setRewardRule(initiativeRewardRule);
+        initiative.setInitiativeRewardType(InitiativeDTO.InitiativeRewardTypeEnum.REFUND);
         initiative.setTrxRule(initiativeTrxConditions);
         return initiative;
     }
@@ -1508,6 +1584,7 @@ class InitiativeModelToDTOMapperTest {
         InitiativeRewardRule initiativeRewardRule = createInitiativeRewardRuleRewardValue();
         InitiativeTrxConditions initiativeTrxConditions = createInitiativeTrxConditionsDayOfWeekNull();
         initiative.setRewardRule(initiativeRewardRule);
+        initiative.setInitiativeRewardType(InitiativeDTO.InitiativeRewardTypeEnum.REFUND);
         initiative.setTrxRule(initiativeTrxConditions);
         return initiative;
     }
@@ -1517,6 +1594,7 @@ class InitiativeModelToDTOMapperTest {
         InitiativeRewardRule initiativeRewardRule = createInitiativeRewardRuleRewardValue();
         InitiativeTrxConditions initiativeTrxConditions = createInitiativeTrxConditionsMccFilterNull();
         initiative.setRewardRule(initiativeRewardRule);
+        initiative.setInitiativeRewardType(InitiativeDTO.InitiativeRewardTypeEnum.REFUND);
         initiative.setTrxRule(initiativeTrxConditions);
         return initiative;
     }
@@ -1526,6 +1604,7 @@ class InitiativeModelToDTOMapperTest {
         InitiativeRewardRule initiativeRewardRule = createInitiativeRewardRuleRewardValue();
         InitiativeTrxConditions initiativeTrxConditions = createInitiativeTrxConditionsTrxCountNull();
         initiative.setRewardRule(initiativeRewardRule);
+        initiative.setInitiativeRewardType(InitiativeDTO.InitiativeRewardTypeEnum.REFUND);
         initiative.setTrxRule(initiativeTrxConditions);
         return initiative;
     }
@@ -1535,6 +1614,7 @@ class InitiativeModelToDTOMapperTest {
         InitiativeRewardRule initiativeRewardRule = createInitiativeRewardRuleRewardValue();
         InitiativeTrxConditions initiativeTrxConditions = createInitiativeTrxConditionsThresholdNull();
         initiative.setRewardRule(initiativeRewardRule);
+        initiative.setInitiativeRewardType(InitiativeDTO.InitiativeRewardTypeEnum.REFUND);
         initiative.setTrxRule(initiativeTrxConditions);
         return initiative;
     }
@@ -1544,6 +1624,7 @@ class InitiativeModelToDTOMapperTest {
         InitiativeRewardRule initiativeRewardRule = createInitiativeRewardRuleRewardGroup();
         InitiativeTrxConditions initiativeTrxConditions = createInitiativeTrxConditionsValid();
         initiative.setRewardRule(initiativeRewardRule);
+        initiative.setInitiativeRewardType(InitiativeDTO.InitiativeRewardTypeEnum.REFUND);
         initiative.setTrxRule(initiativeTrxConditions);
         return initiative;
     }
@@ -1665,7 +1746,7 @@ class InitiativeModelToDTOMapperTest {
         initiativeDetailDTO.setPrivacyLink("privacyLink");
         initiativeDetailDTO.setTcLink("tcLink");
         initiativeDetailDTO.setLogoURL(null);
-        initiativeDetailDTO.setUpdateDate(LocalDateTime.of(2023,03,20,12,00));
+        initiativeDetailDTO.setUpdateDate(LocalDateTime.of(2023,3,20,12,0));
         return initiativeDetailDTO;
     }
 

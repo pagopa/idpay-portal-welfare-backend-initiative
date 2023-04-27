@@ -1,7 +1,5 @@
 package it.gov.pagopa.initiative.model.rule.reward;
 
-import it.gov.pagopa.initiative.constants.InitiativeConstants;
-import it.gov.pagopa.initiative.constants.InitiativeConstants.Status.Validation;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -27,7 +25,7 @@ class RewardValueTest {
         BigDecimal valueOfResult = BigDecimal.valueOf(42L);
         actualRewardValue.setRewardValue(valueOfResult);
         actualRewardValue.setType("Type");
-        actualRewardValue.setRewardValueType("PERCENTAGE");
+        actualRewardValue.setRewardValueType(RewardValue.RewardValueTypeEnum.PERCENTAGE);
         String actualToStringResult = actualRewardValue.toString();
         assertSame(valueOfResult, actualRewardValue.getRewardValue());
         assertEquals("Type", actualRewardValue.getType());
@@ -37,7 +35,7 @@ class RewardValueTest {
     @Test
     void testConstructor2() {
         BigDecimal valueOfResult = BigDecimal.valueOf(42L);
-        RewardValue actualRewardValue = new RewardValue("Type", Validation.REWARD_PERCENTAGE, valueOfResult);
+        RewardValue actualRewardValue = new RewardValue("Type", RewardValue.RewardValueTypeEnum.PERCENTAGE, valueOfResult);
         BigDecimal valueOfResult1 = BigDecimal.valueOf(42L);
         actualRewardValue.setRewardValue(valueOfResult1);
         actualRewardValue.setType("Type");

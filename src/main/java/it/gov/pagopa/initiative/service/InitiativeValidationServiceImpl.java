@@ -1,10 +1,7 @@
 package it.gov.pagopa.initiative.service;
 
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
-import it.gov.pagopa.initiative.dto.InitiativeAdditionalDTO;
-import it.gov.pagopa.initiative.dto.InitiativeBeneficiaryRuleDTO;
-import it.gov.pagopa.initiative.dto.InitiativeDTO;
-import it.gov.pagopa.initiative.dto.InitiativeGeneralDTO;
+import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.InitiativeTrxConditionsDTO;
 import it.gov.pagopa.initiative.exception.InitiativeException;
@@ -96,6 +93,13 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
                         HttpStatus.BAD_REQUEST);
             }
         }
+        if(InitiativeGeneral.BeneficiaryTypeEnum.NF.equals(initiative.getGeneral().getBeneficiaryType()) &&
+                automatedCriteriaList.stream().noneMatch(a -> a.getCode().equals(ISEE))){
+            throw new InitiativeException(
+                    InitiativeConstants.Exception.BadRequest.CODE,
+                    InitiativeConstants.Exception.BadRequest.INITIATIVE_BENEFICIARY_TYPE_NF_ENABLED_AUTOMATED_CRITERIA_ISEE_MISSING_NOT_VALID,
+                    HttpStatus.BAD_REQUEST);
+        }
         if (Boolean.TRUE.equals(general.getRankingEnabled())){
             boolean checkIsee = false;
             for(AutomatedCriteria automatedCriteria : automatedCriteriaList){
@@ -162,7 +166,7 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
     public void checkRewardRuleAbsolute(Initiative initiative) {
         InitiativeRewardRule rewardRule = initiative.getRewardRule();
         if (rewardRule instanceof RewardValue rewardValue &&
-                rewardValue.getRewardValueType().equals(InitiativeConstants.Status.Validation.REWARD_ABSOLUTE)) {
+                RewardValue.RewardValueTypeEnum.ABSOLUTE.equals(rewardValue.getRewardValueType())) {
             Threshold threshold = initiative.getTrxRule().getThreshold();
             if (threshold==null || threshold.getFrom()==null || threshold.getFrom().compareTo(rewardValue.getRewardValue()) < 0){
                 throw new InitiativeException(InitiativeConstants.Exception.BadRequest.CODE,
@@ -173,11 +177,31 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
 
     @Override
     public void checkRefundRuleDiscountInitiative(String initiativeRewardType, InitiativeRefundRule refundRule){
-        if (initiativeRewardType.equals(InitiativeConstants.Status.Validation.REWARD_DISCOUNT)){
+        if (InitiativeRewardAndTrxRulesDTO.InitiativeRewardTypeEnum.DISCOUNT.name().equals(initiativeRewardType)){
             if(refundRule.getAccumulatedAmount() != null || refundRule.getTimeParameter() == null){
                 throw new InitiativeException(InitiativeConstants.Exception.BadRequest.CODE,
                         InitiativeConstants.Exception.BadRequest.REFUND_RULE_INVALID, HttpStatus.BAD_REQUEST);
             }
+        }
+    }
+
+    @Override
+    public void checkBeneficiaryTypeAndFamilyUnit(Initiative initiative) {
+        if (InitiativeGeneral.BeneficiaryTypeEnum.NF.equals(initiative.getGeneral().getBeneficiaryType()) &&
+                (initiative.getGeneral().getFamilyUnitComposition() == null ||
+                        !List.of(InitiativeConstants.FamilyUnitCompositionConstant.INPS,
+                                InitiativeConstants.FamilyUnitCompositionConstant.ANPR).contains(initiative.getGeneral().getFamilyUnitComposition()))) {
+            throw new InitiativeException(
+                    InitiativeConstants.Exception.BadRequest.CODE,
+                    InitiativeConstants.Exception.BadRequest.INITIATIVE_GENERAL_FAMILY_COMPOSITION_MESSAGE,
+                    HttpStatus.BAD_REQUEST);
+        }
+        if (!InitiativeGeneral.BeneficiaryTypeEnum.NF.equals(initiative.getGeneral().getBeneficiaryType()) &&
+                initiative.getGeneral().getFamilyUnitComposition() != null) {
+            throw new InitiativeException(
+                    InitiativeConstants.Exception.BadRequest.CODE,
+                    InitiativeConstants.Exception.BadRequest.INITIATIVE_GENERAL_FAMILY_COMPOSITION_WRONG_BENEFICIARY_TYPE,
+                    HttpStatus.BAD_REQUEST);
         }
     }
 }
