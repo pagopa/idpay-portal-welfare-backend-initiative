@@ -132,6 +132,14 @@ class RewardAndTrxRuleValidatorTest {
         assertFalse(violations.isEmpty());
         assertThat(violations).hasSize(1);
     }
+    @Test
+    void when_trxCount_onlyFrom_then_ValidationOk(){
+        TrxCountDTO trxCountDTO = TrxCountDTO.builder()
+                .from(10L)
+                .fromIncluded(false).build();
+        Set<ConstraintViolation<TrxCountDTO>> violations = validator.validate(trxCountDTO, ValidationApiEnabledGroup.class);
+        assertTrue(violations.isEmpty());
+    }
 
     @Test
     void when_threshold_FromIsLessThanTo_then_ValidationAreOk(){
