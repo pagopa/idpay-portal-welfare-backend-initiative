@@ -22,10 +22,7 @@ public class TrxCountDTO {
     @NotNull(groups = ValidationApiEnabledGroup.class)
     private Boolean fromIncluded;
 
-    @NotNull(groups = ValidationApiEnabledGroup.class)
-    @Min(value = 1, message = "to must be at least 1", groups = ValidationApiEnabledGroup.class)
     private Long to;
 
-    @NotNull(groups = ValidationApiEnabledGroup.class)
     private Boolean toIncluded;
 }
