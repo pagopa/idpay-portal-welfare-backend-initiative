@@ -16,6 +16,6 @@ public class TrxCountFromToValidator implements ConstraintValidator<TrxCountFrom
     public boolean isValid(TrxCountDTO value, ConstraintValidatorContext context) {
         Long fromTmp = value.getFrom();
         Long toTmp = value.getTo();
-        return fromTmp.compareTo(toTmp) < 0;
+        return (toTmp == null || fromTmp.compareTo(toTmp) < 0);
     }
 }

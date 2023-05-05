@@ -211,8 +211,8 @@ public class InitiativeDTOsToModelMapper {
         }
         return TrxCount.builder().to(trxCountDTO.getTo())
                 .from(trxCountDTO.getFrom())
-                .fromIncluded(trxCountDTO.getFromIncluded())
-                .toIncluded(trxCountDTO.getToIncluded()).build();
+                .fromIncluded(trxCountDTO.isFromIncluded())
+                .toIncluded(trxCountDTO.isToIncluded()).build();
     }
 
     private MccFilter toMccFilter(MccFilterDTO mccFilterDTO) {
