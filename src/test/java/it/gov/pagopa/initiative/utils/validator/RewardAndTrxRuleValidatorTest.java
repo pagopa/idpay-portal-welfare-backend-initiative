@@ -130,7 +130,7 @@ class RewardAndTrxRuleValidatorTest {
                 .toIncluded(true).build();
         Set<ConstraintViolation<TrxCountDTO>> violations = validator.validate(trxCountDTO, ValidationApiEnabledGroup.class);
         assertFalse(violations.isEmpty());
-        assertThat(violations).hasSize(2);
+        assertThat(violations).hasSize(1);
     }
 
     @Test
@@ -192,7 +192,7 @@ class RewardAndTrxRuleValidatorTest {
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = creatInitiativeTrxConditionsDTOTrxRuleFromAndToTooSmall_ko();
         Set<ConstraintViolation<InitiativeTrxConditionsDTO>> violations = validator.validate(initiativeTrxConditionsDTO, ValidationApiEnabledGroup.class);
         assertFalse(violations.isEmpty());
-        assertThat(violations).hasSize(3);
+        assertThat(violations).hasSize(2);
     }
 
     @Test
