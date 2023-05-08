@@ -395,7 +395,9 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             return new LogoDTO(fileName, initiativeUtils.createLogoUrl(organizationId, initiativeId), localDateTime);
         } catch (Exception e) {
             performanceLog(startTime, "STORE_INITIATIVE_LOGO");
-            throw new RuntimeException(e);
+            throw new InitiativeException(InternalServerError.CODE,
+                    e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -633,8 +635,10 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         String userId = null;
         if(RequestContextHolder.getRequestAttributes()!=null) {
             RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-            userId = (String) requestAttributes.getAttribute("organizationUserId",
-                    RequestAttributes.SCOPE_REQUEST);
+            if(requestAttributes != null) {
+                userId = (String) requestAttributes.getAttribute("organizationUserId",
+                        RequestAttributes.SCOPE_REQUEST);
+            }
         }
         return userId;
     }

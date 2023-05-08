@@ -1,6 +1,7 @@
 package it.gov.pagopa.initiative.connector.file_storage;
 
 import com.microsoft.azure.storage.CloudStorageAccount;
+import com.microsoft.azure.storage.StorageException;
 import com.microsoft.azure.storage.blob.CloudBlobClient;
 import com.microsoft.azure.storage.blob.CloudBlobContainer;
 import com.microsoft.azure.storage.blob.CloudBlockBlob;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
@@ -29,7 +31,7 @@ public class AzureBlobClient implements FileStorageConnector {
     }
 
     @Override
-    public void uploadInitiativeLogo(InputStream file, String fileName, String contentType) throws Exception {
+    public void uploadInitiativeLogo(InputStream file, String fileName, String contentType) throws URISyntaxException, StorageException, IOException {
 
         final CloudBlobContainer blobContainer = blobClient.getContainerReference(
                     initiativeLogoContainerReference);
@@ -38,7 +40,7 @@ public class AzureBlobClient implements FileStorageConnector {
             blob.upload(file, file.available());
     }
     @Override
-    public ByteArrayOutputStream downloadInitiativeLogo(String fileName) throws Exception {
+    public ByteArrayOutputStream downloadInitiativeLogo(String fileName) throws URISyntaxException, StorageException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         final CloudBlobContainer blobContainer = blobClient.getContainerReference(
                 initiativeLogoContainerReference);

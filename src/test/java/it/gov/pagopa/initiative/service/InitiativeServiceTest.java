@@ -698,7 +698,9 @@ class InitiativeServiceTest {
         try {
             initiativeService.storeInitiativeLogo(ORGANIZATION_ID, INITIATIVE_ID, logo, LOGO_MIME_TYPE,
                     "logo.jpg");
-        } catch(Exception e) {
+        } catch(InitiativeException e) {
+            assertEquals(InternalServerError.CODE, e.getCode());
+            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, e.getHttpStatus());
             assertTrue(e.getMessage().contains("Invalid file extension"));
         }
     }
@@ -721,7 +723,9 @@ class InitiativeServiceTest {
         try {
             initiativeService.storeInitiativeLogo(ORGANIZATION_ID, INITIATIVE_ID, logo, "image/jpg",
                     FILE_NAME);
-        } catch(Exception e) {
+        } catch(InitiativeException e) {
+            assertEquals(InternalServerError.CODE, e.getCode());
+            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, e.getHttpStatus());
             assertTrue(e.getMessage().contains("allowed only"));
         }
     }
@@ -1561,7 +1565,7 @@ class InitiativeServiceTest {
     }
 
     InitiativeDTO createStep1InitiativeDTO() {
-        InitiativeDTO initiativeDTO = InitiativeDTO.builder()
+        return InitiativeDTO.builder()
                 .initiativeId(INITIATIVE_ID)
                 .initiativeName(INITIATIVE_NAME)
                 .organizationId(ORGANIZATION_ID)
@@ -1569,7 +1573,6 @@ class InitiativeServiceTest {
                 .autocertificationCheck(true)
                 .beneficiaryRanking(true)
                 .additionalInfo(createInitiativeAdditionalDTO()).build();
-        return initiativeDTO;
     }
 
     private InitiativeGeneralDTO createInitiativeGeneralDTO(boolean beneficiaryKnown) {

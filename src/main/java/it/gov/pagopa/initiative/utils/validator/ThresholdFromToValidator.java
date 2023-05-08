@@ -8,11 +8,6 @@ import javax.validation.ConstraintValidatorContext;
 import java.math.BigDecimal;
 
 public class ThresholdFromToValidator implements ConstraintValidator<ThresholdFromToValue, ThresholdDTO> {
-
-    @Override
-    public void initialize(ThresholdFromToValue constraintAnnotation) {
-    }
-
     @Override
     public boolean isValid(ThresholdDTO value, ConstraintValidatorContext context) {
         BigDecimal fromTmp = value.getFrom();
