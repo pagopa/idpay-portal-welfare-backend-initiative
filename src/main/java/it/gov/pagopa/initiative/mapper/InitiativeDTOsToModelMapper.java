@@ -111,7 +111,7 @@ public class InitiativeDTOsToModelMapper {
                         .code(automatedCriteriaDTO.getCode())
                         .field(automatedCriteriaDTO.getField())
                         .operator(FilterOperatorEnumModel.valueOf(automatedCriteriaDTO.getOperator().name()))
-                        .authority(automatedCriteriaDTO.getAuthority())//TODO definire modalità di recupero authority
+                        .authority(automatedCriteriaDTO.getAuthority())
                         .value(automatedCriteriaDTO.getValue())
                         .value2(StringUtils.isBlank(automatedCriteriaDTO.getValue2()) ? null : automatedCriteriaDTO.getValue2())
                         .orderDirection(automatedCriteriaDTO.getOrderDirection() != null

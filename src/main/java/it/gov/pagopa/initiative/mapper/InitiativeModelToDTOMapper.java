@@ -205,7 +205,7 @@ public class InitiativeModelToDTOMapper {
                                 .code(modelAC.getCode())
                                 .field(modelAC.getField())
                                 .operator(FilterOperatorEnum.valueOf(modelAC.getOperator().name()))
-                                .authority(modelAC.getAuthority())//TODO definire modalità di recupero authority
+                                .authority(modelAC.getAuthority())
                                 .value(modelAC.getValue())
                                 .value2(modelAC.getValue2())
                                 .orderDirection(modelAC.getOrderDirection() != null
