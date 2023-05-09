@@ -297,12 +297,8 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     public void logicallyDeleteInitiative(String organizationId, String initiativeId, String role) {
         long startTime = System.currentTimeMillis();
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
-        if (
-                initiative.getStatus().equals(InitiativeConstants.Status.IN_REVISION) ||
-                        initiative.getStatus().equals(InitiativeConstants.Status.PUBLISHED) ||
-                        initiative.getStatus().equals(InitiativeConstants.Status.CLOSED) ||
-                        initiative.getStatus().equals(InitiativeConstants.Status.SUSPENDED)
-        ) {
+        if (List.of(InitiativeConstants.Status.IN_REVISION, InitiativeConstants.Status.PUBLISHED,
+                InitiativeConstants.Status.CLOSED, InitiativeConstants.Status.SUSPENDED).contains(initiative.getStatus())) {
             log.error("[LOGICAL_DELETE_INITIATIVE] - Initiative: {}. Cannot be deleted. Current status is {}.", initiative.getInitiativeId(), initiative.getStatus());
             auditUtilities.logInitiativeError(this.getUserId(), initiativeId, organizationId, "initiative cannot be deleted");
             performanceLog(startTime, "DELETE_INITIATIVE");

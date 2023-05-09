@@ -257,8 +257,7 @@ public class InitiativeModelToDTOMapper {
                             .status(initiativeModel.getStatus())
                             .creationDate(initiativeModel.getCreationDate())
                             .updateDate(initiativeModel.getUpdateDate())
-                            .rankingEnabled(initiativeModel.getGeneral() != null && initiativeModel.getGeneral().getRankingEnabled() != null
-                                    ? initiativeModel.getGeneral().getRankingEnabled() : null)
+                            .rankingEnabled(initiativeModel.getGeneral() != null ? initiativeModel.getGeneral().getRankingEnabled() : null)
                             .build();
         }).toList();
     }
@@ -267,29 +266,30 @@ public class InitiativeModelToDTOMapper {
         return Optional.ofNullable(initiatives)
                 .orElse(Collections.emptyList())
                 .stream().map(initiativeModel -> {
-                    String serviceName = initiativeModel.getAdditionalInfo() != null ?
-                            initiativeModel.getAdditionalInfo().getServiceName() : StringUtils.EMPTY;
-                    Map<String, String> descriptionMap = initiativeModel.getGeneral() != null && initiativeModel.getGeneral().getDescriptionMap() != null ?
-                            this.languageMap(initiativeModel.getGeneral().getDescriptionMap()) : null;
-                    return InitiativeIssuerDTO.builder()
-                            .initiativeId(initiativeModel.getInitiativeId())
-                            .initiativeName(StringUtils.isNotBlank(initiativeModel.getInitiativeName()) ?
-                                    initiativeModel.getInitiativeName() : serviceName)
-                            .organizationName(initiativeModel.getOrganizationName())
-                            .descriptionMap(descriptionMap)
-                            .startDate(initiativeModel.getGeneral() != null ? initiativeModel.getGeneral().getStartDate() : null)
-                            .endDate(initiativeModel.getGeneral() != null ? initiativeModel.getGeneral().getEndDate() : null)
-                            .rankingEnabled(initiativeModel.getGeneral() != null && initiativeModel.getGeneral().getRankingEnabled() != null
-                                    ? initiativeModel.getGeneral().getRankingEnabled() : null)
-                            .rankingStartDate(initiativeModel.getGeneral() != null ? initiativeModel.getGeneral().getRankingStartDate() : null)
-                            .rankingEndDate(initiativeModel.getGeneral() != null ? initiativeModel.getGeneral().getRankingEndDate() : null)
-                            .beneficiaryKnown(initiativeModel.getGeneral() != null ? initiativeModel.getGeneral().getBeneficiaryKnown() : null)
-                            .status(initiativeModel.getStatus())
-                            .tcLink(initiativeModel.getAdditionalInfo().getTcLink())
-                            .privacyLink(initiativeModel.getAdditionalInfo().getPrivacyLink())
-                            .logoURL(initiativeModel.getAdditionalInfo() != null && initiativeModel.getAdditionalInfo().getLogoFileName() != null
-                                    ? initiativeUtils.createLogoUrl(initiativeModel.getOrganizationId(), initiativeModel.getInitiativeId()) : null)
-                            .build();
+                    InitiativeIssuerDTO initiativeIssuerDTO = new InitiativeIssuerDTO();
+                    initiativeIssuerDTO.setInitiativeId(initiativeModel.getInitiativeId());
+                    String serviceName = initiativeModel.getAdditionalInfo() != null ? initiativeModel.getAdditionalInfo().getServiceName() : StringUtils.EMPTY;
+                    initiativeIssuerDTO.setInitiativeName(StringUtils.isNotBlank(initiativeModel.getInitiativeName()) ?
+                            initiativeModel.getInitiativeName() : serviceName);
+                    initiativeIssuerDTO.setOrganizationName(initiativeModel.getOrganizationName());
+                    initiativeIssuerDTO.setStatus(initiativeModel.getStatus());
+                    if(initiativeModel.getAdditionalInfo() != null){
+                        initiativeIssuerDTO.setTcLink(initiativeModel.getAdditionalInfo().getTcLink());
+                        initiativeIssuerDTO.setPrivacyLink(initiativeModel.getAdditionalInfo().getPrivacyLink());
+                        initiativeIssuerDTO.setLogoURL(initiativeModel.getAdditionalInfo().getLogoFileName() != null
+                                ? initiativeUtils.createLogoUrl(initiativeModel.getOrganizationId(), initiativeModel.getInitiativeId()) : null);
+                    }
+                    if(initiativeModel.getGeneral() != null){
+                        initiativeIssuerDTO.setDescriptionMap(initiativeModel.getGeneral().getDescriptionMap() != null ?
+                                this.languageMap(initiativeModel.getGeneral().getDescriptionMap()) : null);
+                        initiativeIssuerDTO.setStartDate(initiativeModel.getGeneral().getStartDate());
+                        initiativeIssuerDTO.setEndDate(initiativeModel.getGeneral().getEndDate());
+                        initiativeIssuerDTO.setRankingEnabled(initiativeModel.getGeneral().getRankingEnabled());
+                        initiativeIssuerDTO.setRankingStartDate(initiativeModel.getGeneral().getRankingStartDate());
+                        initiativeIssuerDTO.setRankingEndDate(initiativeModel.getGeneral().getRankingEndDate());
+                        initiativeIssuerDTO.setBeneficiaryKnown(initiativeModel.getGeneral().getBeneficiaryKnown());
+                    }
+                    return initiativeIssuerDTO;
                 }).toList();
     }
     private Map<String,String> languageMap(Map<String,String> map){
