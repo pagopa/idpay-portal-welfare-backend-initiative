@@ -1,10 +1,10 @@
 {
 	"info": {
-		"_postman_id": "3b193411-7fda-4366-904f-c502d4974985",
-		"name": "idpay-initiative-e2e Copy NEW",
+		"_postman_id": "1755c910-d9b2-4638-b16a-5947073b936f",
+		"name": "idpay-initiative-e2e",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "26036679",
-		"_collection_link": "https://idpay-test-funzionali.postman.co/workspace/IDPay-Test-Funzionali~d5f80577-ab5d-4d50-87c4-a81b6bcba6bc/collection/26036679-3b193411-7fda-4366-904f-c502d4974985?action=share&creator=26036679&source=collection_link"
+		"_collection_link": "https://idpay-test-funzionali.postman.co/workspace/IDPay-Test-Funzionali~d5f80577-ab5d-4d50-87c4-a81b6bcba6bc/collection/26036736-1755c910-d9b2-4638-b16a-5947073b936f?action=share&creator=26036679&source=collection_link"
 	},
 	"item": [
 		{
@@ -14071,7 +14071,7 @@
 													"listen": "test",
 													"script": {
 														"exec": [
-															"pm.test(\"Initiative with criteria - Happy case - Initiative pubblication - Ente Admin updates initiative status into PUBLISHED -(Responses with 204)\", function () {\r",
+															"pm.test(\"Initiative with criteria - Unhappy case - Initiative pubblication - Ente Admin updates initiative status into PUBLISHED -(Responses with 204)\", function () {\r",
 															"    pm.response.to.have.status(204);\r",
 															"});\r",
 															""
@@ -14407,7 +14407,7 @@
 											"listen": "prerequest",
 											"script": {
 												"exec": [
-													"setTimeout(() => { }, 5000);"
+													"setTimeout(() => { }, 30000);"
 												],
 												"type": "text/javascript"
 											}
@@ -14442,7 +14442,7 @@
 									"response": []
 								},
 								{
-									"name": "Accept T&C Copy",
+									"name": "Accept T&C Copy to check KO details",
 									"event": [
 										{
 											"listen": "test",
@@ -14450,7 +14450,12 @@
 												"exec": [
 													"pm.test(\"Initiative with Criteria - Onboarding - Unhappy case - Onboarding user with wrong isee - Accept T&C - Status 403\", function () {\r",
 													"    pm.response.to.have.status(403);\r",
-													"});"
+													"});\r",
+													"\r",
+													"pm.test(\"Initiative with criteria - Onboarding user with wrong isee - Accept T&C - message is ISEE_TYPE_KO\", function () {\r",
+													"        let jsonResponse = pm.response.json()\r",
+													"        pm.expect(jsonResponse.details).to.eql(`ISEE_TYPE_KO`);\r",
+													"    });"
 												],
 												"type": "text/javascript"
 											}
@@ -15376,7 +15381,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{fiscalCode_fakeWhitelist}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -15390,7 +15395,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{fiscalCode_fakeWhitelist}}"
 														}
 													]
 												}
@@ -15622,7 +15627,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_1}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -15636,7 +15641,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{CF_fake_1}}"
 														}
 													]
 												}
@@ -15868,7 +15873,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_2}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -15882,7 +15887,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{CF_fake_2}}"
 														}
 													]
 												}
@@ -16114,7 +16119,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_3}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -16128,7 +16133,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{CF_fake_3}}"
 														}
 													]
 												}
@@ -16360,7 +16365,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_4}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -16374,7 +16379,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{CF_fake_4}}"
 														}
 													]
 												}
@@ -16606,7 +16611,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_5}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -16620,7 +16625,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{CF_fake_5}}"
 														}
 													]
 												}
@@ -16852,7 +16857,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_6}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -16866,7 +16871,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{CF_fake_6}}"
 														}
 													]
 												}
@@ -17098,7 +17103,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_7}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -17112,7 +17117,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{CF_fake_7}}"
 														}
 													]
 												}
@@ -17344,7 +17349,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_8}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -17358,7 +17363,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{CF_fake_8}}"
 														}
 													]
 												}
@@ -17590,7 +17595,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_9}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -17604,7 +17609,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{CF_fake_9}}"
 														}
 													]
 												}
@@ -17836,7 +17841,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_10}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -17850,7 +17855,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{CF_fake_10}}"
 														}
 													]
 												}
@@ -18082,7 +18087,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_11}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -18096,7 +18101,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{CF_fake_11}}"
 														}
 													]
 												}
@@ -18328,7 +18333,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_12}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -18342,7 +18347,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{CF_fake_12}}"
 														}
 													]
 												}
@@ -18574,7 +18579,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_13}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -18588,7 +18593,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{CF_fake_13}}"
 														}
 													]
 												}
@@ -18820,7 +18825,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_14}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -18834,7 +18839,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{CF_fake_14}}"
 														}
 													]
 												}
@@ -19066,7 +19071,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_15}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -19080,7 +19085,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{CF_fake_15}}"
 														}
 													]
 												}
@@ -20568,7 +20573,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{fiscalCode_fakeWhitelist}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -20582,7 +20587,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{fiscalCode_fakeWhitelist}}"
 														}
 													]
 												}
@@ -20814,7 +20819,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_1}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -20828,7 +20833,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{CF_fake_1}}"
 														}
 													]
 												}
@@ -21060,7 +21065,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_2}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -21074,7 +21079,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{CF_fake_2}}"
 														}
 													]
 												}
@@ -21306,7 +21311,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_3}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -21320,7 +21325,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{CF_fake_3}}"
 														}
 													]
 												}
@@ -21552,7 +21557,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_4}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -21566,7 +21571,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{CF_fake_4}}"
 														}
 													]
 												}
@@ -21798,7 +21803,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_5}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -21812,7 +21817,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{CF_fake_5}}"
 														}
 													]
 												}
@@ -22044,7 +22049,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_6}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -22058,7 +22063,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{CF_fake_6}}"
 														}
 													]
 												}
@@ -22290,7 +22295,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_7}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -22304,7 +22309,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{CF_fake_7}}"
 														}
 													]
 												}
@@ -22536,7 +22541,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_8}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -22550,7 +22555,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{CF_fake_8}}"
 														}
 													]
 												}
@@ -22782,7 +22787,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_9}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -22796,7 +22801,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{CF_fake_9}}"
 														}
 													]
 												}
@@ -23028,7 +23033,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_10}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -23042,7 +23047,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{CF_fake_10}}"
 														}
 													]
 												}
@@ -23274,7 +23279,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_11}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -23288,7 +23293,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{CF_fake_11}}"
 														}
 													]
 												}
@@ -23520,7 +23525,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_12}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -23534,7 +23539,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{CF_fake_12}}"
 														}
 													]
 												}
@@ -23766,7 +23771,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_13}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -23780,7 +23785,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{CF_fake_13}}"
 														}
 													]
 												}
@@ -24012,7 +24017,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_14}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -24026,7 +24031,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{CF_fake_14}}"
 														}
 													]
 												}
@@ -24258,7 +24263,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_15}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -24272,7 +24277,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{CF_fake_15}}"
 														}
 													]
 												}
@@ -24548,7 +24553,7 @@
 													"listen": "prerequest",
 													"script": {
 														"exec": [
-															"setTimeout(()=> {}, 30000)"
+															"setTimeout(()=> {}, 40000)"
 														],
 														"type": "text/javascript"
 													}
@@ -24721,7 +24726,7 @@
 													"listen": "prerequest",
 													"script": {
 														"exec": [
-															"//setTimeout(()=> {}, 10000)"
+															"setTimeout(()=> {}, 10000)"
 														],
 														"type": "text/javascript"
 													}
@@ -28033,7 +28038,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{fiscalCode_fakeWhitelist}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -28047,7 +28052,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{fiscalCode_fakeWhitelist}}"
 														}
 													]
 												}
@@ -28366,6 +28371,15 @@
 															"     });\r",
 															"    pm.expect(foundInitiative).equals(true); \r",
 															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"setTimeout(() => { }, 20000);"
 														],
 														"type": "text/javascript"
 													}
@@ -29465,7 +29479,7 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{fiscalCode_fakeWhitelist}}",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -29479,7 +29493,7 @@
 															"query": [
 																{
 																	"key": "fiscalCode",
-																	"value": "{{$randomPassword}}"
+																	"value": "{{fiscalCode_fakeWhitelist}}"
 																}
 															]
 														}
@@ -29711,7 +29725,7 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_1}}",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -29725,7 +29739,7 @@
 															"query": [
 																{
 																	"key": "fiscalCode",
-																	"value": "{{$randomPassword}}"
+																	"value": "{{CF_fake_1}}"
 																}
 															]
 														}
@@ -29957,7 +29971,7 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_2}}",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -29971,7 +29985,7 @@
 															"query": [
 																{
 																	"key": "fiscalCode",
-																	"value": "{{$randomPassword}}"
+																	"value": "{{CF_fake_2}}"
 																}
 															]
 														}
@@ -30203,7 +30217,7 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_3}}",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -30217,7 +30231,7 @@
 															"query": [
 																{
 																	"key": "fiscalCode",
-																	"value": "{{$randomPassword}}"
+																	"value": "{{CF_fake_3}}"
 																}
 															]
 														}
@@ -30449,7 +30463,7 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_4}}",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -30463,7 +30477,7 @@
 															"query": [
 																{
 																	"key": "fiscalCode",
-																	"value": "{{$randomPassword}}"
+																	"value": "{{CF_fake_4}}"
 																}
 															]
 														}
@@ -30695,7 +30709,7 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_5}}",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -30709,7 +30723,7 @@
 															"query": [
 																{
 																	"key": "fiscalCode",
-																	"value": "{{$randomPassword}}"
+																	"value": "{{CF_fake_5}}"
 																}
 															]
 														}
@@ -30941,7 +30955,7 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_6}}",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -30955,7 +30969,7 @@
 															"query": [
 																{
 																	"key": "fiscalCode",
-																	"value": "{{$randomPassword}}"
+																	"value": "{{CF_fake_6}}"
 																}
 															]
 														}
@@ -31187,7 +31201,7 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_7}}",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -31201,7 +31215,7 @@
 															"query": [
 																{
 																	"key": "fiscalCode",
-																	"value": "{{$randomPassword}}"
+																	"value": "{{CF_fake_7}}"
 																}
 															]
 														}
@@ -31433,7 +31447,7 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_8}}",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -31447,7 +31461,7 @@
 															"query": [
 																{
 																	"key": "fiscalCode",
-																	"value": "{{$randomPassword}}"
+																	"value": "{{CF_fake_8}}"
 																}
 															]
 														}
@@ -31679,7 +31693,7 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_9}}",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -31693,7 +31707,7 @@
 															"query": [
 																{
 																	"key": "fiscalCode",
-																	"value": "{{$randomPassword}}"
+																	"value": "{{CF_fake_9}}"
 																}
 															]
 														}
@@ -31925,7 +31939,7 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_10}}",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -31939,7 +31953,7 @@
 															"query": [
 																{
 																	"key": "fiscalCode",
-																	"value": "{{$randomPassword}}"
+																	"value": "{{CF_fake_10}}"
 																}
 															]
 														}
@@ -32171,7 +32185,7 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_11}}",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -32185,7 +32199,7 @@
 															"query": [
 																{
 																	"key": "fiscalCode",
-																	"value": "{{$randomPassword}}"
+																	"value": "{{CF_fake_11}}"
 																}
 															]
 														}
@@ -32417,7 +32431,7 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_12}}",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -32431,7 +32445,7 @@
 															"query": [
 																{
 																	"key": "fiscalCode",
-																	"value": "{{$randomPassword}}"
+																	"value": "{{CF_fake_12}}"
 																}
 															]
 														}
@@ -32663,7 +32677,7 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_13}}",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -32677,7 +32691,7 @@
 															"query": [
 																{
 																	"key": "fiscalCode",
-																	"value": "{{$randomPassword}}"
+																	"value": "{{CF_fake_13}}"
 																}
 															]
 														}
@@ -32909,7 +32923,7 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_14}}",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -32923,7 +32937,7 @@
 															"query": [
 																{
 																	"key": "fiscalCode",
-																	"value": "{{$randomPassword}}"
+																	"value": "{{CF_fake_14}}"
 																}
 															]
 														}
@@ -33155,7 +33169,7 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_15}}",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -33169,7 +33183,7 @@
 															"query": [
 																{
 																	"key": "fiscalCode",
-																	"value": "{{$randomPassword}}"
+																	"value": "{{CF_fake_15}}"
 																}
 															]
 														}
@@ -33445,7 +33459,7 @@
 															"listen": "prerequest",
 															"script": {
 																"exec": [
-																	"setTimeout(()=> {}, 30000)"
+																	"setTimeout(()=> {}, 40000)"
 																],
 																"type": "text/javascript"
 															}
@@ -34666,7 +34680,7 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{fiscalCode_fakeWhitelist}}",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -34680,7 +34694,7 @@
 															"query": [
 																{
 																	"key": "fiscalCode",
-																	"value": "{{$randomPassword}}"
+																	"value": "{{fiscalCode_fakeWhitelist}}"
 																}
 															]
 														}
@@ -34912,7 +34926,7 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_1}}",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -34926,7 +34940,7 @@
 															"query": [
 																{
 																	"key": "fiscalCode",
-																	"value": "{{$randomPassword}}"
+																	"value": "{{CF_fake_1}}"
 																}
 															]
 														}
@@ -35158,7 +35172,7 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_2}}",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -35172,7 +35186,7 @@
 															"query": [
 																{
 																	"key": "fiscalCode",
-																	"value": "{{$randomPassword}}"
+																	"value": "{{CF_fake_2}}"
 																}
 															]
 														}
@@ -35404,7 +35418,7 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_3}}",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -35418,7 +35432,7 @@
 															"query": [
 																{
 																	"key": "fiscalCode",
-																	"value": "{{$randomPassword}}"
+																	"value": "{{CF_fake_3}}"
 																}
 															]
 														}
@@ -35650,7 +35664,7 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_4}}",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -35664,7 +35678,7 @@
 															"query": [
 																{
 																	"key": "fiscalCode",
-																	"value": "{{$randomPassword}}"
+																	"value": "{{CF_fake_4}}"
 																}
 															]
 														}
@@ -35896,7 +35910,7 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_5}}",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -35910,7 +35924,7 @@
 															"query": [
 																{
 																	"key": "fiscalCode",
-																	"value": "{{$randomPassword}}"
+																	"value": "{{CF_fake_5}}"
 																}
 															]
 														}
@@ -36142,7 +36156,7 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_6}}",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -36156,7 +36170,7 @@
 															"query": [
 																{
 																	"key": "fiscalCode",
-																	"value": "{{$randomPassword}}"
+																	"value": "{{CF_fake_6}}"
 																}
 															]
 														}
@@ -36388,7 +36402,7 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_7}}",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -36402,7 +36416,7 @@
 															"query": [
 																{
 																	"key": "fiscalCode",
-																	"value": "{{$randomPassword}}"
+																	"value": "{{CF_fake_7}}"
 																}
 															]
 														}
@@ -36634,7 +36648,7 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_8}}",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -36648,7 +36662,7 @@
 															"query": [
 																{
 																	"key": "fiscalCode",
-																	"value": "{{$randomPassword}}"
+																	"value": "{{CF_fake_8}}"
 																}
 															]
 														}
@@ -36880,7 +36894,7 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_9}}",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -36894,7 +36908,7 @@
 															"query": [
 																{
 																	"key": "fiscalCode",
-																	"value": "{{$randomPassword}}"
+																	"value": "{{CF_fake_9}}"
 																}
 															]
 														}
@@ -37126,7 +37140,7 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_10}}",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -37140,7 +37154,7 @@
 															"query": [
 																{
 																	"key": "fiscalCode",
-																	"value": "{{$randomPassword}}"
+																	"value": "{{CF_fake_10}}"
 																}
 															]
 														}
@@ -37372,7 +37386,7 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_11}}",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -37386,7 +37400,7 @@
 															"query": [
 																{
 																	"key": "fiscalCode",
-																	"value": "{{$randomPassword}}"
+																	"value": "{{CF_fake_11}}"
 																}
 															]
 														}
@@ -37618,7 +37632,7 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_12}}",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -37632,7 +37646,7 @@
 															"query": [
 																{
 																	"key": "fiscalCode",
-																	"value": "{{$randomPassword}}"
+																	"value": "{{CF_fake_12}}"
 																}
 															]
 														}
@@ -37864,7 +37878,7 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_13}}",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -37878,7 +37892,7 @@
 															"query": [
 																{
 																	"key": "fiscalCode",
-																	"value": "{{$randomPassword}}"
+																	"value": "{{CF_fake_13}}"
 																}
 															]
 														}
@@ -38110,7 +38124,7 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_14}}",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -38124,7 +38138,7 @@
 															"query": [
 																{
 																	"key": "fiscalCode",
-																	"value": "{{$randomPassword}}"
+																	"value": "{{CF_fake_14}}"
 																}
 															]
 														}
@@ -38356,7 +38370,7 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_15}}",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -38370,7 +38384,7 @@
 															"query": [
 																{
 																	"key": "fiscalCode",
-																	"value": "{{$randomPassword}}"
+																	"value": "{{CF_fake_15}}"
 																}
 															]
 														}
@@ -38646,7 +38660,7 @@
 															"listen": "prerequest",
 															"script": {
 																"exec": [
-																	"setTimeout(()=> {}, 30000)"
+																	"setTimeout(()=> {}, 40000)"
 																],
 																"type": "text/javascript"
 															}
@@ -41194,7 +41208,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{fiscalCode_fakeWhitelist}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -41208,7 +41222,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{fiscalCode_fakeWhitelist}}"
 														}
 													]
 												}
@@ -45308,7 +45322,7 @@
 											"listen": "prerequest",
 											"script": {
 												"exec": [
-													"pm.collectionVariables.set(\"fiscalCode\", pm.variables.replaceIn(\"{{$randomPassword}}\"));"
+													""
 												],
 												"type": "text/javascript"
 											}
@@ -45332,7 +45346,7 @@
 											}
 										],
 										"url": {
-											"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{fiscalCode}}",
+											"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{fiscalCode_fakeWhitelist}}",
 											"host": [
 												"{{baseUrl}}"
 											],
@@ -45346,7 +45360,7 @@
 											"query": [
 												{
 													"key": "fiscalCode",
-													"value": "{{fiscalCode}}"
+													"value": "{{fiscalCode_fakeWhitelist}}"
 												}
 											]
 										}
@@ -45601,7 +45615,7 @@
 									"listen": "prerequest",
 									"script": {
 										"exec": [
-											"setTimeout(()=> {}, 15000)"
+											"setTimeout(()=> {}, 20000)"
 										],
 										"type": "text/javascript"
 									}
@@ -45642,7 +45656,7 @@
 									},
 									{
 										"key": "Fiscal-Code",
-										"value": "{{fiscalCode}}",
+										"value": "{{fiscalCode_fakeWhitelist}}",
 										"type": "text"
 									}
 								],
@@ -45710,7 +45724,7 @@
 									{
 										"key": "Fiscal-Code",
 										"type": "text",
-										"value": "{{fiscalCode}}"
+										"value": "{{fiscalCode_fakeWhitelist}}"
 									}
 								],
 								"url": {
@@ -46607,7 +46621,7 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_1}}",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -46621,7 +46635,7 @@
 															"query": [
 																{
 																	"key": "fiscalCode",
-																	"value": "{{$randomPassword}}"
+																	"value": "{{CF_fake_1}}"
 																}
 															]
 														}
@@ -46800,7 +46814,7 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_2}}",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -46814,7 +46828,7 @@
 															"query": [
 																{
 																	"key": "fiscalCode",
-																	"value": "{{$randomPassword}}"
+																	"value": "{{CF_fake_2}}"
 																}
 															]
 														}
@@ -47172,7 +47186,7 @@
 											},
 											{
 												"key": "Fiscal-Code",
-												"value": "{{fiscalCode}}",
+												"value": "{{CF_fake_1}}",
 												"type": "text"
 											}
 										],
@@ -47239,7 +47253,7 @@
 											},
 											{
 												"key": "Fiscal-Code",
-												"value": "{{fiscalCode}}",
+												"value": "{{CF_fake_2}}",
 												"type": "text"
 											}
 										],
@@ -48366,7 +48380,7 @@
 															"\r",
 															"setTimeout(()=>{ \r",
 															"\r",
-															"pm.test(\"Suspension - Unhappy case - Try to suspend CIT in status INVITED,ONBOARDING_KO,UNSUBSCRIBED (WALLET NOT FOUND) - Onboarding - Status Onboarding - status ON_EVALUATION\", function () {\r",
+															"pm.test(\"Suspension - Unhappy case - Try to suspend CIT in status INVITED,ONBOARDING_KO,UNSUBSCRIBED (WALLET NOT FOUND) - Onboarding - Status Onboarding - status ACCEPTED_TC\", function () {\r",
 															"    let jsonResponse = pm.response.json()\r",
 															"    pm.expect(jsonResponse.status).equals('ACCEPTED_TC');\r",
 															"});\r",
@@ -48526,7 +48540,7 @@
 													},
 													{
 														"key": "Fiscal-Code",
-														"value": "{{fiscalCode_fakeWhitelist2}}",
+														"value": "{{fiscalCode_fakeWhitelist}}",
 														"type": "text"
 													}
 												],
@@ -48570,8 +48584,7 @@
 													"listen": "prerequest",
 													"script": {
 														"exec": [
-															"//setTimeout(()=> {}, 60000)\r",
-															"pm.collectionVariables.set(\"fiscalCode_ko\", pm.variables.replaceIn(\"{{$randomPassword}}\"));"
+															""
 														],
 														"type": "text/javascript"
 													}
@@ -48595,7 +48608,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_1}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -48609,7 +48622,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{CF_1}}"
 														}
 													]
 												}
@@ -48996,57 +49009,6 @@
 											"response": []
 										},
 										{
-											"name": "PDND + Autocertification",
-											"event": [
-												{
-													"listen": "test",
-													"script": {
-														"exec": [
-															"pm.test(\"Suspension - Unhappy case - Try to suspend CIT in status INVITED,ONBOARDING_KO,UNSUBSCRIBED (WALLET NOT FOUND) - Onboarding - PDND + Autocertification - return status 202\", function () {\r",
-															"    pm.response.to.have.status(202);\r",
-															"});"
-														],
-														"type": "text/javascript"
-													}
-												}
-											],
-											"request": {
-												"auth": {
-													"type": "bearer",
-													"bearer": [
-														{
-															"key": "token",
-															"value": "{{tokenIO}}",
-															"type": "string"
-														}
-													]
-												},
-												"method": "PUT",
-												"header": [],
-												"body": {
-													"mode": "raw",
-													"raw": "{\r\n    \"initiativeId\" : \"{{initiativeId}}\",\r\n    \"pdndAccept\": true,\r\n    \"selfDeclarationList\": []\r\n}",
-													"options": {
-														"raw": {
-															"language": "json"
-														}
-													}
-												},
-												"url": {
-													"raw": "{{baseUrl}}/idpay/onboarding/consent",
-													"host": [
-														"{{baseUrl}}"
-													],
-													"path": [
-														"idpay",
-														"onboarding",
-														"consent"
-													]
-												}
-											},
-											"response": []
-										},
-										{
 											"name": "Status Onboarding",
 											"event": [
 												{
@@ -49059,7 +49021,7 @@
 															"\r",
 															"setTimeout(()=>{ \r",
 															"\r",
-															"pm.test(\"Suspension - Unhappy case - Try to suspend CIT in status INVITED,ONBOARDING_KO,UNSUBSCRIBED (WALLET NOT FOUND) - Onboarding - Status Onboarding - status ON_EVALUATION\", function () {\r",
+															"pm.test(\"Suspension - Unhappy case - Try to suspend CIT in status INVITED,ONBOARDING_KO,UNSUBSCRIBED (WALLET NOT FOUND) - Onboarding - Status Onboarding - status ONBOARDING_OK\", function () {\r",
 															"    let jsonResponse = pm.response.json()\r",
 															"    pm.expect(jsonResponse.status).equals('ONBOARDING_OK');\r",
 															"});\r",
@@ -49356,7 +49318,7 @@
 											},
 											{
 												"key": "Fiscal-Code",
-												"value": "{{fiscalCode_ko}}",
+												"value": "{{CF_1}}",
 												"type": "text"
 											}
 										],
@@ -49557,7 +49519,7 @@
 											},
 											{
 												"key": "Fiscal-Code",
-												"value": "{{fiscalCode}}",
+												"value": "{{fiscalCode_fakeWhitelist}}",
 												"type": "text"
 											}
 										],
@@ -49699,7 +49661,7 @@
 									},
 									{
 										"key": "Fiscal-Code",
-										"value": "{{fiscalCode}}",
+										"value": "{{fiscalCode_fakeWhitelist}}",
 										"type": "text"
 									}
 								],
@@ -49765,7 +49727,7 @@
 									},
 									{
 										"key": "Fiscal-Code",
-										"value": "{{fiscalCode}}",
+										"value": "{{fiscalCode_fakeWhitelist}}",
 										"type": "text"
 									}
 								],
@@ -49903,7 +49865,7 @@
 											},
 											{
 												"key": "Fiscal-Code",
-												"value": "{{fiscalCode}}",
+												"value": "{{CF_fake_1}}",
 												"type": "text"
 											}
 										],
@@ -49971,7 +49933,7 @@
 											{
 												"key": "Fiscal-Code",
 												"type": "text",
-												"value": "{{fiscalCode}}"
+												"value": "{{CF_fake_2}}"
 											}
 										],
 										"url": {
@@ -51277,7 +51239,7 @@
 													},
 													{
 														"key": "Fiscal-Code",
-														"value": "{{fiscalCode_fakeWhitelist2}}",
+														"value": "{{fiscalCode_fakeWhitelist}}",
 														"type": "text"
 													}
 												],
@@ -51322,7 +51284,7 @@
 													"script": {
 														"exec": [
 															"//setTimeout(()=> {}, 60000)\r",
-															"pm.collectionVariables.set(\"fiscalCode_ko\", pm.variables.replaceIn(\"{{$randomPassword}}\"));"
+															"pm.collectionVariables.set(\"fiscalCode_ko\", pm.variables.replaceIn(\"{{fiscalCode_fakeWhitelist}}\"));"
 														],
 														"type": "text/javascript"
 													}
@@ -51346,7 +51308,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{$randomPassword}}",
+													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_1}}",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -51360,7 +51322,7 @@
 													"query": [
 														{
 															"key": "fiscalCode",
-															"value": "{{$randomPassword}}"
+															"value": "{{CF_1}}"
 														}
 													]
 												}
@@ -52045,7 +52007,7 @@
 											},
 											{
 												"key": "Fiscal-Code",
-												"value": "{{fiscalCode_ko}}",
+												"value": "{{CF_1}}",
 												"type": "text"
 											}
 										],
@@ -52246,7 +52208,7 @@
 											},
 											{
 												"key": "Fiscal-Code",
-												"value": "{{fiscalCode}}",
+												"value": "{{fiscalCode_fakeWhitelist}}",
 												"type": "text"
 											}
 										],
@@ -52453,16 +52415,8 @@
 			"value": ""
 		},
 		{
-			"key": "fiscalCode_ko",
-			"value": ""
-		},
-		{
 			"key": "fiscalCode_fakeWhitelist",
 			"value": "RNZPMP80A44X000M"
-		},
-		{
-			"key": "fiscalCode",
-			"value": ""
 		},
 		{
 			"key": "initiativeId-suspend",
@@ -52499,6 +52453,81 @@
 		{
 			"key": "familyUnitComposition",
 			"value": ""
+		},
+		{
+			"key": "CF_fake_1",
+			"value": "DSUFLV81R19X000P",
+			"type": "string"
+		},
+		{
+			"key": "CF_fake_2",
+			"value": "BRTVNL63E26X000U",
+			"type": "string"
+		},
+		{
+			"key": "CF_fake_3",
+			"value": "BRNBNT22S45X000B",
+			"type": "string"
+		},
+		{
+			"key": "CF_fake_4",
+			"value": "FRNDLS40E21X000V",
+			"type": "string"
+		},
+		{
+			"key": "CF_fake_5",
+			"value": "SCTNNZ22S12X000S",
+			"type": "string"
+		},
+		{
+			"key": "CF_fake_6",
+			"value": "TRLLGU25M64X000A",
+			"type": "string"
+		},
+		{
+			"key": "CF_fake_7",
+			"value": "LCRGNN67E02X000W",
+			"type": "string"
+		},
+		{
+			"key": "CF_fake_8",
+			"value": "PRLCPN58E63X000Q",
+			"type": "string"
+		},
+		{
+			"key": "CF_fake_9",
+			"value": "RMGSLT57B45X000W",
+			"type": "string"
+		},
+		{
+			"key": "CF_fake_10",
+			"value": "CHGNNT05D07X000K",
+			"type": "string"
+		},
+		{
+			"key": "CF_fake_11",
+			"value": "CRDLNI26L01X000S",
+			"type": "string"
+		},
+		{
+			"key": "CF_fake_12",
+			"value": "PCCGCN01T44X000E",
+			"type": "string"
+		},
+		{
+			"key": "CF_fake_13",
+			"value": "PGFPRL93M41X000B",
+			"type": "string"
+		},
+		{
+			"key": "CF_fake_14",
+			"value": "GNTMNC08M03X000U",
+			"type": "string"
+		},
+		{
+			"key": "CF_fake_15",
+			"value": "TMOVNC75S46X000F",
+			"type": "string"
 		}
 	]
 }

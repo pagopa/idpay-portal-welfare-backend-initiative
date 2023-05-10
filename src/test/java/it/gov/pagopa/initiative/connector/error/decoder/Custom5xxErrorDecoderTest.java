@@ -1,16 +1,16 @@
 package it.gov.pagopa.initiative.connector.error.decoder;
 
-import feign.FeignException;
-import feign.Response;
-import feign.RetryableException;
-import org.junit.jupiter.api.Disabled;
+import feign.*;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.HashMap;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ContextConfiguration(classes = {Custom5xxErrorDecoder.class})
 @ExtendWith(SpringExtension.class)
@@ -18,23 +18,35 @@ class Custom5xxErrorDecoderTest {
     @Autowired
     private Custom5xxErrorDecoder custom5xxErrorDecoder;
 
-    @Disabled
-    void testDecode() throws Exception {
-        Response response = Response.builder().build();
-        FeignException exception = feign.FeignException.errorStatus("Method Key", response);
+    @Test
+    void testDecode_404(){
+        Request request = Request.create(Request.HttpMethod.PUT, "url", new HashMap<>(), null, new RequestTemplate());
+        Response response = Response.builder()
+                .status(HttpStatus.NOT_FOUND.value())
+                .reason("Not found")
+                .body(new byte[0])
+                .request(request)
+                .headers(new HashMap<>())
+                .protocolVersion(null)
+                .build();
 
-        Mockito.doThrow(new FeignException.InternalServerError(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).when(custom5xxErrorDecoder.decode(
-                "Method Key",
-                response));
+        Exception ex = custom5xxErrorDecoder.decode("Method Key", response);
+        assertTrue(ex instanceof FeignException);
+    }
+    @Test
+    void testDecode_500(){
+        Request request = Request.create(Request.HttpMethod.PUT, "url", new HashMap<>(), null, new RequestTemplate());
+        Response response = Response.builder()
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .reason("Internal server error")
+                .body(new byte[0])
+                .request(request)
+                .headers(new HashMap<>())
+                .protocolVersion(null)
+                .build();
 
-        try {
-            custom5xxErrorDecoder.decode("Method Key", response);
-        } catch (RetryableException e) {
-            assertEquals(response.status(), e.status());
-            assertEquals(exception.getMessage(), e.getMessage());
-            assertEquals(response.request().httpMethod(), e.request().httpMethod());
-
-        }
+        Exception ex = custom5xxErrorDecoder.decode("Method Key", response);
+        assertTrue(ex instanceof RetryableException);
     }
 }
 
