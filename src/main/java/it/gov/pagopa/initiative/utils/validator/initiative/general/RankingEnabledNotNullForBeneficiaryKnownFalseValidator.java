@@ -12,7 +12,7 @@ public class RankingEnabledNotNullForBeneficiaryKnownFalseValidator implements C
     public boolean isValid(InitiativeGeneralDTO value, ConstraintValidatorContext context) {
         Boolean beneficiaryKnown = value.getBeneficiaryKnown();
         Boolean rankingEnabled = value.getRankingEnabled();
-        if(!beneficiaryKnown){
+        if(Boolean.FALSE.equals(beneficiaryKnown)){
             return rankingEnabled != null;
         }
         return true;

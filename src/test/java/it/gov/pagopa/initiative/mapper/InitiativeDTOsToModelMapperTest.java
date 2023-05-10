@@ -311,7 +311,7 @@ class InitiativeDTOsToModelMapperTest {
         initiativeRewardAndTrxRulesDTO.setRewardRule(rewardRuleDTO);
         initiativeRewardAndTrxRulesDTO.setInitiativeRewardType(InitiativeRewardAndTrxRulesDTO.InitiativeRewardTypeEnum.REFUND);
        try {
-           initiativeDTOsToModelMapper.toInitiative(initiativeRewardAndTrxRulesDTO).getRewardRule();
+           initiativeDTOsToModelMapper.toInitiative(initiativeRewardAndTrxRulesDTO);
        } catch (IllegalArgumentException exception) {
            assertEquals("Initiative Reward Rule not handled: it.gov.pagopa.initiative.mapper.InitiativeDTOsToModelMapperTest$1", exception.getMessage());
        }
@@ -341,7 +341,9 @@ class InitiativeDTOsToModelMapperTest {
     @Test
     void toBeneficiaryRule_setSelfDeclarationCriteria() {
         InitiativeBeneficiaryRuleDTO beneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
-        InitiativeBeneficiaryRule beneficiaryRule = new InitiativeBeneficiaryRule();
+        beneficiaryRuleDTO.getAutomatedCriteria().get(0).setOrderDirection(null);
+        InitiativeBeneficiaryRule beneficiaryRule = createInitiativeBeneficiaryRule();
+        beneficiaryRule.getAutomatedCriteria().get(0).setOrderDirection(null);
         beneficiaryRuleDTO.setSelfDeclarationCriteria(Collections.emptyList());
         beneficiaryRule.setSelfDeclarationCriteria(Collections.emptyList());
         assertTrue(initiativeDTOsToModelMapper.toBeneficiaryRule(beneficiaryRuleDTO).getSelfDeclarationCriteria().isEmpty());
@@ -379,16 +381,6 @@ class InitiativeDTOsToModelMapperTest {
     void toInitiativeOnlyRefundRule3_equals() {
         Initiative initiative = initiativeDTOsToModelMapper.toInitiative(initiativeRefundRuleDTOAdditionalNull);
         assertEquals(initiativeOnlyRefundRule3, initiative);
-    }
-
-    private Initiative createFullInitiative() {
-        //TODO Test onGoing for different steps. Must use Step6 at the end
-        return createStep2Initiative();
-    }
-
-    private InitiativeDTO createFullInitiativeDTO() {
-        //TODO Test onGoing for different steps. Must use Step6 at the end
-        return createStep2InitiativeDTO();
     }
 
     private void createInitiativeBaseFields(Initiative initiative) {
@@ -483,6 +475,7 @@ class InitiativeDTOsToModelMapperTest {
         List<ISelfDeclarationCriteria> iSelfDeclarationCriteriaList = new ArrayList<>();
         iSelfDeclarationCriteriaList.add(selfCriteriaBool);
         iSelfDeclarationCriteriaList.add(selfCriteriaMulti);
+        iSelfDeclarationCriteriaList.add(null);
         initiativeBeneficiaryRule.setSelfDeclarationCriteria(iSelfDeclarationCriteriaList);
         AutomatedCriteria automatedCriteria = new AutomatedCriteria();
         automatedCriteria.setAuthority("Authority_ISEE");
@@ -610,6 +603,7 @@ class InitiativeDTOsToModelMapperTest {
         List<AnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems> anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems = new ArrayList<>();
         anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems.add(selfCriteriaBoolDTO);
         anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems.add(selfCriteriaMultiDTO);
+        anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems.add(null);
         initiativeBeneficiaryRuleDTO.setSelfDeclarationCriteria(anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems);
         AutomatedCriteriaDTO automatedCriteriaDTO = new AutomatedCriteriaDTO();
         automatedCriteriaDTO.setAuthority("Authority_ISEE");

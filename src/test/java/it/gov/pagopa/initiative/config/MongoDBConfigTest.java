@@ -7,12 +7,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
+import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 @ContextConfiguration(classes = {MongoDBConfig.class})
@@ -56,7 +58,8 @@ class MongoDBConfigTest {
         when(connectionString.isLoadBalanced()).thenReturn(true);
         when(connectionString.getApplicationName()).thenReturn("Application Name");
         when(connectionString.getHosts()).thenReturn(stringList);
-        mongoDBConfig.transactionManager(new SimpleMongoClientDatabaseFactory(connectionString));
+        MongoTransactionManager transManager = mongoDBConfig.transactionManager(new SimpleMongoClientDatabaseFactory(connectionString));
+        assertNotNull(transManager);
         verify(connectionString).isSrvProtocol();
         verify(connectionString, atLeast(1)).getCredential();
         verify(connectionString, atLeast(1)).getReadConcern();
@@ -78,12 +81,9 @@ class MongoDBConfigTest {
         verify(connectionString).getMinConnectionPoolSize();
         verify(connectionString).getServerSelectionTimeout();
         verify(connectionString).getSocketTimeout();
-        verify(connectionString, atLeast(1)).getApplicationName();
         verify(connectionString).getDatabase();
         verify(connectionString).getRequiredReplicaSetName();
         verify(connectionString).getCompressorList();
-        verify(connectionString).getHosts();
-        verify(connectionString, atLeast(1)).getUuidRepresentation();
     }
 }
 

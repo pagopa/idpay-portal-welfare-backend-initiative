@@ -3,7 +3,6 @@ package it.gov.pagopa.initiative.utils.validator.initiative.beneficiary;
 import static it.gov.pagopa.initiative.utils.constraint.initiative.beneficiary.PDNDapiKeyMustExistForAtLeastOneAutoCriteriaConstraint.MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 
 import it.gov.pagopa.initiative.dto.*;
 
@@ -31,10 +30,7 @@ class PDNDapiKeyMustExistForAtLeastOneAutoCriteriaValidatorTest {
 
     @Test
     void whenAutomatedCriteriaIsEmptyAndApiKeysExist_thenTestIsValidIsFalse() {
-        PDNDapiKeyMustExistForAtLeastOneAutoCriteriaValidator pdnDapiKeyMustExistForAtLeastOneAutoCriteriaValidator = new PDNDapiKeyMustExistForAtLeastOneAutoCriteriaValidator();
-
         InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = new InitiativeBeneficiaryRuleDTO();
-
         initiativeBeneficiaryRuleDTO.setApiKeyClientId(API_KEY_CLIENT_ID);
         initiativeBeneficiaryRuleDTO.setApiKeyClientAssertion(API_KEY_CLIENT_ASSERTION);
 
@@ -44,11 +40,7 @@ class PDNDapiKeyMustExistForAtLeastOneAutoCriteriaValidatorTest {
 
     @Test
     void whenAutomatedCriteriaIsEmptyAndApiKeyAssertionExists_thenTestIsValidIsFalse() {
-        PDNDapiKeyMustExistForAtLeastOneAutoCriteriaValidator pdnDapiKeyMustExistForAtLeastOneAutoCriteriaValidator = new PDNDapiKeyMustExistForAtLeastOneAutoCriteriaValidator();
-
         InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = new InitiativeBeneficiaryRuleDTO();
-
-//        initiativeBeneficiaryRuleDTO.setApiKeyClientId(API_KEY_CLIENT_ID);
         initiativeBeneficiaryRuleDTO.setApiKeyClientAssertion(API_KEY_CLIENT_ASSERTION);
 
         Set<ConstraintViolation<InitiativeBeneficiaryRuleDTO>> violations = validator.validate(initiativeBeneficiaryRuleDTO, ValidationApiEnabledGroup.class);
@@ -57,12 +49,8 @@ class PDNDapiKeyMustExistForAtLeastOneAutoCriteriaValidatorTest {
 
     @Test
     void whenAutomatedCriteriaIsEmptyAndApiKeyIdExists_thenTestIsValidIsFalse() {
-        PDNDapiKeyMustExistForAtLeastOneAutoCriteriaValidator pdnDapiKeyMustExistForAtLeastOneAutoCriteriaValidator = new PDNDapiKeyMustExistForAtLeastOneAutoCriteriaValidator();
-
         InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = new InitiativeBeneficiaryRuleDTO();
-
         initiativeBeneficiaryRuleDTO.setApiKeyClientId(API_KEY_CLIENT_ID);
-//        initiativeBeneficiaryRuleDTO.setApiKeyClientAssertion(API_KEY_CLIENT_ASSERTION);
 
         Set<ConstraintViolation<InitiativeBeneficiaryRuleDTO>> violations = validator.validate(initiativeBeneficiaryRuleDTO, ValidationApiEnabledGroup.class);
         assertTrue(violations.stream().anyMatch(initiativeBeneficiaryRuleDTOConstraintViolation -> initiativeBeneficiaryRuleDTOConstraintViolation.getMessage().equals(MESSAGE)));
@@ -70,12 +58,7 @@ class PDNDapiKeyMustExistForAtLeastOneAutoCriteriaValidatorTest {
 
     @Test
     void whenAutomatedCriteriaIsEmptyAndApiKeysNotExist_thenTestIsValidIsFalse() {
-        PDNDapiKeyMustExistForAtLeastOneAutoCriteriaValidator pdnDapiKeyMustExistForAtLeastOneAutoCriteriaValidator = new PDNDapiKeyMustExistForAtLeastOneAutoCriteriaValidator();
-
         InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = new InitiativeBeneficiaryRuleDTO();
-
-//        initiativeBeneficiaryRuleDTO.setApiKeyClientId(API_KEY_CLIENT_ID);
-//        initiativeBeneficiaryRuleDTO.setApiKeyClientAssertion(API_KEY_CLIENT_ASSERTION);
 
         Set<ConstraintViolation<InitiativeBeneficiaryRuleDTO>> violations = validator.validate(initiativeBeneficiaryRuleDTO, ValidationApiEnabledGroup.class);
         assertFalse(violations.stream().anyMatch(initiativeBeneficiaryRuleDTOConstraintViolation -> initiativeBeneficiaryRuleDTOConstraintViolation.getMessage().equals(MESSAGE)));
@@ -83,34 +66,23 @@ class PDNDapiKeyMustExistForAtLeastOneAutoCriteriaValidatorTest {
 
     @Test
     void whenAutomatedCriteriaExistAndApiKeysExist_thenTestIsValidIsTrue() {
-        PDNDapiKeyMustExistForAtLeastOneAutoCriteriaValidator pdnDapiKeyMustExistForAtLeastOneAutoCriteriaValidator = new PDNDapiKeyMustExistForAtLeastOneAutoCriteriaValidator();
-
         InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = new InitiativeBeneficiaryRuleDTO();
-
         ArrayList<AutomatedCriteriaDTO> automatedCriteriaDTOList = new ArrayList<>();
         automatedCriteriaDTOList.add(new AutomatedCriteriaDTO());
         initiativeBeneficiaryRuleDTO.setAutomatedCriteria(automatedCriteriaDTOList);
-
         initiativeBeneficiaryRuleDTO.setApiKeyClientId(API_KEY_CLIENT_ID);
         initiativeBeneficiaryRuleDTO.setApiKeyClientAssertion(API_KEY_CLIENT_ASSERTION);
 
         Set<ConstraintViolation<InitiativeBeneficiaryRuleDTO>> violations = validator.validate(initiativeBeneficiaryRuleDTO, ValidationApiEnabledGroup.class);
-//        IsValid is True then it does not throw related error MESSAGE. Returned only with "false"
         assertFalse(violations.stream().anyMatch(initiativeBeneficiaryRuleDTOConstraintViolation -> initiativeBeneficiaryRuleDTOConstraintViolation.getMessage().equals(MESSAGE)));
     }
 
     @Test
     void whenAutomatedCriteriaExistAndApiKeysNull_thenTestIsValidIsFalse() {
-        PDNDapiKeyMustExistForAtLeastOneAutoCriteriaValidator pdnDapiKeyMustExistForAtLeastOneAutoCriteriaValidator = new PDNDapiKeyMustExistForAtLeastOneAutoCriteriaValidator();
-
         InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = new InitiativeBeneficiaryRuleDTO();
-
         ArrayList<AutomatedCriteriaDTO> automatedCriteriaDTOList = new ArrayList<>();
         automatedCriteriaDTOList.add(new AutomatedCriteriaDTO());
         initiativeBeneficiaryRuleDTO.setAutomatedCriteria(automatedCriteriaDTOList);
-
-//        initiativeBeneficiaryRuleDTO.setApiKeyClientId(API_KEY_CLIENT_ID);
-//        initiativeBeneficiaryRuleDTO.setApiKeyClientAssertion(API_KEY_CLIENT_ASSERTION);
 
         Set<ConstraintViolation<InitiativeBeneficiaryRuleDTO>> violations = validator.validate(initiativeBeneficiaryRuleDTO, ValidationApiEnabledGroup.class);
         assertTrue(violations.stream().anyMatch(initiativeBeneficiaryRuleDTOConstraintViolation -> initiativeBeneficiaryRuleDTOConstraintViolation.getMessage().equals(MESSAGE)));
@@ -118,15 +90,12 @@ class PDNDapiKeyMustExistForAtLeastOneAutoCriteriaValidatorTest {
 
     @Test
     void whenAutomatedCriteriaExistAndApiKeyAssertionExists_thenTestIsValidIsFalse() {
-        PDNDapiKeyMustExistForAtLeastOneAutoCriteriaValidator pdnDapiKeyMustExistForAtLeastOneAutoCriteriaValidator = new PDNDapiKeyMustExistForAtLeastOneAutoCriteriaValidator();
-
         InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = new InitiativeBeneficiaryRuleDTO();
 
         ArrayList<AutomatedCriteriaDTO> automatedCriteriaDTOList = new ArrayList<>();
         automatedCriteriaDTOList.add(new AutomatedCriteriaDTO());
         initiativeBeneficiaryRuleDTO.setAutomatedCriteria(automatedCriteriaDTOList);
 
-//        initiativeBeneficiaryRuleDTO.setApiKeyClientId(API_KEY_CLIENT_ID);
         initiativeBeneficiaryRuleDTO.setApiKeyClientAssertion(API_KEY_CLIENT_ASSERTION);
 
         Set<ConstraintViolation<InitiativeBeneficiaryRuleDTO>> violations = validator.validate(initiativeBeneficiaryRuleDTO, ValidationApiEnabledGroup.class);
@@ -135,16 +104,11 @@ class PDNDapiKeyMustExistForAtLeastOneAutoCriteriaValidatorTest {
 
     @Test
     void whenAutomatedCriteriaExistAndApiKeyClientExists_thenTestIsValidIsFalse() {
-        PDNDapiKeyMustExistForAtLeastOneAutoCriteriaValidator pdnDapiKeyMustExistForAtLeastOneAutoCriteriaValidator = new PDNDapiKeyMustExistForAtLeastOneAutoCriteriaValidator();
-
         InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = new InitiativeBeneficiaryRuleDTO();
-
         ArrayList<AutomatedCriteriaDTO> automatedCriteriaDTOList = new ArrayList<>();
         automatedCriteriaDTOList.add(new AutomatedCriteriaDTO());
         initiativeBeneficiaryRuleDTO.setAutomatedCriteria(automatedCriteriaDTOList);
-
         initiativeBeneficiaryRuleDTO.setApiKeyClientId(API_KEY_CLIENT_ID);
-//        initiativeBeneficiaryRuleDTO.setApiKeyClientAssertion(API_KEY_CLIENT_ASSERTION);
 
         Set<ConstraintViolation<InitiativeBeneficiaryRuleDTO>> violations = validator.validate(initiativeBeneficiaryRuleDTO, ValidationApiEnabledGroup.class);
         assertTrue(violations.stream().anyMatch(initiativeBeneficiaryRuleDTOConstraintViolation -> initiativeBeneficiaryRuleDTOConstraintViolation.getMessage().equals(MESSAGE)));

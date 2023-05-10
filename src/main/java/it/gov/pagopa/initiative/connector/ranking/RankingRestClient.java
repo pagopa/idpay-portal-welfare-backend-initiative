@@ -1,7 +1,6 @@
 package it.gov.pagopa.initiative.connector.ranking;
 
 import it.gov.pagopa.initiative.dto.RankingPageDTO;
-import it.gov.pagopa.initiative.dto.RankingRequestDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
