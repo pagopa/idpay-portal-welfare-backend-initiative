@@ -9,6 +9,7 @@ import it.gov.pagopa.initiative.mapper.InitiativeDTOsToModelMapper;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.service.InitiativeService;
+import it.gov.pagopa.initiative.service.OrganizationService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.LocaleUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,11 +31,11 @@ import static it.gov.pagopa.initiative.constants.InitiativeConstants.Email.TEMPL
 @RestController
 @Slf4j
 public class InitiativeApiController implements InitiativeApi {
-
     private final boolean notifyRE;
     private final boolean notifyIO;
     private final boolean notifyInternal;
     private final InitiativeService initiativeService;
+    private final OrganizationService organizationService;
     private final InitiativeModelToDTOMapper initiativeModelToDTOMapper;
     private final InitiativeDTOsToModelMapper initiativeDTOsToModelMapper;
 
@@ -43,28 +44,45 @@ public class InitiativeApiController implements InitiativeApi {
             @Value("${app.initiative.conditions.notifyIO}") boolean notifyIO,
             @Value("${app.initiative.conditions.notifyInternal}") boolean notifyInternal,
             InitiativeService initiativeService,
+            OrganizationService organizationService,
             InitiativeModelToDTOMapper initiativeModelToDTOMapper,
             InitiativeDTOsToModelMapper initiativeDTOsToModelMapper) {
         this.notifyRE = notifyRE;
         this.notifyIO = notifyIO;
         this.notifyInternal = notifyInternal;
         this.initiativeService = initiativeService;
+        this.organizationService = organizationService;
         this.initiativeModelToDTOMapper = initiativeModelToDTOMapper;
         this.initiativeDTOsToModelMapper = initiativeDTOsToModelMapper;
+    }
+    @Override
+    public ResponseEntity<InitiativeDetailDTO> getInitiativeBeneficiaryDetail(String initiativeId, Locale acceptLanguage) {
+        InitiativeDetailDTO initiativeDetailDTO = initiativeService.getInitiativeBeneficiaryDetail(initiativeId,acceptLanguage);
+        return new ResponseEntity<>(initiativeDetailDTO,HttpStatus.OK);
+    }
+    @Override
+    public ResponseEntity<List<OrganizationDTO>> getListOfOrganization(String role) {
+        log.info("[{}][GET_ORGANIZATION_LIST] - Start processing...", role);
+        return ResponseEntity.ok(organizationService.getOrganizationList(role));
+    }
+
+    @Override
+    public ResponseEntity<OrganizationDTO> getOrganization(String organizationId) {
+        log.info("[GET_ORGANIZATION] - Start processing...");
+        return ResponseEntity.ok(organizationService.getOrganization(organizationId));
     }
 
     @ResponseStatus(HttpStatus.OK)
     @Override
     public ResponseEntity<List<InitiativeSummaryDTO>> getInitiativeSummary(String organizationId, String role) {
         log.info("[{}][GET_INITIATIVES] - InitiativeSummary: Start processing...", role);
-        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeSummaryDTOList(
-                this.initiativeService.retrieveInitiativeSummary(organizationId, role)
-        ));
+        List<Initiative> initiatives = this.initiativeService.retrieveInitiativeSummary(organizationId, role);
+        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeSummaryDTOList(initiatives));
     }
 
     @Override
     public ResponseEntity<List<InitiativeIssuerDTO>> getInitiativeIssuerList() {
-        log.info("[{}][GET_INITIATIVES] - Initiative issuer: Start processing...");
+        log.info("[GET_INITIATIVES] - Initiative issuer: Start processing...");
         return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeIssuerDTOList(this.initiativeService.getInitiativesIssuerList()));
     }
 
@@ -114,8 +132,8 @@ public class InitiativeApiController implements InitiativeApi {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Override
-    public ResponseEntity<Void> updateInitiativeBeneficiary(String organizationId, String initiativeId, InitiativeBeneficiaryRuleDTO beneficiaryRuleDto, String role) {
-        role = beneficiaryRuleDto.getOrganizationUserRole();
+    public ResponseEntity<Void> updateInitiativeBeneficiary(String organizationId, String initiativeId, InitiativeBeneficiaryRuleDTO beneficiaryRuleDto) {
+        String role = beneficiaryRuleDto.getOrganizationUserRole();
         log.info("[{}][UPDATE_BENEFICIARY_RULE]-[UPDATE_TO_DRAFT_STATUS] - Initiative: {}. Start processing...", role, initiativeId);
         if(Boolean.TRUE.equals(this.initiativeService.getInitiative(organizationId, initiativeId, role).getGeneral().getBeneficiaryKnown())){
             throw new InitiativeException(
@@ -213,8 +231,9 @@ public class InitiativeApiController implements InitiativeApi {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Override
-    public ResponseEntity<Void> updateInitiativePublishedStatus(String organizationId, String initiativeId, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO, String role) {
-        role = initiativeOrganizationInfoDTO.getOrganizationUserRole();
+    public ResponseEntity<Void> updateInitiativePublishedStatus(String organizationId, String initiativeId, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO) {
+        long startTime = System.currentTimeMillis();
+        String role = initiativeOrganizationInfoDTO.getOrganizationUserRole();
         //Retrieve Initiative
         log.info("[{}][UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Start processing...", role, initiativeId);
         Initiative initiative = this.initiativeService.getInitiative(organizationId, initiativeId, role);
@@ -225,14 +244,6 @@ public class InitiativeApiController implements InitiativeApi {
         initiativeService.isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED, role);
         log.debug("Current Status validated");
 
-        log.debug("Retrieve current state and save it as TEMP");
-        String statusTemp = initiative.getStatus();
-        LocalDateTime updateDateTemp = initiative.getUpdateDate();
-
-        initiative.setStatus(InitiativeConstants.Status.PUBLISHED);
-        initiative.setUpdateDate(LocalDateTime.now());
-        initiativeService.updateInitiative(initiative);
-        log.debug("Initiative saved in status PUBLISHED");
         try {
             if(notifyRE) {
                 log.info("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Notification to Rule Engine of the published Initiative", initiativeId);
@@ -240,29 +251,36 @@ public class InitiativeApiController implements InitiativeApi {
             }
             //1. Only for the Initiatives to be provided to IO, the integration is carried out with the creation of the Initiative Service to IO BackEnd
             if(Boolean.TRUE.equals(initiative.getAdditionalInfo().getServiceIO())) {
-                if(notifyIO) {
+                if (notifyIO) {
                     log.info("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Notification to IO BackEnd of the published Initiative", initiativeId);
                     initiative = initiativeService.sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(initiative, initiativeOrganizationInfoDTO);
                 }
-                initiativeService.updateInitiative(initiative);
                 //Send citizen to MS-Group via API
                 //This integration necessarily takes place in succession to having created the service with IO in order not to send "orphan" resources (not associated with any Initiative known by IO).
                 //2. BeneficiaryKnown is true -> Send to MS-Group via API about the publishing of Initiative. Then, MS Groups will send it via Topics to NotificationManager and Onboarding
                 if (null != initiative.getGeneral() && initiative.getGeneral().getBeneficiaryKnown() && notifyInternal) {
-                        initiativeService.sendInitiativeInfoToNotificationManager(initiative);
+                    initiativeService.sendInitiativeInfoToNotificationManager(initiative);
                 }
             }
-            initiativeService.sendEmailToPagoPA(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
-            initiativeService.sendEmailToCurrentOrg(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
         } catch (Exception e) {
-            //In case one of the previous Integrations ends badly, the Initiative is rolled back to the initial TEMP state
-            log.error("[UPDATE_TO_PUBLISHED_STATUS] - [ROLLBACK STATUS] Initiative: {}. Generic Error: {}", initiativeId, e.getMessage());
-            initiative.setStatus(statusTemp);
-            initiative.setUpdateDate(updateDateTemp);
-            initiativeService.updateInitiative(initiative);
-            log.debug("Initiative Status has been roll-backed to {}", statusTemp);
+            performanceLog(startTime, "UPDATE_INITIATIVE_PUBLISHED");
             throw new IntegrationException(HttpStatus.BAD_REQUEST);
         }
+
+        log.debug("Initiative saved in status PUBLISHED");
+        initiative.setStatus(InitiativeConstants.Status.PUBLISHED);
+        initiative.setUpdateDate(LocalDateTime.now());
+        initiativeService.updateInitiative(initiative);
+
+        try {
+            log.info("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Sending emails to PagoPA and Organization", initiativeId);
+            initiativeService.sendEmailToPagoPA(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
+            initiativeService.sendEmailToCurrentOrg(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
+        } catch (Exception e){
+            log.error("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Error at sending mails: {}", initiativeId, e.getMessage(), e);
+        }
+
+        performanceLog(startTime, "UPDATE_INITIATIVE_PUBLISHED");
         return ResponseEntity.noContent().build();
     }
 
@@ -307,4 +325,10 @@ public class InitiativeApiController implements InitiativeApi {
         return ResponseEntity.ok(this.initiativeService.getOnboardingStatusList(organizationId,initiativeId,beneficiary,dateFrom,dateTo,state,pageable));
     }
 
+    private void performanceLog(long startTime, String service){
+        log.info(
+                "[PERFORMANCE_LOG] [{}] Time occurred to perform business logic: {} ms",
+                service,
+                System.currentTimeMillis() - startTime);
+    }
 }

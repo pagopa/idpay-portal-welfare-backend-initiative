@@ -36,28 +36,28 @@ class RewardAndTrxRuleValidatorTest {
     @Test
     void when_DayConfigHasWrongIntervals_thenValidationFailed(){
         DayOfWeekDTO.DayConfig dayConfig = createDayConfigWithWrongIntervalsItems();
-        Set<ConstraintViolation<DayOfWeekDTO.DayConfig>> violations = validator.validate(dayConfig, ValidationOnGroup.class);
+        Set<ConstraintViolation<DayOfWeekDTO.DayConfig>> violations = validator.validate(dayConfig, ValidationApiEnabledGroup.class);
         assertThat(violations).hasSize(1);
     }
 
     @Test
     void when_IntervalStartTimeIsNullAndEndTimeIsNotNull(){
         DayOfWeekDTO.Interval interval = createIntervalWithEndTimeNull();
-        Set<ConstraintViolation<DayOfWeekDTO.Interval>> violations = validator.validate(interval, ValidationOnGroup.class);
+        Set<ConstraintViolation<DayOfWeekDTO.Interval>> violations = validator.validate(interval, ValidationApiEnabledGroup.class);
         assertThat(violations).hasSize(1);
     }
 
     @Test
     void when_RewardGroupsDTOAreValid_thenValidationIsPassed(){
         InitiativeRewardRuleDTO initiativeRewardRuleDTO = createInitiativeRewardRuleDTORewardGroupsDTO_ok();
-        Set<ConstraintViolation<InitiativeRewardRuleDTO>> violations = validator.validate(initiativeRewardRuleDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeRewardRuleDTO>> violations = validator.validate(initiativeRewardRuleDTO, ValidationApiEnabledGroup.class);
         assertTrue(violations.isEmpty());
     }
 
     @Test
     void when_rewardGroupsDTOAreValid_thenValidationAreFailed(){
         InitiativeRewardRuleDTO initiativeRewardRuleDTO = createInitiativeRewardRuleDTORewardGroupsDTO_ko();
-        Set<ConstraintViolation<InitiativeRewardRuleDTO>> violations = validator.validate(initiativeRewardRuleDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeRewardRuleDTO>> violations = validator.validate(initiativeRewardRuleDTO, ValidationApiEnabledGroup.class);
         assertFalse(violations.isEmpty());
         assertThat(violations).hasSize(1);
 
@@ -66,14 +66,14 @@ class RewardAndTrxRuleValidatorTest {
     @Test
     void when_RewardValueDTOareValid_thenValidationIsPassed(){
         InitiativeRewardRuleDTO initiativeRewardRuleDTO = createInitiativeRewardRuleDTORewardValueDTO_ok();
-        Set<ConstraintViolation<InitiativeRewardRuleDTO>> violations = validator.validate(initiativeRewardRuleDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeRewardRuleDTO>> violations = validator.validate(initiativeRewardRuleDTO, ValidationApiEnabledGroup.class);
         assertTrue(violations.isEmpty());
     }
 
     @Test
     void given_typeNULL_when_RewardValueDTO_thenValidationHas1Violation(){
         InitiativeRewardRuleDTO initiativeRewardRuleDTO = createInitiativeRewardRuleDTORewardValueDTO_No_typeField();
-        Set<ConstraintViolation<InitiativeRewardRuleDTO>> violations = validator.validate(initiativeRewardRuleDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeRewardRuleDTO>> violations = validator.validate(initiativeRewardRuleDTO, ValidationApiEnabledGroup.class);
         assertFalse(violations.isEmpty());
         assertThat(violations).hasSize(1);
     }
@@ -81,7 +81,7 @@ class RewardAndTrxRuleValidatorTest {
     @Test
     void when_rewardValueDTOTooBigAreNotValid_thenValidationAreFailed(){
         InitiativeRewardRuleDTO initiativeRewardRuleDTO = createInitiativeRewardRuleDTORewardValueDTOvalueTooBig_ko();
-        Set<ConstraintViolation<InitiativeRewardRuleDTO>> violations = validator.validate(initiativeRewardRuleDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeRewardRuleDTO>> violations = validator.validate(initiativeRewardRuleDTO, ValidationApiEnabledGroup.class);
         assertFalse(violations.isEmpty());
         assertThat(violations).hasSize(1);
     }
@@ -89,7 +89,7 @@ class RewardAndTrxRuleValidatorTest {
     @Test
     void when_rewardValueDTOTooSmallAreNotValid_thenValidationAreFailed(){
         InitiativeRewardRuleDTO initiativeRewardRuleDTO = createInitiativeRewardRuleDTORewardValueDTOvalueTooSmall_ko();
-        Set<ConstraintViolation<InitiativeRewardRuleDTO>> violations = validator.validate(initiativeRewardRuleDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeRewardRuleDTO>> violations = validator.validate(initiativeRewardRuleDTO, ValidationApiEnabledGroup.class);
         assertFalse(violations.isEmpty());
         assertThat(violations).hasSize(1);
     }
@@ -97,7 +97,7 @@ class RewardAndTrxRuleValidatorTest {
     @Test
     void when_rewardValueDTO_RateAreNotValid_then_ValidationAreFailed(){
         InitiativeRewardRuleDTO initiativeRewardRuleDTO = createInitiativeRewardRuleDTORewardGroupsDTORateNotValid_ko();
-        Set<ConstraintViolation<InitiativeRewardRuleDTO>> violations = validator.validate(initiativeRewardRuleDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeRewardRuleDTO>> violations = validator.validate(initiativeRewardRuleDTO, ValidationApiEnabledGroup.class);
         assertFalse(violations.isEmpty());
         assertThat(violations).hasSize(2);
     }
@@ -105,7 +105,7 @@ class RewardAndTrxRuleValidatorTest {
     @Test
     void when_rewardValueDTO_FromAndToAreNotValid_then_ValidationAreFailed(){
         InitiativeRewardRuleDTO initiativeRewardRuleDTO = createInitiativeRewardRuleDTORewardGroupsDTOFromAndToNotValid_ko();
-        Set<ConstraintViolation<InitiativeRewardRuleDTO>> violations = validator.validate(initiativeRewardRuleDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeRewardRuleDTO>> violations = validator.validate(initiativeRewardRuleDTO, ValidationApiEnabledGroup.class);
         assertFalse(violations.isEmpty());
         assertThat(violations).hasSize(4);
     }
@@ -117,7 +117,7 @@ class RewardAndTrxRuleValidatorTest {
                 .to(10L)
                 .fromIncluded(false)
                 .toIncluded(true).build();
-        Set<ConstraintViolation<TrxCountDTO>> violations = validator.validate(trxCountDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<TrxCountDTO>> violations = validator.validate(trxCountDTO, ValidationApiEnabledGroup.class);
         assertTrue(violations.isEmpty());
     }
 
@@ -128,9 +128,17 @@ class RewardAndTrxRuleValidatorTest {
                 .to(0L)
                 .fromIncluded(false)
                 .toIncluded(true).build();
-        Set<ConstraintViolation<TrxCountDTO>> violations = validator.validate(trxCountDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<TrxCountDTO>> violations = validator.validate(trxCountDTO, ValidationApiEnabledGroup.class);
         assertFalse(violations.isEmpty());
-        assertThat(violations).hasSize(2);
+        assertThat(violations).hasSize(1);
+    }
+    @Test
+    void when_trxCount_onlyFrom_then_ValidationOk(){
+        TrxCountDTO trxCountDTO = TrxCountDTO.builder()
+                .from(10L)
+                .fromIncluded(false).build();
+        Set<ConstraintViolation<TrxCountDTO>> violations = validator.validate(trxCountDTO, ValidationApiEnabledGroup.class);
+        assertTrue(violations.isEmpty());
     }
 
     @Test
@@ -140,7 +148,7 @@ class RewardAndTrxRuleValidatorTest {
                 .to(BigDecimal.TEN)
                 .fromIncluded(false)
                 .toIncluded(true).build();
-        Set<ConstraintViolation<ThresholdDTO>> violations = validator.validate(thresholdDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<ThresholdDTO>> violations = validator.validate(thresholdDTO, ValidationApiEnabledGroup.class);
         assertTrue(violations.isEmpty());
     }
 
@@ -151,7 +159,7 @@ class RewardAndTrxRuleValidatorTest {
                 .to(BigDecimal.ZERO)
                 .fromIncluded(false)
                 .toIncluded(true).build();
-        Set<ConstraintViolation<ThresholdDTO>> violations = validator.validate(thresholdDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<ThresholdDTO>> violations = validator.validate(thresholdDTO, ValidationApiEnabledGroup.class);
         assertFalse(violations.isEmpty());
         assertThat(violations).hasSize(2);
     }
@@ -159,64 +167,63 @@ class RewardAndTrxRuleValidatorTest {
     @Test
     void when_DaysOfWeekIntervalsIsValid_thenValidationIsPassed(){
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = creatInitiativeTrxConditionsDTOValid_ok();
-        Set<ConstraintViolation<InitiativeTrxConditionsDTO>> violations = validator.validate(initiativeTrxConditionsDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeTrxConditionsDTO>> violations = validator.validate(initiativeTrxConditionsDTO, ValidationApiEnabledGroup.class);
         assertTrue(violations.isEmpty());
     }
 
     @Test
     void when_DaysOfWeekIntervalsIsEmpty_thenValidationAreFailed(){
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = creatInitiativeTrxConditionsDTODaysOfWeekIntervarlsEmpty_ko();
-        Set<ConstraintViolation<InitiativeTrxConditionsDTO>> violations = validator.validate(initiativeTrxConditionsDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeTrxConditionsDTO>> violations = validator.validate(initiativeTrxConditionsDTO, ValidationApiEnabledGroup.class);
         assertFalse(violations.isEmpty());
-        assertThat(violations.size()).isEqualTo(2);
+        assertThat(violations).hasSize(2);
     }
 
     @Test
     void when_DaysOfWeekIntervalsAreNotValid_thenValidationAreFailed(){
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = creatInitiativeTrxConditionsDTODaysOfWeekIntervalsNotValid_ko();
-        Set<ConstraintViolation<InitiativeTrxConditionsDTO>> violations = validator.validate(initiativeTrxConditionsDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeTrxConditionsDTO>> violations = validator.validate(initiativeTrxConditionsDTO, ValidationApiEnabledGroup.class);
         assertFalse(violations.isEmpty());
-        assertThat(violations.size()).isEqualTo(1);
+        assertThat(violations).hasSize(1);
     }
 
     @Test
     void when_ThresholdFromAndToAreTooSmall_thenValidationAreFailed(){
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = creatInitiativeTrxConditionsDTOThresholdFromAndToTooSmall_ko();
-        Set<ConstraintViolation<InitiativeTrxConditionsDTO>> violations = validator.validate(initiativeTrxConditionsDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeTrxConditionsDTO>> violations = validator.validate(initiativeTrxConditionsDTO, ValidationApiEnabledGroup.class);
         assertFalse(violations.isEmpty());
-        assertThat(violations.size()).isEqualTo(3);
+        assertThat(violations).hasSize(3);
     }
 
     @Test
     void when_TrxRuleFromAndToAreTooSmall_thenValidationAreFailed(){
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = creatInitiativeTrxConditionsDTOTrxRuleFromAndToTooSmall_ko();
-        Set<ConstraintViolation<InitiativeTrxConditionsDTO>> violations = validator.validate(initiativeTrxConditionsDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeTrxConditionsDTO>> violations = validator.validate(initiativeTrxConditionsDTO, ValidationApiEnabledGroup.class);
         assertFalse(violations.isEmpty());
-        assertThat(violations.size()).isEqualTo(3);
+        assertThat(violations).hasSize(2);
     }
 
     @Test
     void when_RewardRuleIsNull_thenValidationAreFailed(){
         InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = createInitiativeRewardAndTrxRulesDTOWithRewardRuleNull_ko();
-        Set<ConstraintViolation<InitiativeRewardAndTrxRulesDTO>> violations = validator.validate(initiativeRewardAndTrxRulesDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeRewardAndTrxRulesDTO>> violations = validator.validate(initiativeRewardAndTrxRulesDTO, ValidationApiEnabledGroup.class);
         assertFalse(violations.isEmpty());
-        assertThat(violations.size()).isEqualTo(1);
+        assertThat(violations).hasSize(1);
     }
 
     @Test
     void when_TrxRuleIsNull_thenValidationAreFailed(){
         InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = createInitiativeRewardAndTrxRulesDTOWithTrxRuleNull_ko();
-        Set<ConstraintViolation<InitiativeRewardAndTrxRulesDTO>> violations = validator.validate(initiativeRewardAndTrxRulesDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeRewardAndTrxRulesDTO>> violations = validator.validate(initiativeRewardAndTrxRulesDTO, ValidationApiEnabledGroup.class);
         assertFalse(violations.isEmpty());
-        assertThat(violations.size()).isEqualTo(1);
+        assertThat(violations).hasSize(1);
     }
 
     @Test
     void when_InitiativeRewardAndTrxRulesDTOIsValid_thenValidationIsPassed(){
         InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = createInitiativeRewardAndTrxRulesDTO_ok();
-        Set<ConstraintViolation<InitiativeRewardAndTrxRulesDTO>> violations = validator.validate(initiativeRewardAndTrxRulesDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeRewardAndTrxRulesDTO>> violations = validator.validate(initiativeRewardAndTrxRulesDTO, ValidationApiEnabledGroup.class);
         assertTrue(violations.isEmpty());
-        assertThat(0).isEqualTo(0);
     }
 
     InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardGroupsDTO_ok(){
@@ -271,12 +278,14 @@ class RewardAndTrxRuleValidatorTest {
     InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardValueDTO_ok(){
         return RewardValueDTO.builder()
                 .rewardValue(BigDecimal.valueOf(50))
+                .rewardValueType(RewardValueDTO.RewardValueTypeEnum.PERCENTAGE)
                 .type("rewardValue")
                 .build();
     }
     InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardValueDTO_No_typeField(){
         return RewardValueDTO.builder()
                 .rewardValue(BigDecimal.valueOf(50))
+                .rewardValueType(RewardValueDTO.RewardValueTypeEnum.PERCENTAGE)
                 .build();
     }
     InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardValueDTOvalueTooBig_ko(){
@@ -288,6 +297,7 @@ class RewardAndTrxRuleValidatorTest {
     InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardValueDTOvalueTooSmall_ko(){
         return RewardValueDTO.builder()
                 .rewardValue(BigDecimal.valueOf(-10))
+                .rewardValueType(RewardValueDTO.RewardValueTypeEnum.PERCENTAGE)
                 .type("rewardValue")
                 .build();
     }
@@ -597,6 +607,7 @@ class RewardAndTrxRuleValidatorTest {
     InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTOWithRewardRuleNull_ko(){
         InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = new InitiativeRewardAndTrxRulesDTO();
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = creatInitiativeTrxConditionsDTOValid_ok();
+        initiativeRewardAndTrxRulesDTO.setInitiativeRewardType(InitiativeRewardAndTrxRulesDTO.InitiativeRewardTypeEnum.DISCOUNT);
         initiativeRewardAndTrxRulesDTO.setRewardRule(null);
         initiativeRewardAndTrxRulesDTO.setTrxRule(initiativeTrxConditionsDTO);
         return initiativeRewardAndTrxRulesDTO;
@@ -604,6 +615,7 @@ class RewardAndTrxRuleValidatorTest {
     InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTOWithTrxRuleNull_ko(){
         InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = new InitiativeRewardAndTrxRulesDTO();
         InitiativeRewardRuleDTO initiativeRewardRuleDTO = createInitiativeRewardRuleDTORewardValueDTO_ok();
+        initiativeRewardAndTrxRulesDTO.setInitiativeRewardType(InitiativeRewardAndTrxRulesDTO.InitiativeRewardTypeEnum.DISCOUNT);
         initiativeRewardAndTrxRulesDTO.setRewardRule(initiativeRewardRuleDTO);
         initiativeRewardAndTrxRulesDTO.setTrxRule(null);
         return initiativeRewardAndTrxRulesDTO;
@@ -611,6 +623,7 @@ class RewardAndTrxRuleValidatorTest {
 
     InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTO_ok(){
         InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = new InitiativeRewardAndTrxRulesDTO();
+        initiativeRewardAndTrxRulesDTO.setInitiativeRewardType(InitiativeRewardAndTrxRulesDTO.InitiativeRewardTypeEnum.REFUND);
         InitiativeRewardRuleDTO initiativeRewardRuleDTO = createInitiativeRewardRuleDTORewardValueDTO_ok();
         initiativeRewardAndTrxRulesDTO.setRewardRule(initiativeRewardRuleDTO);
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = creatInitiativeTrxConditionsDTOValid_ok();

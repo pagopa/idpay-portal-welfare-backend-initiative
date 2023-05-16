@@ -3,6 +3,8 @@ package it.gov.pagopa.initiative.model;
 import lombok.*;
 import org.springframework.lang.Nullable;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,6 +20,7 @@ public class AutomatedCriteria {
   private String value2;
   @Nullable
   private OrderDirection orderDirection;
+  private List<IseeTypologyEnum> iseeTypes;
 
   public enum OrderDirection {
     ASC,

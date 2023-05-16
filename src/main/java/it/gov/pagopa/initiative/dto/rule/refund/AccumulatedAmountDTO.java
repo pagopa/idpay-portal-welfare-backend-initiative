@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import it.gov.pagopa.initiative.utils.constraint.AccumulatedAmountType;
-import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
+import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
 import lombok.*;
 
 import javax.validation.constraints.Min;
@@ -18,7 +18,7 @@ import java.math.BigDecimal;
 @Builder
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@AccumulatedAmountType(value1 = "accumulatedType", value2 = "refundThreshold", groups = ValidationOnGroup.class)
+@AccumulatedAmountType(value1 = "accumulatedType", value2 = "refundThreshold", groups = ValidationApiEnabledGroup.class)
 public class AccumulatedAmountDTO {
     public enum AccumulatedTypeEnum {
         BUDGET_EXHAUSTED("BUDGET_EXHAUSTED"),
@@ -45,11 +45,11 @@ public class AccumulatedAmountDTO {
         }
     }
 
-    @NotNull(groups = ValidationOnGroup.class)
+    @NotNull(groups = ValidationApiEnabledGroup.class)
     @JsonProperty("accumulatedType")
     private AccumulatedTypeEnum accumulatedType;
 
-    @Min(value = 0, groups = ValidationOnGroup.class)
+    @Min(value = 0, groups = ValidationApiEnabledGroup.class)
     @JsonProperty("refundThreshold")
     private BigDecimal refundThreshold;
 }

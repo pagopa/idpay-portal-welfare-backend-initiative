@@ -37,7 +37,7 @@ class RankingEnabledNotNullForBeneficiaryKnownFalseValidatorTest {
     @Test
     void whenAllValidationAreValid_InitiativeGeneralDTO_thenValidationArePassed() {
         InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralDTO_ok();
-        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationApiEnabledGroup.class);
 
         assertTrue(violations.isEmpty());
     }
@@ -45,7 +45,7 @@ class RankingEnabledNotNullForBeneficiaryKnownFalseValidatorTest {
     @Test
     void whenStartDateEndDateAreEqual_InitiativeGeneralDTO_thenValidationAreFailed() {
         InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralDTO_ko();
-        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeGeneralDTO>> violations = validator.validate(initiativeGeneralDTO, ValidationApiEnabledGroup.class);
 
         assertFalse(violations.isEmpty());
         //or

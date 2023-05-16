@@ -1,5 +1,7 @@
 package it.gov.pagopa.initiative.mapper;
 
+import it.gov.pagopa.initiative.constants.InitiativeConstants;
+import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.rule.refund.AccumulatedAmountDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
@@ -9,6 +11,7 @@ import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardGroupsDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardValueDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.*;
+import it.gov.pagopa.initiative.exception.InitiativeException;
 import it.gov.pagopa.initiative.model.TypeMultiEnum;
 import it.gov.pagopa.initiative.model.*;
 import it.gov.pagopa.initiative.model.rule.refund.AccumulatedAmount;
@@ -19,16 +22,22 @@ import it.gov.pagopa.initiative.model.rule.reward.InitiativeRewardRule;
 import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
 import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
 import it.gov.pagopa.initiative.model.rule.trx.*;
+import it.gov.pagopa.initiative.service.AESTokenService;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Component
 public class InitiativeDTOsToModelMapper {
+
+    @Autowired
+    AESTokenService aesTokenService;
 
     public Initiative toInitiative(InitiativeAdditionalDTO initiativeAdditionalDTO) {
         Initiative initiative = new Initiative();
@@ -51,6 +60,7 @@ public class InitiativeDTOsToModelMapper {
         return InitiativeGeneral.builder().beneficiaryBudget(generalDTO.getBeneficiaryBudget())
                 .beneficiaryKnown(generalDTO.getBeneficiaryKnown())
                 .beneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.valueOf(generalDTO.getBeneficiaryType().name()))
+                .familyUnitComposition(generalDTO.getFamilyUnitComposition()!=null?generalDTO.getFamilyUnitComposition():null)
                 .budget(generalDTO.getBudget())
                 .endDate(generalDTO.getEndDate())
                 .startDate(generalDTO.getStartDate())
@@ -94,53 +104,54 @@ public class InitiativeDTOsToModelMapper {
             return null;
         }
         InitiativeBeneficiaryRule beneficiaryRule = new InitiativeBeneficiaryRule();
-        if (CollectionUtils.isEmpty(beneficiaryRuleDto.getAutomatedCriteria())) {
-            beneficiaryRule.setAutomatedCriteria(Collections.emptyList());
-        } else {
-            beneficiaryRule.setAutomatedCriteria(beneficiaryRuleDto.getAutomatedCriteria().stream().map(automatedCriteriaDTO ->
-                    AutomatedCriteria.builder()
-                            .code(automatedCriteriaDTO.getCode())
-                            .field(automatedCriteriaDTO.getField())
-                            .operator(FilterOperatorEnumModel.valueOf(automatedCriteriaDTO.getOperator().name()))
-                            .authority(automatedCriteriaDTO.getAuthority())//TODO definire modalità di recupero authority
-                            .value(automatedCriteriaDTO.getValue())
-                            .value2(StringUtils.isBlank(automatedCriteriaDTO.getValue2()) ? null : automatedCriteriaDTO.getValue2())
-                            .orderDirection(automatedCriteriaDTO.getOrderDirection() != null
-                                    ? AutomatedCriteria.OrderDirection.valueOf(automatedCriteriaDTO.getOrderDirection().name())
-                                    : null)
-                            .build()
-            ).toList());
-        }
+        beneficiaryRule.setAutomatedCriteria(Optional.ofNullable(beneficiaryRuleDto.getAutomatedCriteria())
+                .orElse(Collections.emptyList())
+                .stream().map(automatedCriteriaDTO ->
+                AutomatedCriteria.builder()
+                        .code(automatedCriteriaDTO.getCode())
+                        .field(automatedCriteriaDTO.getField())
+                        .operator(FilterOperatorEnumModel.valueOf(automatedCriteriaDTO.getOperator().name()))
+                        .authority(automatedCriteriaDTO.getAuthority())
+                        .value(automatedCriteriaDTO.getValue())
+                        .value2(StringUtils.isBlank(automatedCriteriaDTO.getValue2()) ? null : automatedCriteriaDTO.getValue2())
+                        .orderDirection(automatedCriteriaDTO.getOrderDirection() != null
+                                ? AutomatedCriteria.OrderDirection.valueOf(automatedCriteriaDTO.getOrderDirection().name())
+                                : null)
+                        .iseeTypes(automatedCriteriaDTO.getIseeTypes())
+                        .build()
+        ).toList());
 
-        if (CollectionUtils.isEmpty(beneficiaryRuleDto.getSelfDeclarationCriteria())) {
-            beneficiaryRule.setSelfDeclarationCriteria(Collections.emptyList());
-        } else {
-            beneficiaryRule.setSelfDeclarationCriteria(beneficiaryRuleDto.getSelfDeclarationCriteria().stream()
-                    .map(dto -> {
-                                if (dto instanceof SelfCriteriaBoolDTO selfCriteriaBoolDTOInput) {
-                                    return SelfCriteriaBool.builder()
-                                            ._type(it.gov.pagopa.initiative.model.TypeBoolEnum.valueOf(selfCriteriaBoolDTOInput.getType().name()))
-                                            .code(selfCriteriaBoolDTOInput.getCode())
-                                            .description(selfCriteriaBoolDTOInput.getDescription())
-                                            .value(selfCriteriaBoolDTOInput.getValue())
-                                            .build();
-                                } else if (dto instanceof SelfCriteriaMultiDTO selfCriteriaMultiDTO) {
-                                    return SelfCriteriaMulti.builder()
-                                            ._type(TypeMultiEnum.valueOf(selfCriteriaMultiDTO.getType().name()))
-                                            .code(selfCriteriaMultiDTO.getCode())
-                                            .description(selfCriteriaMultiDTO.getDescription())
-                                            .value(selfCriteriaMultiDTO.getValue())
-                                            .build();
-                                }
-                                return null;
-                            }
-                    ).toList());
+        beneficiaryRule.setSelfDeclarationCriteria(Optional.ofNullable(beneficiaryRuleDto.getSelfDeclarationCriteria())
+                .orElse(Collections.emptyList())
+                .stream().map(dto -> {
+                    if (dto instanceof SelfCriteriaBoolDTO selfCriteriaBoolDTOInput) {
+                        return SelfCriteriaBool.builder()
+                                ._type(it.gov.pagopa.initiative.model.TypeBoolEnum.valueOf(selfCriteriaBoolDTOInput.getType().name()))
+                                .code(selfCriteriaBoolDTOInput.getCode())
+                                .description(selfCriteriaBoolDTOInput.getDescription())
+                                .value(selfCriteriaBoolDTOInput.getValue())
+                                .build();
+                    } else if (dto instanceof SelfCriteriaMultiDTO selfCriteriaMultiDTO) {
+                        return SelfCriteriaMulti.builder()
+                                ._type(TypeMultiEnum.valueOf(selfCriteriaMultiDTO.getType().name()))
+                                .code(selfCriteriaMultiDTO.getCode())
+                                .description(selfCriteriaMultiDTO.getDescription())
+                                .value(selfCriteriaMultiDTO.getValue())
+                                .build();
+                    }
+                    return null;
+                }).toList());
+
+        if(beneficiaryRuleDto.getApiKeyClientId() != null && beneficiaryRuleDto.getApiKeyClientAssertion() != null) {
+            beneficiaryRule.setApiKeyClientId(aesTokenService.encrypt(beneficiaryRuleDto.getApiKeyClientId()));
+            beneficiaryRule.setApiKeyClientAssertion(aesTokenService.encrypt(beneficiaryRuleDto.getApiKeyClientAssertion()));
         }
         return beneficiaryRule;
     }
 
     public Initiative toInitiative(InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDto) {
         Initiative initiative = new Initiative();
+        initiative.setInitiativeRewardType(InitiativeDTO.InitiativeRewardTypeEnum.valueOf(initiativeRewardAndTrxRulesDto.getInitiativeRewardType().name()));
         initiative.setTrxRule(this.toInitiativeTrxRule(initiativeRewardAndTrxRulesDto.getTrxRule()));
         initiative.setRewardRule(this.toInitiativeRewardRule(initiativeRewardAndTrxRulesDto.getRewardRule()));
         return initiative;
@@ -152,8 +163,10 @@ public class InitiativeDTOsToModelMapper {
         }
         InitiativeRewardRule ret;
         if(rewardRuleDTO instanceof RewardValueDTO rewardValueInput){
+            checkReward(rewardValueInput);
             ret = RewardValue.builder()
                     .type(rewardValueInput.getType())
+                    .rewardValueType(RewardValue.RewardValueTypeEnum.valueOf(rewardValueInput.getRewardValueType().name()))
                     .rewardValue(rewardValueInput.getRewardValue())
                     .build();
         } else if (rewardRuleDTO instanceof RewardGroupsDTO rewardGroupsInput) {
@@ -161,11 +174,17 @@ public class InitiativeDTOsToModelMapper {
                     .type(rewardGroupsInput.getType())
                     .rewardGroups(rewardGroupsInput.getRewardGroups().stream().map(
                     x -> RewardGroups.RewardGroup.builder().from(x.getFrom()).to(x.getTo()).rewardValue(x.getRewardValue()).build()
-            ).collect(Collectors.toList())).build();
+            ).toList()).build();
         } else {
             throw new IllegalArgumentException("Initiative Reward Rule not handled: %s".formatted(rewardRuleDTO.getClass().getName()));
         }
         return ret;
+    }
+
+    private void checkReward(RewardValueDTO rewardValueInput) {
+        if(rewardValueInput.getRewardValueType().equals(RewardValueDTO.RewardValueTypeEnum.PERCENTAGE) && rewardValueInput.getRewardValue().intValue()>100){
+            throw new InitiativeException(InitiativeConstants.Exception.BadRequest.CODE, BadRequest.REWARD_TYPE, HttpStatus.BAD_REQUEST);
+        }
     }
 
     private InitiativeTrxConditions toInitiativeTrxRule(InitiativeTrxConditionsDTO trxRulesDTO) {
@@ -187,8 +206,8 @@ public class InitiativeDTOsToModelMapper {
         }
         return TrxCount.builder().to(trxCountDTO.getTo())
                 .from(trxCountDTO.getFrom())
-                .fromIncluded(trxCountDTO.getFromIncluded())
-                .toIncluded(trxCountDTO.getToIncluded()).build();
+                .fromIncluded(trxCountDTO.isFromIncluded())
+                .toIncluded(trxCountDTO.isToIncluded()).build();
     }
 
     private MccFilter toMccFilter(MccFilterDTO mccFilterDTO) {
@@ -247,18 +266,18 @@ public class InitiativeDTOsToModelMapper {
             return null;
         }
         InitiativeRefundRule initiativeRefundRule = new InitiativeRefundRule();
-        initiativeRefundRule.setAccumulatedAmount(toAccomulatedAmount(refundRuleDTO.getAccumulatedAmount()));
+        initiativeRefundRule.setAccumulatedAmount(toAccumulatedAmount(refundRuleDTO.getAccumulatedAmount()));
         initiativeRefundRule.setTimeParameter(toTimeParameter(refundRuleDTO.getTimeParameter()));
         initiativeRefundRule.setAdditionalInfo(toAdditionalInfo(refundRuleDTO.getAdditionalInfo()));
         return initiativeRefundRule;
     }
 
-    private AccumulatedAmount toAccomulatedAmount(AccumulatedAmountDTO accomulatedAmountDTO){
-        if(accomulatedAmountDTO == null){
+    private AccumulatedAmount toAccumulatedAmount(AccumulatedAmountDTO accumulatedAmountDTO){
+        if(accumulatedAmountDTO == null){
             return null;
         }
-        return AccumulatedAmount.builder().accumulatedType(AccumulatedAmount.AccumulatedTypeEnum.valueOf(accomulatedAmountDTO.getAccumulatedType().name()))
-                .refundThreshold(accomulatedAmountDTO.getRefundThreshold()).build();
+        return AccumulatedAmount.builder().accumulatedType(AccumulatedAmount.AccumulatedTypeEnum.valueOf(accumulatedAmountDTO.getAccumulatedType().name()))
+                .refundThreshold(accumulatedAmountDTO.getRefundThreshold()).build();
     }
 
     private TimeParameter toTimeParameter(TimeParameterDTO timeParameterDTO){
@@ -286,7 +305,6 @@ public class InitiativeDTOsToModelMapper {
                 .initiativeId(initiativeDTO.getInitiativeId())
                 .initiativeName(initiativeDTO.getInitiativeName())
                 .organizationId(initiativeDTO.getOrganizationId())
-                .pdndToken(initiativeDTO.getPdndToken())
                 .creationDate(initiativeDTO.getCreationDate())
                 .updateDate(initiativeDTO.getUpdateDate())
                 .status(initiativeDTO.getStatus())
@@ -296,6 +314,7 @@ public class InitiativeDTOsToModelMapper {
                 .rewardRule(initiativeRewardRule)
                 .trxRule(initiativeTrxConditions)
                 .refundRule(initiativeRefundRule)
+                .initiativeRewardType(initiativeDTO.getInitiativeRewardType())
                 .build();
     }
 }

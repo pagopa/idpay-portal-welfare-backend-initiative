@@ -6,27 +6,26 @@ import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
 import it.gov.pagopa.initiative.model.Channel;
 import it.gov.pagopa.initiative.model.InitiativeAdditional;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.context.TestPropertySource;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@TestPropertySource(
-        locations = "classpath:application.yml",
-        properties = {
-                "rest-client.backend-io.service.request.departmentName=productDepartmentName",
-                "rest-client.backend-io.service.request.isVisible=false"
-        })
-@WebMvcTest(value = {
-        InitiativeAdditionalDTOsToIOServiceRequestDTOMapper.class})
+//@TestPropertySource(
+//        locations = "classpath:application.yml",
+//        properties = {
+//                "rest-client.backend-io.service.request.departmentName=productDepartmentName",
+//                "rest-client.backend-io.service.request.isVisible=false"
+//        })
+//@WebMvcTest(value = {
+//        InitiativeAdditionalDTOsToIOServiceRequestDTOMapper.class})
 class InitiativeAdditionalDTOsToIOServiceRequestDTOMapperTest {
 
-    @Autowired
     InitiativeAdditionalDTOsToIOServiceRequestDTOMapper initiativeAdditionalDTOsToIOServiceRequestDTOMapper;
 
     private static final String ROLE = "TEST_ROLE";
@@ -48,50 +47,71 @@ class InitiativeAdditionalDTOsToIOServiceRequestDTOMapperTest {
     private static final String SERVICE_NAME = "serviceName";
     private static final String PRODUCT_DEPARTMENT_NAME = "productDepartmentName";
 
-    private String organizationNameExpected;
+    private ServiceRequestDTO serviceRequestDTOexpected;
+    private final Boolean isVisible = false;
+    private List<String> authorizedRecipients;
 
-    @Test
-    void givenInitiativeAdditionalAndOrganizationInfo_whenOrganizationIsEmpty_thenServiceRequestContainDefaultProductDepartmentName(){
+    @ParameterizedTest
+    @ValueSource(strings = {ORGANIZATION_NAME, ""})
+    void givenInitiativeAdditionalAndOrganizationInfo_whenOrganizationNameChangeAndAuthorizedRecipientsPassed_thenServiceRequestContainDefaultProductDepartmentName(String organizationName){
+        //Init constructor
+        authorizedRecipients = Arrays.asList("AAAAAA00A00A000A","BBBBBB00B00B000B");
+        initiativeAdditionalDTOsToIOServiceRequestDTOMapper = new InitiativeAdditionalDTOsToIOServiceRequestDTOMapper(
+                PRODUCT_DEPARTMENT_NAME,
+                isVisible,
+                authorizedRecipients
+        );
+
+        serviceRequestDTOexpected = createServiceRequestDTOexpected(organizationName, authorizedRecipients);
+
         InitiativeAdditional initiativeAdditional = createInitiativeAdditional();
 
         InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = InitiativeOrganizationInfoDTO.builder()
-                .organizationName("")
+                .organizationName(organizationName)
                 .organizationVat(ORGANIZATION_VAT)
                 .organizationUserRole(ORGANIZATION_USER_ROLE)
                 .build();
 
-        organizationNameExpected = "";
-
         ServiceRequestDTO serviceRequestDTO = initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(initiativeAdditional, initiativeOrganizationInfoDTO);
-        assertEquals(organizationNameExpected, serviceRequestDTO.getOrganizationName());
+        assertEquals(StringUtils.isNotBlank(organizationName)? organizationName : PRODUCT_DEPARTMENT_NAME, serviceRequestDTO.getDepartmentName());
+        assertEquals(serviceRequestDTOexpected, serviceRequestDTO);
     }
 
-    @Test
-    void givenInitiativeAdditionalAndOrganizationInfo_whenOrganizationIsNotEmpty_thenServiceRequestContainOrganizationNamePassedByParams(){
+    @ParameterizedTest
+    @ValueSource(strings = {ORGANIZATION_NAME, ""})
+    void givenInitiativeAdditionalAndOrganizationInfo_whenOrganizationNameChangeAndNoAuthorizedRecipients_thenServiceRequestContainDefaultProductDepartmentName(String organizationName){
+        //Init constructor
+        initiativeAdditionalDTOsToIOServiceRequestDTOMapper = new InitiativeAdditionalDTOsToIOServiceRequestDTOMapper(
+                PRODUCT_DEPARTMENT_NAME,
+                isVisible,
+                null
+        );
+
+        serviceRequestDTOexpected = createServiceRequestDTOexpected(organizationName, null);
+
         InitiativeAdditional initiativeAdditional = createInitiativeAdditional();
 
         InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = InitiativeOrganizationInfoDTO.builder()
-                .organizationName(ORGANIZATION_NAME)
+                .organizationName(organizationName)
                 .organizationVat(ORGANIZATION_VAT)
                 .organizationUserRole(ORGANIZATION_USER_ROLE)
                 .build();
 
-        organizationNameExpected = ORGANIZATION_NAME;
-
         ServiceRequestDTO serviceRequestDTO = initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(initiativeAdditional, initiativeOrganizationInfoDTO);
-        assertEquals(organizationNameExpected, serviceRequestDTO.getOrganizationName());
+        assertEquals(StringUtils.isNotBlank(organizationName)? organizationName : PRODUCT_DEPARTMENT_NAME, serviceRequestDTO.getDepartmentName());
+        assertEquals(serviceRequestDTOexpected, serviceRequestDTO);
     }
 
-    private ServiceRequestDTO createServiceRequestDTO(String organizationName) {
+    private ServiceRequestDTO createServiceRequestDTOexpected(String organizationName, List<String> authorizedRecipients) {
         ServiceMetadataDTO serviceMetadataDTO = createServiceMetadataDTO();
-        return ServiceRequestDTO.builder()
+        ServiceRequestDTO.ServiceRequestDTOBuilder serviceRequestDTOBuilder = ServiceRequestDTO.builder()
                 .serviceMetadata(serviceMetadataDTO)
                 .serviceName(SERVICE_NAME)
-                .departmentName(StringUtils.isNotBlank(organizationName)? organizationName : PRODUCT_DEPARTMENT_NAME)
-                .organizationName(ORGANIZATION_NAME)
+                .departmentName(StringUtils.isNotBlank(organizationName) ? organizationName : PRODUCT_DEPARTMENT_NAME)
+                .organizationName(organizationName)
                 .organizationFiscalCode(ORGANIZATION_VAT)
-                .isVisible(IS_VISIBLE)
-                .build();
+                .isVisible(IS_VISIBLE);
+        return CollectionUtils.isEmpty(authorizedRecipients) ? serviceRequestDTOBuilder.build() : serviceRequestDTOBuilder.authorizedRecipients(authorizedRecipients).build();
     }
 
     private ServiceMetadataDTO createServiceMetadataDTO() {

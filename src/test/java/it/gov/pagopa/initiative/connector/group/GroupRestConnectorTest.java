@@ -49,7 +49,6 @@ class GroupRestConnectorTest {
         initiative.setOrganizationId("42");
         initiative.setOrganizationName("Organization Name");
         initiative.setOrganizationVat("Organization Vat");
-        initiative.setPdndToken("ABC123");
         initiative.setRefundRule(new InitiativeRefundRule());
         initiative.setRewardRule(new RewardGroups());
         initiative.setStatus("Status");
@@ -58,6 +57,15 @@ class GroupRestConnectorTest {
         initiative.setUpdatedBy("2020-03-01");
         groupRestConnectorImpl.notifyInitiativeToGroup(initiative);
         verify(groupFeignRestClient).notifyInitiativeForCitizen(any(), any());
+    }
+
+    @Test
+    void testSetGroupStatusToValidated() {
+        when(groupFeignRestClient.notifyInitiativeForCitizen(any(), any()))
+            .thenReturn(new ResponseEntity<>(HttpStatus.CONTINUE));
+
+        groupRestConnectorImpl.setGroupStatusToValidated("id");
+        verify(groupFeignRestClient).setGroupStatusToValidated(any());
     }
 }
 

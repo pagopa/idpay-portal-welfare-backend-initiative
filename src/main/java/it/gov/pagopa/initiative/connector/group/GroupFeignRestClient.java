@@ -21,4 +21,11 @@ public interface GroupFeignRestClient {
   ResponseEntity<Void> notifyInitiativeForCitizen(
           @PathVariable("initiativeId") String initiativeId,
           @RequestBody InitiativeNotificationDTO initiativeNotificationDTO);
+
+  @PostMapping(
+      value = "/group/initiative/{initiativeId}/validate",
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseBody
+  ResponseEntity<Void> setGroupStatusToValidated(
+      @PathVariable("initiativeId") String initiativeId);
 }

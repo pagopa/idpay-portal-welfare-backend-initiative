@@ -7,6 +7,9 @@ blobStorage.connectionString: ${BLOB_STORAGE_CONNECTION_STRING:}
 blobStorage.initiative.logo.containerReference: ${BLOB_STORAGE_CONTAINER_REFERENCE:}
 
 spring:
+  application:
+    name: "@project.artifactId@"
+    version: "@project.version@"
   data:
     mongodb:
       uri: ${MONGODB_URI}
@@ -58,6 +61,7 @@ rest-client:
       request:
         departmentName: ${IO_BACKEND_SERVICE_DEPARTMENT_NAME:}
         isVisible: ${IO_BACKEND_SERVICE_IS_VISIBLE:false}
+        authorizedRecipients: ${IO_BACKEND_SERVICE_AUTHORIZED_RECIPIENTS:}
   onboarding:
     serviceCode: idpay-onboarding
     uri: ${ONBOARDING_URI:}
@@ -98,6 +102,10 @@ feign:
       ms-group:
         loggerLevel: ${FEIGN_CLIENT_CONFIG_IO_LOG_LEVEL:basic}
 
+management.endpoints:
+  web:
+    exposure.include: info, health
+
 logging:
   level:
     root: ${LOG_LEVEL_ROOT:INFO}
@@ -124,6 +132,7 @@ app:
       notifyRE: ${APP_INITIATIVE_CONDITIONS_NOTIFY_RE:true}
       notifyEmail: ${APP_INITIATIVE_CONDITIONS_NOTIFY_EMAIL:true}
       notifyInternal: ${APP_INITIATIVE_CONDITIONS_NOTIFY_INTERNAL:true}
+    email-assistance: ${EMAIL_RECIPIENT_ASSISTANCE:Assistenza.IDPay@Pagopa.it}
 
 util:
   crypto:

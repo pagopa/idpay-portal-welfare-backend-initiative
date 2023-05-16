@@ -32,7 +32,7 @@ class RefundRuleTest {
     @Test
     void refundRuleValidWithTimeParameter_ok(){
         InitiativeRefundRuleDTO refundRuleDTO = createRefundRuleValidWithTimeParameter_ok();
-        Set<ConstraintViolation<InitiativeRefundRuleDTO>> violations = validator.validate(refundRuleDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeRefundRuleDTO>> violations = validator.validate(refundRuleDTO, ValidationApiEnabledGroup.class);
 
         assertTrue(violations.isEmpty());
     }
@@ -40,7 +40,7 @@ class RefundRuleTest {
     @Test
     void refundRuleValidWithAccumulatedAmount_ok(){
         InitiativeRefundRuleDTO refundRuleDTO = createRefundRuleValidWithAccumulatedAmount_ok();
-        Set<ConstraintViolation<InitiativeRefundRuleDTO>> violations = validator.validate(refundRuleDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeRefundRuleDTO>> violations = validator.validate(refundRuleDTO, ValidationApiEnabledGroup.class);
 
         assertTrue(violations.isEmpty());
     }
@@ -48,7 +48,7 @@ class RefundRuleTest {
     @Test
     void refundRuleWithBothRefundNotValid_ko(){
         InitiativeRefundRuleDTO refundRuleDTO = createRefundRuleWithBothRefundNotValid_ko();
-        Set<ConstraintViolation<InitiativeRefundRuleDTO>> violations = validator.validate(refundRuleDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeRefundRuleDTO>> violations = validator.validate(refundRuleDTO, ValidationApiEnabledGroup.class);
 
         assertFalse(violations.isEmpty());
         assertThat(violations).hasSize(1);
@@ -57,7 +57,7 @@ class RefundRuleTest {
     @Test
     void refundRuleWithBothRefundNullNotValid_ko(){
         InitiativeRefundRuleDTO refundRuleDTO = createRefundWithBothRefundNullNotValid_ko();
-        Set<ConstraintViolation<InitiativeRefundRuleDTO>> violations = validator.validate(refundRuleDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeRefundRuleDTO>> violations = validator.validate(refundRuleDTO, ValidationApiEnabledGroup.class);
 
         assertFalse(violations.isEmpty());
         assertThat(violations).hasSize(1);
@@ -66,7 +66,7 @@ class RefundRuleTest {
     @Test
     void refundRuleWithAccumulatedAmountNotValid_ko(){
         InitiativeRefundRuleDTO refundRuleDTO = createRefundRuleWithAccumulatedAmountNotValid_ko();
-        Set<ConstraintViolation<InitiativeRefundRuleDTO>> violations = validator.validate(refundRuleDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeRefundRuleDTO>> violations = validator.validate(refundRuleDTO, ValidationApiEnabledGroup.class);
 
         assertFalse(violations.isEmpty());
         assertThat(violations).hasSize(1);
@@ -75,7 +75,7 @@ class RefundRuleTest {
     @Test
     void refundRuleWithEmptyAccumulatedAmountNotValid_ko(){
         InitiativeRefundRuleDTO refundRuleDTO = createRefundRuleWithEmptyAccumulatedAmountNotValid_ko();
-        Set<ConstraintViolation<InitiativeRefundRuleDTO>> violations = validator.validate(refundRuleDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeRefundRuleDTO>> violations = validator.validate(refundRuleDTO, ValidationApiEnabledGroup.class);
 
         assertFalse(violations.isEmpty());
         assertThat(violations).hasSize(1);
@@ -84,7 +84,7 @@ class RefundRuleTest {
     @Test
     void refundRuleWithEmptyTimeParameterNotValid_ko(){
         InitiativeRefundRuleDTO refundRuleDTO = createRefundRuleWithEmptyTimeParameterNotValid_ko();
-        Set<ConstraintViolation<InitiativeRefundRuleDTO>> violations = validator.validate(refundRuleDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeRefundRuleDTO>> violations = validator.validate(refundRuleDTO, ValidationApiEnabledGroup.class);
 
         assertFalse(violations.isEmpty());
         assertThat(violations).hasSize(1);
@@ -93,7 +93,7 @@ class RefundRuleTest {
     @Test
     void refundRuleWithEmptyAdditionalInfoNotValid_ko(){
         InitiativeRefundRuleDTO refundRuleDTO = createRefundRuleWithEmptyAdditionalInfoNotValid_ko();
-        Set<ConstraintViolation<InitiativeRefundRuleDTO>> violations = validator.validate(refundRuleDTO, ValidationOnGroup.class);
+        Set<ConstraintViolation<InitiativeRefundRuleDTO>> violations = validator.validate(refundRuleDTO, ValidationApiEnabledGroup.class);
 
         assertFalse(violations.isEmpty());
         assertThat(violations).hasSize(1);

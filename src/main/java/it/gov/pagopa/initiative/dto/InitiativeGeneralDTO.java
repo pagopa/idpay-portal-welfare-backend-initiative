@@ -8,7 +8,7 @@ import it.gov.pagopa.initiative.utils.constraint.BeneficiaryBudgetValue;
 import it.gov.pagopa.initiative.utils.constraint.RankingAndSpendingDatesDoubleUseCaseValue;
 import it.gov.pagopa.initiative.utils.constraint.initiative.general.RankingEnabledNotNullForBeneficiaryKnownFalseConstraint;
 import it.gov.pagopa.initiative.utils.constraint.initiative.general.RankingGracePeriodConstraint;
-import it.gov.pagopa.initiative.utils.validator.ValidationOnGroup;
+import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -30,23 +30,23 @@ import java.util.Map;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
-@BeneficiaryBudgetValue(budget1 = "beneficiaryBudget", budget2 = "budget", groups = ValidationOnGroup.class)
-@RankingAndSpendingDatesDoubleUseCaseValue(date1 = "rankingStartDate", date2 = "rankingEndDate", date3 = "startDate", date4 = "endDate", groups = ValidationOnGroup.class)
-@RankingGracePeriodConstraint(groups = ValidationOnGroup.class)
-@RankingEnabledNotNullForBeneficiaryKnownFalseConstraint(groups = ValidationOnGroup.class)
+@BeneficiaryBudgetValue(budget1 = "beneficiaryBudget", budget2 = "budget", groups = ValidationApiEnabledGroup.class)
+@RankingAndSpendingDatesDoubleUseCaseValue(date1 = "rankingStartDate", date2 = "rankingEndDate", date3 = "startDate", date4 = "endDate", groups = ValidationApiEnabledGroup.class)
+@RankingGracePeriodConstraint(groups = ValidationApiEnabledGroup.class)
+@RankingEnabledNotNullForBeneficiaryKnownFalseConstraint(groups = ValidationApiEnabledGroup.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class InitiativeGeneralDTO extends InitiativeOrganizationInfoDTO {
 
     @JsonProperty("budget")
-    @Min(value = 1, message = "budget should have an amount of at least 1", groups = ValidationOnGroup.class)
-    @NotNull(groups = ValidationOnGroup.class)
+    @Min(value = 1, message = "budget should have an amount of at least 1", groups = ValidationApiEnabledGroup.class)
+    @NotNull(groups = ValidationApiEnabledGroup.class)
     private BigDecimal budget;
 
     /**
      * Gets or Sets beneficiaryType
      */
     public enum BeneficiaryTypeEnum {
-        PF("PF"), PG("PG");
+        PF("PF"), PG("PG"), NF("NF");
 
         private final String value;
 
@@ -72,44 +72,47 @@ public class InitiativeGeneralDTO extends InitiativeOrganizationInfoDTO {
     }
 
     @JsonProperty("beneficiaryType")
-    @NotNull(groups = ValidationOnGroup.class)
+    @NotNull(groups = ValidationApiEnabledGroup.class)
     private BeneficiaryTypeEnum beneficiaryType;
 
+    @JsonProperty("familyUnitComposition")
+    private String familyUnitComposition;
+
     @JsonProperty("beneficiaryKnown")
-    @NotNull(groups = ValidationOnGroup.class)
+    @NotNull(groups = ValidationApiEnabledGroup.class)
     private Boolean beneficiaryKnown;
 
     @JsonProperty("beneficiaryBudget")
-    @Min(value = 1, message = "Beneficiary budget should have an amount of at least 1", groups = ValidationOnGroup.class)
-    @NotNull(groups = ValidationOnGroup.class)
+    @Min(value = 1, message = "Beneficiary budget should have an amount of at least 1", groups = ValidationApiEnabledGroup.class)
+    @NotNull(groups = ValidationApiEnabledGroup.class)
     private BigDecimal beneficiaryBudget;
 
     /**
      * Start of period of spending funds in an initiative
      */
     @JsonProperty("startDate")
-    @NotNull(groups = ValidationOnGroup.class)
+    @NotNull(groups = ValidationApiEnabledGroup.class)
     private LocalDate startDate;
 
     /**
      * End of period of spending funds in an initiative
      */
     @JsonProperty("endDate")
-    @NotNull(groups = ValidationOnGroup.class)
+    @NotNull(groups = ValidationApiEnabledGroup.class)
     private LocalDate endDate;
 
     /**
      * Start of period of participation/adhesion in an initiative
      */
     @JsonProperty("rankingStartDate")
-    @FutureOrPresent(groups = ValidationOnGroup.class)
+    @FutureOrPresent(groups = ValidationApiEnabledGroup.class)
     private LocalDate rankingStartDate;
 
     /**
      * End of period of participation/adhesion in an initiative
      */
     @JsonProperty("rankingEndDate")
-    @Future(groups = ValidationOnGroup.class)
+    @Future(groups = ValidationApiEnabledGroup.class)
     private LocalDate rankingEndDate;
 
     @JsonProperty("rankingEnabled")
@@ -117,6 +120,6 @@ public class InitiativeGeneralDTO extends InitiativeOrganizationInfoDTO {
 
     @JsonProperty("descriptionMap")
     @Valid
-    @NotEmpty(groups = ValidationOnGroup.class)
+    @NotEmpty(groups = ValidationApiEnabledGroup.class)
     private Map<String, String> descriptionMap;
 }

@@ -13,5 +13,7 @@ public class InitiativeBeneficiaryRule {
 
   private List<ISelfDeclarationCriteria> selfDeclarationCriteria;
   private List<AutomatedCriteria> automatedCriteria;
+  private String apiKeyClientId;
+  private String apiKeyClientAssertion;
 
 }

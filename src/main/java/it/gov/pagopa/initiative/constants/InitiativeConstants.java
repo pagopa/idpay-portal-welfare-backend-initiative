@@ -1,11 +1,15 @@
 package it.gov.pagopa.initiative.constants;
 
 
+import java.util.List;
+
 public class InitiativeConstants {
 
     private InitiativeConstants(){}
 
     public static final class Status {
+        public static final List<String> INITIATIVE_STATUS_LIST_FOR_PAGOPA_ADMIN_OPERATOR = List.of(InitiativeConstants.Status.IN_REVISION, InitiativeConstants.Status.TO_CHECK, InitiativeConstants.Status.APPROVED, InitiativeConstants.Status.PUBLISHED);
+        public static final List<String> INITIATIVE_STATUS_LIST_FOR_ADMIN_OPERATOR = List.of(InitiativeConstants.Status.DRAFT, InitiativeConstants.Status.IN_REVISION, InitiativeConstants.Status.TO_CHECK, InitiativeConstants.Status.APPROVED, InitiativeConstants.Status.PUBLISHED, InitiativeConstants.Status.SUSPENDED, InitiativeConstants.Status.CLOSED);
         public static final String DRAFT = "DRAFT"; //In bozza
         public static final String IN_REVISION = "IN_REVISION"; //In revisione
         public static final String TO_CHECK = "TO_CHECK"; //Da controllare/revisionare
@@ -15,6 +19,8 @@ public class InitiativeConstants {
         public static final String SUSPENDED = "SUSPENDED"; //Sospesa
 
         public static final class Validation {
+            public static final String REWARD_PERCENTAGE = "PERCENTAGE";
+            public static final String REWARD_ABSOLUTE = "ABSOLUTE";
             public static final String [] INITIATIVES_ALLOWED_STATES_TO_BE_EDITABLE_ARRAY = {Status.DRAFT, Status.TO_CHECK, Status.APPROVED};
             public static final String [] INITIATIVE_ALLOWED_STATES_TO_BECOME_PUBLISHED_ARRAY = {Status.APPROVED};
         }
@@ -27,7 +33,7 @@ public class InitiativeConstants {
 
     public static final class Role {
         public static final String ADMIN = "admin";
-        public static final String OPE_BASE = "ope_base";
+        public static final String PAGOPA_ADMIN = "pagopa_admin";
     }
 
     public static final class Email {
@@ -35,8 +41,24 @@ public class InitiativeConstants {
         public static final String TEMPLATE_NAME_EMAIL_INITIATIVE_CREATED = "Email_InitiativeCreated";
         public static final String SUBJECT_CHANGE_STATE = "Cambio stato iniziativa per il prodotto IdPay";
         public static final String SUBJECT_INITIATIVE_CREATED = "Nuova Iniziativa";
-        public static final String RECIPIENT_ASSISTANCE = "Assistenza.IDPay@Pagopa.it";
+    }
 
+    public static final class CtaConstant {
+        public static final String START = "---\n";
+        public static final String IT = "it:\n    ";
+        public static final String CTA_1_IT = "cta_1: \n        ";
+        public static final String TEXT_IT = "text: \"Richiedi il Bonus\"\n        ";
+        public static final String ACTION_IT = "action: \"ioit://idpay/onboarding/";
+        public static final String EN = "\"\nen:\n    ";
+        public static final String CTA_1_EN = "cta_1: \n        ";
+        public static final String TEXT_EN = "text: \"Request Bonus\"\n        ";
+        public static final String ACTION_EN = "action: \"ioit://idpay/onboarding/";
+        public static final String END = "\"\n---";
+    }
+
+    public static final class FamilyUnitCompositionConstant {
+        public static final String INPS = "INPS";
+        public static final String ANPR = "ANPR";
     }
 
     public static final class Exception extends AbstractConstant {
@@ -55,6 +77,7 @@ public class InitiativeConstants {
             public static final String INITIATIVE_BENEFICIARY_RANKING_ENABLED_AUTOMATED_CRITERIA_ORDER_OPERATION_ISEE_EQ_OP_NOT_VALID = "Automated criteria not valid. OrderDirection not feasible. When Ranking enabled, It must be used ISEE only with non 'Equals' operator";
             public static final String INITIATIVE_BENEFICIARY_RANKING_ENABLED_AUTOMATED_CRITERIA_ORDER_OPERATION_MISSING_NOT_VALID = "Automated criteria not valid. OrderDirection is Missing. Please check it when Ranking is enabled";
             public static final String INITIATIVE_BENEFICIARY_RANKING_ENABLED_AUTOMATED_CRITERIA_ISEE_MISSING_NOT_VALID = "Automated criteria not valid. ISEE is Missing. Please check it when Ranking is enabled";
+            public static final String INITIATIVE_BENEFICIARY_TYPE_NF_ENABLED_AUTOMATED_CRITERIA_ISEE_MISSING_NOT_VALID = "Automated criteria not valid. ISEE is Missing. Please check it when beneficiary type 'NF' is selected";
             public static final String INITIATIVE_STATUS_NOT_IN_REVISION = "The status of initiative [%s] is not IN_REVISION";
             public static final String INITIATIVE_BY_INITIATIVE_ID_PROPERTIES_NOT_VALID = "Initiative %s properties are not valid for this request";
             public static final String INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_STATUS_NOT_VALID = "Initiative %s unprocessable for status not valid";
@@ -63,7 +86,12 @@ public class InitiativeConstants {
             public static final String INITIATIVE_CANNOT_BE_DELETED = "Initiative %s cannot be deleted";
             public static final String PERMISSION_NOT_VALID= "Permission not valid for [%s]";
             public static final String INITIATIVE_DESCRIPTION_LANGUAGE_MESSAGE = "Italian language is required for initiative description";
+            public static final String INITIATIVE_GENERAL_FAMILY_COMPOSITION_MESSAGE = "Family unit composition must be set as 'INPS' or 'ANPR'";
+            public static final String INITIATIVE_GENERAL_FAMILY_COMPOSITION_WRONG_BENEFICIARY_TYPE = "Family unit composition must be unset for this beneficiary type";
             public static final String WIZARD_VALIDATION = "Error on Validation caused by: %s";
+            public static final String REWARD_TYPE = "REWARD INVALID";
+            public static final String REFUND_RULE_INVALID = "REFUND RULE INVALID";
+            public static final String ISEE_TYPES_NOT_VALID = "Automated criteria not valid. ISEE typology is missing.";
         }
         public static final class Publish {
             public static final String PUBLISH_CODE = BASE_CODE + ".published";

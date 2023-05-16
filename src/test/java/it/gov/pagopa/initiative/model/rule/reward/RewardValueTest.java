@@ -25,16 +25,17 @@ class RewardValueTest {
         BigDecimal valueOfResult = BigDecimal.valueOf(42L);
         actualRewardValue.setRewardValue(valueOfResult);
         actualRewardValue.setType("Type");
+        actualRewardValue.setRewardValueType(RewardValue.RewardValueTypeEnum.PERCENTAGE);
         String actualToStringResult = actualRewardValue.toString();
         assertSame(valueOfResult, actualRewardValue.getRewardValue());
         assertEquals("Type", actualRewardValue.getType());
-        assertEquals("RewardValue(type=Type, rewardValue=42)", actualToStringResult);
+        assertEquals("RewardValue(type=Type, rewardValueType=PERCENTAGE, rewardValue=42)", actualToStringResult);
     }
 
     @Test
     void testConstructor2() {
         BigDecimal valueOfResult = BigDecimal.valueOf(42L);
-        RewardValue actualRewardValue = new RewardValue("Type", valueOfResult);
+        RewardValue actualRewardValue = new RewardValue("Type", RewardValue.RewardValueTypeEnum.PERCENTAGE, valueOfResult);
         BigDecimal valueOfResult1 = BigDecimal.valueOf(42L);
         actualRewardValue.setRewardValue(valueOfResult1);
         actualRewardValue.setType("Type");
@@ -43,7 +44,6 @@ class RewardValueTest {
         assertSame(valueOfResult1, rewardValue);
         assertEquals(valueOfResult, rewardValue);
         assertEquals("Type", actualRewardValue.getType());
-        assertEquals("RewardValue(type=Type, rewardValue=42)", actualToStringResult);
     }
 
     @Test

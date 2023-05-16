@@ -1,21 +1,13 @@
-/*
 package it.gov.pagopa.initiative.config;
 
 import it.gov.pagopa.initiative.controller.filter.HeaderFilter;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import java.util.Collections;
-import java.util.function.BooleanSupplier;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
 
 @ContextConfiguration(classes = {IngressInterceptorConfig.class})
 @ExtendWith(SpringExtension.class)
@@ -25,11 +17,16 @@ class IngressInterceptorConfigTest {
 
     @Test
     void testSessionLoginHeaderFilterRegistrationBean() {
-        FilterRegistrationBean<HeaderFilter> registrationBean1 = new FilterRegistrationBean<>();
-        registrationBean1.setFilter(new HeaderFilter());
-        registrationBean1.addUrlPatterns("/");
-        assertEquals(ingressInterceptorConfig.sessionLoginHeaderFilterRegistrationBean(), registrationBean1);
+        FilterRegistrationBean<HeaderFilter> registrationBean = new FilterRegistrationBean<>();
+        HeaderFilter headerFilter = new HeaderFilter();
+        String url = "/*";
+        registrationBean.setFilter(headerFilter);
+        registrationBean.addUrlPatterns(url);
+
+        ingressInterceptorConfig.sessionLoginHeaderFilterRegistrationBean();
+
+        Assertions.assertEquals(registrationBean.getUrlPatterns(),
+                ingressInterceptorConfig.sessionLoginHeaderFilterRegistrationBean().getUrlPatterns());
     }
 }
 
-*/
