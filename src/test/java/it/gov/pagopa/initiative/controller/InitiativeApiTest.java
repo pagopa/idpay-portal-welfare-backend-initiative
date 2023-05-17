@@ -1499,6 +1499,7 @@ class InitiativeApiTest {
         initiativeDetailDTO.setTcLink("tc.it");
         initiativeDetailDTO.setLogoURL("logo.png");
         initiativeDetailDTO.setUpdateDate(LocalDateTime.now());
+        initiativeDetailDTO.setServiceId("SERVICE_ID");
         return initiativeDetailDTO;
     }
 
