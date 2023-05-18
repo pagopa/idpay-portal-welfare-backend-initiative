@@ -28,4 +28,5 @@ public class InitiativeDetailDTO {
     private String tcLink;
     private String logoURL;
     private LocalDateTime updateDate;
+    private String serviceId;
 }
