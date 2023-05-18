@@ -244,6 +244,15 @@ public class InitiativeApiController implements InitiativeApi {
         initiativeService.isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED, role);
         log.debug("Current Status validated");
 
+        log.debug("Retrieve current state and save it as TEMP");
+        String statusTemp = initiative.getStatus();
+        LocalDateTime updateDateTemp = initiative.getUpdateDate();
+
+        initiative.setStatus(InitiativeConstants.Status.PUBLISHED);
+        initiative.setUpdateDate(LocalDateTime.now());
+        initiativeService.updateInitiative(initiative);
+        log.debug("Initiative saved in status PUBLISHED");
+
         try {
             if(notifyRE) {
                 log.info("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Notification to Rule Engine of the published Initiative", initiativeId);
@@ -263,6 +272,11 @@ public class InitiativeApiController implements InitiativeApi {
                 }
             }
         } catch (Exception e) {
+            log.error("[UPDATE_TO_PUBLISHED_STATUS] - [ROLLBACK STATUS] Initiative: {}. Generic Error: {}", initiativeId, e.getMessage());
+            initiative.setStatus(statusTemp);
+            initiative.setUpdateDate(updateDateTemp);
+            initiativeService.updateInitiative(initiative);
+            log.debug("Initiative Status has been roll-backed to {}", statusTemp);
             performanceLog(startTime, "UPDATE_INITIATIVE_PUBLISHED");
             throw new IntegrationException(HttpStatus.BAD_REQUEST);
         }
