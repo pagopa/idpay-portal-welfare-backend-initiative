@@ -44,5 +44,3 @@ microservice-chart:
   # tolerations: []
 
   # affinity: {}
-https://sonarcloud:
-  io/component_measures?id=pagopa_idpay-group&metric=coverage&branch=release-dev&view=list:
