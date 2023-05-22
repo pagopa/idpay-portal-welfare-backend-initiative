@@ -85,21 +85,9 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
     @Validated(value = ValidationApiEnabledGroup.class)
     public void checkAutomatedCriteria(Initiative initiative, List<AutomatedCriteria> automatedCriteriaList) {
         InitiativeGeneral general = initiative.getGeneral();
-        for(AutomatedCriteria automatedCriteria : automatedCriteriaList){
-            if(automatedCriteria.getCode().equals(ISEE) && CollectionUtils.isEmpty(automatedCriteria.getIseeTypes())){
-                throw new InitiativeException(
-                        InitiativeConstants.Exception.BadRequest.CODE,
-                        InitiativeConstants.Exception.BadRequest.ISEE_TYPES_NOT_VALID,
-                        HttpStatus.BAD_REQUEST);
-            }
-        }
-        if(InitiativeGeneral.BeneficiaryTypeEnum.NF.equals(initiative.getGeneral().getBeneficiaryType()) &&
-                automatedCriteriaList.stream().noneMatch(a -> a.getCode().equals(ISEE))){
-            throw new InitiativeException(
-                    InitiativeConstants.Exception.BadRequest.CODE,
-                    InitiativeConstants.Exception.BadRequest.INITIATIVE_BENEFICIARY_TYPE_NF_ENABLED_AUTOMATED_CRITERIA_ISEE_MISSING_NOT_VALID,
-                    HttpStatus.BAD_REQUEST);
-        }
+        checkIseeTypes(automatedCriteriaList);
+        checkIseeCriteriaForNF(initiative, automatedCriteriaList);
+
         if (Boolean.TRUE.equals(general.getRankingEnabled())){
             boolean checkIsee = false;
             for(AutomatedCriteria automatedCriteria : automatedCriteriaList){
@@ -130,6 +118,26 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
                         HttpStatus.BAD_REQUEST
                 );
             }
+        }
+    }
+
+    private void checkIseeTypes(List<AutomatedCriteria> automatedCriteriaList){
+        for(AutomatedCriteria automatedCriteria : automatedCriteriaList){
+            if(automatedCriteria.getCode().equals(ISEE) && CollectionUtils.isEmpty(automatedCriteria.getIseeTypes())){
+                throw new InitiativeException(
+                        InitiativeConstants.Exception.BadRequest.CODE,
+                        InitiativeConstants.Exception.BadRequest.ISEE_TYPES_NOT_VALID,
+                        HttpStatus.BAD_REQUEST);
+            }
+        }
+    }
+    private void checkIseeCriteriaForNF(Initiative initiative, List<AutomatedCriteria> automatedCriteriaList){
+        if(InitiativeGeneral.BeneficiaryTypeEnum.NF.equals(initiative.getGeneral().getBeneficiaryType()) &&
+                automatedCriteriaList.stream().noneMatch(a -> a.getCode().equals(ISEE))){
+            throw new InitiativeException(
+                    InitiativeConstants.Exception.BadRequest.CODE,
+                    InitiativeConstants.Exception.BadRequest.INITIATIVE_BENEFICIARY_TYPE_NF_ENABLED_AUTOMATED_CRITERIA_ISEE_MISSING_NOT_VALID,
+                    HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -177,11 +185,10 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
 
     @Override
     public void checkRefundRuleDiscountInitiative(String initiativeRewardType, InitiativeRefundRule refundRule){
-        if (InitiativeRewardAndTrxRulesDTO.InitiativeRewardTypeEnum.DISCOUNT.name().equals(initiativeRewardType)){
-            if(refundRule.getAccumulatedAmount() != null || refundRule.getTimeParameter() == null){
+        if (InitiativeRewardAndTrxRulesDTO.InitiativeRewardTypeEnum.DISCOUNT.name().equals(initiativeRewardType) &&
+                (refundRule.getAccumulatedAmount() != null || refundRule.getTimeParameter() == null)){
                 throw new InitiativeException(InitiativeConstants.Exception.BadRequest.CODE,
                         InitiativeConstants.Exception.BadRequest.REFUND_RULE_INVALID, HttpStatus.BAD_REQUEST);
-            }
         }
     }
 

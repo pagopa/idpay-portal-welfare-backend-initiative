@@ -196,8 +196,7 @@ public interface InitiativeApi {
     ResponseEntity<Void> updateInitiativeBeneficiary(
             @PathVariable("organizationId") String organizationId,
             @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId,
-            @Parameter(in = ParameterIn.DEFAULT, description = "Unique identifier of the subscribed initiative, instrument HPAN", schema = @Schema()) @RequestBody @Validated(ValidationApiEnabledGroup.class) InitiativeBeneficiaryRuleDTO body,
-            @RequestParam(required = false) String role);
+            @Parameter(in = ParameterIn.DEFAULT, description = "Unique identifier of the subscribed initiative, instrument HPAN", schema = @Schema()) @RequestBody @Validated(ValidationApiEnabledGroup.class) InitiativeBeneficiaryRuleDTO body);
 
   @Operation(summary = "Association of transaction and reward rules to a draft initiative without validation", description = "", security = {
       @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
@@ -352,8 +351,7 @@ public interface InitiativeApi {
   ResponseEntity<Void> updateInitiativePublishedStatus(
       @PathVariable("organizationId") String organizationId,
       @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId,
-      @Parameter(in = ParameterIn.DEFAULT, schema = @Schema()) @RequestBody InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO,
-      @RequestParam(required = false) String role);
+      @Parameter(in = ParameterIn.DEFAULT, schema = @Schema()) @RequestBody InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO);
 
   @Operation(summary = "Add logo to initiative", description = "", security = {
           @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})

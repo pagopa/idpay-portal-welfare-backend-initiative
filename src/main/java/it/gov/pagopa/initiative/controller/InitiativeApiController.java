@@ -82,7 +82,7 @@ public class InitiativeApiController implements InitiativeApi {
 
     @Override
     public ResponseEntity<List<InitiativeIssuerDTO>> getInitiativeIssuerList() {
-        log.info("[{}][GET_INITIATIVES] - Initiative issuer: Start processing...");
+        log.info("[GET_INITIATIVES] - Initiative issuer: Start processing...");
         return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeIssuerDTOList(this.initiativeService.getInitiativesIssuerList()));
     }
 
@@ -132,8 +132,8 @@ public class InitiativeApiController implements InitiativeApi {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Override
-    public ResponseEntity<Void> updateInitiativeBeneficiary(String organizationId, String initiativeId, InitiativeBeneficiaryRuleDTO beneficiaryRuleDto, String role) {
-        role = beneficiaryRuleDto.getOrganizationUserRole();
+    public ResponseEntity<Void> updateInitiativeBeneficiary(String organizationId, String initiativeId, InitiativeBeneficiaryRuleDTO beneficiaryRuleDto) {
+        String role = beneficiaryRuleDto.getOrganizationUserRole();
         log.info("[{}][UPDATE_BENEFICIARY_RULE]-[UPDATE_TO_DRAFT_STATUS] - Initiative: {}. Start processing...", role, initiativeId);
         if(Boolean.TRUE.equals(this.initiativeService.getInitiative(organizationId, initiativeId, role).getGeneral().getBeneficiaryKnown())){
             throw new InitiativeException(
@@ -231,9 +231,9 @@ public class InitiativeApiController implements InitiativeApi {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Override
-    public ResponseEntity<Void> updateInitiativePublishedStatus(String organizationId, String initiativeId, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO, String role) {
+    public ResponseEntity<Void> updateInitiativePublishedStatus(String organizationId, String initiativeId, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO) {
         long startTime = System.currentTimeMillis();
-        role = initiativeOrganizationInfoDTO.getOrganizationUserRole();
+        String role = initiativeOrganizationInfoDTO.getOrganizationUserRole();
         //Retrieve Initiative
         log.info("[{}][UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Start processing...", role, initiativeId);
         Initiative initiative = this.initiativeService.getInitiative(organizationId, initiativeId, role);
@@ -243,6 +243,15 @@ public class InitiativeApiController implements InitiativeApi {
         log.debug("Validating current Status");
         initiativeService.isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED, role);
         log.debug("Current Status validated");
+
+        log.debug("Retrieve current state and save it as TEMP");
+        String statusTemp = initiative.getStatus();
+        LocalDateTime updateDateTemp = initiative.getUpdateDate();
+
+        initiative.setStatus(InitiativeConstants.Status.PUBLISHED);
+        initiative.setUpdateDate(LocalDateTime.now());
+        initiativeService.updateInitiative(initiative);
+        log.debug("Initiative saved in status PUBLISHED");
 
         try {
             if(notifyRE) {
@@ -263,6 +272,11 @@ public class InitiativeApiController implements InitiativeApi {
                 }
             }
         } catch (Exception e) {
+            log.error("[UPDATE_TO_PUBLISHED_STATUS] - [ROLLBACK STATUS] Initiative: {}. Generic Error: {}", initiativeId, e.getMessage());
+            initiative.setStatus(statusTemp);
+            initiative.setUpdateDate(updateDateTemp);
+            initiativeService.updateInitiative(initiative);
+            log.debug("Initiative Status has been roll-backed to {}", statusTemp);
             performanceLog(startTime, "UPDATE_INITIATIVE_PUBLISHED");
             throw new IntegrationException(HttpStatus.BAD_REQUEST);
         }

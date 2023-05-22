@@ -38,8 +38,8 @@ import it.gov.pagopa.initiative.model.rule.reward.InitiativeRewardRule;
 import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
 import it.gov.pagopa.initiative.model.rule.trx.*;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
-import it.gov.pagopa.initiative.utils.InitiativeUtils;
 import it.gov.pagopa.initiative.utils.AuditUtilities;
+import it.gov.pagopa.initiative.utils.InitiativeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -698,7 +698,9 @@ class InitiativeServiceTest {
         try {
             initiativeService.storeInitiativeLogo(ORGANIZATION_ID, INITIATIVE_ID, logo, LOGO_MIME_TYPE,
                     "logo.jpg");
-        } catch(Exception e) {
+        } catch(InitiativeException e) {
+            assertEquals(InternalServerError.CODE, e.getCode());
+            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, e.getHttpStatus());
             assertTrue(e.getMessage().contains("Invalid file extension"));
         }
     }
@@ -721,8 +723,31 @@ class InitiativeServiceTest {
         try {
             initiativeService.storeInitiativeLogo(ORGANIZATION_ID, INITIATIVE_ID, logo, "image/jpg",
                     FILE_NAME);
-        } catch(Exception e) {
+        } catch(InitiativeException e) {
+            assertEquals(InternalServerError.CODE, e.getCode());
+            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, e.getHttpStatus());
             assertTrue(e.getMessage().contains("allowed only"));
+        }
+    }
+    @Test
+    void storeInitiativeLogo_initiativeNotFound() throws Exception {
+        InputStream logo = new ByteArrayInputStream("logo.png".getBytes());
+        Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true))
+                .thenThrow(new InitiativeException(InitiativeConstants.Exception.NotFound.CODE,
+                        String.format(
+                                InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE,
+                                INITIATIVE_ID),
+                        HttpStatus.NOT_FOUND));
+        Mockito.doNothing().when(fileStorageConnector).uploadInitiativeLogo(Mockito.any(), Mockito.anyString(),
+                Mockito.anyString());
+        try {
+            initiativeService.storeInitiativeLogo(ORGANIZATION_ID, INITIATIVE_ID, logo, LOGO_MIME_TYPE,
+                    FILE_NAME);
+        } catch (InitiativeException e){
+            assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
+            assertEquals(String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE,
+                    INITIATIVE_ID), e.getMessage());
+            assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
         }
     }
 
@@ -1561,7 +1586,7 @@ class InitiativeServiceTest {
     }
 
     InitiativeDTO createStep1InitiativeDTO() {
-        InitiativeDTO initiativeDTO = InitiativeDTO.builder()
+        return InitiativeDTO.builder()
                 .initiativeId(INITIATIVE_ID)
                 .initiativeName(INITIATIVE_NAME)
                 .organizationId(ORGANIZATION_ID)
@@ -1569,7 +1594,6 @@ class InitiativeServiceTest {
                 .autocertificationCheck(true)
                 .beneficiaryRanking(true)
                 .additionalInfo(createInitiativeAdditionalDTO()).build();
-        return initiativeDTO;
     }
 
     private InitiativeGeneralDTO createInitiativeGeneralDTO(boolean beneficiaryKnown) {
@@ -1803,6 +1827,7 @@ class InitiativeServiceTest {
         initiativeDetailDTO.setTcLink("tc.it");
         initiativeDetailDTO.setLogoURL("logo.png");
         initiativeDetailDTO.setUpdateDate(LocalDateTime.now());
+        initiativeDetailDTO.setServiceId("SERVICE_ID");
         return initiativeDetailDTO;
     }
 
