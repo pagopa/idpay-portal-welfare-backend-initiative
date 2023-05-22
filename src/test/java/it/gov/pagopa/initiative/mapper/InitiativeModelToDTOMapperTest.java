@@ -55,6 +55,7 @@ class InitiativeModelToDTOMapperTest {
     public static final String ENCRYPTED_API_KEY_CLIENT_ID = "encryptedApiKeyClientId";
     public static final String ENCRYPTED_API_KEY_CLIENT_ASSERTION = "encryptedApiKeyClientAssertion";
     public static final String ITALIAN_LANGUAGE = "it";
+    private final static String SERVICE_ID = "SERVICE_ID";
 
     @Autowired
     InitiativeModelToDTOMapper initiativeModelToDTOMapper;
@@ -258,6 +259,7 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void toInitiativeAdditionalDTOOnlyTokens() {
         InitiativeAdditionalDTO additionalDTO = initiativeModelToDTOMapper.toInitiativeAdditionalDTOOnlyTokens(initiativeAdditionalOnlyTokens);
+        additionalDTO.setServiceId(SERVICE_ID);
         assertEquals(initiativeAdditionalDTOOnlyTokens, additionalDTO);
     }
 
@@ -637,6 +639,7 @@ class InitiativeModelToDTOMapperTest {
         initiativeAdditional.setDescription("Description");
         initiativeAdditional.setPrivacyLink("privacyLink");
         initiativeAdditional.setTcLink("tcLink");
+        initiativeAdditional.setServiceId(SERVICE_ID);
         initiativeAdditional.setServiceScope(InitiativeAdditional.ServiceScope.LOCAL);
         Channel channel = new Channel();
         channel.setType(Channel.TypeEnum.EMAIL);
@@ -658,6 +661,7 @@ class InitiativeModelToDTOMapperTest {
         InitiativeAdditionalDTO initiativeAdditionalDTO = new InitiativeAdditionalDTO();
         initiativeAdditionalDTO.setPrimaryTokenIO("firstToken");
         initiativeAdditionalDTO.setSecondaryTokenIO("secondToken");
+        initiativeAdditionalDTO.setServiceId(SERVICE_ID);
         return initiativeAdditionalDTO;
     }
 
@@ -733,6 +737,7 @@ class InitiativeModelToDTOMapperTest {
         initiativeAdditionalDTO.setDescription("Description");
         initiativeAdditionalDTO.setPrivacyLink("privacyLink");
         initiativeAdditionalDTO.setTcLink("tcLink");
+        initiativeAdditionalDTO.setServiceId(SERVICE_ID);
         ChannelDTO channelDTO = new ChannelDTO();
         channelDTO.setType(ChannelDTO.TypeEnum.EMAIL);
         channelDTO.setContact("contact");
@@ -1795,6 +1800,7 @@ class InitiativeModelToDTOMapperTest {
         initiativeDetailDTO.setTcLink("tcLink");
         initiativeDetailDTO.setLogoURL(null);
         initiativeDetailDTO.setUpdateDate(LocalDateTime.of(2023,3,20,12,0));
+        initiativeDetailDTO.setServiceId(SERVICE_ID);
         return initiativeDetailDTO;
     }
 

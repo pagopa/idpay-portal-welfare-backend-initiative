@@ -95,6 +95,7 @@ public class InitiativeModelToDTOMapper {
                 .tcLink(initiative.getAdditionalInfo().getTcLink())
                 .logoURL(logoURL)
                 .updateDate(initiative.getUpdateDate())
+                .serviceId(initiative.getAdditionalInfo().getServiceId())
                 .build();
     }
 
