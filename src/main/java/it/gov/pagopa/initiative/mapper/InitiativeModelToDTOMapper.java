@@ -255,6 +255,7 @@ public class InitiativeModelToDTOMapper {
                             .initiativeName(StringUtils.isNotBlank(initiativeModel.getInitiativeName()) ?
                                     initiativeModel.getInitiativeName() : serviceName
                             )
+                            .initiativeRewardType(initiativeModel.getInitiativeRewardType().name())
                             .status(initiativeModel.getStatus())
                             .creationDate(initiativeModel.getCreationDate())
                             .updateDate(initiativeModel.getUpdateDate())

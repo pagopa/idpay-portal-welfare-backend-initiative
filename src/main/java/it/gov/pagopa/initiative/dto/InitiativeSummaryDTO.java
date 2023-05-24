@@ -23,6 +23,9 @@ public class InitiativeSummaryDTO   {
   @JsonProperty("initiativeName")
   private String initiativeName;
 
+  @JsonProperty("initiativeRewardType")
+  private String initiativeRewardType;
+
   @JsonProperty("status")
   private String status;
 
@@ -34,4 +37,5 @@ public class InitiativeSummaryDTO   {
 
   @JsonProperty("rankingEnabled")
   private Boolean rankingEnabled;
+
 }
