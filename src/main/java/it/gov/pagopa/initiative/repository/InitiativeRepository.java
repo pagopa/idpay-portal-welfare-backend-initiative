@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface InitiativeRepository extends MongoRepository<Initiative, String>, InitiativeRepositoryExtended {
 
-    @Query(value="{organizationId : ?0, enabled: ?1}", fields="{initiativeId : 1, initiativeName : 1, status : 1, 'additionalInfo.serviceName' : 1, creationDate : 1, updateDate : 1, 'general.rankingEnabled' : 1}")
+    @Query(value="{organizationId : ?0, enabled: ?1}", fields="{initiativeId : 1, initiativeName : 1,initiativeRewardType : 1, status : 1, 'additionalInfo.serviceName' : 1, creationDate : 1, updateDate : 1, 'general.rankingEnabled' : 1}")
     List<Initiative> retrieveInitiativeSummary(String organizationId, Boolean enabled);
 
     List<Initiative> findByEnabledAndStatus(Boolean enabled, String status);
