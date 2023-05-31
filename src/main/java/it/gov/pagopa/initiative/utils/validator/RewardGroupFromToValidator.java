@@ -4,8 +4,8 @@ import it.gov.pagopa.initiative.dto.rule.reward.RewardGroupsDTO;
 import it.gov.pagopa.initiative.utils.constraint.RewardGroupFromToValue;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import java.util.List;
 
 public class RewardGroupFromToValidator implements ConstraintValidator<RewardGroupFromToValue, RewardGroupsDTO> {

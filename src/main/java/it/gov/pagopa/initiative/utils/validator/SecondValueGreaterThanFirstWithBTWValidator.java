@@ -4,8 +4,8 @@ import it.gov.pagopa.initiative.dto.AutomatedCriteriaDTO;
 import it.gov.pagopa.initiative.dto.FilterOperatorEnum;
 import it.gov.pagopa.initiative.utils.constraint.SecondValueGreaterThanFirstWithBTW;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 

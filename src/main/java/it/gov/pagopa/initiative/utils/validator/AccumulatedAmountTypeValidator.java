@@ -4,8 +4,8 @@ import it.gov.pagopa.initiative.dto.rule.refund.AccumulatedAmountDTO;
 import it.gov.pagopa.initiative.utils.constraint.AccumulatedAmountType;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import java.math.BigDecimal;
 
 public class AccumulatedAmountTypeValidator implements ConstraintValidator<AccumulatedAmountType, AccumulatedAmountDTO> {

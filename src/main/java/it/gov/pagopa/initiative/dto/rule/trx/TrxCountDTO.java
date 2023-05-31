@@ -4,7 +4,7 @@ import it.gov.pagopa.initiative.utils.constraint.TrxCountFromToValue;
 import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
 import lombok.*;
 
-import javax.validation.constraints.Min;
+import jakarta.validation.constraints.Min;
 
 @Data
 @AllArgsConstructor
