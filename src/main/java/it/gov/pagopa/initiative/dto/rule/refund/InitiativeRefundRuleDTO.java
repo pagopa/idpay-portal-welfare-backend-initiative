@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 @Data
 @AllArgsConstructor
