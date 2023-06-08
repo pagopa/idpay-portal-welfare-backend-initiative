@@ -3,8 +3,8 @@ package it.gov.pagopa.initiative.utils.validator;
 import it.gov.pagopa.initiative.dto.rule.trx.DayOfWeekDTO;
 import it.gov.pagopa.initiative.utils.constraint.DayOfWeekStartTimeBeforeEndTime;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import java.time.LocalTime;
 
 public class DayOfWeekStartTimeBeforeEndTimeValidator implements ConstraintValidator<DayOfWeekStartTimeBeforeEndTime, DayOfWeekDTO.Interval> {

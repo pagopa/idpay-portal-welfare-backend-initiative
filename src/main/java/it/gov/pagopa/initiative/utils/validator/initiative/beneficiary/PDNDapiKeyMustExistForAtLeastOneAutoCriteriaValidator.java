@@ -6,8 +6,8 @@ import it.gov.pagopa.initiative.utils.constraint.initiative.beneficiary.PDNDapiK
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import java.util.List;
 
 public class PDNDapiKeyMustExistForAtLeastOneAutoCriteriaValidator implements ConstraintValidator<PDNDapiKeyMustExistForAtLeastOneAutoCriteriaConstraint, InitiativeBeneficiaryRuleDTO> {

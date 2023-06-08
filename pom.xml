@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--suppress ALL -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -7,13 +6,13 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.3</version>
+        <version>3.0.6</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
     <groupId>it.gov.pagopa</groupId>
     <artifactId>idpay-portal-welfare-backend-initiative</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>idpay-portal-welfare-backend-initiative</name>
     <description>Project which handle initiative lifecycle</description>
     <properties>
@@ -77,14 +76,35 @@
         <!--OpenAPI SpringDOC-->
         <dependency>
             <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-ui</artifactId>
-            <version>${springdoc.version}</version>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.1.0</version>
         </dependency>
         <!--        <dependency>-->
         <!--            <groupId>org.springdoc</groupId>-->
         <!--            <artifactId>springdoc-openapi-data-rest</artifactId>-->
         <!--            <version>${springdoc.version}</version>-->
         <!--        </dependency>-->
+
+        <!-- Security fixes -->
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <!-- Forced to 1.5 due to https://nvd.nist.gov/vuln/detail/CVE-2023-24998 -->
+            <version>1.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <!-- Forced to 2.0 due to https://nvd.nist.gov/vuln/detail/CVE-2022-1471 -->
+            <version>2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <!-- Forced to 32.0.0 due to https://nvd.nist.gov/vuln/detail/CVE-2018-10237 -->
+            <version>32.0.0-jre</version>
+        </dependency>
+
 
         <!--TEST-->
         <dependency>
@@ -110,14 +130,15 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.tomakehurst</groupId>
-            <artifactId>wiremock-jre8</artifactId>
-            <version>2.35.0</version>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-contract-wiremock</artifactId>
+            <version>4.0.2</version>
         </dependency>
         <!-- MongoDB Embedded -->
         <dependency>
             <groupId>de.flapdoodle.embed</groupId>
-            <artifactId>de.flapdoodle.embed.mongo</artifactId>
+            <artifactId>de.flapdoodle.embed.mongo.spring30x</artifactId>
+            <version>4.6.2</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -127,7 +148,7 @@
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${spring-cloud.version}</version>
+                <version>2022.0.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

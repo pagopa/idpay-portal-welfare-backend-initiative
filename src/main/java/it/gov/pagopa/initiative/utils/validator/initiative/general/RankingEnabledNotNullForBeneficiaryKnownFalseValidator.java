@@ -3,8 +3,8 @@ package it.gov.pagopa.initiative.utils.validator.initiative.general;
 import it.gov.pagopa.initiative.dto.InitiativeGeneralDTO;
 import it.gov.pagopa.initiative.utils.constraint.initiative.general.RankingEnabledNotNullForBeneficiaryKnownFalseConstraint;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 public class RankingEnabledNotNullForBeneficiaryKnownFalseValidator implements ConstraintValidator<RankingEnabledNotNullForBeneficiaryKnownFalseConstraint, InitiativeGeneralDTO> {
 

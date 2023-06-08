@@ -2,8 +2,8 @@ package it.gov.pagopa.initiative.utils.constraint;
 
 import it.gov.pagopa.initiative.utils.validator.RefundRuleTypeValidator;
 
-import javax.validation.Constraint;
-import javax.validation.Payload;
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
 import java.lang.annotation.*;
 
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.ErrorDtoDefaultMsg.SOMETHING_WRONG_WITH_THE_REFUND_TYPE;

@@ -8,7 +8,7 @@ import it.gov.pagopa.initiative.dto.*;
 
 import java.util.ArrayList;
 import java.util.Set;
-import javax.validation.*;
+import jakarta.validation.*;
 
 import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
 import org.junit.jupiter.api.BeforeEach;
