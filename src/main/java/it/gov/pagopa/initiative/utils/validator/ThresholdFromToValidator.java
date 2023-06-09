@@ -3,8 +3,8 @@ package it.gov.pagopa.initiative.utils.validator;
 import it.gov.pagopa.initiative.dto.rule.trx.ThresholdDTO;
 import it.gov.pagopa.initiative.utils.constraint.ThresholdFromToValue;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import java.math.BigDecimal;
 
 public class ThresholdFromToValidator implements ConstraintValidator<ThresholdFromToValue, ThresholdDTO> {

@@ -8,10 +8,10 @@ import it.gov.pagopa.initiative.dto.rule.trx.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -130,7 +130,7 @@ class RewardAndTrxRuleValidatorTest {
                 .toIncluded(true).build();
         Set<ConstraintViolation<TrxCountDTO>> violations = validator.validate(trxCountDTO, ValidationApiEnabledGroup.class);
         assertFalse(violations.isEmpty());
-        assertThat(violations).hasSize(1);
+        assertThat(violations).hasSize(2);
     }
     @Test
     void when_trxCount_onlyFrom_then_ValidationOk(){
@@ -141,6 +141,14 @@ class RewardAndTrxRuleValidatorTest {
         assertTrue(violations.isEmpty());
     }
 
+    @Test
+    void when_trxCount_onlyTo_then_ValidationOk(){
+        TrxCountDTO trxCountDTO = TrxCountDTO.builder()
+                .to(10L)
+                .toIncluded(false).build();
+        Set<ConstraintViolation<TrxCountDTO>> violations = validator.validate(trxCountDTO, ValidationApiEnabledGroup.class);
+        assertTrue(violations.isEmpty());
+    }
     @Test
     void when_threshold_FromIsLessThanTo_then_ValidationAreOk(){
         ThresholdDTO thresholdDTO = ThresholdDTO.builder()
@@ -200,7 +208,7 @@ class RewardAndTrxRuleValidatorTest {
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = creatInitiativeTrxConditionsDTOTrxRuleFromAndToTooSmall_ko();
         Set<ConstraintViolation<InitiativeTrxConditionsDTO>> violations = validator.validate(initiativeTrxConditionsDTO, ValidationApiEnabledGroup.class);
         assertFalse(violations.isEmpty());
-        assertThat(violations).hasSize(2);
+        assertThat(violations).hasSize(3);
     }
 
     @Test

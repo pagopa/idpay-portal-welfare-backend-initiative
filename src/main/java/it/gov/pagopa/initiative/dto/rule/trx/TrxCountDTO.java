@@ -4,8 +4,7 @@ import it.gov.pagopa.initiative.utils.constraint.TrxCountFromToValue;
 import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
 import lombok.*;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.Min;
 
 @Data
 @AllArgsConstructor
@@ -15,13 +14,11 @@ import javax.validation.constraints.NotNull;
 @TrxCountFromToValue(groups = ValidationApiEnabledGroup.class)
 public class TrxCountDTO {
 
-    @NotNull(groups = ValidationApiEnabledGroup.class)
     @Min(value = 1, message = "from must be at least 1", groups = ValidationApiEnabledGroup.class)
     private Long from;
-
-    @NotNull(groups = ValidationApiEnabledGroup.class)
     private boolean fromIncluded;
 
+    @Min(value = 1, message = "to must be at least 1", groups = ValidationApiEnabledGroup.class)
     private Long to;
     private boolean toIncluded;
 }

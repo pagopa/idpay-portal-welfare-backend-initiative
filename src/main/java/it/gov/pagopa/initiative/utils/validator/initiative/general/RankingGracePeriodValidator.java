@@ -4,8 +4,8 @@ import it.gov.pagopa.initiative.dto.InitiativeGeneralDTO;
 import it.gov.pagopa.initiative.utils.constraint.initiative.general.RankingGracePeriodConstraint;
 import org.springframework.beans.factory.annotation.Value;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import java.time.LocalDate;
 
 public class RankingGracePeriodValidator implements ConstraintValidator<RankingGracePeriodConstraint, InitiativeGeneralDTO> {
