@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
+import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -21,10 +22,12 @@ class AuditingConfigTest {
     private AuditingConfig auditingConfig;
 
     @MockBean
-    private HttpServletRequest httpServletRequest;
+    private HttpServletRequest httpServletRequestMock;
 
+    @MockBean(name = "mongoMappingContext")
+    private MongoMappingContext mongoMappingContextMock;
     @MockBean
-    private MappingMongoConverter mappingMongoConverter;
+    private MappingMongoConverter mappingMongoConverterMock;
 
     @Test
     void testMyAuditorProvider() {
