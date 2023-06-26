@@ -10,6 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -18,6 +19,9 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 @DataMongoTest
+@TestPropertySource(properties = {
+        "de.flapdoodle.mongodb.embedded.version=4.0.21",
+})
 class InitiativeRepositoryExtendedImplTest {
 
     private static final int DATA_LIST_SIZE = 4;
@@ -25,7 +29,7 @@ class InitiativeRepositoryExtendedImplTest {
     @Autowired
     private InitiativeRepository initiativeRepository;
 
-    List<Initiative> testData = createInitiativeList();
+    private final List<Initiative> testData = createInitiativeList();
 
     @BeforeEach
     void prepareData() {
