@@ -58,9 +58,12 @@ class InitiativeModelToDTOMapperTest {
     private final static String SERVICE_ID = "SERVICE_ID";
 
     @Autowired
-    InitiativeModelToDTOMapper initiativeModelToDTOMapper;
+    private InitiativeModelToDTOMapper initiativeModelToDTOMapper;
+
     @MockBean
-    AESTokenService aesTokenService;
+    private AESTokenService aesTokenServiceMock;
+    @MockBean
+    private InitiativeUtils initiativeUtilsMock;
 
     private Initiative fullInitiative;
     private List<Initiative> initiativeList;
@@ -95,9 +98,6 @@ class InitiativeModelToDTOMapperTest {
     private InitiativeDTO initiativeStep2DTOBeneficiaryTypeNull;
     private Initiative initiativeStep2FamilyUnitNotNull;
     private InitiativeDTO initiativeStep2DTOFamilyUnitNotNull;
-
-    @MockBean
-    InitiativeUtils initiativeUtils;
 
     @BeforeEach
     public void setUp() {
@@ -140,8 +140,8 @@ class InitiativeModelToDTOMapperTest {
         initiativeStep2FamilyUnitNotNull = createStep2InitiativeFamilyUnitNotNull();
         initiativeStep2DTOFamilyUnitNotNull = createStep2InitiativeDTOFamilyUnitNotNull();
 
-        Mockito.when(aesTokenService.decrypt(ENCRYPTED_API_KEY_CLIENT_ID)).thenReturn(API_KEY_CLIENT_ID);
-        Mockito.when(aesTokenService.decrypt(ENCRYPTED_API_KEY_CLIENT_ASSERTION)).thenReturn(API_KEY_CLIENT_ASSERTION);
+        Mockito.when(aesTokenServiceMock.decrypt(ENCRYPTED_API_KEY_CLIENT_ID)).thenReturn(API_KEY_CLIENT_ID);
+        Mockito.when(aesTokenServiceMock.decrypt(ENCRYPTED_API_KEY_CLIENT_ASSERTION)).thenReturn(API_KEY_CLIENT_ASSERTION);
     }
 
     @Test
@@ -157,7 +157,7 @@ class InitiativeModelToDTOMapperTest {
         initiative.getAdditionalInfo().setLogoFileName("logo.png");
         Locale acceptLanguage = Locale.ENGLISH;
 
-        Mockito.when(initiativeUtils.createLogoUrl(initiative.getOrganizationId(), initiative.getInitiativeId())).thenReturn("https://test" + String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE,
+        Mockito.when(initiativeUtilsMock.createLogoUrl(initiative.getOrganizationId(), initiative.getInitiativeId())).thenReturn("https://test" + String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE,
                 initiative.getOrganizationId(),initiative.getInitiativeId(), InitiativeConstants.Logo.LOGO_NAME));
 
         InitiativeDataDTO initiativeDataDTO = initiativeModelToDTOMapper.toInitiativeDataDTO(initiative, acceptLanguage);
@@ -346,7 +346,7 @@ class InitiativeModelToDTOMapperTest {
         fullInitiative.setAdditionalInfo(createInitiativeAdditional());
         fullInitiative.getAdditionalInfo().setLogoFileName("test.png");
 
-        Mockito.when(initiativeUtils.createLogoUrl(anyString(),anyString())).thenReturn("test.it");
+        Mockito.when(initiativeUtilsMock.createLogoUrl(anyString(),anyString())).thenReturn("test.it");
 
         InitiativeDTO initiativeDTOExpected = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiative);
 
@@ -410,7 +410,7 @@ class InitiativeModelToDTOMapperTest {
         Locale acceptLanguage = Locale.ITALIAN;
         fullInitiative.getAdditionalInfo().setLogoFileName("test.png");
 
-        Mockito.when(initiativeUtils.createLogoUrl(anyString(),anyString())).thenReturn("test.it");
+        Mockito.when(initiativeUtilsMock.createLogoUrl(anyString(),anyString())).thenReturn("test.it");
 
         InitiativeDetailDTO initiativeDetailDTO = initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative,acceptLanguage);
 
@@ -572,7 +572,7 @@ class InitiativeModelToDTOMapperTest {
 
         ArrayList<Initiative> initiativeList = new ArrayList<>();
         initiativeList.add(initiative);
-        Mockito.when(initiativeUtils.createLogoUrl(initiative.getOrganizationId(), initiative.getInitiativeId()))
+        Mockito.when(initiativeUtilsMock.createLogoUrl(initiative.getOrganizationId(), initiative.getInitiativeId()))
                 .thenReturn("https://test" + String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE,
                 initiative.getOrganizationId(),initiative.getInitiativeId(), InitiativeConstants.Logo.LOGO_NAME));
 
@@ -827,6 +827,7 @@ class InitiativeModelToDTOMapperTest {
         initiativeSummaryDTO.setInitiativeId("Id1");
         initiativeSummaryDTO.setInitiativeName("initiativeName1");
         initiativeSummaryDTO.setStatus("DRAFT");
+        initiativeSummaryDTO.setInitiativeRewardType("REFUND");
         return initiativeSummaryDTO;
     }
     private InitiativeSummaryDTO createInitiativeSummaryDTO2() {
@@ -835,6 +836,7 @@ class InitiativeModelToDTOMapperTest {
         initiativeSummaryDTO2.setInitiativeName("initiativeName1");
         initiativeSummaryDTO2.setStatus("DRAFT");
         initiativeSummaryDTO2.setRankingEnabled(Boolean.FALSE);
+        initiativeSummaryDTO2.setInitiativeRewardType("REFUND");
         return initiativeSummaryDTO2;
     }
 
