@@ -24,6 +24,9 @@ import org.springframework.validation.annotation.Validated;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
+
+import java.time.LocalDate;
+import java.time.Year;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -208,6 +211,28 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
             throw new InitiativeException(
                     InitiativeConstants.Exception.BadRequest.CODE,
                     InitiativeConstants.Exception.BadRequest.INITIATIVE_GENERAL_FAMILY_COMPOSITION_WRONG_BENEFICIARY_TYPE,
+                    HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @Override
+    public void checkStartDateAndEndDate(Initiative initiative) {
+        if (initiative.getGeneral().getStartDate().isBefore(LocalDate.now()) || initiative.getGeneral().getEndDate().isBefore(LocalDate.now())) {
+            throw new InitiativeException(
+                    InitiativeConstants.Exception.BadRequest.CODE,
+                    "The startDate and endDate cannot be less than today",
+                    HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @Override
+    public void checkFieldYearLengthAndValues(List<AutomatedCriteria> initiativeBeneficiaryRuleModel) {
+        if (initiativeBeneficiaryRuleModel.stream().anyMatch(a -> "BIRTHDATE".equals(a.getCode()) && "Year".equals(a.getField())) &&
+                (!initiativeBeneficiaryRuleModel.stream().allMatch(a -> a.getValue().matches("\\d{4}")
+                    && Integer.parseInt(a.getValue()) >= Year.now().minusYears(150).getValue() && Integer.parseInt(a.getValue()) <= Year.now().getValue()))) {
+            throw new InitiativeException(
+                    InitiativeConstants.Exception.BadRequest.CODE,
+                    "The value must contain 4 numbers and the year cannot be less than 150 years",
                     HttpStatus.BAD_REQUEST);
         }
     }

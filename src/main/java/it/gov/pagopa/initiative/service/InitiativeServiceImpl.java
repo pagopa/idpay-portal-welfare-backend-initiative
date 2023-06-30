@@ -168,6 +168,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
         isInitiativeAllowedToBeEditableThenThrows(initiative);
         initiativeValidationService.checkBeneficiaryTypeAndFamilyUnit(initiativeInfoModel);
+        initiativeValidationService.checkStartDateAndEndDate(initiativeInfoModel);
         initiative.setGeneral(initiativeInfoModel.getGeneral());
         if (!initiative.getAdditionalInfo().getServiceName().equals(initiative.getInitiativeName())) {
             initiative.setInitiativeName(initiative.getAdditionalInfo().getServiceName());
@@ -198,6 +199,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         long startTime = System.currentTimeMillis();
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
         List<AutomatedCriteria> automatedCriteriaList = initiativeBeneficiaryRuleModel.getAutomatedCriteria();
+        initiativeValidationService.checkFieldYearLengthAndValues(automatedCriteriaList);
         initiativeValidationService.checkAutomatedCriteria(initiative, automatedCriteriaList);
         //Check Initiative Status
         isInitiativeAllowedToBeEditableThenThrows(initiative);
