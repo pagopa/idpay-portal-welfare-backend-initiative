@@ -220,7 +220,7 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
         if (initiative.getGeneral().getStartDate().isBefore(LocalDate.now()) || initiative.getGeneral().getEndDate().isBefore(LocalDate.now())) {
             throw new InitiativeException(
                     InitiativeConstants.Exception.BadRequest.CODE,
-                    "The startDate and endDate cannot be less than today",
+                    InitiativeConstants.Exception.BadRequest.INITIATIVE_GENERAL_START_DATE_END_DATE_WRONG,
                     HttpStatus.BAD_REQUEST);
         }
     }
@@ -232,7 +232,7 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
                     && Integer.parseInt(a.getValue()) >= Year.now().minusYears(150).getValue() && Integer.parseInt(a.getValue()) <= Year.now().getValue()))) {
             throw new InitiativeException(
                     InitiativeConstants.Exception.BadRequest.CODE,
-                    "The value must contain 4 numbers and the year cannot be less than 150 years",
+                    InitiativeConstants.Exception.BadRequest.INITIATIVE_BENEFICIARY_FIELD_YEAR_VALUE_WRONG,
                     HttpStatus.BAD_REQUEST);
         }
     }
