@@ -6,6 +6,7 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import feign.FeignException;
+import feign.RetryableException;
 import it.gov.pagopa.initiative.config.IOBackEndRestConnectorConfig;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.io.service.ServiceMetadataDTO;
@@ -199,12 +200,12 @@ class IOBackEndFeignRestClientTest {
         );
 
         Executable executable = () -> ioBackEndFeignRestClient.createService(serviceRequestDTO, "subscriptionKey");
-        FeignException exception = Assertions.assertThrows(FeignException.class, executable);
+        FeignException exception = Assertions.assertThrows(RetryableException.class, executable);
         assertThat(exception.getMessage()).contains("[500 Server Error]");
         assertThat(exception.status()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
 
         //Verifying has been done 1 external call to IO BackEnd with our Request
-        wireMockServer.verify(1,
+        wireMockServer.verify(5,
                 WireMock.postRequestedFor(WireMock.urlEqualTo("/services"))
                         .withRequestBody(equalToJson(serviceRequestDTOjson, true, false))
         );
@@ -267,12 +268,12 @@ class IOBackEndFeignRestClientTest {
         //JSON to be returned placed here: src\resources\stub\mappings\io\digital_citizenship_api_put_updateService_500.json
 
         Executable executable = () -> ioBackEndFeignRestClient.updateService(SERVICE_ID_500, serviceRequestDTO, "primaryKey");
-        FeignException exception = Assertions.assertThrows(FeignException.class, executable);
+        FeignException exception = Assertions.assertThrows(RetryableException.class, executable);
         assertThat(exception.getMessage()).contains("[500 Server Error]");
         assertThat(exception.status()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
 
         //Verifying has been done 1 external call to IO BackEnd with our Request
-        wireMockServer.verify(1,
+        wireMockServer.verify(5,
                 WireMock.putRequestedFor(WireMock.urlEqualTo("/services/" + SERVICE_ID_500))
                         .withRequestBody(equalToJson(serviceRequestDTOjson, true, false))
         );
