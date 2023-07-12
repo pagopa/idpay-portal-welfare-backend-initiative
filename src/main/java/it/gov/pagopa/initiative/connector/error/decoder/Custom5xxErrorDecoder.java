@@ -5,6 +5,7 @@ import feign.Response;
 import feign.RetryableException;
 import feign.codec.ErrorDecoder;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -16,7 +17,7 @@ public class Custom5xxErrorDecoder implements ErrorDecoder {
         FeignException exception = feign.FeignException.errorStatus(methodKey, response);
         log.debug("Feign Client Exception caught with Status [{}] during [{}] to [{}]", response.status(), response.request().httpMethod().name(), response.request().url());
         int status = response.status();
-        if (status >= 500) {
+        if (status >= HttpStatus.INTERNAL_SERVER_ERROR.value()) {
             log.debug("Retrying is about to start");
             return new RetryableException(
                     response.status(),
