@@ -11666,7 +11666,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\r\n    \"automatedCriteria\": [\r\n        {\r\n            \"authority\": \"INPS\",\r\n            \"code\": \"ISEE\",\r\n            \"operator\": \"GT\",\r\n            \"value\": \"1\",\r\n            \"value2\": \"\",\r\n            \"iseeTypes\": [\r\n                \"ORDINARIO\",\r\n                \"MINORENNE\",\r\n                \"UNIVERSITARIO\",\r\n                \"SOCIOSANITARIO\",\r\n                \"DOTTORATO\",\r\n                \"RESIDENZIALE\",\r\n                \"CORRENTE\"\r\n            ]\r\n        }\r\n    ],\r\n    \"selfDeclarationCriteria\": []\r\n}",
+											"raw": "{\r\n    \"automatedCriteria\": [\r\n        {\r\n            \"authority\": \"INPS\",\r\n            \"code\": \"ISEE\",\r\n            \"operator\": \"LT\",\r\n            \"value\": \"1\",\r\n            \"value2\": \"\",\r\n            \"iseeTypes\": [\r\n                \"ORDINARIO\",\r\n                \"MINORENNE\",\r\n                \"UNIVERSITARIO\",\r\n                \"SOCIOSANITARIO\",\r\n                \"DOTTORATO\",\r\n                \"RESIDENZIALE\",\r\n                \"CORRENTE\"\r\n            ]\r\n        }\r\n    ],\r\n    \"selfDeclarationCriteria\": []\r\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -12637,7 +12637,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\r\n    \"automatedCriteria\": [\r\n        {\r\n            \"authority\": \"AUTH2\",\r\n            \"code\": \"RESIDENCE\",\r\n            \"field\": \"city\",\r\n            \"operator\": \"EQ\",\r\n            \"value\": \"Milano\",\r\n            \"value2\": \"\",\r\n            \"iseeTypes\": [\r\n                \"ORDINARIO\",\r\n                \"MINORENNE\",\r\n                \"UNIVERSITARIO\",\r\n                \"SOCIOSANITARIO\",\r\n                \"DOTTORATO\",\r\n                \"RESIDENZIALE\",\r\n                \"CORRENTE\"\r\n            ]\r\n        }\r\n    ],\r\n    \"selfDeclarationCriteria\": [\r\n        {\r\n            \"_type\": \"multi\",\r\n            \"description\": \"test_funzionale\",\r\n            \"value\": [\r\n                \"primo\",\r\n                \"secondo\"\r\n            ],\r\n            \"code\": \"1\"\r\n        }\r\n    ]\r\n}",
+											"raw": "{\r\n    \"automatedCriteria\": [\r\n        {\r\n            \"authority\": \"AGID\",\r\n            \"code\": \"RESIDENCE\",\r\n            \"field\": \"city\",\r\n            \"operator\": \"EQ\",\r\n            \"value\": \"Milano\",\r\n            \"value2\": \"\",\r\n            \"iseeTypes\": [\r\n                \"ORDINARIO\",\r\n                \"MINORENNE\",\r\n                \"UNIVERSITARIO\",\r\n                \"SOCIOSANITARIO\",\r\n                \"DOTTORATO\",\r\n                \"RESIDENZIALE\",\r\n                \"CORRENTE\"\r\n            ]\r\n        }\r\n    ],\r\n    \"selfDeclarationCriteria\": [\r\n        {\r\n            \"_type\": \"multi\",\r\n            \"description\": \"test_funzionale\",\r\n            \"value\": [\r\n                \"primo\",\r\n                \"secondo\"\r\n            ],\r\n            \"code\": \"1\"\r\n        }\r\n    ]\r\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -14160,7 +14160,7 @@
 											"listen": "prerequest",
 											"script": {
 												"exec": [
-													""
+													"setTimeout(() => {}, 7000);"
 												],
 												"type": "text/javascript"
 											}
@@ -14174,7 +14174,7 @@
 										"header": [
 											{
 												"key": "Ocp-Apim-Subscription-Key",
-												"value": "",
+												"value": "{{genericSubscriptionKey}}",
 												"type": "default"
 											},
 											{
@@ -14184,15 +14184,13 @@
 											}
 										],
 										"url": {
-											"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_2}}",
+											"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_2}}",
 											"host": [
 												"{{baseUrl}}"
 											],
 											"path": [
-												"bpd",
-												"pagopa",
-												"api",
-												"v1",
+												"rtd",
+												"mock-io",
 												"login"
 											],
 											"query": [
@@ -14216,6 +14214,15 @@
 													"    pm.response.to.have.status(204);\r",
 													"});\r",
 													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"setTimeout(() => {}, 15000);"
 												],
 												"type": "text/javascript"
 											}
@@ -14452,9 +14459,9 @@
 													"    pm.response.to.have.status(403);\r",
 													"});\r",
 													"\r",
-													"pm.test(\"Initiative with criteria - Onboarding user with wrong isee - Accept T&C - message is ISEE_TYPE_KO\", function () {\r",
+													"pm.test(\"Initiative with criteria - Onboarding user with wrong isee - Accept T&C - message is ISEE_TYPE_FAIL\", function () {\r",
 													"        let jsonResponse = pm.response.json()\r",
-													"        pm.expect(jsonResponse.details).to.eql(`ISEE_TYPE_KO`);\r",
+													"        pm.expect(jsonResponse.details).to.eql(`ISEE_TYPE_FAIL`);\r",
 													"    });"
 												],
 												"type": "text/javascript"
@@ -15371,7 +15378,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -15381,15 +15388,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{fiscalCode_fakeWhitelist}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{fiscalCode_fakeWhitelist}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -15617,7 +15622,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -15627,15 +15632,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_1}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_1}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -15863,7 +15866,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -15873,15 +15876,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_2}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_2}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -16109,7 +16110,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -16119,15 +16120,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_3}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_3}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -16355,7 +16354,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -16365,15 +16364,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_4}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_4}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -16601,7 +16598,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -16611,15 +16608,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_5}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_5}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -16847,7 +16842,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -16857,15 +16852,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_6}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_6}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -17093,7 +17086,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -17103,15 +17096,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_7}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_7}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -17339,7 +17330,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -17349,15 +17340,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_8}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_8}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -17585,7 +17574,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -17595,15 +17584,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_9}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_9}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -17831,7 +17818,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -17841,15 +17828,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_10}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_10}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -18077,7 +18062,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -18087,15 +18072,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_11}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_11}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -18323,7 +18306,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -18333,15 +18316,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_12}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_12}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -18569,7 +18550,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -18579,15 +18560,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_13}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_13}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -18815,7 +18794,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -18825,15 +18804,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_14}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_14}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -19061,7 +19038,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -19071,15 +19048,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_15}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_15}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -19281,7 +19256,9 @@
 														"exec": [
 															"let moment = require('moment');\r",
 															"let yesterday = String(moment().subtract(1, 'days').format('YYYY-MM-DD'));\r",
-															"pm.collectionVariables.set('yesterday', yesterday);"
+															"pm.collectionVariables.set('yesterday', yesterday);\r",
+															"\r",
+															"setTimeout(() => {}, 8000);"
 														],
 														"type": "text/javascript"
 													}
@@ -19361,7 +19338,7 @@
 													"listen": "prerequest",
 													"script": {
 														"exec": [
-															"setTimeout(()=> {}, 30000)"
+															"setTimeout(()=> {}, 40000)"
 														],
 														"type": "text/javascript"
 													}
@@ -20563,7 +20540,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -20573,15 +20550,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{fiscalCode_fakeWhitelist}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{fiscalCode_fakeWhitelist}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -20809,7 +20784,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -20819,15 +20794,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_1}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_1}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -21055,7 +21028,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -21065,15 +21038,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_2}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_2}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -21301,7 +21272,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -21311,15 +21282,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_3}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_3}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -21547,7 +21516,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -21557,15 +21526,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_4}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_4}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -21793,7 +21760,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -21803,15 +21770,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_5}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_5}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -22039,7 +22004,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -22049,15 +22014,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_6}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_6}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -22285,7 +22248,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -22295,15 +22258,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_7}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_7}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -22531,7 +22492,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -22541,15 +22502,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_8}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_8}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -22777,7 +22736,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -22787,15 +22746,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_9}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_9}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -23023,7 +22980,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -23033,15 +22990,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_10}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_10}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -23269,7 +23224,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -23279,15 +23234,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_11}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_11}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -23515,7 +23468,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -23525,15 +23478,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_12}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_12}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -23761,7 +23712,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -23771,15 +23722,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_13}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_13}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -24007,7 +23956,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -24017,15 +23966,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_14}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_14}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -24253,7 +24200,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -24263,15 +24210,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_15}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_15}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -24473,7 +24418,9 @@
 														"exec": [
 															"let moment = require('moment');\r",
 															"let yesterday = String(moment().subtract(1, 'days').format('YYYY-MM-DD'));\r",
-															"pm.collectionVariables.set('yesterday', yesterday);"
+															"pm.collectionVariables.set('yesterday', yesterday);\r",
+															"\r",
+															"setTimeout(() => {}, 8000);"
 														],
 														"type": "text/javascript"
 													}
@@ -28028,7 +27975,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -28038,15 +27985,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{fiscalCode_fakeWhitelist}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{fiscalCode_fakeWhitelist}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -28463,7 +28408,7 @@
 														"exec": [
 															"pm.test(\"Initiative with ranking - Unhappy case - Beneficiary filter field empty - Forcing ranking pubblication - Response is: Fiscal code must not be blank\", function () {\r",
 															"    let jsonResponse = pm.response.json()\r",
-															"    pm.expect(jsonResponse.message).equals('[400 ] during [PUT] to [https://api.uat.tokenizer.pdv.pagopa.it/tokenizer/v1/tokens] [EncryptRest#upsertToken(CFDTO,String)]: [{\\\"title\\\":\\\"Bad Request\\\",\\\"status\\\":400,\\\"detail\\\":\\\"Validation failed\\\",\\\"instance\\\":\\\"/tokens\\\",\\\"invalidParams\\\":[{\\\"name\\\":\\\"piiResource.pii\\\",\\\"reason\\\":\\\"must not be blank\\\"}]}]');\r",
+															"    pm.expect(jsonResponse.message).equals('[400 Bad Request] during [PUT] to [https://api.uat.tokenizer.pdv.pagopa.it/tokenizer/v1/tokens] [EncryptRest#upsertToken(CFDTO,String)]: [{\\\"title\\\":\\\"Bad Request\\\",\\\"status\\\":400,\\\"detail\\\":\\\"Validation failed\\\",\\\"instance\\\":\\\"/tokens\\\",\\\"invalidParams\\\":[{\\\"name\\\":\\\"piiResource.pii\\\",\\\"reason\\\":\\\"must not be blank\\\"}]}]');\r",
 															"});"
 														],
 														"type": "text/javascript"
@@ -28538,7 +28483,7 @@
 														"exec": [
 															"pm.test(\"Initiative with ranking - Unhappy case - State filter does not exist - Forcing ranking pubblication - Response is: State filter does not exist\", function () {\r",
 															"    let jsonResponse = pm.response.json()\r",
-															"    pm.expect(jsonResponse.message).contain('[400 ] during [GET] to [http://idpay-ranking-microservice-chart:8080/idpay/ranking');\r",
+															"    pm.expect(jsonResponse.message).contain('[400] during [GET] to [http://idpay-ranking-microservice-chart:8080/idpay/ranking');\r",
 															"});"
 														],
 														"type": "text/javascript"
@@ -29469,7 +29414,7 @@
 														"header": [
 															{
 																"key": "Ocp-Apim-Subscription-Key",
-																"value": "",
+																"value": "{{genericSubscriptionKey}}",
 																"type": "default"
 															},
 															{
@@ -29479,15 +29424,13 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{fiscalCode_fakeWhitelist}}",
+															"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{fiscalCode_fakeWhitelist}}",
 															"host": [
 																"{{baseUrl}}"
 															],
 															"path": [
-																"bpd",
-																"pagopa",
-																"api",
-																"v1",
+																"rtd",
+																"mock-io",
 																"login"
 															],
 															"query": [
@@ -29715,7 +29658,7 @@
 														"header": [
 															{
 																"key": "Ocp-Apim-Subscription-Key",
-																"value": "",
+																"value": "{{genericSubscriptionKey}}",
 																"type": "default"
 															},
 															{
@@ -29725,15 +29668,13 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_1}}",
+															"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_1}}",
 															"host": [
 																"{{baseUrl}}"
 															],
 															"path": [
-																"bpd",
-																"pagopa",
-																"api",
-																"v1",
+																"rtd",
+																"mock-io",
 																"login"
 															],
 															"query": [
@@ -29961,7 +29902,7 @@
 														"header": [
 															{
 																"key": "Ocp-Apim-Subscription-Key",
-																"value": "",
+																"value": "{{genericSubscriptionKey}}",
 																"type": "default"
 															},
 															{
@@ -29971,15 +29912,13 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_2}}",
+															"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_2}}",
 															"host": [
 																"{{baseUrl}}"
 															],
 															"path": [
-																"bpd",
-																"pagopa",
-																"api",
-																"v1",
+																"rtd",
+																"mock-io",
 																"login"
 															],
 															"query": [
@@ -30207,7 +30146,7 @@
 														"header": [
 															{
 																"key": "Ocp-Apim-Subscription-Key",
-																"value": "",
+																"value": "{{genericSubscriptionKey}}",
 																"type": "default"
 															},
 															{
@@ -30217,15 +30156,13 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_3}}",
+															"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_3}}",
 															"host": [
 																"{{baseUrl}}"
 															],
 															"path": [
-																"bpd",
-																"pagopa",
-																"api",
-																"v1",
+																"rtd",
+																"mock-io",
 																"login"
 															],
 															"query": [
@@ -30453,7 +30390,7 @@
 														"header": [
 															{
 																"key": "Ocp-Apim-Subscription-Key",
-																"value": "",
+																"value": "{{genericSubscriptionKey}}",
 																"type": "default"
 															},
 															{
@@ -30463,15 +30400,13 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_4}}",
+															"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_4}}",
 															"host": [
 																"{{baseUrl}}"
 															],
 															"path": [
-																"bpd",
-																"pagopa",
-																"api",
-																"v1",
+																"rtd",
+																"mock-io",
 																"login"
 															],
 															"query": [
@@ -30699,7 +30634,7 @@
 														"header": [
 															{
 																"key": "Ocp-Apim-Subscription-Key",
-																"value": "",
+																"value": "{{genericSubscriptionKey}}",
 																"type": "default"
 															},
 															{
@@ -30709,15 +30644,13 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_5}}",
+															"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_5}}",
 															"host": [
 																"{{baseUrl}}"
 															],
 															"path": [
-																"bpd",
-																"pagopa",
-																"api",
-																"v1",
+																"rtd",
+																"mock-io",
 																"login"
 															],
 															"query": [
@@ -30945,7 +30878,7 @@
 														"header": [
 															{
 																"key": "Ocp-Apim-Subscription-Key",
-																"value": "",
+																"value": "{{genericSubscriptionKey}}",
 																"type": "default"
 															},
 															{
@@ -30955,15 +30888,13 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_6}}",
+															"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_6}}",
 															"host": [
 																"{{baseUrl}}"
 															],
 															"path": [
-																"bpd",
-																"pagopa",
-																"api",
-																"v1",
+																"rtd",
+																"mock-io",
 																"login"
 															],
 															"query": [
@@ -31191,7 +31122,7 @@
 														"header": [
 															{
 																"key": "Ocp-Apim-Subscription-Key",
-																"value": "",
+																"value": "{{genericSubscriptionKey}}",
 																"type": "default"
 															},
 															{
@@ -31201,15 +31132,13 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_7}}",
+															"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_7}}",
 															"host": [
 																"{{baseUrl}}"
 															],
 															"path": [
-																"bpd",
-																"pagopa",
-																"api",
-																"v1",
+																"rtd",
+																"mock-io",
 																"login"
 															],
 															"query": [
@@ -31437,7 +31366,7 @@
 														"header": [
 															{
 																"key": "Ocp-Apim-Subscription-Key",
-																"value": "",
+																"value": "{{genericSubscriptionKey}}",
 																"type": "default"
 															},
 															{
@@ -31447,15 +31376,13 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_8}}",
+															"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_8}}",
 															"host": [
 																"{{baseUrl}}"
 															],
 															"path": [
-																"bpd",
-																"pagopa",
-																"api",
-																"v1",
+																"rtd",
+																"mock-io",
 																"login"
 															],
 															"query": [
@@ -31683,7 +31610,7 @@
 														"header": [
 															{
 																"key": "Ocp-Apim-Subscription-Key",
-																"value": "",
+																"value": "{{genericSubscriptionKey}}",
 																"type": "default"
 															},
 															{
@@ -31693,15 +31620,13 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_9}}",
+															"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_9}}",
 															"host": [
 																"{{baseUrl}}"
 															],
 															"path": [
-																"bpd",
-																"pagopa",
-																"api",
-																"v1",
+																"rtd",
+																"mock-io",
 																"login"
 															],
 															"query": [
@@ -31929,7 +31854,7 @@
 														"header": [
 															{
 																"key": "Ocp-Apim-Subscription-Key",
-																"value": "",
+																"value": "{{genericSubscriptionKey}}",
 																"type": "default"
 															},
 															{
@@ -31939,15 +31864,13 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_10}}",
+															"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_10}}",
 															"host": [
 																"{{baseUrl}}"
 															],
 															"path": [
-																"bpd",
-																"pagopa",
-																"api",
-																"v1",
+																"rtd",
+																"mock-io",
 																"login"
 															],
 															"query": [
@@ -32175,7 +32098,7 @@
 														"header": [
 															{
 																"key": "Ocp-Apim-Subscription-Key",
-																"value": "",
+																"value": "{{genericSubscriptionKey}}",
 																"type": "default"
 															},
 															{
@@ -32185,15 +32108,13 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_11}}",
+															"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_11}}",
 															"host": [
 																"{{baseUrl}}"
 															],
 															"path": [
-																"bpd",
-																"pagopa",
-																"api",
-																"v1",
+																"rtd",
+																"mock-io",
 																"login"
 															],
 															"query": [
@@ -32421,7 +32342,7 @@
 														"header": [
 															{
 																"key": "Ocp-Apim-Subscription-Key",
-																"value": "",
+																"value": "{{genericSubscriptionKey}}",
 																"type": "default"
 															},
 															{
@@ -32431,15 +32352,13 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_12}}",
+															"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_12}}",
 															"host": [
 																"{{baseUrl}}"
 															],
 															"path": [
-																"bpd",
-																"pagopa",
-																"api",
-																"v1",
+																"rtd",
+																"mock-io",
 																"login"
 															],
 															"query": [
@@ -32667,7 +32586,7 @@
 														"header": [
 															{
 																"key": "Ocp-Apim-Subscription-Key",
-																"value": "",
+																"value": "{{genericSubscriptionKey}}",
 																"type": "default"
 															},
 															{
@@ -32677,15 +32596,13 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_13}}",
+															"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_13}}",
 															"host": [
 																"{{baseUrl}}"
 															],
 															"path": [
-																"bpd",
-																"pagopa",
-																"api",
-																"v1",
+																"rtd",
+																"mock-io",
 																"login"
 															],
 															"query": [
@@ -32913,7 +32830,7 @@
 														"header": [
 															{
 																"key": "Ocp-Apim-Subscription-Key",
-																"value": "",
+																"value": "{{genericSubscriptionKey}}",
 																"type": "default"
 															},
 															{
@@ -32923,15 +32840,13 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_14}}",
+															"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_14}}",
 															"host": [
 																"{{baseUrl}}"
 															],
 															"path": [
-																"bpd",
-																"pagopa",
-																"api",
-																"v1",
+																"rtd",
+																"mock-io",
 																"login"
 															],
 															"query": [
@@ -33159,7 +33074,7 @@
 														"header": [
 															{
 																"key": "Ocp-Apim-Subscription-Key",
-																"value": "",
+																"value": "{{genericSubscriptionKey}}",
 																"type": "default"
 															},
 															{
@@ -33169,15 +33084,13 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_15}}",
+															"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_15}}",
 															"host": [
 																"{{baseUrl}}"
 															],
 															"path": [
-																"bpd",
-																"pagopa",
-																"api",
-																"v1",
+																"rtd",
+																"mock-io",
 																"login"
 															],
 															"query": [
@@ -33379,7 +33292,9 @@
 																"exec": [
 																	"let moment = require('moment');\r",
 																	"let yesterday = String(moment().subtract(1, 'days').format('YYYY-MM-DD'));\r",
-																	"pm.collectionVariables.set('yesterday', yesterday);"
+																	"pm.collectionVariables.set('yesterday', yesterday);\r",
+																	"\r",
+																	"setTimeout(() => {}, 8000);"
 																],
 																"type": "text/javascript"
 															}
@@ -33632,7 +33547,7 @@
 															"listen": "prerequest",
 															"script": {
 																"exec": [
-																	"//setTimeout(()=> {}, 10000)"
+																	"setTimeout(()=> {}, 10000)"
 																],
 																"type": "text/javascript"
 															}
@@ -34514,7 +34429,7 @@
 																			"});\r",
 																			"\r",
 																			"//response time is less than 1s\r",
-																			"tests[\"Response time is less than 1s\"] = responseTime < 1000;"
+																			"tests[\"Response time is less than 2s\"] = responseTime < 2000;"
 																		],
 																		"type": "text/javascript"
 																	}
@@ -34670,7 +34585,7 @@
 														"header": [
 															{
 																"key": "Ocp-Apim-Subscription-Key",
-																"value": "",
+																"value": "{{genericSubscriptionKey}}",
 																"type": "default"
 															},
 															{
@@ -34680,15 +34595,13 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{fiscalCode_fakeWhitelist}}",
+															"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{fiscalCode_fakeWhitelist}}",
 															"host": [
 																"{{baseUrl}}"
 															],
 															"path": [
-																"bpd",
-																"pagopa",
-																"api",
-																"v1",
+																"rtd",
+																"mock-io",
 																"login"
 															],
 															"query": [
@@ -34916,7 +34829,7 @@
 														"header": [
 															{
 																"key": "Ocp-Apim-Subscription-Key",
-																"value": "",
+																"value": "{{genericSubscriptionKey}}",
 																"type": "default"
 															},
 															{
@@ -34926,15 +34839,13 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_1}}",
+															"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_1}}",
 															"host": [
 																"{{baseUrl}}"
 															],
 															"path": [
-																"bpd",
-																"pagopa",
-																"api",
-																"v1",
+																"rtd",
+																"mock-io",
 																"login"
 															],
 															"query": [
@@ -35162,7 +35073,7 @@
 														"header": [
 															{
 																"key": "Ocp-Apim-Subscription-Key",
-																"value": "",
+																"value": "{{genericSubscriptionKey}}",
 																"type": "default"
 															},
 															{
@@ -35172,15 +35083,13 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_2}}",
+															"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_2}}",
 															"host": [
 																"{{baseUrl}}"
 															],
 															"path": [
-																"bpd",
-																"pagopa",
-																"api",
-																"v1",
+																"rtd",
+																"mock-io",
 																"login"
 															],
 															"query": [
@@ -35408,7 +35317,7 @@
 														"header": [
 															{
 																"key": "Ocp-Apim-Subscription-Key",
-																"value": "",
+																"value": "{{genericSubscriptionKey}}",
 																"type": "default"
 															},
 															{
@@ -35418,15 +35327,13 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_3}}",
+															"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_3}}",
 															"host": [
 																"{{baseUrl}}"
 															],
 															"path": [
-																"bpd",
-																"pagopa",
-																"api",
-																"v1",
+																"rtd",
+																"mock-io",
 																"login"
 															],
 															"query": [
@@ -35654,7 +35561,7 @@
 														"header": [
 															{
 																"key": "Ocp-Apim-Subscription-Key",
-																"value": "",
+																"value": "{{genericSubscriptionKey}}",
 																"type": "default"
 															},
 															{
@@ -35664,15 +35571,13 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_4}}",
+															"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_4}}",
 															"host": [
 																"{{baseUrl}}"
 															],
 															"path": [
-																"bpd",
-																"pagopa",
-																"api",
-																"v1",
+																"rtd",
+																"mock-io",
 																"login"
 															],
 															"query": [
@@ -35900,7 +35805,7 @@
 														"header": [
 															{
 																"key": "Ocp-Apim-Subscription-Key",
-																"value": "",
+																"value": "{{genericSubscriptionKey}}",
 																"type": "default"
 															},
 															{
@@ -35910,15 +35815,13 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_5}}",
+															"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_5}}",
 															"host": [
 																"{{baseUrl}}"
 															],
 															"path": [
-																"bpd",
-																"pagopa",
-																"api",
-																"v1",
+																"rtd",
+																"mock-io",
 																"login"
 															],
 															"query": [
@@ -36146,7 +36049,7 @@
 														"header": [
 															{
 																"key": "Ocp-Apim-Subscription-Key",
-																"value": "",
+																"value": "{{genericSubscriptionKey}}",
 																"type": "default"
 															},
 															{
@@ -36156,15 +36059,13 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_6}}",
+															"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_6}}",
 															"host": [
 																"{{baseUrl}}"
 															],
 															"path": [
-																"bpd",
-																"pagopa",
-																"api",
-																"v1",
+																"rtd",
+																"mock-io",
 																"login"
 															],
 															"query": [
@@ -36392,7 +36293,7 @@
 														"header": [
 															{
 																"key": "Ocp-Apim-Subscription-Key",
-																"value": "",
+																"value": "{{genericSubscriptionKey}}",
 																"type": "default"
 															},
 															{
@@ -36402,15 +36303,13 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_7}}",
+															"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_7}}",
 															"host": [
 																"{{baseUrl}}"
 															],
 															"path": [
-																"bpd",
-																"pagopa",
-																"api",
-																"v1",
+																"rtd",
+																"mock-io",
 																"login"
 															],
 															"query": [
@@ -36638,7 +36537,7 @@
 														"header": [
 															{
 																"key": "Ocp-Apim-Subscription-Key",
-																"value": "",
+																"value": "{{genericSubscriptionKey}}",
 																"type": "default"
 															},
 															{
@@ -36648,15 +36547,13 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_8}}",
+															"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_8}}",
 															"host": [
 																"{{baseUrl}}"
 															],
 															"path": [
-																"bpd",
-																"pagopa",
-																"api",
-																"v1",
+																"rtd",
+																"mock-io",
 																"login"
 															],
 															"query": [
@@ -36884,7 +36781,7 @@
 														"header": [
 															{
 																"key": "Ocp-Apim-Subscription-Key",
-																"value": "",
+																"value": "{{genericSubscriptionKey}}",
 																"type": "default"
 															},
 															{
@@ -36894,15 +36791,13 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_9}}",
+															"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_9}}",
 															"host": [
 																"{{baseUrl}}"
 															],
 															"path": [
-																"bpd",
-																"pagopa",
-																"api",
-																"v1",
+																"rtd",
+																"mock-io",
 																"login"
 															],
 															"query": [
@@ -37130,7 +37025,7 @@
 														"header": [
 															{
 																"key": "Ocp-Apim-Subscription-Key",
-																"value": "",
+																"value": "{{genericSubscriptionKey}}",
 																"type": "default"
 															},
 															{
@@ -37140,15 +37035,13 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_10}}",
+															"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_10}}",
 															"host": [
 																"{{baseUrl}}"
 															],
 															"path": [
-																"bpd",
-																"pagopa",
-																"api",
-																"v1",
+																"rtd",
+																"mock-io",
 																"login"
 															],
 															"query": [
@@ -37376,7 +37269,7 @@
 														"header": [
 															{
 																"key": "Ocp-Apim-Subscription-Key",
-																"value": "",
+																"value": "{{genericSubscriptionKey}}",
 																"type": "default"
 															},
 															{
@@ -37386,15 +37279,13 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_11}}",
+															"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_11}}",
 															"host": [
 																"{{baseUrl}}"
 															],
 															"path": [
-																"bpd",
-																"pagopa",
-																"api",
-																"v1",
+																"rtd",
+																"mock-io",
 																"login"
 															],
 															"query": [
@@ -37622,7 +37513,7 @@
 														"header": [
 															{
 																"key": "Ocp-Apim-Subscription-Key",
-																"value": "",
+																"value": "{{genericSubscriptionKey}}",
 																"type": "default"
 															},
 															{
@@ -37632,15 +37523,13 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_12}}",
+															"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_12}}",
 															"host": [
 																"{{baseUrl}}"
 															],
 															"path": [
-																"bpd",
-																"pagopa",
-																"api",
-																"v1",
+																"rtd",
+																"mock-io",
 																"login"
 															],
 															"query": [
@@ -37868,7 +37757,7 @@
 														"header": [
 															{
 																"key": "Ocp-Apim-Subscription-Key",
-																"value": "",
+																"value": "{{genericSubscriptionKey}}",
 																"type": "default"
 															},
 															{
@@ -37878,15 +37767,13 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_13}}",
+															"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_13}}",
 															"host": [
 																"{{baseUrl}}"
 															],
 															"path": [
-																"bpd",
-																"pagopa",
-																"api",
-																"v1",
+																"rtd",
+																"mock-io",
 																"login"
 															],
 															"query": [
@@ -38114,7 +38001,7 @@
 														"header": [
 															{
 																"key": "Ocp-Apim-Subscription-Key",
-																"value": "",
+																"value": "{{genericSubscriptionKey}}",
 																"type": "default"
 															},
 															{
@@ -38124,15 +38011,13 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_14}}",
+															"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_14}}",
 															"host": [
 																"{{baseUrl}}"
 															],
 															"path": [
-																"bpd",
-																"pagopa",
-																"api",
-																"v1",
+																"rtd",
+																"mock-io",
 																"login"
 															],
 															"query": [
@@ -38360,7 +38245,7 @@
 														"header": [
 															{
 																"key": "Ocp-Apim-Subscription-Key",
-																"value": "",
+																"value": "{{genericSubscriptionKey}}",
 																"type": "default"
 															},
 															{
@@ -38370,15 +38255,13 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_15}}",
+															"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_15}}",
 															"host": [
 																"{{baseUrl}}"
 															],
 															"path": [
-																"bpd",
-																"pagopa",
-																"api",
-																"v1",
+																"rtd",
+																"mock-io",
 																"login"
 															],
 															"query": [
@@ -38580,7 +38463,9 @@
 																"exec": [
 																	"let moment = require('moment');\r",
 																	"let yesterday = String(moment().subtract(1, 'days').format('YYYY-MM-DD'));\r",
-																	"pm.collectionVariables.set('yesterday', yesterday);"
+																	"pm.collectionVariables.set('yesterday', yesterday);\r",
+																	"\r",
+																	"setTimeout(() => {}, 7000);"
 																],
 																"type": "text/javascript"
 															}
@@ -39987,7 +39872,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -39997,15 +39882,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{fiscalCode_fakeWhitelist}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{fiscalCode_fakeWhitelist}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -41198,7 +41081,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -41208,15 +41091,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{fiscalCode_fakeWhitelist}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{fiscalCode_fakeWhitelist}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -45322,7 +45203,7 @@
 											"listen": "prerequest",
 											"script": {
 												"exec": [
-													""
+													"setTimeout(() => {}, 7000);"
 												],
 												"type": "text/javascript"
 											}
@@ -45336,7 +45217,7 @@
 										"header": [
 											{
 												"key": "Ocp-Apim-Subscription-Key",
-												"value": "",
+												"value": "{{genericSubscriptionKey}}",
 												"type": "default"
 											},
 											{
@@ -45346,15 +45227,13 @@
 											}
 										],
 										"url": {
-											"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{fiscalCode_fakeWhitelist}}",
+											"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{fiscalCode_fakeWhitelist}}",
 											"host": [
 												"{{baseUrl}}"
 											],
 											"path": [
-												"bpd",
-												"pagopa",
-												"api",
-												"v1",
+												"rtd",
+												"mock-io",
 												"login"
 											],
 											"query": [
@@ -45377,6 +45256,15 @@
 													"pm.test(\"Suspension/Readmission - Happy case - Onboarding - Accept T&C - return status 204\", function () {\r",
 													"    pm.response.to.have.status(204);\r",
 													"});"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"setTimeout(() => {}, 10000);"
 												],
 												"type": "text/javascript"
 											}
@@ -46611,7 +46499,7 @@
 														"header": [
 															{
 																"key": "Ocp-Apim-Subscription-Key",
-																"value": "",
+																"value": "{{genericSubscriptionKey}}",
 																"type": "default"
 															},
 															{
@@ -46621,15 +46509,13 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_1}}",
+															"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_1}}",
 															"host": [
 																"{{baseUrl}}"
 															],
 															"path": [
-																"bpd",
-																"pagopa",
-																"api",
-																"v1",
+																"rtd",
+																"mock-io",
 																"login"
 															],
 															"query": [
@@ -46804,7 +46690,7 @@
 														"header": [
 															{
 																"key": "Ocp-Apim-Subscription-Key",
-																"value": "",
+																"value": "{{genericSubscriptionKey}}",
 																"type": "default"
 															},
 															{
@@ -46814,15 +46700,13 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_fake_2}}",
+															"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_fake_2}}",
 															"host": [
 																"{{baseUrl}}"
 															],
 															"path": [
-																"bpd",
-																"pagopa",
-																"api",
-																"v1",
+																"rtd",
+																"mock-io",
 																"login"
 															],
 															"query": [
@@ -48274,7 +48158,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -48284,15 +48168,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{fiscalCode_fakeWhitelist}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{fiscalCode_fakeWhitelist}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -48598,7 +48480,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -48608,15 +48490,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_1}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_1}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -48853,7 +48733,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -48863,15 +48743,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{fiscalCode_fakeWhitelist}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{fiscalCode_fakeWhitelist}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -50974,7 +50852,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -50984,15 +50862,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{fiscalCode_fakeWhitelist}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{fiscalCode_fakeWhitelist}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -51298,7 +51174,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -51308,15 +51184,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{CF_1}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{CF_1}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -51553,7 +51427,7 @@
 												"header": [
 													{
 														"key": "Ocp-Apim-Subscription-Key",
-														"value": "",
+														"value": "{{genericSubscriptionKey}}",
 														"type": "default"
 													},
 													{
@@ -51563,15 +51437,13 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/bpd/pagopa/api/v1/login?fiscalCode={{fiscalCode_fakeWhitelist}}",
+													"raw": "{{baseUrl}}/rtd/mock-io/login?fiscalCode={{fiscalCode_fakeWhitelist}}",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
-														"bpd",
-														"pagopa",
-														"api",
-														"v1",
+														"rtd",
+														"mock-io",
 														"login"
 													],
 													"query": [
@@ -52388,7 +52260,7 @@
 		},
 		{
 			"key": "basePath",
-			"value": "./postman"
+			"value": "C:/Users/ranaldoda/IDPay/idpay-portal-welfare-backend-initiative/postman"
 		},
 		{
 			"key": "rankingEnabled",
