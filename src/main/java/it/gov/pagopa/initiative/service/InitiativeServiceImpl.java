@@ -81,7 +81,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             AESTokenService ioTokenService,
             InitiativeValidationService initiativeValidationService,
             InitiativeUtils initiativeUtils,
-            AuditUtilities auditUtilities, InitiativeModelToDTOMapper initiativeModelToDTOMapper) {
+            AuditUtilities auditUtilities, InitiativeModelToDTOMapper initiativeModelToDTOMapper){
         this.notifyEmail = notifyEmail;
         this.initiativeRepository = initiativeRepository;
         this.initiativeProducer = initiativeProducer;
@@ -115,7 +115,6 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     public List<Initiative> getInitiativesIssuerList() {
         return initiativeRepository.findByEnabledAndStatus(true, Status.PUBLISHED);
     }
-
     @Override
     public InitiativeDetailDTO getInitiativeBeneficiaryDetail(String initiativeId, Locale acceptLanguage) {
 
@@ -459,8 +458,8 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     }
 
     @Override
-    public void sendEmailToCurrentOrg(Initiative initiative, String template, String subject) {
-        if (notifyEmail) {
+    public void sendEmailToCurrentOrg(Initiative initiative, String template,  String subject){
+        if(notifyEmail){
             try {
                 emailNotificationService.sendInitiativeToCurrentOrganization(initiative, template, subject);
             } catch (FeignException e) {
@@ -470,8 +469,8 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     }
 
     @Override
-    public void sendEmailToPagoPA(Initiative initiative, String template, String subject) {
-        if (notifyEmail) {
+    public void sendEmailToPagoPA(Initiative initiative, String template,  String subject){
+        if(notifyEmail){
             try {
                 emailNotificationService.sendInitiativeToPagoPA(initiative, template, subject);
             } catch (FeignException e) {
