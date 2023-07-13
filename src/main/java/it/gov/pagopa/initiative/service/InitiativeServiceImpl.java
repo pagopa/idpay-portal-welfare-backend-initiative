@@ -239,12 +239,11 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     public void updateInitiativeRefundRules(String organizationId, String initiativeId, String role, Initiative refundRule, boolean changeInitiativeStatus) {
         long startTime = System.currentTimeMillis();
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
-        initiativeValidationService.checkRefundRuleDiscountInitiative(initiative.getInitiativeRewardType().name(), refundRule.getRefundRule());
         //Check Initiative Status
         isInitiativeAllowedToBeEditableThenThrows(initiative);
-        initiative.setRefundRule(refundRule.getRefundRule());
         log.info("[UPDATE_REFUND_RULE] - Initiative: {}. Refund rules successfully set.", initiativeId);
         if (changeInitiativeStatus) {
+            initiativeValidationService.checkRefundRuleDiscountInitiative(initiative.getInitiativeRewardType().name(), refundRule.getRefundRule());
             //Insert [All Steps validation -> validateAllWizardSteps with @Validated(value = ValidationOnGroup.class)]
             //Move this validation in [All Steps validation -> .validateAllWizardSteps()]
             if (initiative.getGeneral().getDescriptionMap().get(Locale.ITALIAN.getLanguage()) == null) {
@@ -266,6 +265,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             initiative.setStatus(InitiativeConstants.Status.DRAFT);
             auditUtilities.logEditInitiative(this.getUserId(), initiativeId, organizationId);
         }
+        initiative.setRefundRule(refundRule.getRefundRule());
         this.initiativeRepository.save(initiative);
         if (changeInitiativeStatus) {
             this.sendEmailToPagoPA(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
