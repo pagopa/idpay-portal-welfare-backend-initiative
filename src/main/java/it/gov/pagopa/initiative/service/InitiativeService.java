@@ -24,13 +24,13 @@ public interface InitiativeService {
 
     Initiative getInitiativeBeneficiaryView(String initiativeId);
 
-    void updateInitiativeGeneralInfo(String organizationId, String initiativeId, Initiative initiativeInfoModel, String role);
+    void updateInitiativeGeneralInfo(String organizationId, String initiativeId, Initiative initiativeInfoModel, String role, boolean isDraft);
 
     void updateInitiativeAdditionalInfo(String organizationId, String initiativeId, Initiative initiativeAdditionalInfo, String role);
 
-    void updateStep3InitiativeBeneficiary(String organizationId, String initiativeId, InitiativeBeneficiaryRule toBeneficiaryRuleModel, String role);
+    void updateStep3InitiativeBeneficiary(String organizationId, String initiativeId, InitiativeBeneficiaryRule toBeneficiaryRuleModel, String role, boolean isDraft);
 
-    void updateTrxAndRewardRules(String organizationId, String initiativeId, Initiative rewardAndTrxRules, String role);
+    void updateTrxAndRewardRules(String organizationId, String initiativeId, Initiative rewardAndTrxRules, String role, boolean isDraft);
 
     void updateInitiativeRefundRules(String organizationId, String initiativeId, String role, Initiative refundRule, boolean changeInitiativeStatus);
 
