@@ -236,4 +236,14 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
                     HttpStatus.BAD_REQUEST);
         }
     }
+
+    @Override
+    public void checkReward(Initiative initiative) {
+        InitiativeRewardRule rewardRule = initiative.getRewardRule();
+        if (rewardRule instanceof RewardValue rewardValue &&
+                RewardValue.RewardValueTypeEnum.PERCENTAGE.equals(rewardValue.getRewardValueType()) &&
+                rewardValue.getRewardValue().intValue()>100){
+            throw new InitiativeException(InitiativeConstants.Exception.BadRequest.CODE, InitiativeConstants.Exception.BadRequest.REWARD_TYPE, HttpStatus.BAD_REQUEST);
+        }
+    }
 }

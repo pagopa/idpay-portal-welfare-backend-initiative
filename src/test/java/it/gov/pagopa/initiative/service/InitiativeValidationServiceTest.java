@@ -433,6 +433,48 @@ class InitiativeValidationServiceTest {
         Executable executable = () -> initiativeValidationService.checkRewardRuleAbsolute(step4Initiative);
         assertDoesNotThrow(executable);
     }
+
+    @Test
+    void checkReward_PERCENTAGE_ok(){
+        Initiative step4Initiative = createStep4Initiative();
+        RewardValue rewardValue = new RewardValue();
+        rewardValue.setRewardValueType(RewardValue.RewardValueTypeEnum.PERCENTAGE);
+        rewardValue.setRewardValue(BigDecimal.valueOf(10));
+        step4Initiative.setRewardRule(rewardValue);
+        Executable executable = () -> initiativeValidationService.checkReward(step4Initiative);
+        assertDoesNotThrow(executable);
+    }
+
+    @Test
+    void checkReward_PERCENTAGE_ko(){
+        Initiative step4Initiative = createStep4Initiative();
+        RewardValue rewardValue = new RewardValue();
+        rewardValue.setRewardValueType(RewardValue.RewardValueTypeEnum.PERCENTAGE);
+        rewardValue.setRewardValue(BigDecimal.valueOf(105));
+        step4Initiative.setRewardRule(rewardValue);
+        try {
+            initiativeValidationService.checkReward(step4Initiative);
+        } catch (InitiativeException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
+            assertEquals(InitiativeConstants.Exception.BadRequest.REWARD_TYPE, e.getMessage());
+        }
+    }
+
+    @Test
+    void checkReward_ABSOLUTE_ok(){
+        Initiative step4Initiative = createStep4Initiative();
+        RewardValue rewardValue = new RewardValue();
+        rewardValue.setRewardValueType(RewardValue.RewardValueTypeEnum.PERCENTAGE);
+        rewardValue.setRewardValue(BigDecimal.valueOf(105));
+        step4Initiative.setRewardRule(rewardValue);
+        try {
+            initiativeValidationService.checkReward(step4Initiative);
+        } catch (InitiativeException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
+            assertEquals(InitiativeConstants.Exception.BadRequest.REWARD_TYPE, e.getMessage());
+        }
+    }
+
     @Test
     void checkRefundRuleDiscountInitiative_RefundType(){
         Initiative step5Initiative = createStep5Initiative();
