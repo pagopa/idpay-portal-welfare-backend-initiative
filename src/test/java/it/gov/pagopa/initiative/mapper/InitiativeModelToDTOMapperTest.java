@@ -1792,9 +1792,9 @@ class InitiativeModelToDTOMapperTest {
         LocalDate rankingEndDate = rankingStartDate.plusDays(1);
         LocalDate startDate = rankingEndDate.plusDays(1);
         LocalDate endDate = startDate.plusDays(1);
-        initiativeDetailDTO.setEndDate(endDate);
-        initiativeDetailDTO.setRankingStartDate(rankingStartDate);
-        initiativeDetailDTO.setRankingEndDate(rankingEndDate);
+        initiativeDetailDTO.setEndDate(rankingEndDate);
+        initiativeDetailDTO.setRankingStartDate(startDate);
+        initiativeDetailDTO.setRankingEndDate(endDate);
         initiativeDetailDTO.setRewardRule(createInitiativeRewardRuleDTORewardGroupDTO());
         initiativeDetailDTO.setRewardRule(createInitiativeRewardRuleDTORewardValueDTOWithoutType());
         initiativeDetailDTO.setRefundRule(null);

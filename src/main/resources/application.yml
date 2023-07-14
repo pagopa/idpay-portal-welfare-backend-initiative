@@ -61,6 +61,18 @@ spring:
                 linger.ms: ${KAFKA_INITIATIVE_PRODUCER_CONFIG_LINGER_MS:${KAFKA_LINGER_MS:2}}
                 batch.size: ${KAFKA_INITIATIVE_PRODUCER_CONFIG_BATCH_SIZE:${KAFKA_BATCH_SIZE:16384}}
                 metadata.max.idle.ms: ${KAFKA_INITIATIVE_PRODUCER_DEFAULT_METADATA_MAX_IDLE_MS:180000}
+    openfeign:
+      okhttp:
+        enabled: true
+      client:
+        config:
+          default:
+            errorDecoder: it.gov.pagopa.initiative.connector.error.decoder.Custom5xxErrorDecoder
+            retryer: feign.Retryer.Default
+          backend-io:
+            loggerLevel: ${FEIGN_CLIENT_CONFIG_IO_LOG_LEVEL:basic}
+          ms-group:
+            loggerLevel: ${FEIGN_CLIENT_CONFIG_IO_LOG_LEVEL:basic}
 
 rest-client:
   backend-io:
@@ -99,18 +111,6 @@ rest-client:
       name: selc-prod-users
       subscriptionKey: ${SELC_EXTERNAL_API_KEY:}
       selfCareUid: ${SELC_UID:idpay}
-feign:
-  okhttp:
-    enabled: true
-  client:
-    config:
-      default:
-        errorDecoder: it.gov.pagopa.initiative.connector.error.decoder.Custom5xxErrorDecoder
-        retryer: feign.Retryer.Default
-      backend-io:
-        loggerLevel: ${FEIGN_CLIENT_CONFIG_IO_LOG_LEVEL:basic}
-      ms-group:
-        loggerLevel: ${FEIGN_CLIENT_CONFIG_IO_LOG_LEVEL:basic}
 
 management.endpoints:
   web:
