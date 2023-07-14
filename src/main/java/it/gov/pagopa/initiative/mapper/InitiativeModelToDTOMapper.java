@@ -86,9 +86,10 @@ public class InitiativeModelToDTOMapper {
                 .status(initiative.getStatus())
                 .description(initiative.getAdditionalInfo().getDescription())
                 .ruleDescription(ruleDescription)
-                .endDate(initiative.getGeneral().getEndDate())
-                .rankingStartDate(initiative.getGeneral().getRankingStartDate())
-                .rankingEndDate(initiative.getGeneral().getRankingEndDate())
+                .endDate(initiative.getGeneral().getRankingEndDate() != null ?
+                        initiative.getGeneral().getRankingEndDate() : initiative.getGeneral().getEndDate())
+                .rankingStartDate(initiative.getGeneral().getStartDate())
+                .rankingEndDate(initiative.getGeneral().getEndDate())
                 .rewardRule(this.toRewardRuleDTOWithoutType(initiative.getRewardRule()))
                 .refundRule(this.toInitiativeRefundRuleDTOWithoutAdditionalInfo((initiative.getRefundRule())))
                 .privacyLink(initiative.getAdditionalInfo().getPrivacyLink())
