@@ -1818,9 +1818,10 @@ class InitiativeServiceTest {
         initiativeDetailDTO.setInitiativeName("TEST");
         initiativeDetailDTO.setStatus("APPROVED");
         initiativeDetailDTO.setDescription("test test");
-        initiativeDetailDTO.setEndDate(LocalDate.now());
-        initiativeDetailDTO.setRankingStartDate(LocalDate.now());
-        initiativeDetailDTO.setRankingEndDate(LocalDate.now().plusDays(40));
+        initiativeDetailDTO.setOnboardingStartDate(LocalDate.now().minusDays(25));
+        initiativeDetailDTO.setOnboardingEndDate(LocalDate.now());
+        initiativeDetailDTO.setFruitionStartDate(LocalDate.now());
+        initiativeDetailDTO.setFruitionEndDate(LocalDate.now().plusDays(40));
         initiativeDetailDTO.setRewardRule(createRewardRuleDTO(false));
         initiativeDetailDTO.setRefundRule(null);
         initiativeDetailDTO.setPrivacyLink("privacy.it");
