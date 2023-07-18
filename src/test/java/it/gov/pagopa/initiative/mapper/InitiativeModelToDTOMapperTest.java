@@ -440,6 +440,19 @@ class InitiativeModelToDTOMapperTest {
     }
 
     @Test
+    void toInitiativeDetailDTO_nullStartAndEndDate() {
+        Locale acceptLanguage = Locale.ITALIAN;
+        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0));
+        fullInitiative.getGeneral().setRankingStartDate(null);
+        fullInitiative.getGeneral().setRankingEndDate(null);
+
+        InitiativeDetailDTO initiativeDetailDTO = initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative,acceptLanguage);
+
+        assertEquals(fullInitiative.getGeneral().getStartDate(), initiativeDetailDTO.getFruitionStartDate());
+        assertEquals(fullInitiative.getGeneral().getEndDate(), initiativeDetailDTO.getFruitionEndDate());
+    }
+
+    @Test
     void toInitiativeDTONull_equals() {
         assertNull(initiativeModelToDTOMapper.toInitiativeDTO(null));
     }
@@ -1792,9 +1805,10 @@ class InitiativeModelToDTOMapperTest {
         LocalDate rankingEndDate = rankingStartDate.plusDays(1);
         LocalDate startDate = rankingEndDate.plusDays(1);
         LocalDate endDate = startDate.plusDays(1);
-        initiativeDetailDTO.setEndDate(rankingEndDate);
-        initiativeDetailDTO.setRankingStartDate(startDate);
-        initiativeDetailDTO.setRankingEndDate(endDate);
+        initiativeDetailDTO.setOnboardingStartDate(rankingStartDate);
+        initiativeDetailDTO.setOnboardingEndDate(rankingEndDate);
+        initiativeDetailDTO.setFruitionStartDate(startDate);
+        initiativeDetailDTO.setFruitionEndDate(endDate);
         initiativeDetailDTO.setRewardRule(createInitiativeRewardRuleDTORewardGroupDTO());
         initiativeDetailDTO.setRewardRule(createInitiativeRewardRuleDTORewardValueDTOWithoutType());
         initiativeDetailDTO.setRefundRule(null);
