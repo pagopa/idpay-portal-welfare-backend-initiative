@@ -879,7 +879,7 @@ class InitiativeServiceTest {
 
         // you are expecting initiativeValidationService to be called once with correct param
         verify(initiativeValidationService, times(1)).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
-        verify(initiativeValidationService, times(1)).checkRewardRuleAbsolute(step3Initiative);
+        verify(initiativeValidationService, times(1)).checkRewardRuleAbsolute(initiative);
     }
 
     @Test
