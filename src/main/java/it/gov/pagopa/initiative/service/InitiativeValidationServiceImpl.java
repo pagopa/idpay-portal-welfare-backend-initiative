@@ -227,7 +227,8 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
 
     @Override
     public void checkFieldYearLengthAndValues(List<AutomatedCriteria> initiativeBeneficiaryRuleModel) {
-        if (initiativeBeneficiaryRuleModel.stream().anyMatch(a -> "BIRTHDATE".equals(a.getCode()) && "Year".equals(a.getField())) &&
+
+        if (initiativeBeneficiaryRuleModel.stream().anyMatch(a -> "BIRTHDATE".equals(a.getCode()) && "year".equalsIgnoreCase(a.getField())) &&
                 (!initiativeBeneficiaryRuleModel.stream().allMatch(a -> a.getValue().matches("\\d{4}")
                     && Integer.parseInt(a.getValue()) >= Year.now().minusYears(150).getValue() && Integer.parseInt(a.getValue()) <= Year.now().getValue()))) {
             throw new InitiativeException(
