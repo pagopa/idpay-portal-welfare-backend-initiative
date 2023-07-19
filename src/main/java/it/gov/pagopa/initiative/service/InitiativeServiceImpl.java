@@ -221,8 +221,8 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         long startTime = System.currentTimeMillis();
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
         if (!isDraft) {
-            initiativeValidationService.checkReward(initiative);
-            initiativeValidationService.checkRewardRuleAbsolute(initiative);
+            initiativeValidationService.checkReward(rewardAndTrxRules);
+            initiativeValidationService.checkRewardRuleAbsolute(rewardAndTrxRules);
         }
         //Check Initiative Status
         isInitiativeAllowedToBeEditableThenThrows(initiative);
