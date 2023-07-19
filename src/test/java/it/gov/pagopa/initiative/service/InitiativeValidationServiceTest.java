@@ -476,6 +476,13 @@ class InitiativeValidationServiceTest {
     }
 
     @Test
+    void checkReward_noInstanceOf(){
+        Initiative step4Initiative = createStep4Initiative();
+        Executable executable = () -> initiativeValidationService.checkReward(step4Initiative);
+        assertDoesNotThrow(executable);
+    }
+
+    @Test
     void checkRefundRuleDiscountInitiative_RefundType(){
         Initiative step5Initiative = createStep5Initiative();
         step5Initiative.setInitiativeRewardType(InitiativeDTO.InitiativeRewardTypeEnum.REFUND);
