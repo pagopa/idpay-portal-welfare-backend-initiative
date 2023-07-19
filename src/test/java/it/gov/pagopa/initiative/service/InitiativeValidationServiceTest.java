@@ -21,6 +21,7 @@ import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
 import it.gov.pagopa.initiative.model.rule.trx.InitiativeTrxConditions;
 import it.gov.pagopa.initiative.model.rule.trx.Threshold;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
+import org.bson.assertions.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -454,6 +455,7 @@ class InitiativeValidationServiceTest {
         step4Initiative.setRewardRule(rewardValue);
         try {
             initiativeValidationService.checkReward(step4Initiative);
+            Assertions.fail();
         } catch (InitiativeException e) {
             assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
             assertEquals(InitiativeConstants.Exception.BadRequest.REWARD_TYPE, e.getMessage());
@@ -464,15 +466,11 @@ class InitiativeValidationServiceTest {
     void checkReward_ABSOLUTE_ok(){
         Initiative step4Initiative = createStep4Initiative();
         RewardValue rewardValue = new RewardValue();
-        rewardValue.setRewardValueType(RewardValue.RewardValueTypeEnum.PERCENTAGE);
+        rewardValue.setRewardValueType(RewardValue.RewardValueTypeEnum.ABSOLUTE);
         rewardValue.setRewardValue(BigDecimal.valueOf(105));
         step4Initiative.setRewardRule(rewardValue);
-        try {
-            initiativeValidationService.checkReward(step4Initiative);
-        } catch (InitiativeException e) {
-            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
-            assertEquals(InitiativeConstants.Exception.BadRequest.REWARD_TYPE, e.getMessage());
-        }
+        Executable executable = () -> initiativeValidationService.checkReward(step4Initiative);
+        assertDoesNotThrow(executable);
     }
 
     @Test
