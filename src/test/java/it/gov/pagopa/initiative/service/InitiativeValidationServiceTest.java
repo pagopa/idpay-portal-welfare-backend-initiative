@@ -21,8 +21,12 @@ import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
 import it.gov.pagopa.initiative.model.rule.trx.InitiativeTrxConditions;
 import it.gov.pagopa.initiative.model.rule.trx.Threshold;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
+import org.bson.assertions.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
@@ -35,7 +39,9 @@ import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.Year;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -428,6 +434,52 @@ class InitiativeValidationServiceTest {
         Executable executable = () -> initiativeValidationService.checkRewardRuleAbsolute(step4Initiative);
         assertDoesNotThrow(executable);
     }
+
+    @Test
+    void checkReward_PERCENTAGE_ok(){
+        Initiative step4Initiative = createStep4Initiative();
+        RewardValue rewardValue = new RewardValue();
+        rewardValue.setRewardValueType(RewardValue.RewardValueTypeEnum.PERCENTAGE);
+        rewardValue.setRewardValue(BigDecimal.valueOf(10));
+        step4Initiative.setRewardRule(rewardValue);
+        Executable executable = () -> initiativeValidationService.checkReward(step4Initiative);
+        assertDoesNotThrow(executable);
+    }
+
+    @Test
+    void checkReward_PERCENTAGE_ko(){
+        Initiative step4Initiative = createStep4Initiative();
+        RewardValue rewardValue = new RewardValue();
+        rewardValue.setRewardValueType(RewardValue.RewardValueTypeEnum.PERCENTAGE);
+        rewardValue.setRewardValue(BigDecimal.valueOf(105));
+        step4Initiative.setRewardRule(rewardValue);
+        try {
+            initiativeValidationService.checkReward(step4Initiative);
+            Assertions.fail();
+        } catch (InitiativeException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
+            assertEquals(InitiativeConstants.Exception.BadRequest.REWARD_TYPE, e.getMessage());
+        }
+    }
+
+    @Test
+    void checkReward_ABSOLUTE_ok(){
+        Initiative step4Initiative = createStep4Initiative();
+        RewardValue rewardValue = new RewardValue();
+        rewardValue.setRewardValueType(RewardValue.RewardValueTypeEnum.ABSOLUTE);
+        rewardValue.setRewardValue(BigDecimal.valueOf(105));
+        step4Initiative.setRewardRule(rewardValue);
+        Executable executable = () -> initiativeValidationService.checkReward(step4Initiative);
+        assertDoesNotThrow(executable);
+    }
+
+    @Test
+    void checkReward_noInstanceOf(){
+        Initiative step4Initiative = createStep4Initiative();
+        Executable executable = () -> initiativeValidationService.checkReward(step4Initiative);
+        assertDoesNotThrow(executable);
+    }
+
     @Test
     void checkRefundRuleDiscountInitiative_RefundType(){
         Initiative step5Initiative = createStep5Initiative();
@@ -472,6 +524,42 @@ class InitiativeValidationServiceTest {
         } catch (InitiativeException e) {
             assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
             assertEquals(InitiativeConstants.Exception.BadRequest.REFUND_RULE_INVALID, e.getMessage());
+        }
+    }
+    @ParameterizedTest
+    @MethodSource("rangeDate")
+    void checkStartDateAndEndDate(LocalDate startDate, LocalDate endDate) {
+        Initiative step2Initiative = createStep2Initiative(false);
+        InitiativeGeneral initiativeGeneral = createInitiativeGeneral(false);
+        initiativeGeneral.setStartDate(startDate);
+        initiativeGeneral.setEndDate(endDate);
+        step2Initiative.setGeneral(initiativeGeneral);
+
+        try {
+            initiativeValidationService.checkStartDateAndEndDate(step2Initiative);
+        } catch (InitiativeException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
+            assertEquals("The startDate and endDate cannot be less than today", e.getMessage());
+        }
+    }
+    @ParameterizedTest
+    @MethodSource("fieldsAndDate")
+    void checkValuesWhenCodeIsBirthdateAndFieldIsYear(String code, String field, String value) {
+        Initiative fullInitiative = createFullInitiative();
+        InitiativeGeneral generalInfoInitiative = createInitiativeGeneralFamilyUnitComposition();
+        fullInitiative.setGeneral(generalInfoInitiative);
+        InitiativeBeneficiaryRule beneficiaryInfoInitiative = createInitiativeBeneficiaryRule();
+        beneficiaryInfoInitiative.getAutomatedCriteria().get(0).setCode(code);
+        beneficiaryInfoInitiative.getAutomatedCriteria().get(0).setField(field);
+        beneficiaryInfoInitiative.getAutomatedCriteria().get(0).setValue(value);
+        fullInitiative.setBeneficiaryRule(beneficiaryInfoInitiative);
+        List<AutomatedCriteria> automatedCriteriaList = fullInitiative.getBeneficiaryRule().getAutomatedCriteria();
+
+        try {
+            initiativeValidationService.checkFieldYearLengthAndValues(automatedCriteriaList);
+        } catch (InitiativeException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
+            assertEquals("The value must contain 4 numbers and the year cannot be less than 150 years", e.getMessage());
         }
     }
 
@@ -665,8 +753,8 @@ class InitiativeValidationServiceTest {
         iSelfDeclarationCriteriaList.add(selfCriteriaMulti);
         initiativeBeneficiaryRule.setSelfDeclarationCriteria(iSelfDeclarationCriteriaList);
         AutomatedCriteria automatedCriteria = new AutomatedCriteria();
-        automatedCriteria.setCode("BIRTHDAY");
-        automatedCriteria.setField("true");
+        automatedCriteria.setCode("BIRTHDATE");
+        automatedCriteria.setField("Year");
         automatedCriteria.setOperator(FilterOperatorEnumModel.EQ);
         automatedCriteria.setValue("value");
         automatedCriteria.setIseeTypes(List.of(IseeTypologyEnum.CORRENTE, IseeTypologyEnum.DOTTORATO, IseeTypologyEnum.RESIDENZIALE));
@@ -931,5 +1019,27 @@ class InitiativeValidationServiceTest {
         initiativeGeneral.setRankingEndDate(LocalDate.of(2022, 8, 18));
         initiativeGeneral.setDescriptionMap(language);
         return initiativeGeneral;
+    }
+    private static Stream<Arguments> rangeDate() {
+        return Stream.of(
+                Arguments.of(LocalDate.now().minusDays(5),LocalDate.now().minusDays(2)),
+                Arguments.of(LocalDate.now(), LocalDate.now().minusDays(2)),
+                Arguments.of(LocalDate.now().minusDays(2),LocalDate.now()),
+                Arguments.of(LocalDate.now(),LocalDate.now().plusDays(5)));
+    }
+
+    private static Stream<Arguments> fieldsAndDate() {
+        return Stream.of(
+                Arguments.of("BIRTHDATE","Year", Year.now().toString()),
+                Arguments.of("BIRTHDATE","Year", Year.now().minusYears(180).toString()),
+                Arguments.of("BIRTHDATE","Year", "120"),
+                Arguments.of("BIRTHDATE","Year", Year.now().plusYears(10).toString()),
+                Arguments.of("ISEE","Year", Year.now().toString()),
+                Arguments.of("ISEE","Year", Year.now().minusYears(180).toString()),
+                Arguments.of("ISEE","Year", "120"),
+                Arguments.of("BIRTHDATE","Age", Year.now().toString()),
+                Arguments.of("BIRTHDATE","Age", Year.now().minusYears(180).toString()),
+                Arguments.of("BIRTHDATE","Age", "120")
+        );
     }
 }

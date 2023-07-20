@@ -375,7 +375,7 @@ class InitiativeApiTest {
         when(initiativeDTOsToModelMapper.toInitiative(initiativeGeneralDTO)).thenReturn(step2Initiative);
 
         //doNothing only for Void method
-        doNothing().when(initiativeService).updateInitiativeGeneralInfo(ORGANIZATION_ID, INITIATIVE_ID, step2Initiative, ROLE);
+        doNothing().when(initiativeService).updateInitiativeGeneralInfo(ORGANIZATION_ID, INITIATIVE_ID, step2Initiative, ROLE, true);
 
         mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_GENERAL_INFO_URL, ORGANIZATION_ID, INITIATIVE_ID))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -452,7 +452,7 @@ class InitiativeApiTest {
         when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step2Initiative);
 
         //doNothing only for Void method
-        doNothing().when(initiativeService).updateStep3InitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule, ROLE);
+        doNothing().when(initiativeService).updateStep3InitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule, ROLE, false);
 
         mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_BENEFICIARY_RULES_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -482,7 +482,7 @@ class InitiativeApiTest {
         when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step2Initiative);
 
         //doNothing only for Void method
-        doNothing().when(initiativeService).updateStep3InitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule, ROLE);
+        doNothing().when(initiativeService).updateStep3InitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule, ROLE, false);
 
         mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_BENEFICIARY_RULES_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -505,7 +505,7 @@ class InitiativeApiTest {
         when(initiativeDTOsToModelMapper.toInitiative(rewardAndTrxRulesDTO)).thenReturn(step1Initiative);
 
         //doNothing only for Void method
-        doNothing().when(initiativeService).updateTrxAndRewardRules(ORGANIZATION_ID, INITIATIVE_ID, step1Initiative, ROLE);
+        doNothing().when(initiativeService).updateTrxAndRewardRules(ORGANIZATION_ID, INITIATIVE_ID, step1Initiative, ROLE, false);
 
         mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_TRX_REWARD_RULE_URL,
                                 ORGANIZATION_ID, INITIATIVE_ID))
@@ -529,7 +529,7 @@ class InitiativeApiTest {
         when(initiativeDTOsToModelMapper.toInitiative(rewardAndTrxRulesDTO)).thenReturn(step1Initiative);
 
         //doNothing only for Void method
-        doNothing().when(initiativeService).updateTrxAndRewardRules(ORGANIZATION_ID, INITIATIVE_ID, step1Initiative, ROLE);
+        doNothing().when(initiativeService).updateTrxAndRewardRules(ORGANIZATION_ID, INITIATIVE_ID, step1Initiative, ROLE, true);
 
         mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_TRX_REWARD_RULE_URL + "/draft",
                                 ORGANIZATION_ID, INITIATIVE_ID))
@@ -625,7 +625,7 @@ class InitiativeApiTest {
 
         //doNothing only for Void method
         InitiativeBeneficiaryRule initiativeBeneficiaryRule2 = initiativeDTOsToModelMapper.toBeneficiaryRule(initiativeBeneficiaryRuleDTO);
-        doNothing().when(initiativeService).updateStep3InitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule2, ROLE);
+        doNothing().when(initiativeService).updateStep3InitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule2, ROLE, true);
 
         mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_BENEFICIARY_RULES_DRAFT_URL + "/draft", ORGANIZATION_ID, INITIATIVE_ID))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -1490,9 +1490,10 @@ class InitiativeApiTest {
         initiativeDetailDTO.setInitiativeName("TEST");
         initiativeDetailDTO.setStatus("APPROVED");
         initiativeDetailDTO.setDescription("test test");
-        initiativeDetailDTO.setEndDate(LocalDate.now());
-        initiativeDetailDTO.setRankingStartDate(LocalDate.now());
-        initiativeDetailDTO.setRankingEndDate(LocalDate.now().plusDays(40));
+        initiativeDetailDTO.setOnboardingStartDate(LocalDate.now().minusDays(25));
+        initiativeDetailDTO.setOnboardingEndDate(LocalDate.now());
+        initiativeDetailDTO.setFruitionStartDate(LocalDate.now());
+        initiativeDetailDTO.setFruitionEndDate(LocalDate.now().plusDays(40));
         initiativeDetailDTO.setRewardRule(createRewardRuleDTO(false));
         initiativeDetailDTO.setRefundRule(null);
         initiativeDetailDTO.setPrivacyLink("privacy.it");

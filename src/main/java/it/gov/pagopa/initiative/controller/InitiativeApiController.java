@@ -107,7 +107,7 @@ public class InitiativeApiController implements InitiativeApi {
     public ResponseEntity<Void> updateInitiativeGeneralInfo(String organizationId, String initiativeId, InitiativeGeneralDTO initiativeGeneralDTO) {
         String role = initiativeGeneralDTO.getOrganizationUserRole();
         log.info("[{}][UPDATE_GENERAL_INFO]-[UPDATE_TO_DRAFT_STATUS] - Initiative: {}. Start processing...", role, initiativeId);
-        this.initiativeService.updateInitiativeGeneralInfo(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toInitiative(initiativeGeneralDTO), role);
+        this.initiativeService.updateInitiativeGeneralInfo(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toInitiative(initiativeGeneralDTO), role, false);
         return ResponseEntity.noContent().build();
     }
 
@@ -125,7 +125,7 @@ public class InitiativeApiController implements InitiativeApi {
     public ResponseEntity<Void> updateInitiativeGeneralInfoDraft(String organizationId, String initiativeId, InitiativeGeneralDTO initiativeGeneralDTO) {
         String role = initiativeGeneralDTO.getOrganizationUserRole();
         log.info("[{}][API-DRAFT]-[UPDATE_GENERAL_INFO]-[UPDATE_TO_DRAFT_STATUS] - Initiative: {}. Start processing...", role, initiativeId);
-        this.initiativeService.updateInitiativeGeneralInfo(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toInitiative(initiativeGeneralDTO), role);
+        this.initiativeService.updateInitiativeGeneralInfo(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toInitiative(initiativeGeneralDTO), role, true);
         return ResponseEntity.noContent().build();
     }
 
@@ -141,7 +141,7 @@ public class InitiativeApiController implements InitiativeApi {
                     String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_PROPERTIES_NOT_VALID, initiativeId),
                     HttpStatus.BAD_REQUEST);
         }
-        this.initiativeService.updateStep3InitiativeBeneficiary(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toBeneficiaryRule(beneficiaryRuleDto), role);
+        this.initiativeService.updateStep3InitiativeBeneficiary(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toBeneficiaryRule(beneficiaryRuleDto), role, false);
         return ResponseEntity.noContent().build();
     }
 
@@ -150,7 +150,7 @@ public class InitiativeApiController implements InitiativeApi {
     public ResponseEntity<Void> updateInitiativeBeneficiaryDraft(String organizationId, String initiativeId, InitiativeBeneficiaryRuleDTO beneficiaryRuleDto) {
         String role = beneficiaryRuleDto.getOrganizationUserRole();
         log.info("[{}][API-DRAFT]-[UPDATE_BENEFICIARY_RULE]-[UPDATE_TO_DRAFT_STATUS] - Initiative: {}. Start processing...", role, initiativeId);
-        this.initiativeService.updateStep3InitiativeBeneficiary(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toBeneficiaryRule(beneficiaryRuleDto), role);
+        this.initiativeService.updateStep3InitiativeBeneficiary(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toBeneficiaryRule(beneficiaryRuleDto), role, true);
         return ResponseEntity.noContent().build();
     }
 
@@ -161,7 +161,7 @@ public class InitiativeApiController implements InitiativeApi {
         String role = rewardAndTrxRulesDTO.getOrganizationUserRole();
         log.info("[{}][UPDATE_TRX_REWARD_RULE]-[UPDATE_TO_DRAFT_STATUS] - Initiative: {}. Start processing...", role, initiativeId);
         Initiative initiative = this.initiativeDTOsToModelMapper.toInitiative(rewardAndTrxRulesDTO);
-        this.initiativeService.updateTrxAndRewardRules(organizationId, initiativeId, initiative, role);
+        this.initiativeService.updateTrxAndRewardRules(organizationId, initiativeId, initiative, role, false);
         return ResponseEntity.noContent().build();
     }
 
@@ -171,7 +171,7 @@ public class InitiativeApiController implements InitiativeApi {
         String role = rewardAndTrxRulesDTO.getOrganizationUserRole();
         log.info("[{}][API-DRAFT]-[UPDATE_TRX_REWARD_RULE]-[UPDATE_TO_DRAFT_STATUS] - Initiative: {}. Start processing...", role, initiativeId);
         Initiative initiative = this.initiativeDTOsToModelMapper.toInitiative(rewardAndTrxRulesDTO);
-        this.initiativeService.updateTrxAndRewardRules(organizationId, initiativeId, initiative, role);
+        this.initiativeService.updateTrxAndRewardRules(organizationId, initiativeId, initiative, role, true);
         return ResponseEntity.noContent().build();
     }
 
