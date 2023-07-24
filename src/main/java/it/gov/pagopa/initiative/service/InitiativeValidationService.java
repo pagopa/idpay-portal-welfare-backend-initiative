@@ -19,4 +19,7 @@ public interface InitiativeValidationService {
     void checkRewardRuleAbsolute(Initiative initiative);
     void checkRefundRuleDiscountInitiative(String initiativeRewardType, InitiativeRefundRule refundRule);
     void checkBeneficiaryTypeAndFamilyUnit(Initiative initiative);
+    void checkStartDateAndEndDate(Initiative initiative);
+    void checkFieldYearLengthAndValues(List<AutomatedCriteria> initiativeBeneficiaryRuleModel);
+    void checkReward(Initiative initiative);
 }

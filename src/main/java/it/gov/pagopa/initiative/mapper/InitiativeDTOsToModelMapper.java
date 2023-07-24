@@ -1,7 +1,5 @@
 package it.gov.pagopa.initiative.mapper;
 
-import it.gov.pagopa.initiative.constants.InitiativeConstants;
-import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.rule.refund.AccumulatedAmountDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
@@ -11,7 +9,6 @@ import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardGroupsDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardValueDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.*;
-import it.gov.pagopa.initiative.exception.InitiativeException;
 import it.gov.pagopa.initiative.model.TypeMultiEnum;
 import it.gov.pagopa.initiative.model.*;
 import it.gov.pagopa.initiative.model.rule.refund.AccumulatedAmount;
@@ -25,7 +22,6 @@ import it.gov.pagopa.initiative.model.rule.trx.*;
 import it.gov.pagopa.initiative.service.AESTokenService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -163,7 +159,6 @@ public class InitiativeDTOsToModelMapper {
         }
         InitiativeRewardRule ret;
         if(rewardRuleDTO instanceof RewardValueDTO rewardValueInput){
-            checkReward(rewardValueInput);
             ret = RewardValue.builder()
                     .type(rewardValueInput.getType())
                     .rewardValueType(RewardValue.RewardValueTypeEnum.valueOf(rewardValueInput.getRewardValueType().name()))
@@ -179,12 +174,6 @@ public class InitiativeDTOsToModelMapper {
             throw new IllegalArgumentException("Initiative Reward Rule not handled: %s".formatted(rewardRuleDTO.getClass().getName()));
         }
         return ret;
-    }
-
-    private void checkReward(RewardValueDTO rewardValueInput) {
-        if(rewardValueInput.getRewardValueType().equals(RewardValueDTO.RewardValueTypeEnum.PERCENTAGE) && rewardValueInput.getRewardValue().intValue()>100){
-            throw new InitiativeException(InitiativeConstants.Exception.BadRequest.CODE, BadRequest.REWARD_TYPE, HttpStatus.BAD_REQUEST);
-        }
     }
 
     private InitiativeTrxConditions toInitiativeTrxRule(InitiativeTrxConditionsDTO trxRulesDTO) {

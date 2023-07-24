@@ -118,15 +118,16 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     @Override
     public InitiativeDetailDTO getInitiativeBeneficiaryDetail(String initiativeId, Locale acceptLanguage) {
 
-        Initiative initiativeDetail = initiativeRepository.findByInitiativeIdAndStatusIn(initiativeId, List.of(Status.PUBLISHED,Status.CLOSED)).orElseThrow(() -> new InitiativeException(
+        Initiative initiativeDetail = initiativeRepository.findByInitiativeIdAndStatusIn(initiativeId, List.of(Status.PUBLISHED, Status.CLOSED)).orElseThrow(() -> new InitiativeException(
                 InitiativeConstants.Exception.NotFound.CODE,
                 String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
                 HttpStatus.NOT_FOUND));
 
 
-        return initiativeModelToDTOMapper.toInitiativeDetailDTO(initiativeDetail,acceptLanguage);
+        return initiativeModelToDTOMapper.toInitiativeDetailDTO(initiativeDetail, acceptLanguage);
 
     }
+
     @Override
     public Initiative insertInitiative(Initiative initiative, String organizationId, String organizationName, String role) {
         long startTime = System.currentTimeMillis();
@@ -162,12 +163,16 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     }
 
     @Override
-    public void updateInitiativeGeneralInfo(String organizationId, String initiativeId, Initiative initiativeInfoModel, String role) {
+    public void updateInitiativeGeneralInfo(String organizationId, String initiativeId, Initiative initiativeInfoModel, String role, boolean isDraft) {
         long startTime = System.currentTimeMillis();
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
 
         isInitiativeAllowedToBeEditableThenThrows(initiative);
-        initiativeValidationService.checkBeneficiaryTypeAndFamilyUnit(initiativeInfoModel);
+
+        if (!isDraft) {
+            initiativeValidationService.checkBeneficiaryTypeAndFamilyUnit(initiativeInfoModel);
+            initiativeValidationService.checkStartDateAndEndDate(initiativeInfoModel);
+        }
         initiative.setGeneral(initiativeInfoModel.getGeneral());
         if (!initiative.getAdditionalInfo().getServiceName().equals(initiative.getInitiativeName())) {
             initiative.setInitiativeName(initiative.getAdditionalInfo().getServiceName());
@@ -184,7 +189,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
         isInitiativeAllowedToBeEditableThenThrows(initiative);
         InitiativeAdditional infoOriginal = initiative.getAdditionalInfo();
-        InitiativeAdditional infoNew =  initiativeAdditionalInfo.getAdditionalInfo();
+        InitiativeAdditional infoNew = initiativeAdditionalInfo.getAdditionalInfo();
         BeanUtils.copyProperties(infoNew, infoOriginal, "logoFileName", "logoUploadDate", "serviceId", "primaryTokenIO", "secondaryTokenIO");
         initiative.setInitiativeName(infoNew.getServiceName());
         initiative.setStatus(InitiativeConstants.Status.DRAFT);
@@ -194,11 +199,14 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     }
 
     @Override
-    public void updateStep3InitiativeBeneficiary(String organizationId, String initiativeId, InitiativeBeneficiaryRule initiativeBeneficiaryRuleModel, String role){
+    public void updateStep3InitiativeBeneficiary(String organizationId, String initiativeId, InitiativeBeneficiaryRule initiativeBeneficiaryRuleModel, String role, boolean isDraft) {
         long startTime = System.currentTimeMillis();
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
         List<AutomatedCriteria> automatedCriteriaList = initiativeBeneficiaryRuleModel.getAutomatedCriteria();
-        initiativeValidationService.checkAutomatedCriteria(initiative, automatedCriteriaList);
+        if (!isDraft) {
+            initiativeValidationService.checkFieldYearLengthAndValues(automatedCriteriaList);
+            initiativeValidationService.checkAutomatedCriteria(initiative, automatedCriteriaList);
+        }
         //Check Initiative Status
         isInitiativeAllowedToBeEditableThenThrows(initiative);
         initiative.setBeneficiaryRule(initiativeBeneficiaryRuleModel);
@@ -209,10 +217,13 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     }
 
     @Override
-    public void updateTrxAndRewardRules(String organizationId, String initiativeId, Initiative rewardAndTrxRules, String role) {
+    public void updateTrxAndRewardRules(String organizationId, String initiativeId, Initiative rewardAndTrxRules, String role, boolean isDraft) {
         long startTime = System.currentTimeMillis();
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
-        initiativeValidationService.checkRewardRuleAbsolute(initiative);
+        if (!isDraft) {
+            initiativeValidationService.checkReward(rewardAndTrxRules);
+            initiativeValidationService.checkRewardRuleAbsolute(rewardAndTrxRules);
+        }
         //Check Initiative Status
         isInitiativeAllowedToBeEditableThenThrows(initiative);
         initiative.setTrxRule(rewardAndTrxRules.getTrxRule());
@@ -229,12 +240,11 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     public void updateInitiativeRefundRules(String organizationId, String initiativeId, String role, Initiative refundRule, boolean changeInitiativeStatus) {
         long startTime = System.currentTimeMillis();
         Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
-        initiativeValidationService.checkRefundRuleDiscountInitiative(initiative.getInitiativeRewardType().name(), refundRule.getRefundRule());
         //Check Initiative Status
         isInitiativeAllowedToBeEditableThenThrows(initiative);
-        initiative.setRefundRule(refundRule.getRefundRule());
         log.info("[UPDATE_REFUND_RULE] - Initiative: {}. Refund rules successfully set.", initiativeId);
         if (changeInitiativeStatus) {
+            initiativeValidationService.checkRefundRuleDiscountInitiative(initiative.getInitiativeRewardType().name(), refundRule.getRefundRule());
             //Insert [All Steps validation -> validateAllWizardSteps with @Validated(value = ValidationOnGroup.class)]
             //Move this validation in [All Steps validation -> .validateAllWizardSteps()]
             if (initiative.getGeneral().getDescriptionMap().get(Locale.ITALIAN.getLanguage()) == null) {
@@ -247,16 +257,16 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                         HttpStatus.BAD_REQUEST);
             }
             initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
-            auditUtilities.logInitiativeInRevision(this.getUserId(),initiativeId, organizationId);
-            if(Boolean.TRUE.equals(initiative.getGeneral().getBeneficiaryKnown())) {
+            auditUtilities.logInitiativeInRevision(this.getUserId(), initiativeId, organizationId);
+            if (Boolean.TRUE.equals(initiative.getGeneral().getBeneficiaryKnown())) {
                 groupRestConnector.setGroupStatusToValidated(initiativeId);
             }
             log.info("[UPDATE_TO_IN_REVISION_STATUS] - Initiative: {}. Status successfully set to IN_REVISION.", initiativeId);
-        }
-        else{
+        } else {
             initiative.setStatus(InitiativeConstants.Status.DRAFT);
             auditUtilities.logEditInitiative(this.getUserId(), initiativeId, organizationId);
         }
+        initiative.setRefundRule(refundRule.getRefundRule());
         this.initiativeRepository.save(initiative);
         if (changeInitiativeStatus) {
             this.sendEmailToPagoPA(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
@@ -266,7 +276,6 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     }
 
 
-
     @Override
     public void updateInitiativeApprovedStatus(String organizationId, String initiativeId, String role) {
         long startTime = System.currentTimeMillis();
@@ -274,7 +283,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         isInitiativeStatusNotInRevisionThenThrow(initiative, InitiativeConstants.Status.APPROVED);
         initiative.setStatus(InitiativeConstants.Status.APPROVED);
         this.initiativeRepository.save(initiative);
-        auditUtilities.logInitiativeApproved(this.getUserId(),initiativeId, organizationId);
+        auditUtilities.logInitiativeApproved(this.getUserId(), initiativeId, organizationId);
         log.info("[UPDATE_TO_APPROVED_STATUS] - Initiative: {}. Status successfully changed", initiative.getInitiativeId());
         this.sendEmailToCurrentOrg(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
         performanceLog(startTime, "UPDATE_INITIATIVE_APPROVED");
@@ -549,7 +558,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
     @Override
     public BeneficiaryRankingPageDTO getRankingList(String organizationId, String initiativeId,
-            Pageable pageable, String beneficiary, String state) {
+                                                    Pageable pageable, String beneficiary, String state) {
         log.info("start get ranking, initiative: " + initiativeId);
         Initiative initiative = initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(
                         organizationId, initiativeId, true)
@@ -559,7 +568,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                                 InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE,
                                 initiativeId),
                         HttpStatus.NOT_FOUND));
-        if(initiative.getGeneral() != null && !initiative.getGeneral().getRankingEnabled()){
+        if (initiative.getGeneral() != null && !initiative.getGeneral().getRankingEnabled()) {
             throw new InitiativeException(
                     InternalServerError.CODE,
                     InternalServerError.NO_RANKING,
@@ -580,7 +589,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         }
         RankingPageDTO rankingPageDTO = new RankingPageDTO();
         try {
-            rankingPageDTO = rankingRestConnector.getRankingList(organizationId,initiativeId,pageable,state,userId);
+            rankingPageDTO = rankingRestConnector.getRankingList(organizationId, initiativeId, pageable, state, userId);
             log.info("response ranking: " + rankingPageDTO);
         } catch (Exception e) {
             auditUtilities.logInitiativeError(this.getUserId(), initiativeId, organizationId, "request for ranking list failed");
@@ -608,7 +617,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         auditUtilities.logDetailUser(this.getUserId(), initiativeId, organizationId);
         return new BeneficiaryRankingPageDTO(beneficiaryRankingDTOS, rankingPageDTO.getPageNumber(),
                 rankingPageDTO.getPageSize(), rankingPageDTO.getTotalElements(),
-                rankingPageDTO.getTotalPages(), rankingPageDTO.getRankingStatus(), rankingPageDTO.getRankingPublishedTimestamp(),rankingPageDTO.getRankingGeneratedTimestamp(),rankingPageDTO.getTotalEligibleOk(),rankingPageDTO.getTotalEligibleKo(),rankingPageDTO.getTotalOnboardingKo(),
+                rankingPageDTO.getTotalPages(), rankingPageDTO.getRankingStatus(), rankingPageDTO.getRankingPublishedTimestamp(), rankingPageDTO.getRankingGeneratedTimestamp(), rankingPageDTO.getTotalEligibleOk(), rankingPageDTO.getTotalEligibleKo(), rankingPageDTO.getTotalOnboardingKo(),
                 rankingPageDTO.getRankingFilePath());
     }
 
@@ -627,11 +636,11 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         }
     }
 
-    private String getUserId(){
+    private String getUserId() {
         String userId = null;
-        if(RequestContextHolder.getRequestAttributes()!=null) {
+        if (RequestContextHolder.getRequestAttributes() != null) {
             RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-            if(requestAttributes != null) {
+            if (requestAttributes != null) {
                 userId = (String) requestAttributes.getAttribute("organizationUserId",
                         RequestAttributes.SCOPE_REQUEST);
             }
@@ -639,7 +648,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         return userId;
     }
 
-    private void performanceLog(long startTime, String service){
+    private void performanceLog(long startTime, String service) {
         log.info(
                 "[PERFORMANCE_LOG] [{}] Time occurred to perform business logic: {} ms",
                 service,

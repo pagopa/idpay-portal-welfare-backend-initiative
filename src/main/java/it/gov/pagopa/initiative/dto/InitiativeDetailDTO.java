@@ -19,9 +19,10 @@ public class InitiativeDetailDTO {
     private String status;
     private String description;
     private String ruleDescription;
-    private LocalDate endDate;
-    private LocalDate rankingStartDate;
-    private LocalDate rankingEndDate;
+    private LocalDate onboardingStartDate;
+    private LocalDate onboardingEndDate;
+    private LocalDate fruitionStartDate;
+    private LocalDate fruitionEndDate;
     private InitiativeRewardRuleDTO rewardRule;
     private InitiativeRefundRuleDTO refundRule;
     private String privacyLink;
