@@ -84,7 +84,6 @@ microservice-chart:
     FEIGN_CLIENT_CONFIG_IO_LOG_LEVEL: basic
     SELC_UID: idpay
     BLOB_STORAGE_CONTAINER_REFERENCE: logo
-    INITIATIVE_LOGO_URL: "https://cstardweuidpayidpaycdnsa.blob.core.windows.net/$web/assets/logo/"
     RANKING_GRACE_PERIOD: "10"
 
   envConfigMapExternals:
