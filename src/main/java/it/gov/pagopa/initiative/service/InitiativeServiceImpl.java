@@ -69,6 +69,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     private final InitiativeModelToDTOMapper initiativeModelToDTOMapper;
 
     private static final String DELETE_INITIATIVE_SERVICE = "DELETE_INITIATIVE";
+    private static final String DELETE_INITIATIVE_OPERATION_TYPE = "DELETE_INITIATIVE";
 
     public InitiativeServiceImpl(
             @Value("${app.initiative.conditions.notifyEmail}") boolean notifyEmail,
@@ -641,7 +642,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
         QueueCommandOperationDTO deleteInitiativeCommand = QueueCommandOperationDTO.builder()
                 .operationId(initiativeId)
-                .operationType("DELETE_INITIATIVE")
+                .operationType(DELETE_INITIATIVE_OPERATION_TYPE)
                 .operationTime(LocalDateTime.now())
                 .build();
         if(!commandProducer.sendCommand(deleteInitiativeCommand)){
