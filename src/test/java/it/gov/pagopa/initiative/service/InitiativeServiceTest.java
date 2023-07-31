@@ -1505,48 +1505,61 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void deleteInitiative_sendCommandError() {
+    void deleteInitiative_initiativeNotFound() {
+        when(initiativeRepository.findById(any()))
+                .thenReturn(Optional.empty());
+
+        try {
+            initiativeService.deleteInitiative(INITIATIVE_ID);
+            Assertions.fail();
+        } catch (InitiativeException e) {
+            assertEquals(InitiativeConstants.Exception.NotFound.CODE,e.getCode());
+            assertEquals(String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID), e.getMessage());
+            assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
+        }
+
+        verify(initiativeRepository, times(1)).findById(INITIATIVE_ID);
+    }
+
+    @Test
+    void deleteInitiative_sendMessageOnCommandQueueError() {
+        Optional<Initiative> foundInitiative = Optional.of(createFullInitiative());
+        foundInitiative.get().setInitiativeId(INITIATIVE_ID);
+        when(initiativeRepository.findById(any()))
+                .thenReturn(Optional.of(createFullInitiative()));
         when(commandProducer.sendCommand(any()))
                 .thenReturn(false);
 
         try {
             initiativeService.deleteInitiative(INITIATIVE_ID);
             Assertions.fail();
-        } catch (IllegalStateException e) {
-            assertEquals("[DELETE_INITIATIVE] - Something went wrong while sendind message on Commands Queue",e.getMessage());
+        } catch (InitiativeException e) {
+            assertEquals(InitiativeConstants.Exception.Publish.InternalServerError.CODE, e.getCode());
+            assertEquals(String.format(InitiativeConstants.Exception.Publish.InternalServerError.COMMANDS_QUEUE, INITIATIVE_ID), e.getMessage());
+            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, e.getHttpStatus());
         }
 
         verify(commandProducer, times(1)).sendCommand(any());
+        verify(initiativeRepository, times(1)).findById(INITIATIVE_ID);
     }
 
 
     @Test
     void deleteInitiative() {
-        Initiative deletedInitiative = createStep5Initiative();
-
+        Optional<Initiative> foundInitiative = Optional.of(createFullInitiative());
+        foundInitiative.get().setInitiativeId(INITIATIVE_ID);
+        when(initiativeRepository.findById(any()))
+                .thenReturn(Optional.of(createFullInitiative()));
         when(commandProducer.sendCommand(any()))
                 .thenReturn(true);
-        when(initiativeRepository.deleteByInitiativeId(any()))
-                .thenReturn(deletedInitiative);
 
         initiativeService.deleteInitiative(INITIATIVE_ID);
 
+        verify(initiativeRepository, times(1)).findById(INITIATIVE_ID);
         verify(commandProducer, times(1)).sendCommand(any());
-        verify(initiativeRepository, times(1)).deleteByInitiativeId(INITIATIVE_ID);
+        verify(initiativeRepository, times(1)).deleteById(INITIATIVE_ID);
     }
 
-    @Test
-    void deleteInitiative_nullDeletedInitiative() {
-        when(commandProducer.sendCommand(any()))
-                .thenReturn(true);
-        when(initiativeRepository.deleteByInitiativeId(any()))
-                .thenReturn(null);
-
-        initiativeService.deleteInitiative(INITIATIVE_ID);
-
-        verify(commandProducer, times(1)).sendCommand(any());
-        verify(initiativeRepository, times(1)).deleteByInitiativeId(INITIATIVE_ID);
-    }
 
     private ServiceResponseErrorDTO createServiceResponseErrorDTO(int httpStatus) {
         return ServiceResponseErrorDTO.builder()

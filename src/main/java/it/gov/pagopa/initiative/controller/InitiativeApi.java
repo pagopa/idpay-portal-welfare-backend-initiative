@@ -442,12 +442,10 @@ public interface InitiativeApi {
   ResponseEntity<InitiativeDetailDTO> getInitiativeBeneficiaryDetail(
           @PathVariable("initiativeId") String initiativeId,@RequestHeader(value = "Accept-Language", defaultValue = "it_IT") Locale acceptLanguage);
 
-  @Operation(summary = "Delete of an initiative ", description = "", security = {
-          @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
+  @Operation(summary = "Delete of an initiative ", description = "")
   @ApiResponses(value = {
           @ApiResponse(responseCode = "204", description = "No Content"),
           @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
-          @ApiResponse(responseCode = "401", description = "Authentication failed", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
           @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
           @ApiResponse(responseCode = "404", description = "Initiative ID not found or already deleted", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
           @ApiResponse(responseCode = "429", description = "Too many Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
