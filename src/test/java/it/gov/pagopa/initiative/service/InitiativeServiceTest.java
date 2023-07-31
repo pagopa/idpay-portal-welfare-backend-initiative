@@ -23,6 +23,7 @@ import it.gov.pagopa.initiative.dto.io.service.ServiceResponseErrorDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardGroupsDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.*;
+import it.gov.pagopa.initiative.event.CommandProducer;
 import it.gov.pagopa.initiative.event.InitiativeProducer;
 import it.gov.pagopa.initiative.exception.InitiativeException;
 import it.gov.pagopa.initiative.mapper.InitiativeAdditionalDTOsToIOServiceRequestDTOMapper;
@@ -160,6 +161,9 @@ class InitiativeServiceTest {
 
     @MockBean
     InitiativeUtils initiativeUtils;
+
+    @MockBean
+    CommandProducer commandProducer;
 
 
     @ParameterizedTest
@@ -1498,6 +1502,50 @@ class InitiativeServiceTest {
         } catch (InitiativeException e) {
             assertEquals(InternalServerError.CODE,e.getCode());
         }
+    }
+
+    @Test
+    void deleteInitiative_sendCommandError() {
+        when(commandProducer.sendCommand(any()))
+                .thenReturn(false);
+
+        try {
+            initiativeService.deleteInitiative(INITIATIVE_ID);
+            Assertions.fail();
+        } catch (IllegalStateException e) {
+            assertEquals("[DELETE_INITIATIVE] - Something went wrong while sendind message on Commands Queue",e.getMessage());
+        }
+
+        verify(commandProducer, times(1)).sendCommand(any());
+    }
+
+
+    @Test
+    void deleteInitiative() {
+        Initiative deletedInitiative = createStep5Initiative();
+
+        when(commandProducer.sendCommand(any()))
+                .thenReturn(true);
+        when(initiativeRepository.deleteByInitiativeId(any()))
+                .thenReturn(deletedInitiative);
+
+        initiativeService.deleteInitiative(INITIATIVE_ID);
+
+        verify(commandProducer, times(1)).sendCommand(any());
+        verify(initiativeRepository, times(1)).deleteByInitiativeId(INITIATIVE_ID);
+    }
+
+    @Test
+    void deleteInitiative_nullDeletedInitiative() {
+        when(commandProducer.sendCommand(any()))
+                .thenReturn(true);
+        when(initiativeRepository.deleteByInitiativeId(any()))
+                .thenReturn(null);
+
+        initiativeService.deleteInitiative(INITIATIVE_ID);
+
+        verify(commandProducer, times(1)).sendCommand(any());
+        verify(initiativeRepository, times(1)).deleteByInitiativeId(INITIATIVE_ID);
     }
 
     private ServiceResponseErrorDTO createServiceResponseErrorDTO(int httpStatus) {

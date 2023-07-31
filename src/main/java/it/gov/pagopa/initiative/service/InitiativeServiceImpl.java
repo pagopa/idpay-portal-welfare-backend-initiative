@@ -15,6 +15,7 @@ import it.gov.pagopa.initiative.constants.InitiativeConstants.Status;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceResponseDTO;
+import it.gov.pagopa.initiative.event.CommandProducer;
 import it.gov.pagopa.initiative.event.InitiativeProducer;
 import it.gov.pagopa.initiative.exception.InitiativeException;
 import it.gov.pagopa.initiative.mapper.InitiativeAdditionalDTOsToIOServiceRequestDTOMapper;
@@ -51,6 +52,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     private final InitiativeRepository initiativeRepository;
     private final InitiativeAdditionalDTOsToIOServiceRequestDTOMapper initiativeAdditionalDTOsToIOServiceRequestDTOMapper;
     private final InitiativeProducer initiativeProducer;
+    private final CommandProducer commandProducer;
     private final IOBackEndRestConnector ioBackEndRestConnector;
     private final GroupRestConnector groupRestConnector;
     private final OnboardingRestConnector onboardingRestConnector;
@@ -81,7 +83,9 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             AESTokenService ioTokenService,
             InitiativeValidationService initiativeValidationService,
             InitiativeUtils initiativeUtils,
-            AuditUtilities auditUtilities, InitiativeModelToDTOMapper initiativeModelToDTOMapper){
+            AuditUtilities auditUtilities,
+            InitiativeModelToDTOMapper initiativeModelToDTOMapper,
+            CommandProducer commandProducer){
         this.notifyEmail = notifyEmail;
         this.initiativeRepository = initiativeRepository;
         this.initiativeProducer = initiativeProducer;
@@ -99,6 +103,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         this.initiativeUtils = initiativeUtils;
         this.auditUtilities = auditUtilities;
         this.initiativeModelToDTOMapper = initiativeModelToDTOMapper;
+        this.commandProducer = commandProducer;
     }
 
     public List<Initiative> retrieveInitiativeSummary(String organizationId, String role) {
@@ -619,6 +624,33 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                 rankingPageDTO.getPageSize(), rankingPageDTO.getTotalElements(),
                 rankingPageDTO.getTotalPages(), rankingPageDTO.getRankingStatus(), rankingPageDTO.getRankingPublishedTimestamp(), rankingPageDTO.getRankingGeneratedTimestamp(), rankingPageDTO.getTotalEligibleOk(), rankingPageDTO.getTotalEligibleKo(), rankingPageDTO.getTotalOnboardingKo(),
                 rankingPageDTO.getRankingFilePath());
+    }
+
+    @Override
+    public void deleteInitiative(String initiativeId){
+        long startTime = System.currentTimeMillis();
+
+        QueueCommandOperationDTO deleteInitiativeCommand = QueueCommandOperationDTO.builder()
+                .operationId(initiativeId)
+                .operationType("DELETE_INITIATIVE")
+                .operationTime(LocalDateTime.now())
+                .build();
+
+        if(!commandProducer.sendCommand(deleteInitiativeCommand)){
+            log.error("[DELETE_INITIATIVE] - Initiative: {}. Something went wrong while sending message on Commands Queue", initiativeId);
+            throw new IllegalStateException("[DELETE_INITIATIVE] - Something went wrong while sendind message on Commands Queue");
+        }
+
+        Initiative deletedInitiative = initiativeRepository.deleteByInitiativeId(initiativeId);
+
+        if(deletedInitiative != null){
+            log.info("[DELETE INITIATIVE] Deleted initiative with initiativeId {}", initiativeId);
+            auditUtilities.logDeletedInitiative(initiativeId);
+        } else {
+            log.info("[DELETE INITIATIVE] Initiative with initiativeId {} was not found.", initiativeId);
+        }
+
+        performanceLog(startTime, "DELETE_INITIATIVE");
     }
 
     public void validate(String contentType, String fileName) {

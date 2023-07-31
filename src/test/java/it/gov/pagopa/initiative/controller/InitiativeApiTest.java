@@ -121,6 +121,7 @@ class InitiativeApiTest {
     private static final String LOGICALLY_DELETE_INITIATIVE_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER;
     //    private static final String ROLE = "TEST_ROLE";
     private static final String GET_INITIATIVE_BENEFICIARY_DETAIL_URL = "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/detail";
+    private static final String DELETE_INITIATIVE_URL = "/initiative/" + INITIATIVE_ID_PLACEHOLDER;
     private static final String ORGANIZATION_NAME = "organizationName";
     private static final String ORGANIZATION_VAT = "organizationVat";
     public static final String API_KEY_CLIENT_ID = "apiKeyClientId";
@@ -1026,6 +1027,21 @@ class InitiativeApiTest {
                         MockMvcRequestBuilders.get(BASE_URL + String.format(GET_INITIATIVE_BENEFICIARY_DETAIL_URL, INITIATIVE_ID))
                                 .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    void deleteInitiative() throws Exception {
+        // When
+        // With this instruction, I instruct the service (via Mockito's when) to always return the DummyInitiative to me anytime I call the same service's function
+        doNothing().when(initiativeService).deleteInitiative(any());
+
+        //The MVC perform should perform the API by returning the response based on the Service previously mocked.
+        mvc.perform(
+                        MockMvcRequestBuilders.delete(BASE_URL + String.format(DELETE_INITIATIVE_URL, INITIATIVE_ID))
+                                .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isNoContent())
                 .andDo(print())
                 .andReturn();
     }
