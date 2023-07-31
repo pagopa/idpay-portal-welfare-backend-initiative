@@ -68,6 +68,8 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
     private final InitiativeModelToDTOMapper initiativeModelToDTOMapper;
 
+    private static final String DELETE_INITIATIVE_SERVICE = "DELETE_INITIATIVE";
+
     public InitiativeServiceImpl(
             @Value("${app.initiative.conditions.notifyEmail}") boolean notifyEmail,
             InitiativeRepository initiativeRepository,
@@ -315,7 +317,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                 InitiativeConstants.Status.CLOSED, InitiativeConstants.Status.SUSPENDED).contains(initiative.getStatus())) {
             log.error("[LOGICAL_DELETE_INITIATIVE] - Initiative: {}. Cannot be deleted. Current status is {}.", initiative.getInitiativeId(), initiative.getStatus());
             auditUtilities.logInitiativeError(this.getUserId(), initiativeId, organizationId, "initiative cannot be deleted");
-            performanceLog(startTime, "DELETE_INITIATIVE");
+            performanceLog(startTime, DELETE_INITIATIVE_SERVICE);
             throw new InitiativeException(
                     InitiativeConstants.Exception.BadRequest.CODE,
                     String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_CANNOT_BE_DELETED, initiativeId),
@@ -328,7 +330,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             log.info("[LOGICAL_DELETE_INITIATIVE] - Initiative: {}. Successfully logical elimination.", initiative.getInitiativeId());
         }
         this.sendEmailToPagoPA(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
-        performanceLog(startTime, "DELETE_INITIATIVE");
+        performanceLog(startTime, DELETE_INITIATIVE_SERVICE);
     }
 
     @Override
@@ -630,10 +632,12 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     public void deleteInitiative(String initiativeId){
         long startTime = System.currentTimeMillis();
 
-        initiativeRepository.findById(initiativeId)
-                .orElseThrow(()->new InitiativeException(InitiativeConstants.Exception.NotFound.CODE,
-                        String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
-                        HttpStatus.NOT_FOUND));
+        Optional<Initiative> foundInitiative = initiativeRepository.findById(initiativeId);
+        if(foundInitiative.isEmpty()){
+            throw new InitiativeException(InitiativeConstants.Exception.NotFound.CODE,
+                    String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
+                    HttpStatus.NOT_FOUND);
+        }
 
         QueueCommandOperationDTO deleteInitiativeCommand = QueueCommandOperationDTO.builder()
                 .operationId(initiativeId)
@@ -651,7 +655,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         log.info("[DELETE INITIATIVE] Deleted initiative with initiativeId {}", initiativeId);
         auditUtilities.logDeletedInitiative(initiativeId);
 
-        performanceLog(startTime, "DELETE_INITIATIVE");
+        performanceLog(startTime, DELETE_INITIATIVE_SERVICE);
     }
 
     public void validate(String contentType, String fileName) {
