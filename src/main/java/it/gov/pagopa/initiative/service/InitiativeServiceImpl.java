@@ -15,7 +15,7 @@ import it.gov.pagopa.initiative.constants.InitiativeConstants.Status;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceResponseDTO;
-import it.gov.pagopa.initiative.event.CommandProducer;
+import it.gov.pagopa.initiative.event.CommandsProducer;
 import it.gov.pagopa.initiative.event.InitiativeProducer;
 import it.gov.pagopa.initiative.exception.InitiativeException;
 import it.gov.pagopa.initiative.mapper.InitiativeAdditionalDTOsToIOServiceRequestDTOMapper;
@@ -52,7 +52,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     private final InitiativeRepository initiativeRepository;
     private final InitiativeAdditionalDTOsToIOServiceRequestDTOMapper initiativeAdditionalDTOsToIOServiceRequestDTOMapper;
     private final InitiativeProducer initiativeProducer;
-    private final CommandProducer commandProducer;
+    private final CommandsProducer commandsProducer;
     private final IOBackEndRestConnector ioBackEndRestConnector;
     private final GroupRestConnector groupRestConnector;
     private final OnboardingRestConnector onboardingRestConnector;
@@ -88,7 +88,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             InitiativeUtils initiativeUtils,
             AuditUtilities auditUtilities,
             InitiativeModelToDTOMapper initiativeModelToDTOMapper,
-            CommandProducer commandProducer){
+            CommandsProducer commandsProducer){
         this.notifyEmail = notifyEmail;
         this.initiativeRepository = initiativeRepository;
         this.initiativeProducer = initiativeProducer;
@@ -106,7 +106,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         this.initiativeUtils = initiativeUtils;
         this.auditUtilities = auditUtilities;
         this.initiativeModelToDTOMapper = initiativeModelToDTOMapper;
-        this.commandProducer = commandProducer;
+        this.commandsProducer = commandsProducer;
     }
 
     public List<Initiative> retrieveInitiativeSummary(String organizationId, String role) {
@@ -646,7 +646,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                 .operationType(DELETE_INITIATIVE_OPERATION_TYPE)
                 .operationTime(LocalDateTime.now())
                 .build();
-        if(!commandProducer.sendCommand(deleteInitiativeCommand)){
+        if(!commandsProducer.sendCommand(deleteInitiativeCommand)){
             log.error("[DELETE_INITIATIVE] - Initiative: {}. Something went wrong while sending the message on Commands Queue", initiativeId);
             throw new InitiativeException(InitiativeConstants.Exception.Publish.InternalServerError.CODE,
                     String.format(InitiativeConstants.Exception.Publish.InternalServerError.COMMANDS_QUEUE, deleteInitiativeCommand.getOperationId()),

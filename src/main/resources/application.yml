@@ -33,7 +33,7 @@ spring:
             spring.cloud.stream.kafka.binder:
               configuration:
                 sasl.jaas.config: ${KAFKA_INITIATIVE_SASL_JAAS_CONFIG:}
-        kafka-command-outcome:
+        kafka-commands-outcome:
           type: kafka
           environment:
             spring.cloud.stream.kafka.binder:
@@ -44,8 +44,8 @@ spring:
           binder: kafka-initiative-outcome
           destination: ${KAFKA_INITIATIVE_OUTCOME_TOPIC:idpay-rule-update}
           content-type: ${KAFKA_CONTENT_TYPE:application/json}
-        commandQueue-out-0:
-          binder: kafka-command-outcome
+        commandsQueue-out-0:
+          binder: kafka-commands-outcome
           destination: ${KAFKA_COMMANDS_OUTCOME_TOPIC:idpay-commands}
           content-type: ${KAFKA_CONTENT_TYPE:application/json}
       kafka:
@@ -71,7 +71,7 @@ spring:
                 linger.ms: ${KAFKA_INITIATIVE_PRODUCER_CONFIG_LINGER_MS:${KAFKA_LINGER_MS:2}}
                 batch.size: ${KAFKA_INITIATIVE_PRODUCER_CONFIG_BATCH_SIZE:${KAFKA_BATCH_SIZE:16384}}
                 metadata.max.idle.ms: ${KAFKA_INITIATIVE_PRODUCER_DEFAULT_METADATA_MAX_IDLE_MS:180000}
-          commandQueue-out-0:
+          commandsQueue-out-0:
             producer:
               configuration:
                 client.id: commandsQueue-producer

@@ -23,7 +23,7 @@ import it.gov.pagopa.initiative.dto.io.service.ServiceResponseErrorDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardGroupsDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.*;
-import it.gov.pagopa.initiative.event.CommandProducer;
+import it.gov.pagopa.initiative.event.CommandsProducer;
 import it.gov.pagopa.initiative.event.InitiativeProducer;
 import it.gov.pagopa.initiative.exception.InitiativeException;
 import it.gov.pagopa.initiative.mapper.InitiativeAdditionalDTOsToIOServiceRequestDTOMapper;
@@ -163,7 +163,7 @@ class InitiativeServiceTest {
     InitiativeUtils initiativeUtils;
 
     @MockBean
-    CommandProducer commandProducer;
+    CommandsProducer commandsProducer;
 
 
     @ParameterizedTest
@@ -1527,7 +1527,7 @@ class InitiativeServiceTest {
         foundInitiative.get().setInitiativeId(INITIATIVE_ID);
         when(initiativeRepository.findById(any()))
                 .thenReturn(Optional.of(createFullInitiative()));
-        when(commandProducer.sendCommand(any()))
+        when(commandsProducer.sendCommand(any()))
                 .thenReturn(false);
 
         try {
@@ -1539,7 +1539,7 @@ class InitiativeServiceTest {
             assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, e.getHttpStatus());
         }
 
-        verify(commandProducer, times(1)).sendCommand(any());
+        verify(commandsProducer, times(1)).sendCommand(any());
         verify(initiativeRepository, times(1)).findById(INITIATIVE_ID);
     }
 
@@ -1550,13 +1550,13 @@ class InitiativeServiceTest {
         foundInitiative.get().setInitiativeId(INITIATIVE_ID);
         when(initiativeRepository.findById(any()))
                 .thenReturn(Optional.of(createFullInitiative()));
-        when(commandProducer.sendCommand(any()))
+        when(commandsProducer.sendCommand(any()))
                 .thenReturn(true);
 
         initiativeService.deleteInitiative(INITIATIVE_ID);
 
         verify(initiativeRepository, times(1)).findById(INITIATIVE_ID);
-        verify(commandProducer, times(1)).sendCommand(any());
+        verify(commandsProducer, times(1)).sendCommand(any());
         verify(initiativeRepository, times(1)).deleteById(INITIATIVE_ID);
     }
 
