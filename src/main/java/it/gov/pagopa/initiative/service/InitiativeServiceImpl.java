@@ -635,6 +635,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
         Optional<Initiative> foundInitiative = initiativeRepository.findById(initiativeId);
         if(foundInitiative.isEmpty()){
+            log.error("[DELETE_INITIATIVE] - Initiative with initativeId {} was not found", initiativeId);
             throw new InitiativeException(InitiativeConstants.Exception.NotFound.CODE,
                     String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
                     HttpStatus.NOT_FOUND);
