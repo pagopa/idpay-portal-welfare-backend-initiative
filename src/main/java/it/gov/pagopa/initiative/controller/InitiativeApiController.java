@@ -339,6 +339,13 @@ public class InitiativeApiController implements InitiativeApi {
         return ResponseEntity.ok(this.initiativeService.getOnboardingStatusList(organizationId,initiativeId,beneficiary,dateFrom,dateTo,state,pageable));
     }
 
+    @Override
+    public ResponseEntity<Void> deleteInitiative(String initiativeId){
+        log.info("[DELETE_INITIATIVE] - Initiative: {}. Start processing...", initiativeId);
+        this.initiativeService.deleteInitiative(initiativeId);
+        return ResponseEntity.noContent().build();
+    }
+
     private void performanceLog(long startTime, String service){
         log.info(
                 "[PERFORMANCE_LOG] [{}] Time occurred to perform business logic: {} ms",
