@@ -649,7 +649,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         if(!commandsProducer.sendCommand(deleteInitiativeCommand)){
             log.error("[DELETE_INITIATIVE] - Initiative: {}. Something went wrong while sending the message on Commands Queue", initiativeId);
             throw new InitiativeException(InitiativeConstants.Exception.Publish.InternalServerError.CODE,
-                    String.format(InitiativeConstants.Exception.Publish.InternalServerError.COMMANDS_QUEUE, deleteInitiativeCommand.getEntityId()),
+                    String.format(InitiativeConstants.Exception.Publish.InternalServerError.COMMANDS_QUEUE, deleteInitiativeCommand.getEntityId(), deleteInitiativeCommand.getOperationType()),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
 

@@ -1535,7 +1535,7 @@ class InitiativeServiceTest {
             Assertions.fail();
         } catch (InitiativeException e) {
             assertEquals(InitiativeConstants.Exception.Publish.InternalServerError.CODE, e.getCode());
-            assertEquals(String.format(InitiativeConstants.Exception.Publish.InternalServerError.COMMANDS_QUEUE, INITIATIVE_ID), e.getMessage());
+            assertEquals(String.format(InitiativeConstants.Exception.Publish.InternalServerError.COMMANDS_QUEUE, INITIATIVE_ID, "DELETE_INITIATIVE"), e.getMessage());
             assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, e.getHttpStatus());
         }
 

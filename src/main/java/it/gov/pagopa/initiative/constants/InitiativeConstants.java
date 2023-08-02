@@ -103,7 +103,7 @@ public class InitiativeConstants {
             }
             public static final class InternalServerError{
                 public static final String CODE = PUBLISH_CODE + ".internal.server.error";
-                public static final String COMMANDS_QUEUE = "Something went wrong while sending the message with operationId %s on the Commands Queue";
+                public static final String COMMANDS_QUEUE = "Something went wrong while sending the message with entityId %s and operationType %s on the Commands Queue";
             }
 
         }
