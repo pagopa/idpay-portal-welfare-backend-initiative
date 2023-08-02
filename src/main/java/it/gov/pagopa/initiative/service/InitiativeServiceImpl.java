@@ -642,14 +642,14 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         }
 
         QueueCommandOperationDTO deleteInitiativeCommand = QueueCommandOperationDTO.builder()
-                .operationId(initiativeId)
+                .entityId(initiativeId)
                 .operationType(DELETE_INITIATIVE_OPERATION_TYPE)
                 .operationTime(LocalDateTime.now())
                 .build();
         if(!commandsProducer.sendCommand(deleteInitiativeCommand)){
             log.error("[DELETE_INITIATIVE] - Initiative: {}. Something went wrong while sending the message on Commands Queue", initiativeId);
             throw new InitiativeException(InitiativeConstants.Exception.Publish.InternalServerError.CODE,
-                    String.format(InitiativeConstants.Exception.Publish.InternalServerError.COMMANDS_QUEUE, deleteInitiativeCommand.getOperationId()),
+                    String.format(InitiativeConstants.Exception.Publish.InternalServerError.COMMANDS_QUEUE, deleteInitiativeCommand.getEntityId()),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
