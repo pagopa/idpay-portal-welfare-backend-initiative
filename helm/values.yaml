@@ -103,6 +103,7 @@ microservice-chart:
       KAFKA_INITIATIVE_SASL_MECHANISM: kafka_sasl_mechanism
       KAFKA_INITIATIVE_SECURITY_PROTOCOL: kafka_security_protocol
       KAFKA_INITIATIVE_OUTCOME_TOPIC: idpay_rule_update_topic
+      KAFKA_COMMANDS_OUTCOME_TOPIC: idpay_commands_topic
 
   envSecret:
     MONGODB_URI: mongodb-connection-string
