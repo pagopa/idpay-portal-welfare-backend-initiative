@@ -1,24 +1,22 @@
 package it.gov.pagopa.common.web.dto;
 
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
-/**
- * ErrorDTO
- */
-@JsonPropertyOrder({
-    it.gov.pagopa.common.web.dto.ErrorDTO.JSON_PROPERTY_CODE,
-    it.gov.pagopa.common.web.dto.ErrorDTO.JSON_PROPERTY_MESSAGE
-})
-@Data
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @AllArgsConstructor
+@NoArgsConstructor
+@Data
+@EqualsAndHashCode
 public class ErrorDTO {
 
-  public static final String JSON_PROPERTY_CODE = "code";
+  @NotBlank
   private String code;
-
-  public static final String JSON_PROPERTY_MESSAGE = "message";
+  @NotBlank
   private String message;
-
 }
