@@ -441,5 +441,17 @@ public interface InitiativeApi {
   @GetMapping(value = "/idpay/initiative/{initiativeId}/detail")
   ResponseEntity<InitiativeDetailDTO> getInitiativeBeneficiaryDetail(
           @PathVariable("initiativeId") String initiativeId,@RequestHeader(value = "Accept-Language", defaultValue = "it_IT") Locale acceptLanguage);
+
+  @Operation(summary = "Delete of an initiative ", description = "")
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "204", description = "No Content"),
+          @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+          @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+          @ApiResponse(responseCode = "404", description = "Initiative ID not found or already deleted", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+          @ApiResponse(responseCode = "429", description = "Too many Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+          @ApiResponse(responseCode = "500", description = "Server ERROR", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))})
+  @DeleteMapping(value = "/idpay/initiative/{initiativeId}")
+  ResponseEntity<Void> deleteInitiative(
+          @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId);
 }
 

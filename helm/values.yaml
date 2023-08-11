@@ -116,6 +116,7 @@ microservice-chart:
     PDV_ENCRYPT_API_KEY: pdv-api-key
     PDV_DECRYPT_API_KEY: pdv-api-key
     BLOB_STORAGE_CONNECTION_STRING: web-storage-connection-string
+    KAFKA_COMMANDS_SASL_JAAS_CONFIG: evh-idpay-commands-idpay-commands-producer-jaas-config-idpay-01
 
 
   # nodeSelector: {}
