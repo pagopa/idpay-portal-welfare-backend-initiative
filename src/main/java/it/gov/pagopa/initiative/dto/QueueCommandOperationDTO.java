@@ -12,5 +12,6 @@ public class QueueCommandOperationDTO {
     private String operationType;
     private String entityId;
     private LocalDateTime operationTime;
+    private String organizationId;
 
 }

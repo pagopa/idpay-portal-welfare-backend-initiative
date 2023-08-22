@@ -294,6 +294,8 @@ public class InitiativeApiController implements InitiativeApi {
             log.error("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Error at sending mails: {}", initiativeId, e.getMessage(), e);
         }
 
+        initiativeService.initializeStatistics(initiativeId, organizationId);
+
         performanceLog(startTime, "UPDATE_INITIATIVE_PUBLISHED");
         return ResponseEntity.noContent().build();
     }
