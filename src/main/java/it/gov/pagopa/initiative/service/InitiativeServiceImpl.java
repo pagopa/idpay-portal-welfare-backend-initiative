@@ -639,8 +639,6 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                 "63fdd546fea3f35a5644e735", "63fded4ffea3f35a5644e738"
         );
 
-        System.out.println(initiatives.size());
-
         /*if(foundInitiative.isEmpty()){
             log.error("[DELETE_INITIATIVE] - Initiative with initativeId {} was not found", initiativeId);
             throw new InitiativeException(InitiativeConstants.Exception.NotFound.CODE,
@@ -653,7 +651,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         for(Initiative initiative : initiatives){
             if(!saveInitiatives.contains(initiative.getInitiativeId())){
                 QueueCommandOperationDTO deleteInitiativeCommand = QueueCommandOperationDTO.builder()
-                        .entityId(initiativeId)
+                        .entityId(initiative.getInitiativeId())
                         .operationType(DELETE_INITIATIVE_OPERATION_TYPE)
                         .operationTime(LocalDateTime.now())
                         .build();
@@ -664,9 +662,9 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                             HttpStatus.INTERNAL_SERVER_ERROR);
                 }
 
-                initiativeRepository.deleteById(initiativeId);
-                log.info("[DELETE INITIATIVE] Deleted initiative with initiativeId {}", initiativeId);
-                auditUtilities.logDeletedInitiative(initiativeId);
+                initiativeRepository.deleteById(initiative.getInitiativeId());
+                log.info("[DELETE INITIATIVE] Deleted initiative with initiativeId {}", initiative.getInitiativeId());
+                auditUtilities.logDeletedInitiative(initiative.getInitiativeId());
             }
 
 
