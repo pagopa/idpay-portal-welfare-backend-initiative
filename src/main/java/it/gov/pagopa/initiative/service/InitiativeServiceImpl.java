@@ -633,42 +633,30 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     public void deleteInitiative(String initiativeId){
         long startTime = System.currentTimeMillis();
 
-        //Optional<Initiative> foundInitiative = initiativeRepository.findById(initiativeId);
-        List<Initiative> initiatives = initiativeRepository.findAll();
-        List<String> saveInitiatives = List.of(
-                "64cb5e54899aa86a62068151","6453c905044c9254c692d6a0","6454d405044c9254c692d6a1","6454d4b5044c9254c692d6a2","6454d53b044c9254c692d6a3","64184a81ba99a7279acbd5ca","643d01d7d57aaa0e7822b86e","6450e7c914051b1c28d5c1c5","645237fd14051b1c28d5c1c7","64536ee6044c9254c692d69c","6453828f044c9254c692d69d","6453a2c9044c9254c692d69e","6453ba5d044c9254c692d69f","646b1fc4fa987977739e2228","64bfd193648fb4497ebf8dec","649c50b5a03f655e6543af06","64b8ffc49079081e65ffa5ea","64b541839079081e65ffa5b6","6400abed5416301023ae4c9f","63ff1505fea3f35a5644e73a","6400a8ad5416301023ae4c9e","63ff3184ca344b69d5637c77","63fddde7fea3f35a5644e737","640f010ffbab65182af2deb2"
-        );
-
-        /*if(foundInitiative.isEmpty()){
+        Optional<Initiative> foundInitiative = initiativeRepository.findById(initiativeId);
+        if(foundInitiative.isEmpty()){
             log.error("[DELETE_INITIATIVE] - Initiative with initativeId {} was not found", initiativeId);
             throw new InitiativeException(InitiativeConstants.Exception.NotFound.CODE,
                     String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
                     HttpStatus.NOT_FOUND);
         }
-         */
 
-
-        for(Initiative initiative : initiatives){
-            if(!saveInitiatives.contains(initiative.getInitiativeId())){
-                QueueCommandOperationDTO deleteInitiativeCommand = QueueCommandOperationDTO.builder()
-                        .entityId(initiative.getInitiativeId())
-                        .operationType(DELETE_INITIATIVE_OPERATION_TYPE)
-                        .operationTime(LocalDateTime.now())
-                        .build();
-                if(!commandsProducer.sendCommand(deleteInitiativeCommand)){
-                    log.error("[DELETE_INITIATIVE] - Initiative: {}. Something went wrong while sending the message on Commands Queue", initiativeId);
-                    throw new InitiativeException(InitiativeConstants.Exception.Publish.InternalServerError.CODE,
-                            String.format(InitiativeConstants.Exception.Publish.InternalServerError.COMMANDS_QUEUE, deleteInitiativeCommand.getEntityId(), deleteInitiativeCommand.getOperationType()),
-                            HttpStatus.INTERNAL_SERVER_ERROR);
-                }
-
-                initiativeRepository.deleteById(initiative.getInitiativeId());
-                log.info("[DELETE INITIATIVE] Deleted initiative with initiativeId {}", initiative.getInitiativeId());
-                auditUtilities.logDeletedInitiative(initiative.getInitiativeId());
-            }
-
-
+        QueueCommandOperationDTO deleteInitiativeCommand = QueueCommandOperationDTO.builder()
+                .entityId(initiativeId)
+                .operationType(DELETE_INITIATIVE_OPERATION_TYPE)
+                .operationTime(LocalDateTime.now())
+                .build();
+        if(!commandsProducer.sendCommand(deleteInitiativeCommand)){
+            log.error("[DELETE_INITIATIVE] - Initiative: {}. Something went wrong while sending the message on Commands Queue", initiativeId);
+            throw new InitiativeException(InitiativeConstants.Exception.Publish.InternalServerError.CODE,
+                    String.format(InitiativeConstants.Exception.Publish.InternalServerError.COMMANDS_QUEUE, deleteInitiativeCommand.getEntityId(), deleteInitiativeCommand.getOperationType()),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
+        initiativeRepository.deleteById(initiativeId);
+        log.info("[DELETE INITIATIVE] Deleted initiative with initiativeId {}", initiativeId);
+        auditUtilities.logDeletedInitiative(initiativeId);
+
         performanceLog(startTime, DELETE_INITIATIVE_SERVICE);
     }
 
