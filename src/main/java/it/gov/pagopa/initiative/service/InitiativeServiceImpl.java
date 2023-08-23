@@ -636,7 +636,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         //Optional<Initiative> foundInitiative = initiativeRepository.findById(initiativeId);
         List<Initiative> initiatives = initiativeRepository.findAll();
         List<String> saveInitiatives = List.of(
-                "63fdd546fea3f35a5644e735", "63fded4ffea3f35a5644e738"
+                "64cb5e54899aa86a62068151","6453c905044c9254c692d6a0","6454d405044c9254c692d6a1","6454d4b5044c9254c692d6a2","6454d53b044c9254c692d6a3","64184a81ba99a7279acbd5ca","643d01d7d57aaa0e7822b86e","6450e7c914051b1c28d5c1c5","645237fd14051b1c28d5c1c7","64536ee6044c9254c692d69c","6453828f044c9254c692d69d","6453a2c9044c9254c692d69e","6453ba5d044c9254c692d69f","646b1fc4fa987977739e2228","64bfd193648fb4497ebf8dec","649c50b5a03f655e6543af06","64b8ffc49079081e65ffa5ea","64b541839079081e65ffa5b6","6400abed5416301023ae4c9f","63ff1505fea3f35a5644e73a","6400a8ad5416301023ae4c9e","63ff3184ca344b69d5637c77","63fddde7fea3f35a5644e737","640f010ffbab65182af2deb2"
         );
 
         /*if(foundInitiative.isEmpty()){
