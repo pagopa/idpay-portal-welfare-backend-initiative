@@ -633,30 +633,44 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     public void deleteInitiative(String initiativeId){
         long startTime = System.currentTimeMillis();
 
-        Optional<Initiative> foundInitiative = initiativeRepository.findById(initiativeId);
-        if(foundInitiative.isEmpty()){
+        //Optional<Initiative> foundInitiative = initiativeRepository.findById(initiativeId);
+        List<Initiative> initiatives = initiativeRepository.findAll();
+        List<String> saveInitiatives = List.of(
+                "63fdd546fea3f35a5644e735", "63fded4ffea3f35a5644e738"
+        );
+
+        System.out.println(initiatives.size());
+
+        /*if(foundInitiative.isEmpty()){
             log.error("[DELETE_INITIATIVE] - Initiative with initativeId {} was not found", initiativeId);
             throw new InitiativeException(InitiativeConstants.Exception.NotFound.CODE,
                     String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
                     HttpStatus.NOT_FOUND);
         }
+         */
 
-        QueueCommandOperationDTO deleteInitiativeCommand = QueueCommandOperationDTO.builder()
-                .entityId(initiativeId)
-                .operationType(DELETE_INITIATIVE_OPERATION_TYPE)
-                .operationTime(LocalDateTime.now())
-                .build();
-        if(!commandsProducer.sendCommand(deleteInitiativeCommand)){
-            log.error("[DELETE_INITIATIVE] - Initiative: {}. Something went wrong while sending the message on Commands Queue", initiativeId);
-            throw new InitiativeException(InitiativeConstants.Exception.Publish.InternalServerError.CODE,
-                    String.format(InitiativeConstants.Exception.Publish.InternalServerError.COMMANDS_QUEUE, deleteInitiativeCommand.getEntityId(), deleteInitiativeCommand.getOperationType()),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+
+        for(Initiative initiative : initiatives){
+            if(!saveInitiatives.contains(initiative.getInitiativeId())){
+                QueueCommandOperationDTO deleteInitiativeCommand = QueueCommandOperationDTO.builder()
+                        .entityId(initiativeId)
+                        .operationType(DELETE_INITIATIVE_OPERATION_TYPE)
+                        .operationTime(LocalDateTime.now())
+                        .build();
+                if(!commandsProducer.sendCommand(deleteInitiativeCommand)){
+                    log.error("[DELETE_INITIATIVE] - Initiative: {}. Something went wrong while sending the message on Commands Queue", initiativeId);
+                    throw new InitiativeException(InitiativeConstants.Exception.Publish.InternalServerError.CODE,
+                            String.format(InitiativeConstants.Exception.Publish.InternalServerError.COMMANDS_QUEUE, deleteInitiativeCommand.getEntityId(), deleteInitiativeCommand.getOperationType()),
+                            HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+
+                initiativeRepository.deleteById(initiativeId);
+                log.info("[DELETE INITIATIVE] Deleted initiative with initiativeId {}", initiativeId);
+                auditUtilities.logDeletedInitiative(initiativeId);
+            }
+
+
         }
-
-        initiativeRepository.deleteById(initiativeId);
-        log.info("[DELETE INITIATIVE] Deleted initiative with initiativeId {}", initiativeId);
-        auditUtilities.logDeletedInitiative(initiativeId);
-
         performanceLog(startTime, DELETE_INITIATIVE_SERVICE);
     }
 
