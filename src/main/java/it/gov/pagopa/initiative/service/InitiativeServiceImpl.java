@@ -664,10 +664,9 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     @Override
     public void initializeStatistics(String initiativeId, String organizationId) {
         QueueCommandOperationDTO createInitiativeStatistics = QueueCommandOperationDTO.builder()
-                .entityId(initiativeId)
+                .entityId(initiativeId.concat("_").concat(organizationId))
                 .operationType(CREATE_STATISTICS_OPERATION_TYPE)
                 .operationTime(LocalDateTime.now())
-                .organizationId(organizationId)
                 .build();
         if(!commandsProducer.sendCommand(createInitiativeStatistics)){
             log.error("[CREATE_INITIATIVE_STATISTICS] - Initiative: {}. Something went wrong while sending the message on Commands Queue", initiativeId);
