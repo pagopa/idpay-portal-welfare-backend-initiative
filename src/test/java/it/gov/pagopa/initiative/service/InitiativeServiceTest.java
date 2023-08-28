@@ -1560,6 +1560,28 @@ class InitiativeServiceTest {
         verify(initiativeRepository, times(1)).deleteById(INITIATIVE_ID);
     }
 
+    @Test
+    void initializeStatistics() {
+        when(commandsProducer.sendCommand(any())).thenReturn(true);
+
+        initiativeService.initializeStatistics(INITIATIVE_ID, ORGANIZATION_ID);
+
+        verify(commandsProducer, times(1)).sendCommand(any());
+    }
+
+    @Test
+    void initializeStatistics_exception() {
+        when(commandsProducer.sendCommand(any())).thenReturn(false);
+
+        try {
+            initiativeService.initializeStatistics(INITIATIVE_ID, ORGANIZATION_ID);
+            Assertions.fail();
+        } catch (InitiativeException e) {
+            assertEquals(InitiativeConstants.Exception.Publish.InternalServerError.CODE, e.getCode());
+            assertEquals(String.format(InitiativeConstants.Exception.Publish.InternalServerError.COMMANDS_QUEUE, INITIATIVE_ID+"_"+ORGANIZATION_ID, "CREATE_INITIATIVE_STATISTICS"), e.getMessage());
+            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, e.getHttpStatus());
+        }
+    }
 
     private ServiceResponseErrorDTO createServiceResponseErrorDTO(int httpStatus) {
         return ServiceResponseErrorDTO.builder()

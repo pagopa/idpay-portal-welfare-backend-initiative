@@ -61,6 +61,6 @@ public interface InitiativeService {
     BeneficiaryRankingPageDTO getRankingList(String organizationId, String initiativeId,  Pageable pageable, String beneficiary, String state);
     void validate(String contentType, String fileName);
     InitiativeDetailDTO getInitiativeBeneficiaryDetail(String initiativeId, Locale acceptLanguage);
-
     void deleteInitiative(String initiativeId);
+    void initializeStatistics(String initiativeId, String organizationId);
 }

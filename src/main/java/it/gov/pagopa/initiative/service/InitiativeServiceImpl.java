@@ -70,6 +70,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
     private static final String DELETE_INITIATIVE_SERVICE = "DELETE_INITIATIVE";
     private static final String DELETE_INITIATIVE_OPERATION_TYPE = "DELETE_INITIATIVE";
+    private static final String CREATE_STATISTICS_OPERATION_TYPE = "CREATE_INITIATIVE_STATISTICS";
 
     public InitiativeServiceImpl(
             @Value("${app.initiative.conditions.notifyEmail}") boolean notifyEmail,
@@ -635,7 +636,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
         Optional<Initiative> foundInitiative = initiativeRepository.findById(initiativeId);
         if(foundInitiative.isEmpty()){
-            log.error("[DELETE_INITIATIVE] - Initiative with initativeId {} was not found", initiativeId);
+            log.error("[DELETE_INITIATIVE] - Initiative with initiativeId {} was not found", initiativeId);
             throw new InitiativeException(InitiativeConstants.Exception.NotFound.CODE,
                     String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
                     HttpStatus.NOT_FOUND);
@@ -658,6 +659,23 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         auditUtilities.logDeletedInitiative(initiativeId);
 
         performanceLog(startTime, DELETE_INITIATIVE_SERVICE);
+    }
+
+    @Override
+    public void initializeStatistics(String initiativeId, String organizationId) {
+        QueueCommandOperationDTO createInitiativeStatistics = QueueCommandOperationDTO.builder()
+                .entityId(initiativeId.concat("_").concat(organizationId))
+                .operationType(CREATE_STATISTICS_OPERATION_TYPE)
+                .operationTime(LocalDateTime.now())
+                .build();
+        if(!commandsProducer.sendCommand(createInitiativeStatistics)){
+            log.error("[CREATE_INITIATIVE_STATISTICS] - Initiative: {}. Something went wrong while sending the message on Commands Queue", initiativeId);
+            throw new InitiativeException(InitiativeConstants.Exception.Publish.InternalServerError.CODE,
+                    String.format(InitiativeConstants.Exception.Publish.InternalServerError.COMMANDS_QUEUE,
+                            createInitiativeStatistics.getEntityId(),
+                            createInitiativeStatistics.getOperationType()),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     public void validate(String contentType, String fileName) {
