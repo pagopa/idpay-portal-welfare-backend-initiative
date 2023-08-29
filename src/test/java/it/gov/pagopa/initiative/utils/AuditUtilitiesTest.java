@@ -216,7 +216,7 @@ class AuditUtilitiesTest {
         auditUtilities.logDeletedInitiative(INITIATIVE_ID);
 
         Assertions.assertEquals(
-                ("CEF:0|PagoPa|IDPAY|1.0|7|User interaction|2| event=Initiative dstip=%s msg=Deleted initiative:" +
+                ("CEF:0|PagoPa|IDPAY|1.0|7|User interaction|2| event=Initiative dstip=%s msg=Initiative deleted" +
                         " cs1Label=initiativeId cs1=%s")
                         .formatted(
                                 AuditUtilities.SRCIP,
