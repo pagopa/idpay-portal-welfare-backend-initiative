@@ -102,7 +102,7 @@ public class AuditUtilities {
   public void logDeletedInitiative(String initiativeId){
     logAuditString(
             AuditUtilities.CEF_PATTERN_INITIATIVE_ID,
-            "Deleted initiative:",  initiativeId
+            "Initiative deleted",  initiativeId
     );
   }
 

@@ -655,7 +655,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         }
 
         initiativeRepository.deleteById(initiativeId);
-        log.info("[DELETE INITIATIVE] Deleted initiative with initiativeId {}", initiativeId);
+        log.info("[DELETE_INITIATIVE] Deleted initiative {} from collection: initiative", initiativeId);
         auditUtilities.logDeletedInitiative(initiativeId);
 
         performanceLog(startTime, DELETE_INITIATIVE_SERVICE);
