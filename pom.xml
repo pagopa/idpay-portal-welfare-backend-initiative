@@ -118,6 +118,12 @@
             <!-- Forced to 32.0.0 due to https://nvd.nist.gov/vuln/detail/CVE-2018-10237 -->
             <version>32.0.0-jre</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
+            <!-- Forced 5.3-alpha1 due to https://nvd.nist.gov/vuln/detail/CVE-2020-13956#range-7888200 -->
+            <version>5.3-alpha1</version>
+        </dependency>
 
 
         <!--TEST-->
