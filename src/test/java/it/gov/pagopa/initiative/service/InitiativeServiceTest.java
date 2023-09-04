@@ -23,6 +23,7 @@ import it.gov.pagopa.initiative.dto.io.service.ServiceResponseErrorDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardGroupsDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.*;
+import it.gov.pagopa.initiative.event.CommandsProducer;
 import it.gov.pagopa.initiative.event.InitiativeProducer;
 import it.gov.pagopa.initiative.exception.InitiativeException;
 import it.gov.pagopa.initiative.mapper.InitiativeAdditionalDTOsToIOServiceRequestDTOMapper;
@@ -160,6 +161,9 @@ class InitiativeServiceTest {
 
     @MockBean
     InitiativeUtils initiativeUtils;
+
+    @MockBean
+    CommandsProducer commandsProducer;
 
 
     @ParameterizedTest
@@ -1497,6 +1501,85 @@ class InitiativeServiceTest {
             Assertions.fail();
         } catch (InitiativeException e) {
             assertEquals(InternalServerError.CODE,e.getCode());
+        }
+    }
+
+    @Test
+    void deleteInitiative_initiativeNotFound() {
+        when(initiativeRepository.findById(any()))
+                .thenReturn(Optional.empty());
+
+        try {
+            initiativeService.deleteInitiative(INITIATIVE_ID);
+            Assertions.fail();
+        } catch (InitiativeException e) {
+            assertEquals(InitiativeConstants.Exception.NotFound.CODE,e.getCode());
+            assertEquals(String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID), e.getMessage());
+            assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
+        }
+
+        verify(initiativeRepository, times(1)).findById(INITIATIVE_ID);
+    }
+
+    @Test
+    void deleteInitiative_sendMessageOnCommandQueueError() {
+        Optional<Initiative> foundInitiative = Optional.of(createFullInitiative());
+        foundInitiative.get().setInitiativeId(INITIATIVE_ID);
+        when(initiativeRepository.findById(any()))
+                .thenReturn(Optional.of(createFullInitiative()));
+        when(commandsProducer.sendCommand(any()))
+                .thenReturn(false);
+
+        try {
+            initiativeService.deleteInitiative(INITIATIVE_ID);
+            Assertions.fail();
+        } catch (InitiativeException e) {
+            assertEquals(InitiativeConstants.Exception.Publish.InternalServerError.CODE, e.getCode());
+            assertEquals(String.format(InitiativeConstants.Exception.Publish.InternalServerError.COMMANDS_QUEUE, INITIATIVE_ID, "DELETE_INITIATIVE"), e.getMessage());
+            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, e.getHttpStatus());
+        }
+
+        verify(commandsProducer, times(1)).sendCommand(any());
+        verify(initiativeRepository, times(1)).findById(INITIATIVE_ID);
+    }
+
+
+    @Test
+    void deleteInitiative() {
+        Optional<Initiative> foundInitiative = Optional.of(createFullInitiative());
+        foundInitiative.get().setInitiativeId(INITIATIVE_ID);
+        when(initiativeRepository.findById(any()))
+                .thenReturn(Optional.of(createFullInitiative()));
+        when(commandsProducer.sendCommand(any()))
+                .thenReturn(true);
+
+        initiativeService.deleteInitiative(INITIATIVE_ID);
+
+        verify(initiativeRepository, times(1)).findById(INITIATIVE_ID);
+        verify(commandsProducer, times(1)).sendCommand(any());
+        verify(initiativeRepository, times(1)).deleteById(INITIATIVE_ID);
+    }
+
+    @Test
+    void initializeStatistics() {
+        when(commandsProducer.sendCommand(any())).thenReturn(true);
+
+        initiativeService.initializeStatistics(INITIATIVE_ID, ORGANIZATION_ID);
+
+        verify(commandsProducer, times(1)).sendCommand(any());
+    }
+
+    @Test
+    void initializeStatistics_exception() {
+        when(commandsProducer.sendCommand(any())).thenReturn(false);
+
+        try {
+            initiativeService.initializeStatistics(INITIATIVE_ID, ORGANIZATION_ID);
+            Assertions.fail();
+        } catch (InitiativeException e) {
+            assertEquals(InitiativeConstants.Exception.Publish.InternalServerError.CODE, e.getCode());
+            assertEquals(String.format(InitiativeConstants.Exception.Publish.InternalServerError.COMMANDS_QUEUE, INITIATIVE_ID+"_"+ORGANIZATION_ID, "CREATE_INITIATIVE_STATISTICS"), e.getMessage());
+            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, e.getHttpStatus());
         }
     }
 

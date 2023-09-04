@@ -294,6 +294,8 @@ public class InitiativeApiController implements InitiativeApi {
             log.error("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Error at sending mails: {}", initiativeId, e.getMessage(), e);
         }
 
+        initiativeService.initializeStatistics(initiativeId, organizationId);
+
         performanceLog(startTime, "UPDATE_INITIATIVE_PUBLISHED");
         return ResponseEntity.noContent().build();
     }
@@ -337,6 +339,13 @@ public class InitiativeApiController implements InitiativeApi {
     public ResponseEntity<OnboardingDTO> getOnboardingStatus(String organizationId,String initiativeId, Pageable pageable,
         String beneficiary, LocalDateTime dateFrom, LocalDateTime dateTo, String state) {
         return ResponseEntity.ok(this.initiativeService.getOnboardingStatusList(organizationId,initiativeId,beneficiary,dateFrom,dateTo,state,pageable));
+    }
+
+    @Override
+    public ResponseEntity<Void> deleteInitiative(String initiativeId){
+        log.info("[DELETE_INITIATIVE] - Initiative: {}. Start processing...", initiativeId);
+        this.initiativeService.deleteInitiative(initiativeId);
+        return ResponseEntity.noContent().build();
     }
 
     private void performanceLog(long startTime, String service){

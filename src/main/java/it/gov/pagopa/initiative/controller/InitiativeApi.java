@@ -9,22 +9,44 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import it.gov.pagopa.initiative.dto.*;
+import it.gov.pagopa.common.web.dto.ErrorDTO;
+import it.gov.pagopa.initiative.dto.BeneficiaryRankingPageDTO;
+import it.gov.pagopa.initiative.dto.InitiativeAdditionalDTO;
+import it.gov.pagopa.initiative.dto.InitiativeBeneficiaryRuleDTO;
+import it.gov.pagopa.initiative.dto.InitiativeDTO;
+import it.gov.pagopa.initiative.dto.InitiativeDataDTO;
+import it.gov.pagopa.initiative.dto.InitiativeDetailDTO;
+import it.gov.pagopa.initiative.dto.InitiativeGeneralDTO;
+import it.gov.pagopa.initiative.dto.InitiativeIssuerDTO;
+import it.gov.pagopa.initiative.dto.InitiativeOrganizationInfoDTO;
+import it.gov.pagopa.initiative.dto.InitiativeRewardAndTrxRulesDTO;
+import it.gov.pagopa.initiative.dto.InitiativeSummaryDTO;
+import it.gov.pagopa.initiative.dto.LogoDTO;
+import it.gov.pagopa.initiative.dto.OnboardingDTO;
+import it.gov.pagopa.initiative.dto.OrganizationDTO;
+import it.gov.pagopa.initiative.dto.OrganizationListDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
 import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Locale;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Locale;
 
 public interface InitiativeApi {
 
@@ -441,5 +463,17 @@ public interface InitiativeApi {
   @GetMapping(value = "/idpay/initiative/{initiativeId}/detail")
   ResponseEntity<InitiativeDetailDTO> getInitiativeBeneficiaryDetail(
           @PathVariable("initiativeId") String initiativeId,@RequestHeader(value = "Accept-Language", defaultValue = "it_IT") Locale acceptLanguage);
+
+  @Operation(summary = "Delete of an initiative ", description = "")
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "204", description = "No Content"),
+          @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+          @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+          @ApiResponse(responseCode = "404", description = "Initiative ID not found or already deleted", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+          @ApiResponse(responseCode = "429", description = "Too many Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+          @ApiResponse(responseCode = "500", description = "Server ERROR", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))})
+  @DeleteMapping(value = "/idpay/initiative/{initiativeId}")
+  ResponseEntity<Void> deleteInitiative(
+          @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId);
 }
 

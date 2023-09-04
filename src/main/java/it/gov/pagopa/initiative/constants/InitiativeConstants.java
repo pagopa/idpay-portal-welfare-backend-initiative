@@ -101,6 +101,10 @@ public class InitiativeConstants {
                 public static final String CODE = PUBLISH_CODE + ".bad.request";
                 public static final String INTEGRATION_FAILED = "Something gone wrong while notify Initiative for publishing";
             }
+            public static final class InternalServerError{
+                public static final String CODE = PUBLISH_CODE + ".internal.server.error";
+                public static final String COMMANDS_QUEUE = "Something went wrong while sending the message with entityId %s and operationType %s on the Commands Queue";
+            }
 
         }
         public static final class NotFound { //404

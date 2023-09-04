@@ -15,6 +15,7 @@ import it.gov.pagopa.initiative.constants.InitiativeConstants.Status;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceResponseDTO;
+import it.gov.pagopa.initiative.event.CommandsProducer;
 import it.gov.pagopa.initiative.event.InitiativeProducer;
 import it.gov.pagopa.initiative.exception.InitiativeException;
 import it.gov.pagopa.initiative.mapper.InitiativeAdditionalDTOsToIOServiceRequestDTOMapper;
@@ -51,6 +52,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     private final InitiativeRepository initiativeRepository;
     private final InitiativeAdditionalDTOsToIOServiceRequestDTOMapper initiativeAdditionalDTOsToIOServiceRequestDTOMapper;
     private final InitiativeProducer initiativeProducer;
+    private final CommandsProducer commandsProducer;
     private final IOBackEndRestConnector ioBackEndRestConnector;
     private final GroupRestConnector groupRestConnector;
     private final OnboardingRestConnector onboardingRestConnector;
@@ -65,6 +67,10 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     private final AuditUtilities auditUtilities;
 
     private final InitiativeModelToDTOMapper initiativeModelToDTOMapper;
+
+    private static final String DELETE_INITIATIVE_SERVICE = "DELETE_INITIATIVE";
+    private static final String DELETE_INITIATIVE_OPERATION_TYPE = "DELETE_INITIATIVE";
+    private static final String CREATE_STATISTICS_OPERATION_TYPE = "CREATE_INITIATIVE_STATISTICS";
 
     public InitiativeServiceImpl(
             @Value("${app.initiative.conditions.notifyEmail}") boolean notifyEmail,
@@ -81,7 +87,9 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             AESTokenService ioTokenService,
             InitiativeValidationService initiativeValidationService,
             InitiativeUtils initiativeUtils,
-            AuditUtilities auditUtilities, InitiativeModelToDTOMapper initiativeModelToDTOMapper){
+            AuditUtilities auditUtilities,
+            InitiativeModelToDTOMapper initiativeModelToDTOMapper,
+            CommandsProducer commandsProducer){
         this.notifyEmail = notifyEmail;
         this.initiativeRepository = initiativeRepository;
         this.initiativeProducer = initiativeProducer;
@@ -99,6 +107,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         this.initiativeUtils = initiativeUtils;
         this.auditUtilities = auditUtilities;
         this.initiativeModelToDTOMapper = initiativeModelToDTOMapper;
+        this.commandsProducer = commandsProducer;
     }
 
     public List<Initiative> retrieveInitiativeSummary(String organizationId, String role) {
@@ -310,7 +319,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                 InitiativeConstants.Status.CLOSED, InitiativeConstants.Status.SUSPENDED).contains(initiative.getStatus())) {
             log.error("[LOGICAL_DELETE_INITIATIVE] - Initiative: {}. Cannot be deleted. Current status is {}.", initiative.getInitiativeId(), initiative.getStatus());
             auditUtilities.logInitiativeError(this.getUserId(), initiativeId, organizationId, "initiative cannot be deleted");
-            performanceLog(startTime, "DELETE_INITIATIVE");
+            performanceLog(startTime, DELETE_INITIATIVE_SERVICE);
             throw new InitiativeException(
                     InitiativeConstants.Exception.BadRequest.CODE,
                     String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_CANNOT_BE_DELETED, initiativeId),
@@ -323,7 +332,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             log.info("[LOGICAL_DELETE_INITIATIVE] - Initiative: {}. Successfully logical elimination.", initiative.getInitiativeId());
         }
         this.sendEmailToPagoPA(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
-        performanceLog(startTime, "DELETE_INITIATIVE");
+        performanceLog(startTime, DELETE_INITIATIVE_SERVICE);
     }
 
     @Override
@@ -619,6 +628,54 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                 rankingPageDTO.getPageSize(), rankingPageDTO.getTotalElements(),
                 rankingPageDTO.getTotalPages(), rankingPageDTO.getRankingStatus(), rankingPageDTO.getRankingPublishedTimestamp(), rankingPageDTO.getRankingGeneratedTimestamp(), rankingPageDTO.getTotalEligibleOk(), rankingPageDTO.getTotalEligibleKo(), rankingPageDTO.getTotalOnboardingKo(),
                 rankingPageDTO.getRankingFilePath());
+    }
+
+    @Override
+    public void deleteInitiative(String initiativeId){
+        long startTime = System.currentTimeMillis();
+
+        Optional<Initiative> foundInitiative = initiativeRepository.findById(initiativeId);
+        if(foundInitiative.isEmpty()){
+            log.error("[DELETE_INITIATIVE] - Initiative with initiativeId {} was not found", initiativeId);
+            throw new InitiativeException(InitiativeConstants.Exception.NotFound.CODE,
+                    String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
+                    HttpStatus.NOT_FOUND);
+        }
+
+        QueueCommandOperationDTO deleteInitiativeCommand = QueueCommandOperationDTO.builder()
+                .entityId(initiativeId)
+                .operationType(DELETE_INITIATIVE_OPERATION_TYPE)
+                .operationTime(LocalDateTime.now())
+                .build();
+        if(!commandsProducer.sendCommand(deleteInitiativeCommand)){
+            log.error("[DELETE_INITIATIVE] - Initiative: {}. Something went wrong while sending the message on Commands Queue", initiativeId);
+            throw new InitiativeException(InitiativeConstants.Exception.Publish.InternalServerError.CODE,
+                    String.format(InitiativeConstants.Exception.Publish.InternalServerError.COMMANDS_QUEUE, deleteInitiativeCommand.getEntityId(), deleteInitiativeCommand.getOperationType()),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        initiativeRepository.deleteById(initiativeId);
+        log.info("[DELETE_INITIATIVE] Deleted initiative {} from collection: initiative", initiativeId);
+        auditUtilities.logDeletedInitiative(initiativeId);
+
+        performanceLog(startTime, DELETE_INITIATIVE_SERVICE);
+    }
+
+    @Override
+    public void initializeStatistics(String initiativeId, String organizationId) {
+        QueueCommandOperationDTO createInitiativeStatistics = QueueCommandOperationDTO.builder()
+                .entityId(initiativeId.concat("_").concat(organizationId))
+                .operationType(CREATE_STATISTICS_OPERATION_TYPE)
+                .operationTime(LocalDateTime.now())
+                .build();
+        if(!commandsProducer.sendCommand(createInitiativeStatistics)){
+            log.error("[CREATE_INITIATIVE_STATISTICS] - Initiative: {}. Something went wrong while sending the message on Commands Queue", initiativeId);
+            throw new InitiativeException(InitiativeConstants.Exception.Publish.InternalServerError.CODE,
+                    String.format(InitiativeConstants.Exception.Publish.InternalServerError.COMMANDS_QUEUE,
+                            createInitiativeStatistics.getEntityId(),
+                            createInitiativeStatistics.getOperationType()),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     public void validate(String contentType, String fileName) {

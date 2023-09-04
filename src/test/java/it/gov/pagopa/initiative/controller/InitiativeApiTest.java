@@ -1,13 +1,48 @@
 package it.gov.pagopa.initiative.controller;
 
+import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest.CODE;
+import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.ErrorDtoDefaultMsg.ACCUMULATED_AMOUNT_TYPE;
+import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.ErrorDtoDefaultMsg.SOMETHING_WRONG_WITH_THE_REFUND_TYPE;
+import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.ADMIN;
+import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.PAGOPA_ADMIN;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import feign.FeignException;
 import feign.Request;
 import feign.RequestTemplate;
 import feign.Response;
+import it.gov.pagopa.common.web.dto.ErrorDTO;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
-import it.gov.pagopa.initiative.dto.*;
+import it.gov.pagopa.initiative.dto.AnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems;
+import it.gov.pagopa.initiative.dto.AutomatedCriteriaDTO;
+import it.gov.pagopa.initiative.dto.ChannelDTO;
+import it.gov.pagopa.initiative.dto.FilterOperatorEnum;
+import it.gov.pagopa.initiative.dto.InitiativeAdditionalDTO;
+import it.gov.pagopa.initiative.dto.InitiativeBeneficiaryRuleDTO;
+import it.gov.pagopa.initiative.dto.InitiativeDTO;
+import it.gov.pagopa.initiative.dto.InitiativeDetailDTO;
+import it.gov.pagopa.initiative.dto.InitiativeGeneralDTO;
+import it.gov.pagopa.initiative.dto.InitiativeOrganizationInfoDTO;
+import it.gov.pagopa.initiative.dto.InitiativeRewardAndTrxRulesDTO;
+import it.gov.pagopa.initiative.dto.InitiativeSummaryDTO;
+import it.gov.pagopa.initiative.dto.LogoDTO;
+import it.gov.pagopa.initiative.dto.OrganizationDTO;
+import it.gov.pagopa.initiative.dto.SelfCriteriaBoolDTO;
+import it.gov.pagopa.initiative.dto.SelfCriteriaMultiDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.AccumulatedAmountDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.RefundAdditionalInfoDTO;
@@ -15,19 +50,51 @@ import it.gov.pagopa.initiative.dto.rule.refund.TimeParameterDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardGroupsDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardValueDTO;
-import it.gov.pagopa.initiative.dto.rule.trx.*;
+import it.gov.pagopa.initiative.dto.rule.trx.DayOfWeekDTO;
+import it.gov.pagopa.initiative.dto.rule.trx.InitiativeTrxConditionsDTO;
+import it.gov.pagopa.initiative.dto.rule.trx.MccFilterDTO;
+import it.gov.pagopa.initiative.dto.rule.trx.RewardLimitsDTO;
+import it.gov.pagopa.initiative.dto.rule.trx.ThresholdDTO;
+import it.gov.pagopa.initiative.dto.rule.trx.TrxCountDTO;
 import it.gov.pagopa.initiative.exception.InitiativeException;
 import it.gov.pagopa.initiative.mapper.InitiativeDTOsToModelMapper;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
+import it.gov.pagopa.initiative.model.AutomatedCriteria;
+import it.gov.pagopa.initiative.model.Channel;
+import it.gov.pagopa.initiative.model.FilterOperatorEnumModel;
+import it.gov.pagopa.initiative.model.ISelfDeclarationCriteria;
+import it.gov.pagopa.initiative.model.Initiative;
+import it.gov.pagopa.initiative.model.InitiativeAdditional;
+import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
+import it.gov.pagopa.initiative.model.InitiativeGeneral;
+import it.gov.pagopa.initiative.model.SelfCriteriaBool;
+import it.gov.pagopa.initiative.model.SelfCriteriaMulti;
 import it.gov.pagopa.initiative.model.TypeBoolEnum;
 import it.gov.pagopa.initiative.model.TypeMultiEnum;
-import it.gov.pagopa.initiative.model.*;
 import it.gov.pagopa.initiative.model.rule.refund.AccumulatedAmount;
 import it.gov.pagopa.initiative.model.rule.refund.AdditionalInfo;
 import it.gov.pagopa.initiative.model.rule.refund.InitiativeRefundRule;
 import it.gov.pagopa.initiative.model.rule.refund.TimeParameter;
 import it.gov.pagopa.initiative.service.InitiativeService;
 import it.gov.pagopa.initiative.service.OrganizationService;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.nio.charset.Charset;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.IntStream;
 import org.apache.kafka.common.KafkaException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -45,30 +112,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.nio.charset.Charset;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.*;
-import java.util.stream.IntStream;
-
-import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest.CODE;
-import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.ErrorDtoDefaultMsg.ACCUMULATED_AMOUNT_TYPE;
-import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.ErrorDtoDefaultMsg.SOMETHING_WRONG_WITH_THE_REFUND_TYPE;
-import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.ADMIN;
-import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.PAGOPA_ADMIN;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 @TestPropertySource(
         locations = "classpath:application.yml",
@@ -121,6 +164,7 @@ class InitiativeApiTest {
     private static final String LOGICALLY_DELETE_INITIATIVE_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER;
     //    private static final String ROLE = "TEST_ROLE";
     private static final String GET_INITIATIVE_BENEFICIARY_DETAIL_URL = "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/detail";
+    private static final String DELETE_INITIATIVE_URL = "/initiative/" + INITIATIVE_ID_PLACEHOLDER;
     private static final String ORGANIZATION_NAME = "organizationName";
     private static final String ORGANIZATION_VAT = "organizationVat";
     public static final String API_KEY_CLIENT_ID = "apiKeyClientId";
@@ -1026,6 +1070,21 @@ class InitiativeApiTest {
                         MockMvcRequestBuilders.get(BASE_URL + String.format(GET_INITIATIVE_BENEFICIARY_DETAIL_URL, INITIATIVE_ID))
                                 .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    void deleteInitiative() throws Exception {
+        // When
+        // With this instruction, I instruct the service (via Mockito's when) to always return the DummyInitiative to me anytime I call the same service's function
+        doNothing().when(initiativeService).deleteInitiative(any());
+
+        //The MVC perform should perform the API by returning the response based on the Service previously mocked.
+        mvc.perform(
+                        MockMvcRequestBuilders.delete(BASE_URL + String.format(DELETE_INITIATIVE_URL, INITIATIVE_ID))
+                                .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isNoContent())
                 .andDo(print())
                 .andReturn();
     }
