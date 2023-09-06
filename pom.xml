@@ -101,6 +101,12 @@
             <!-- Forced to 2.0 due to https://nvd.nist.gov/vuln/detail/CVE-2022-1471 -->
             <version>2.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <!-- Forced to 32.1.2-jre due to https://nvd.nist.gov/vuln/detail/CVE-2023-2976 -->
+            <version>32.1.2-jre</version>
+        </dependency>
 <!--        <dependency>-->
 <!--            <groupId>org.apache.httpcomponents.client5</groupId>-->
 <!--            <artifactId>httpclient5</artifactId>-->
@@ -130,7 +136,9 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-contract-wiremock</artifactId>
             <version>4.0.4</version>
+            <scope>test</scope>
         </dependency>
+
         <!-- MongoDB Embedded -->
         <dependency>
             <groupId>de.flapdoodle.embed</groupId>
