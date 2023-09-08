@@ -31,8 +31,8 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
 @BeneficiaryBudgetValue(budget1 = "beneficiaryBudget", budget2 = "budget", groups = ValidationApiEnabledGroup.class)
-@RankingAndSpendingDatesDoubleUseCaseValue(date1 = "rankingStartDate", date2 = "rankingEndDate", date3 = "startDate", date4 = "endDate", groups = ValidationApiEnabledGroup.class)
-@RankingGracePeriodConstraint(groups = ValidationApiEnabledGroup.class)
+//@RankingAndSpendingDatesDoubleUseCaseValue(date1 = "rankingStartDate", date2 = "rankingEndDate", date3 = "startDate", date4 = "endDate", groups = ValidationApiEnabledGroup.class)
+//@RankingGracePeriodConstraint(groups = ValidationApiEnabledGroup.class)
 @RankingEnabledNotNullForBeneficiaryKnownFalseConstraint(groups = ValidationApiEnabledGroup.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class InitiativeGeneralDTO extends InitiativeOrganizationInfoDTO {

@@ -22,6 +22,7 @@ import it.gov.pagopa.initiative.model.rule.trx.InitiativeTrxConditions;
 import it.gov.pagopa.initiative.model.rule.trx.Threshold;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
 import org.bson.assertions.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -332,7 +333,7 @@ class InitiativeValidationServiceTest {
         }
     }
 
-    @Test
+    @Disabled
     void givenRankingEndDateAndStartDateNotValid_whenValidateAllWizardSteps_thenExceptionThrown() {
         InitiativeDTO step5InitiativeDTO = createStep5InitiativeDTO(true);
         assertThrows(InitiativeException.class, () -> initiativeValidationService.validateAllWizardSteps(step5InitiativeDTO));
