@@ -1447,14 +1447,13 @@ class InitiativeServiceTest {
         Mockito.when(decryptRestConnector.getPiiByToken(USER_ID)).thenReturn(new DecryptCfDTO(CF));
         Mockito.when(decryptRestConnector.getPiiByToken("USER_ID_2")).thenReturn(new DecryptCfDTO("CF_2"));
 
-        try {
-            initiativeService.getRankingList(ORGANIZATION_ID,INITIATIVE_ID,null, "",
-                    Status.PUBLISHED);
-            Assertions.fail();
-        } catch (InitiativeException e) {
-            assertEquals(InternalServerError.CODE,e.getCode());
+
+        BeneficiaryRankingPageDTO beneficiaryRankingDTO = initiativeService.getRankingList(ORGANIZATION_ID,INITIATIVE_ID,null, "",
+                Status.PUBLISHED);
+        assertEquals(CF,beneficiaryRankingDTO.getContent().get(0).getBeneficiary());
+        assertEquals("FAMILY_ID", beneficiaryRankingDTO.getContent().get(0).getFamilyId());
+        assertEquals(List.of(CF, "CF_2"), beneficiaryRankingDTO.getContent().get(0).getMemberIds());
         }
-    }
 
     @Test
     void getOnboardingStatusList_ok() {
