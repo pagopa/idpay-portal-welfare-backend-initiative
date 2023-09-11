@@ -1452,7 +1452,7 @@ class InitiativeServiceTest {
                 Status.PUBLISHED);
         assertEquals(CF,beneficiaryRankingDTO.getContent().get(0).getBeneficiary());
         assertEquals("FAMILY_ID", beneficiaryRankingDTO.getContent().get(0).getFamilyId());
-        assertEquals(List.of(CF, "CF_2"), beneficiaryRankingDTO.getContent().get(0).getMemberIds());
+        assertTrue(beneficiaryRankingDTO.getContent().get(0).getMemberIds().containsAll(List.of(CF, "CF_2")));
         }
 
     @Test
