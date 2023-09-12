@@ -1,20 +1,10 @@
 package it.gov.pagopa.common.mongo.retry;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import ch.qos.logback.classic.LoggerContext;
 import com.mongodb.MongoQueryException;
 import com.mongodb.ServerAddress;
 import it.gov.pagopa.common.mongo.retry.exception.MongoRequestRateTooLargeRetryExpiredException;
-import it.gov.pagopa.initiative.utils.MemoryAppender;
-import java.util.function.Supplier;
+import it.gov.pagopa.common.utils.MemoryAppender;
 import org.bson.BsonDocument;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
@@ -28,6 +18,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.mongodb.UncategorizedMongoDbException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.util.function.Supplier;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {MongoRequestRateTooLargeRetryableAspect.class,
@@ -176,7 +171,7 @@ public class MongoRequestRateTooLargeRetryerTest {
     //Given
     long[] counter = {0};
     UncategorizedMongoDbException mongoDbException = new UncategorizedMongoDbException(
-        "RequestRateTooLarge", new Throwable());
+        "TooManyRequests", new Throwable());
 
     Mockito.doAnswer(invocationOnMock -> {
       if (counter[0] < REQUEST_RATE_TOO_LARGE_MAX_RETRY) {
