@@ -1,6 +1,8 @@
 package it.gov.pagopa.initiative.dto;
 
 import java.time.LocalDateTime;
+import java.util.Set;
+
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -26,4 +28,6 @@ public class RankingRequestDTO {
     private long rankingValue;
     private long ranking;
     private String beneficiaryRankingStatus;
+    private String familyId;
+    private Set<String> memberIds;
 }

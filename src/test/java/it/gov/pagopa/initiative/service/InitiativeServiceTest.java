@@ -1336,7 +1336,7 @@ class InitiativeServiceTest {
     @Test
     void getRankingList_ok() {
         Initiative initiative = this.createFullInitiative();
-        RankingRequestDTO rankingRequestDTO = new RankingRequestDTO(USER_ID,INITIATIVE_ID,ORGANIZATION_ID,LocalDateTime.now(),LocalDateTime.now(),1,1,"test");
+        RankingRequestDTO rankingRequestDTO = new RankingRequestDTO(USER_ID,INITIATIVE_ID,ORGANIZATION_ID,LocalDateTime.now(),LocalDateTime.now(),1,1,"test", null, null);
         RankingPageDTO rankingPageDTO =new RankingPageDTO();
         rankingPageDTO.setContent(List.of(rankingRequestDTO));
         DecryptCfDTO decryptCfDTO = new DecryptCfDTO(CF);
@@ -1379,7 +1379,7 @@ class InitiativeServiceTest {
     @Test
     void getRankingList_ko_decrypt() {
         Initiative initiative = this.createFullInitiative();
-        RankingRequestDTO rankingRequestDTO = new RankingRequestDTO(USER_ID,INITIATIVE_ID,ORGANIZATION_ID,LocalDateTime.now(),LocalDateTime.now(),1,1,"test");
+        RankingRequestDTO rankingRequestDTO = new RankingRequestDTO(USER_ID,INITIATIVE_ID,ORGANIZATION_ID,LocalDateTime.now(),LocalDateTime.now(),1,1,"test", null, null);
         RankingPageDTO rankingPageDTO =new RankingPageDTO();
         rankingPageDTO.setContent(List.of(rankingRequestDTO));
         EncryptedCfDTO encryptedCfDTO = new EncryptedCfDTO(USER_ID);
@@ -1426,6 +1426,34 @@ class InitiativeServiceTest {
             assertEquals(InternalServerError.CODE,e.getCode());
         }
     }
+    @Test
+    void getRankingList_familyUnit() {
+        Initiative initiative = this.createFullInitiative();
+        initiative.setGeneral(new InitiativeGeneral());
+        initiative.getGeneral().setRankingEnabled(true);
+        initiative.getGeneral().setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.NF);
+        initiative.getGeneral().setFamilyUnitComposition(InitiativeConstants.FamilyUnitCompositionConstant.INPS);
+
+        Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
+
+        EncryptedCfDTO encryptedCfDTO = new EncryptedCfDTO(USER_ID);
+        Mockito.when(encryptRestConnector.upsertToken(Mockito.any())).thenReturn(encryptedCfDTO);
+
+        RankingRequestDTO rankingRequestDTO = new RankingRequestDTO(USER_ID,INITIATIVE_ID,ORGANIZATION_ID,LocalDateTime.now(),LocalDateTime.now(),1,1,"test", "FAMILY_ID", Set.of(USER_ID, "USER_ID_2"));
+        RankingPageDTO rankingPageDTO =new RankingPageDTO();
+        rankingPageDTO.setContent(List.of(rankingRequestDTO));
+        Mockito.when(rankingRestConnector.getRankingList(Mockito.anyString(),Mockito.anyString(),Mockito.any(),Mockito.anyString(),Mockito.anyString())).thenReturn(rankingPageDTO);
+
+        Mockito.when(decryptRestConnector.getPiiByToken(USER_ID)).thenReturn(new DecryptCfDTO(CF));
+        Mockito.when(decryptRestConnector.getPiiByToken("USER_ID_2")).thenReturn(new DecryptCfDTO("CF_2"));
+
+
+        BeneficiaryRankingPageDTO beneficiaryRankingDTO = initiativeService.getRankingList(ORGANIZATION_ID,INITIATIVE_ID,null, "",
+                Status.PUBLISHED);
+        assertEquals(CF,beneficiaryRankingDTO.getContent().get(0).getBeneficiary());
+        assertEquals("FAMILY_ID", beneficiaryRankingDTO.getContent().get(0).getFamilyId());
+        assertTrue(beneficiaryRankingDTO.getContent().get(0).getMemberIds().containsAll(List.of(CF, "CF_2")));
+        }
 
     @Test
     void getOnboardingStatusList_ok() {
