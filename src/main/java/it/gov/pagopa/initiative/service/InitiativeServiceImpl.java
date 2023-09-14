@@ -596,7 +596,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                         HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
-        RankingPageDTO rankingPageDTO = new RankingPageDTO();
+        RankingPageDTO rankingPageDTO;
         try {
             rankingPageDTO = rankingRestConnector.getRankingList(organizationId, initiativeId, pageable, state, userId);
             log.info("response ranking: " + rankingPageDTO);
@@ -612,9 +612,19 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             try {
                 DecryptCfDTO decryptedCfDTO = decryptRestConnector.getPiiByToken(
                         rankingRequestDTO.getUserId());
-                beneficiaryRankingDTOS.add(new BeneficiaryRankingDTO(decryptedCfDTO.getPii(), rankingRequestDTO.getCriteriaConsensusTimestamp(),
-                        rankingRequestDTO.getRankingValue(), rankingRequestDTO.getRanking(),
-                        rankingRequestDTO.getBeneficiaryRankingStatus()));
+                BeneficiaryRankingDTO beneficiaryRankingDTO = BeneficiaryRankingDTO.builder()
+                        .beneficiary(decryptedCfDTO.getPii())
+                        .criteriaConsensusTimestamp(rankingRequestDTO.getCriteriaConsensusTimestamp())
+                        .rankingValue(rankingRequestDTO.getRankingValue())
+                        .ranking(rankingRequestDTO.getRanking())
+                        .beneficiaryRankingStatus(rankingRequestDTO.getBeneficiaryRankingStatus())
+                        .build();
+                if(StringUtils.isNotBlank(rankingRequestDTO.getFamilyId())){
+                    beneficiaryRankingDTO.setFamilyId(rankingRequestDTO.getFamilyId());
+                    beneficiaryRankingDTO.setMemberIds(rankingRequestDTO.getMemberIds().stream()
+                            .map(member -> decryptRestConnector.getPiiByToken(member).getPii()).toList());
+                }
+                beneficiaryRankingDTOS.add(beneficiaryRankingDTO);
 
             } catch (Exception e) {
                 throw new InitiativeException(
@@ -633,14 +643,6 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     @Override
     public void deleteInitiative(String initiativeId){
         long startTime = System.currentTimeMillis();
-
-        Optional<Initiative> foundInitiative = initiativeRepository.findById(initiativeId);
-        if(foundInitiative.isEmpty()){
-            log.error("[DELETE_INITIATIVE] - Initiative with initiativeId {} was not found", initiativeId);
-            throw new InitiativeException(InitiativeConstants.Exception.NotFound.CODE,
-                    String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
-                    HttpStatus.NOT_FOUND);
-        }
 
         QueueCommandOperationDTO deleteInitiativeCommand = QueueCommandOperationDTO.builder()
                 .entityId(initiativeId)

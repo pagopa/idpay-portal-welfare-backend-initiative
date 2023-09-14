@@ -1,10 +1,12 @@
 package it.gov.pagopa.initiative.dto;
 
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -17,4 +19,6 @@ public class BeneficiaryRankingDTO {
     private long rankingValue;
     private long ranking;
     private String beneficiaryRankingStatus;
+    private String familyId;
+    private List<String> memberIds;
 }
