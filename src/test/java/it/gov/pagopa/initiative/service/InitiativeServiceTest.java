@@ -1533,28 +1533,7 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void deleteInitiative_initiativeNotFound() {
-        when(initiativeRepository.findById(any()))
-                .thenReturn(Optional.empty());
-
-        try {
-            initiativeService.deleteInitiative(INITIATIVE_ID);
-            Assertions.fail();
-        } catch (InitiativeException e) {
-            assertEquals(InitiativeConstants.Exception.NotFound.CODE,e.getCode());
-            assertEquals(String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID), e.getMessage());
-            assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
-        }
-
-        verify(initiativeRepository, times(1)).findById(INITIATIVE_ID);
-    }
-
-    @Test
     void deleteInitiative_sendMessageOnCommandQueueError() {
-        Optional<Initiative> foundInitiative = Optional.of(createFullInitiative());
-        foundInitiative.get().setInitiativeId(INITIATIVE_ID);
-        when(initiativeRepository.findById(any()))
-                .thenReturn(Optional.of(createFullInitiative()));
         when(commandsProducer.sendCommand(any()))
                 .thenReturn(false);
 
@@ -1568,22 +1547,16 @@ class InitiativeServiceTest {
         }
 
         verify(commandsProducer, times(1)).sendCommand(any());
-        verify(initiativeRepository, times(1)).findById(INITIATIVE_ID);
     }
 
 
     @Test
     void deleteInitiative() {
-        Optional<Initiative> foundInitiative = Optional.of(createFullInitiative());
-        foundInitiative.get().setInitiativeId(INITIATIVE_ID);
-        when(initiativeRepository.findById(any()))
-                .thenReturn(Optional.of(createFullInitiative()));
         when(commandsProducer.sendCommand(any()))
                 .thenReturn(true);
 
         initiativeService.deleteInitiative(INITIATIVE_ID);
 
-        verify(initiativeRepository, times(1)).findById(INITIATIVE_ID);
         verify(commandsProducer, times(1)).sendCommand(any());
         verify(initiativeRepository, times(1)).deleteById(INITIATIVE_ID);
     }

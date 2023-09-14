@@ -644,14 +644,6 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     public void deleteInitiative(String initiativeId){
         long startTime = System.currentTimeMillis();
 
-        Optional<Initiative> foundInitiative = initiativeRepository.findById(initiativeId);
-        if(foundInitiative.isEmpty()){
-            log.error("[DELETE_INITIATIVE] - Initiative with initiativeId {} was not found", initiativeId);
-            throw new InitiativeException(InitiativeConstants.Exception.NotFound.CODE,
-                    String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
-                    HttpStatus.NOT_FOUND);
-        }
-
         QueueCommandOperationDTO deleteInitiativeCommand = QueueCommandOperationDTO.builder()
                 .entityId(initiativeId)
                 .operationType(DELETE_INITIATIVE_OPERATION_TYPE)
