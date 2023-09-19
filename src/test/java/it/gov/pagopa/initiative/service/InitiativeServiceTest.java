@@ -9,7 +9,7 @@ import it.gov.pagopa.initiative.connector.encrypt.EncryptRestConnector;
 import it.gov.pagopa.initiative.connector.file_storage.FileStorageConnector;
 import it.gov.pagopa.initiative.connector.group.GroupRestConnector;
 import it.gov.pagopa.initiative.connector.io_service.IOBackEndRestConnector;
-import it.gov.pagopa.initiative.connector.io_service.IOManageBackEndRestConnectorNew;
+import it.gov.pagopa.initiative.connector.io_service.IOManageBackEndRestConnector;
 import it.gov.pagopa.initiative.connector.onboarding.OnboardingRestConnector;
 import it.gov.pagopa.initiative.connector.ranking.RankingRestConnector;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
@@ -134,7 +134,7 @@ class InitiativeServiceTest {
     IOBackEndRestConnector ioBackEndRestConnector;
 
     @MockBean
-    IOManageBackEndRestConnectorNew ioManageBackEndRestConnector;
+    IOManageBackEndRestConnector ioManageBackEndRestConnector;
 
     @MockBean
     GroupRestConnector groupRestConnector;
