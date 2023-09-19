@@ -649,9 +649,13 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
         try{
             Optional<Initiative> initiative = initiativeRepository.findById(initiativeId);
-            initiative.ifPresent(value -> ioManageBackEndRestConnector.deleteService(value.getAdditionalInfo().getServiceId()));
+            if (initiative.isPresent() && initiative.get().getAdditionalInfo() != null &&
+                    initiative.get().getAdditionalInfo().getServiceId() !=null) {
+                ioManageBackEndRestConnector.deleteService(initiative.get().getAdditionalInfo().getServiceId());
+                log.info("[DELETE_INITIATIVE] - Service deleted for initiative: {}", initiativeId);
+            }
         } catch (Exception e){
-            log.error("[DELETE_INITIATIVE] - Error while deleting service - Initiative: {}. Error: " + e.getMessage(),
+            log.info("[DELETE_INITIATIVE] - Error while deleting service - Initiative: {}. Error: " + e.getMessage(),
                     initiativeId, e);
         }
 
