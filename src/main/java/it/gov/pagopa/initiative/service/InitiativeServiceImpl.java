@@ -7,6 +7,7 @@ import it.gov.pagopa.initiative.connector.encrypt.EncryptRestConnector;
 import it.gov.pagopa.initiative.connector.file_storage.FileStorageConnector;
 import it.gov.pagopa.initiative.connector.group.GroupRestConnector;
 import it.gov.pagopa.initiative.connector.io_service.IOBackEndRestConnector;
+import it.gov.pagopa.initiative.connector.io_service.IOManageBackEndRestConnectorNew;
 import it.gov.pagopa.initiative.connector.onboarding.OnboardingRestConnector;
 import it.gov.pagopa.initiative.connector.ranking.RankingRestConnector;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
@@ -54,6 +55,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     private final InitiativeProducer initiativeProducer;
     private final CommandsProducer commandsProducer;
     private final IOBackEndRestConnector ioBackEndRestConnector;
+    private final IOManageBackEndRestConnectorNew ioManageBackEndRestConnector;
     private final GroupRestConnector groupRestConnector;
     private final OnboardingRestConnector onboardingRestConnector;
     private final RankingRestConnector rankingRestConnector;
@@ -89,7 +91,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             InitiativeUtils initiativeUtils,
             AuditUtilities auditUtilities,
             InitiativeModelToDTOMapper initiativeModelToDTOMapper,
-            CommandsProducer commandsProducer){
+            CommandsProducer commandsProducer, IOManageBackEndRestConnectorNew ioManageBackEndRestConnector){
         this.notifyEmail = notifyEmail;
         this.initiativeRepository = initiativeRepository;
         this.initiativeProducer = initiativeProducer;
@@ -108,6 +110,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         this.auditUtilities = auditUtilities;
         this.initiativeModelToDTOMapper = initiativeModelToDTOMapper;
         this.commandsProducer = commandsProducer;
+        this.ioManageBackEndRestConnector = ioManageBackEndRestConnector;
     }
 
     public List<Initiative> retrieveInitiativeSummary(String organizationId, String role) {
@@ -643,6 +646,14 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     @Override
     public void deleteInitiative(String initiativeId){
         long startTime = System.currentTimeMillis();
+
+        try{
+            Optional<Initiative> initiative = initiativeRepository.findById(initiativeId);
+            initiative.ifPresent(value -> ioManageBackEndRestConnector.deleteService(value.getAdditionalInfo().getServiceId()));
+        } catch (Exception e){
+            log.error("[DELETE_INITIATIVE] - Error while deleting service - Initiative: {}. Error: " + e.getMessage(),
+                    initiativeId, e);
+        }
 
         QueueCommandOperationDTO deleteInitiativeCommand = QueueCommandOperationDTO.builder()
                 .entityId(initiativeId)
