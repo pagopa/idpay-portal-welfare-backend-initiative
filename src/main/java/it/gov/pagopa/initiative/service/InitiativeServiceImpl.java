@@ -549,7 +549,8 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                 DecryptCfDTO decryptedCfDTO = decryptRestConnector.getPiiByToken(
                         onboardingStatusCitizenDTO.getUserId());
                 StatusOnboardingDTO statusOnboardingDTO = new StatusOnboardingDTO(decryptedCfDTO.getPii(),
-                        onboardingStatusCitizenDTO.getStatus(), onboardingStatusCitizenDTO.getStatusDate());
+                        onboardingStatusCitizenDTO.getStatus(), onboardingStatusCitizenDTO.getStatusDate(),
+                        onboardingStatusCitizenDTO.getFamilyId());
                 statusOnboardingDTOS.add(statusOnboardingDTO);
 
             } catch (Exception e) {

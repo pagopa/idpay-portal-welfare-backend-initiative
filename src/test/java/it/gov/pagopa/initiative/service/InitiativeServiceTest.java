@@ -1363,7 +1363,7 @@ class InitiativeServiceTest {
     @Test
     void getRankingList_ko_encrypt() {
         Initiative initiative = this.createFullInitiative();
-        OnboardingStatusCitizenDTO onboardingStatusCitizenDTO = new OnboardingStatusCitizenDTO(USER_ID, STATUS, LocalDateTime.now().toString());
+        OnboardingStatusCitizenDTO onboardingStatusCitizenDTO = new OnboardingStatusCitizenDTO(USER_ID, STATUS, LocalDateTime.now().toString(), null);
         EncryptedCfDTO encryptedCfDTO = new EncryptedCfDTO(USER_ID);
         Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
         Mockito.doThrow(new InitiativeException(InternalServerError.CODE, "", HttpStatus.INTERNAL_SERVER_ERROR)).when(encryptRestConnector).upsertToken(Mockito.any());
@@ -1458,7 +1458,7 @@ class InitiativeServiceTest {
     @Test
     void getOnboardingStatusList_ok() {
         Initiative initiative = this.createFullInitiative();
-        OnboardingStatusCitizenDTO onboardingStatusCitizenDTO = new OnboardingStatusCitizenDTO(USER_ID, STATUS, LocalDateTime.now().toString());
+        OnboardingStatusCitizenDTO onboardingStatusCitizenDTO = new OnboardingStatusCitizenDTO(USER_ID, STATUS, LocalDateTime.now().toString(), "familyId");
         List<OnboardingStatusCitizenDTO> onboardingStatusCitizenDTOS = new ArrayList<>();
         onboardingStatusCitizenDTOS.add(onboardingStatusCitizenDTO);
         ResponseOnboardingDTO onboardingDTO = new ResponseOnboardingDTO(onboardingStatusCitizenDTOS, 1, 1, 1, 1);
@@ -1471,6 +1471,7 @@ class InitiativeServiceTest {
         OnboardingDTO onboardingDTO1 = initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID, CF, STARTDATE, ENDDATE, STATUS, null);
         assertEquals(CF,onboardingDTO1.getContent().get(0).getBeneficiary());
         assertEquals(STATUS,onboardingDTO1.getContent().get(0).getBeneficiaryState());
+        assertEquals("familyId", onboardingDTO1.getContent().get(0).getFamilyId());
 
     }
 
@@ -1490,7 +1491,7 @@ class InitiativeServiceTest {
     @Test
     void getOnboardingStatusList_ko_decrypt() {
         Initiative initiative = this.createFullInitiative();
-        OnboardingStatusCitizenDTO onboardingStatusCitizenDTO = new OnboardingStatusCitizenDTO(USER_ID, STATUS, LocalDateTime.now().toString());
+        OnboardingStatusCitizenDTO onboardingStatusCitizenDTO = new OnboardingStatusCitizenDTO(USER_ID, STATUS, LocalDateTime.now().toString(), null);
         List<OnboardingStatusCitizenDTO> onboardingStatusCitizenDTOS = new ArrayList<>();
         onboardingStatusCitizenDTOS.add(onboardingStatusCitizenDTO);
         ResponseOnboardingDTO onboardingDTO = new ResponseOnboardingDTO(onboardingStatusCitizenDTOS, 1, 1, 1, 1);
