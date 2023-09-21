@@ -1,6 +1,7 @@
 package it.gov.pagopa.initiative.connector.io_service;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,8 +17,9 @@ public class IOManageBackEndRestConnectorImpl implements IOManageBackEndRestConn
   }
 
   @Override
-  public void deleteService(String serviceId) {
+  public ResponseEntity<Void> deleteService(String serviceId) {
     ioManageBackEndFeignRestClient.deleteService(serviceId, subscriptionKey);
+      return null;
   }
 
 }

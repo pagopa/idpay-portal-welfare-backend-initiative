@@ -1271,8 +1271,8 @@ class InitiativeServiceTest {
 
         //Try to call the Real Service
         //Prepare Executable with invocation of the method on your system under test
-        Executable executable = () -> initiativeService.sendInitiativeInfoToRuleEngine(initiative);
 
+        Executable executable = () -> initiativeService.sendInitiativeInfoToRuleEngine(initiative);
         Assertions.assertThrows(IllegalStateException.class, executable);
     }
 
@@ -1538,7 +1538,8 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void deleteInitiative_sendMessageOnCommandQueueError() {
+    void deleteInitiative_initiative_no_service_id_sendMessageOnCommandQueueError() {
+        when(initiativeRepository.findById(INITIATIVE_ID)).thenReturn(Optional.ofNullable(createStep1Initiative()));
         when(commandsProducer.sendCommand(any()))
                 .thenReturn(false);
 
@@ -1551,12 +1552,64 @@ class InitiativeServiceTest {
             assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, e.getHttpStatus());
         }
 
+        verify(ioManageBackEndRestConnector, times(0)).deleteService(anyString());
         verify(commandsProducer, times(1)).sendCommand(any());
     }
 
 
     @Test
     void deleteInitiative() {
+        Initiative initiative = createFullInitiative();
+        initiative.getAdditionalInfo().setServiceId("test");
+        when(initiativeRepository.findById(INITIATIVE_ID)).thenReturn(Optional.of(initiative));
+        when(commandsProducer.sendCommand(any()))
+                .thenReturn(true);
+
+        initiativeService.deleteInitiative(INITIATIVE_ID);
+
+        verify(ioManageBackEndRestConnector, times(1)).deleteService("test");
+        verify(commandsProducer, times(1)).sendCommand(any());
+        verify(initiativeRepository, times(1)).deleteById(INITIATIVE_ID);
+    }
+
+    @Test
+    void deleteInitiative_initiative_not_found() {
+        when(initiativeRepository.findById(INITIATIVE_ID)).thenReturn(null);
+        when(commandsProducer.sendCommand(any()))
+                .thenReturn(true);
+
+        initiativeService.deleteInitiative(INITIATIVE_ID);
+
+        verify(ioManageBackEndRestConnector, times(0)).deleteService(anyString());
+        verify(commandsProducer, times(1)).sendCommand(any());
+        verify(initiativeRepository, times(1)).deleteById(INITIATIVE_ID);
+    }
+
+    @Test
+    void deleteInitiative_initiative_no_additional_info() {
+        Initiative initiative = createStep1Initiative();
+        initiative.setAdditionalInfo(null);
+        when(initiativeRepository.findById(INITIATIVE_ID)).thenReturn(Optional.of(initiative));
+
+        when(commandsProducer.sendCommand(any()))
+                .thenReturn(true);
+
+        initiativeService.deleteInitiative(INITIATIVE_ID);
+
+        verify(ioManageBackEndRestConnector, times(0)).deleteService(anyString());
+        verify(commandsProducer, times(1)).sendCommand(any());
+        verify(initiativeRepository, times(1)).deleteById(INITIATIVE_ID);
+    }
+
+    @Test
+    void deleteInitiative_throw_ioManageBackEndRestConnector_exception() {
+        Initiative initiative = createFullInitiative();
+        initiative.getAdditionalInfo().setServiceId("test");
+        when(initiativeRepository.findById(INITIATIVE_ID)).thenReturn(Optional.of(initiative));
+
+        when(ioManageBackEndRestConnector.deleteService("test")).thenThrow(new RuntimeException());
+
+
         when(commandsProducer.sendCommand(any()))
                 .thenReturn(true);
 
