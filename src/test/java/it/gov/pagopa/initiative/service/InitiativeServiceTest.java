@@ -1574,7 +1574,6 @@ class InitiativeServiceTest {
 
     @Test
     void deleteInitiative_initiative_not_found() {
-        when(initiativeRepository.findById(INITIATIVE_ID)).thenReturn(null);
         when(commandsProducer.sendCommand(any()))
                 .thenReturn(true);
 
