@@ -665,15 +665,10 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                     initiativeId, e);
         }
 
-        Map<String, String> additionalParams = new HashMap<>();
-        additionalParams.put("pagination", pagination);
-        additionalParams.put("delay", delay);
-
         QueueCommandOperationDTO deleteInitiativeCommand = QueueCommandOperationDTO.builder()
                 .entityId(initiativeId)
                 .operationType(DELETE_INITIATIVE_OPERATION_TYPE)
                 .operationTime(LocalDateTime.now())
-                .additionalParams(additionalParams)
                 .build();
         if(!commandsProducer.sendCommand(deleteInitiativeCommand)){
             log.error("[DELETE_INITIATIVE] - Initiative: {}. Something went wrong while sending the message on Commands Queue", initiativeId);

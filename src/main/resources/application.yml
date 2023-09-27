@@ -177,9 +177,6 @@ app:
       notifyEmail: ${APP_INITIATIVE_CONDITIONS_NOTIFY_EMAIL:true}
       notifyInternal: ${APP_INITIATIVE_CONDITIONS_NOTIFY_INTERNAL:true}
     email-assistance: ${EMAIL_RECIPIENT_ASSISTANCE:Assistenza.IDPay@Pagopa.it}
-    delete:
-      paginationSize: ${DELETE_PAGINATION_SIZE}
-      delayTime: ${DELETE_DELAY_TIME}
 
 util:
   crypto:
