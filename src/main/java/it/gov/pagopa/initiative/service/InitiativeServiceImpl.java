@@ -70,11 +70,6 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
     private final InitiativeModelToDTOMapper initiativeModelToDTOMapper;
 
-    @Value("${app.initiative.delete.paginationSize}")
-    private String pagination;
-    @Value("${app.initiative.delete.delayTime}")
-    private String delay;
-
     private static final String DELETE_INITIATIVE_SERVICE = "DELETE_INITIATIVE";
     private static final String DELETE_INITIATIVE_OPERATION_TYPE = "DELETE_INITIATIVE";
     private static final String CREATE_STATISTICS_OPERATION_TYPE = "CREATE_INITIATIVE_STATISTICS";
