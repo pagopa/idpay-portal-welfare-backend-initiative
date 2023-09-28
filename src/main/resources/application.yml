@@ -113,6 +113,11 @@ rest-client:
         departmentName: ${IO_BACKEND_SERVICE_DEPARTMENT_NAME:}
         isVisible: ${IO_BACKEND_SERVICE_IS_VISIBLE:false}
         authorizedRecipients: ${IO_BACKEND_SERVICE_AUTHORIZED_RECIPIENTS:}
+  backend-io-manage:
+    service:
+      base-url: ${IO_MANAGE_BACKEND_SERVICE_BASE_URL:}/api/v1
+      name: backend-io-manage
+      subscriptionKey: ${IO_BACKEND_SERVICE_SUBSCRIPTION_API_KEY:}
   onboarding:
     serviceCode: idpay-onboarding
     uri: ${ONBOARDING_URI:}

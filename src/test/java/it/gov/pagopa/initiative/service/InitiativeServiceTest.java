@@ -9,6 +9,7 @@ import it.gov.pagopa.initiative.connector.encrypt.EncryptRestConnector;
 import it.gov.pagopa.initiative.connector.file_storage.FileStorageConnector;
 import it.gov.pagopa.initiative.connector.group.GroupRestConnector;
 import it.gov.pagopa.initiative.connector.io_service.IOBackEndRestConnector;
+import it.gov.pagopa.initiative.connector.io_service.IOManageBackEndRestConnector;
 import it.gov.pagopa.initiative.connector.onboarding.OnboardingRestConnector;
 import it.gov.pagopa.initiative.connector.ranking.RankingRestConnector;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
@@ -131,6 +132,9 @@ class InitiativeServiceTest {
 
     @MockBean
     IOBackEndRestConnector ioBackEndRestConnector;
+
+    @MockBean
+    IOManageBackEndRestConnector ioManageBackEndRestConnector;
 
     @MockBean
     GroupRestConnector groupRestConnector;
@@ -1267,8 +1271,8 @@ class InitiativeServiceTest {
 
         //Try to call the Real Service
         //Prepare Executable with invocation of the method on your system under test
-        Executable executable = () -> initiativeService.sendInitiativeInfoToRuleEngine(initiative);
 
+        Executable executable = () -> initiativeService.sendInitiativeInfoToRuleEngine(initiative);
         Assertions.assertThrows(IllegalStateException.class, executable);
     }
 
@@ -1363,7 +1367,7 @@ class InitiativeServiceTest {
     @Test
     void getRankingList_ko_encrypt() {
         Initiative initiative = this.createFullInitiative();
-        OnboardingStatusCitizenDTO onboardingStatusCitizenDTO = new OnboardingStatusCitizenDTO(USER_ID, STATUS, LocalDateTime.now().toString());
+        OnboardingStatusCitizenDTO onboardingStatusCitizenDTO = new OnboardingStatusCitizenDTO(USER_ID, STATUS, LocalDateTime.now().toString(), null);
         EncryptedCfDTO encryptedCfDTO = new EncryptedCfDTO(USER_ID);
         Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
         Mockito.doThrow(new InitiativeException(InternalServerError.CODE, "", HttpStatus.INTERNAL_SERVER_ERROR)).when(encryptRestConnector).upsertToken(Mockito.any());
@@ -1458,7 +1462,7 @@ class InitiativeServiceTest {
     @Test
     void getOnboardingStatusList_ok() {
         Initiative initiative = this.createFullInitiative();
-        OnboardingStatusCitizenDTO onboardingStatusCitizenDTO = new OnboardingStatusCitizenDTO(USER_ID, STATUS, LocalDateTime.now().toString());
+        OnboardingStatusCitizenDTO onboardingStatusCitizenDTO = new OnboardingStatusCitizenDTO(USER_ID, STATUS, LocalDateTime.now().toString(), "familyId");
         List<OnboardingStatusCitizenDTO> onboardingStatusCitizenDTOS = new ArrayList<>();
         onboardingStatusCitizenDTOS.add(onboardingStatusCitizenDTO);
         ResponseOnboardingDTO onboardingDTO = new ResponseOnboardingDTO(onboardingStatusCitizenDTOS, 1, 1, 1, 1);
@@ -1471,6 +1475,7 @@ class InitiativeServiceTest {
         OnboardingDTO onboardingDTO1 = initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID, CF, STARTDATE, ENDDATE, STATUS, null);
         assertEquals(CF,onboardingDTO1.getContent().get(0).getBeneficiary());
         assertEquals(STATUS,onboardingDTO1.getContent().get(0).getBeneficiaryState());
+        assertEquals("familyId", onboardingDTO1.getContent().get(0).getFamilyId());
 
     }
 
@@ -1490,7 +1495,7 @@ class InitiativeServiceTest {
     @Test
     void getOnboardingStatusList_ko_decrypt() {
         Initiative initiative = this.createFullInitiative();
-        OnboardingStatusCitizenDTO onboardingStatusCitizenDTO = new OnboardingStatusCitizenDTO(USER_ID, STATUS, LocalDateTime.now().toString());
+        OnboardingStatusCitizenDTO onboardingStatusCitizenDTO = new OnboardingStatusCitizenDTO(USER_ID, STATUS, LocalDateTime.now().toString(), null);
         List<OnboardingStatusCitizenDTO> onboardingStatusCitizenDTOS = new ArrayList<>();
         onboardingStatusCitizenDTOS.add(onboardingStatusCitizenDTO);
         ResponseOnboardingDTO onboardingDTO = new ResponseOnboardingDTO(onboardingStatusCitizenDTOS, 1, 1, 1, 1);
@@ -1533,7 +1538,8 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void deleteInitiative_sendMessageOnCommandQueueError() {
+    void deleteInitiative_initiative_no_service_id_sendMessageOnCommandQueueError() {
+        when(initiativeRepository.findById(INITIATIVE_ID)).thenReturn(Optional.ofNullable(createStep1Initiative()));
         when(commandsProducer.sendCommand(any()))
                 .thenReturn(false);
 
@@ -1546,12 +1552,63 @@ class InitiativeServiceTest {
             assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, e.getHttpStatus());
         }
 
+        verify(ioManageBackEndRestConnector, times(0)).deleteService(anyString());
         verify(commandsProducer, times(1)).sendCommand(any());
     }
 
 
     @Test
     void deleteInitiative() {
+        Initiative initiative = createFullInitiative();
+        initiative.getAdditionalInfo().setServiceId("test");
+        when(initiativeRepository.findById(INITIATIVE_ID)).thenReturn(Optional.of(initiative));
+        when(commandsProducer.sendCommand(any()))
+                .thenReturn(true);
+
+        initiativeService.deleteInitiative(INITIATIVE_ID);
+
+        verify(ioManageBackEndRestConnector, times(1)).deleteService("test");
+        verify(commandsProducer, times(1)).sendCommand(any());
+        verify(initiativeRepository, times(1)).deleteById(INITIATIVE_ID);
+    }
+
+    @Test
+    void deleteInitiative_initiative_not_found() {
+        when(commandsProducer.sendCommand(any()))
+                .thenReturn(true);
+
+        initiativeService.deleteInitiative(INITIATIVE_ID);
+
+        verify(ioManageBackEndRestConnector, times(0)).deleteService(anyString());
+        verify(commandsProducer, times(1)).sendCommand(any());
+        verify(initiativeRepository, times(1)).deleteById(INITIATIVE_ID);
+    }
+
+    @Test
+    void deleteInitiative_initiative_no_additional_info() {
+        Initiative initiative = createStep1Initiative();
+        initiative.setAdditionalInfo(null);
+        when(initiativeRepository.findById(INITIATIVE_ID)).thenReturn(Optional.of(initiative));
+
+        when(commandsProducer.sendCommand(any()))
+                .thenReturn(true);
+
+        initiativeService.deleteInitiative(INITIATIVE_ID);
+
+        verify(ioManageBackEndRestConnector, times(0)).deleteService(anyString());
+        verify(commandsProducer, times(1)).sendCommand(any());
+        verify(initiativeRepository, times(1)).deleteById(INITIATIVE_ID);
+    }
+
+    @Test
+    void deleteInitiative_throw_ioManageBackEndRestConnector_exception() {
+        Initiative initiative = createFullInitiative();
+        initiative.getAdditionalInfo().setServiceId("test");
+        when(initiativeRepository.findById(INITIATIVE_ID)).thenReturn(Optional.of(initiative));
+
+        when(ioManageBackEndRestConnector.deleteService("test")).thenThrow(new RuntimeException());
+
+
         when(commandsProducer.sendCommand(any()))
                 .thenReturn(true);
 
