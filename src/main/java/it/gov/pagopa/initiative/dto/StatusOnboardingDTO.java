@@ -14,4 +14,5 @@ public class StatusOnboardingDTO {
   private String beneficiary;
   private String beneficiaryState;
   private String updateStatusDate;
+  private String familyId;
 }
