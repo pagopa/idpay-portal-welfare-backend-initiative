@@ -132,8 +132,6 @@ class InitiativeModelToDTOMapperTest {
         fullInitiativeDTOStep4TrxCountNull = createStep4InitiativeDTOTrxCountNull();
         fullInitiativeStep4ThresholdNull = createStep4InitiativeThresholdNull();
         fullInitiativeDTOStep4ThresholdNull = createStep4InitiativeDTOThresholdNull();
-        initiativeAdditionalOnlyTokens = createInitiativeAdditionalOnlyTokens();
-        initiativeAdditionalDTOOnlyTokens = createInitiativeAdditionalDTOOnlyTokens();
         fullInitiativeDetailDTO = createInitiativeDetailDTO();
         initiativeStep2BeneficiaryTypeNull = createStep2InitiativeBeneficiaryTypeNull();
         initiativeStep2DTOBeneficiaryTypeNull = createStep2InitiativeDTOBeneficiaryTypeNull();
@@ -254,19 +252,6 @@ class InitiativeModelToDTOMapperTest {
         InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(initiativeStep2FamilyUnitNotNull);
         assertEquals(initiativeStep2DTOFamilyUnitNotNull, initiativeDTO);
 
-    }
-
-    @Test
-    void toInitiativeAdditionalDTOOnlyTokens() {
-        InitiativeAdditionalDTO additionalDTO = initiativeModelToDTOMapper.toInitiativeAdditionalDTOOnlyTokens(initiativeAdditionalOnlyTokens);
-        additionalDTO.setServiceId(SERVICE_ID);
-        assertEquals(initiativeAdditionalDTOOnlyTokens, additionalDTO);
-    }
-
-    @Test
-    void toInitiativeAdditionalDTOOnlyTokensNull() {
-        InitiativeAdditionalDTO additionalDTO = initiativeModelToDTOMapper.toInitiativeAdditionalDTOOnlyTokens(null);
-        assertNull(additionalDTO);
     }
 
     @Test
@@ -661,21 +646,6 @@ class InitiativeModelToDTOMapperTest {
         channels.add(channel);
         initiativeAdditional.setChannels(channels);
         return initiativeAdditional;
-    }
-
-    private InitiativeAdditional createInitiativeAdditionalOnlyTokens() {
-        InitiativeAdditional initiativeAdditional = new InitiativeAdditional();
-        initiativeAdditional.setPrimaryTokenIO("firstToken");
-        initiativeAdditional.setSecondaryTokenIO("secondToken");
-        return initiativeAdditional;
-    }
-
-    private InitiativeAdditionalDTO createInitiativeAdditionalDTOOnlyTokens() {
-        InitiativeAdditionalDTO initiativeAdditionalDTO = new InitiativeAdditionalDTO();
-        initiativeAdditionalDTO.setPrimaryTokenIO("firstToken");
-        initiativeAdditionalDTO.setSecondaryTokenIO("secondToken");
-        initiativeAdditionalDTO.setServiceId(SERVICE_ID);
-        return initiativeAdditionalDTO;
     }
 
     private InitiativeBeneficiaryRule createInitiativeBeneficiaryRule() {

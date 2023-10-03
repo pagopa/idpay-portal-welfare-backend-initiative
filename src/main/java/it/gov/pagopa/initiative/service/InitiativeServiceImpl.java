@@ -6,7 +6,6 @@ import it.gov.pagopa.initiative.connector.decrypt.DecryptRestConnector;
 import it.gov.pagopa.initiative.connector.encrypt.EncryptRestConnector;
 import it.gov.pagopa.initiative.connector.file_storage.FileStorageConnector;
 import it.gov.pagopa.initiative.connector.group.GroupRestConnector;
-import it.gov.pagopa.initiative.connector.io_service.IOBackEndRestConnector;
 import it.gov.pagopa.initiative.connector.io_service.IOManageBackEndRestConnector;
 import it.gov.pagopa.initiative.connector.onboarding.OnboardingRestConnector;
 import it.gov.pagopa.initiative.connector.ranking.RankingRestConnector;
@@ -14,6 +13,7 @@ import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.InternalServerError;
 import it.gov.pagopa.initiative.constants.InitiativeConstants.Status;
 import it.gov.pagopa.initiative.dto.*;
+import it.gov.pagopa.initiative.dto.io.service.KeysDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceResponseDTO;
 import it.gov.pagopa.initiative.event.CommandsProducer;
@@ -54,7 +54,6 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     private final InitiativeAdditionalDTOsToIOServiceRequestDTOMapper initiativeAdditionalDTOsToIOServiceRequestDTOMapper;
     private final InitiativeProducer initiativeProducer;
     private final CommandsProducer commandsProducer;
-    private final IOBackEndRestConnector ioBackEndRestConnector;
     private final IOManageBackEndRestConnector ioManageBackEndRestConnector;
     private final GroupRestConnector groupRestConnector;
     private final OnboardingRestConnector onboardingRestConnector;
@@ -79,7 +78,6 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             InitiativeRepository initiativeRepository,
             InitiativeAdditionalDTOsToIOServiceRequestDTOMapper initiativeAdditionalDTOsToIOServiceRequestDTOMapper,
             InitiativeProducer initiativeProducer,
-            IOBackEndRestConnector ioBackEndRestConnector,
             GroupRestConnector groupRestConnector,
             OnboardingRestConnector onboardingRestConnector,
             RankingRestConnector rankingRestConnector, EncryptRestConnector encryptRestConnector,
@@ -96,7 +94,6 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         this.initiativeRepository = initiativeRepository;
         this.initiativeProducer = initiativeProducer;
         this.initiativeAdditionalDTOsToIOServiceRequestDTOMapper = initiativeAdditionalDTOsToIOServiceRequestDTOMapper;
-        this.ioBackEndRestConnector = ioBackEndRestConnector;
         this.groupRestConnector = groupRestConnector;
         this.onboardingRestConnector = onboardingRestConnector;
         this.rankingRestConnector = rankingRestConnector;
@@ -426,18 +423,10 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         ServiceRequestDTO serviceRequestDTO = initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(additionalInfo, initiativeOrganizationInfoDTO);
 
         if (StringUtils.isBlank(serviceId)) {
-            ServiceResponseDTO serviceResponseDTO = ioBackEndRestConnector.createService(serviceRequestDTO);
-            serviceId = serviceResponseDTO.getServiceId();
+            ServiceResponseDTO serviceResponseDTO = ioManageBackEndRestConnector.createService(serviceRequestDTO);
+            serviceId = serviceResponseDTO.getId();
             log.debug("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Created new service to ServiceIO", initiative.getInitiativeId());
             additionalInfo.setServiceId(serviceId);
-
-            log.debug("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Start ServiceIO Keys encryption...", initiative.getInitiativeId());
-            String encryptedPrimaryToken = ioTokenService.encrypt(serviceResponseDTO.getPrimaryKey());
-            String encryptedSecondaryToken = ioTokenService.encrypt(serviceResponseDTO.getSecondaryKey());
-            log.debug("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Encryption completed.", initiative.getInitiativeId());
-            additionalInfo.setPrimaryTokenIO(encryptedPrimaryToken);
-            additionalInfo.setSecondaryTokenIO(encryptedSecondaryToken);
-
             this.updateInitiative(initiative);
         }
 
@@ -447,7 +436,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                 ByteArrayOutputStream byteArrayOutputStream = fileStorageConnector.downloadInitiativeLogo(
                         initiativeUtils.getPathLogo(initiative.getOrganizationId(),
                                 initiative.getInitiativeId()));
-                ioBackEndRestConnector.sendLogoIo(serviceId, LogoIODTO.builder().logo(new String(
+                ioManageBackEndRestConnector.sendLogoIo(serviceId, LogoIODTO.builder().logo(new String(
                                 Base64.getEncoder().encode(byteArrayOutputStream.toByteArray())))
                         .build());
             } catch (Exception e) {
@@ -464,7 +453,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                         InitiativeConstants.CtaConstant.EN + InitiativeConstants.CtaConstant.CTA_1_EN + InitiativeConstants.CtaConstant.TEXT_EN + InitiativeConstants.CtaConstant.ACTION_EN + serviceId +
                         InitiativeConstants.CtaConstant.END
         );
-        ioBackEndRestConnector.updateService(serviceId, serviceRequestDTO);
+        ioManageBackEndRestConnector.updateService(serviceId, serviceRequestDTO);
 
         auditUtilities.logInitiativePublished(this.getUserId(), initiative.getInitiativeId(), initiative.getOrganizationId());
         return initiative;
@@ -696,6 +685,23 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         }
     }
 
+    @Override
+    public KeysDTO getTokenKeys(String initiativeId) {
+        log.info("[GET_SERVICE_IO_TOKEN_KEYS] - Initiative: {}. Getting serviceIO token keys", initiativeId);
+        Initiative initiative = initiativeRepository.findById(initiativeId)
+                .orElseThrow(() -> new InitiativeException(
+                        InitiativeConstants.Exception.NotFound.CODE,
+                        String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
+                        HttpStatus.NOT_FOUND));
+        try {
+            return ioManageBackEndRestConnector.getServiceKeys(initiative.getAdditionalInfo().getServiceId());
+        } catch (Exception e) {
+            throw new InitiativeException(InternalServerError.CODE,
+                        e.getMessage(),
+                        HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     public void validate(String contentType, String fileName) {
         Assert.notNull(fileName, "file name cannot be null");
 
@@ -729,4 +735,5 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                 service,
                 System.currentTimeMillis() - startTime);
     }
+
 }

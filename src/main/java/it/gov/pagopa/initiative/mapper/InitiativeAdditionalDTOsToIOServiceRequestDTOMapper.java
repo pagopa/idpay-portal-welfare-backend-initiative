@@ -1,6 +1,7 @@
 package it.gov.pagopa.initiative.mapper;
 
 import it.gov.pagopa.initiative.dto.InitiativeOrganizationInfoDTO;
+import it.gov.pagopa.initiative.dto.io.service.OrganizationDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceMetadataDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
 import it.gov.pagopa.initiative.model.Channel;
@@ -38,16 +39,18 @@ public class InitiativeAdditionalDTOsToIOServiceRequestDTOMapper {
                 .supportUrl(channelMap.get(Channel.TypeEnum.WEB))
                 .privacyUrl(initiativeAdditional.getPrivacyLink())
                 .tosUrl(initiativeAdditional.getTcLink())
-                .description(initiativeAdditional.getDescription())
                 .scope(initiativeAdditional.getServiceScope().name())
+                .build();
+        OrganizationDTO organizationDTO = OrganizationDTO.builder()
+                .departmentName(StringUtils.isNotBlank(initiativeOrganizationInfoDTO.getOrganizationName()) ? initiativeOrganizationInfoDTO.getOrganizationName() : productDepartmentName)
+                .organizationName(initiativeOrganizationInfoDTO.getOrganizationName())
+                .organizationFiscalCode(initiativeOrganizationInfoDTO.getOrganizationVat())
                 .build();
         ServiceRequestDTO.ServiceRequestDTOBuilder serviceRequestDTOBuilder = ServiceRequestDTO.builder()
                 .serviceMetadata(serviceMetadataDTO)
                 .serviceName(initiativeAdditional.getServiceName())
-                .departmentName(StringUtils.isNotBlank(initiativeOrganizationInfoDTO.getOrganizationName()) ? initiativeOrganizationInfoDTO.getOrganizationName() : productDepartmentName)
-                .organizationName(initiativeOrganizationInfoDTO.getOrganizationName())
-                .organizationFiscalCode(initiativeOrganizationInfoDTO.getOrganizationVat())
-                .isVisible(isVisible);
+                .description(initiativeAdditional.getDescription())
+                .organization(organizationDTO);
         return CollectionUtils.isEmpty(authorizedRecipients) ? serviceRequestDTOBuilder.build() : serviceRequestDTOBuilder.authorizedRecipients(authorizedRecipients).build();
     }
 

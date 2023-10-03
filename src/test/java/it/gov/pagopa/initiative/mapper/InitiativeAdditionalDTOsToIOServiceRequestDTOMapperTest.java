@@ -1,6 +1,7 @@
 package it.gov.pagopa.initiative.mapper;
 
 import it.gov.pagopa.initiative.dto.InitiativeOrganizationInfoDTO;
+import it.gov.pagopa.initiative.dto.io.service.OrganizationDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceMetadataDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
 import it.gov.pagopa.initiative.model.Channel;
@@ -73,7 +74,7 @@ class InitiativeAdditionalDTOsToIOServiceRequestDTOMapperTest {
                 .build();
 
         ServiceRequestDTO serviceRequestDTO = initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(initiativeAdditional, initiativeOrganizationInfoDTO);
-        assertEquals(StringUtils.isNotBlank(organizationName)? organizationName : PRODUCT_DEPARTMENT_NAME, serviceRequestDTO.getDepartmentName());
+        assertEquals(StringUtils.isNotBlank(organizationName)? organizationName : PRODUCT_DEPARTMENT_NAME, serviceRequestDTO.getOrganization().getDepartmentName());
         assertEquals(serviceRequestDTOexpected, serviceRequestDTO);
     }
 
@@ -98,7 +99,7 @@ class InitiativeAdditionalDTOsToIOServiceRequestDTOMapperTest {
                 .build();
 
         ServiceRequestDTO serviceRequestDTO = initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(initiativeAdditional, initiativeOrganizationInfoDTO);
-        assertEquals(StringUtils.isNotBlank(organizationName)? organizationName : PRODUCT_DEPARTMENT_NAME, serviceRequestDTO.getDepartmentName());
+        assertEquals(StringUtils.isNotBlank(organizationName)? organizationName : PRODUCT_DEPARTMENT_NAME, serviceRequestDTO.getOrganization().getDepartmentName());
         assertEquals(serviceRequestDTOexpected, serviceRequestDTO);
     }
 
@@ -107,11 +108,17 @@ class InitiativeAdditionalDTOsToIOServiceRequestDTOMapperTest {
         ServiceRequestDTO.ServiceRequestDTOBuilder serviceRequestDTOBuilder = ServiceRequestDTO.builder()
                 .serviceMetadata(serviceMetadataDTO)
                 .serviceName(SERVICE_NAME)
+                .organization(createOrganizationDTOexpected(organizationName))
+                .description(DESCRIPTION);
+        return CollectionUtils.isEmpty(authorizedRecipients) ? serviceRequestDTOBuilder.build() : serviceRequestDTOBuilder.authorizedRecipients(authorizedRecipients).build();
+    }
+
+    private OrganizationDTO createOrganizationDTOexpected(String organizationName) {
+        return  OrganizationDTO.builder()
                 .departmentName(StringUtils.isNotBlank(organizationName) ? organizationName : PRODUCT_DEPARTMENT_NAME)
                 .organizationName(organizationName)
                 .organizationFiscalCode(ORGANIZATION_VAT)
-                .isVisible(IS_VISIBLE);
-        return CollectionUtils.isEmpty(authorizedRecipients) ? serviceRequestDTOBuilder.build() : serviceRequestDTOBuilder.authorizedRecipients(authorizedRecipients).build();
+                .build();
     }
 
     private ServiceMetadataDTO createServiceMetadataDTO() {
@@ -119,7 +126,6 @@ class InitiativeAdditionalDTOsToIOServiceRequestDTOMapperTest {
                 .supportUrl(SUPPORT_URL)
                 .privacyUrl(PRIVACY_URL)
                 .tosUrl(TOS_URL)
-                .description(DESCRIPTION)
                 .scope(SCOPE)
                 .build();
     }

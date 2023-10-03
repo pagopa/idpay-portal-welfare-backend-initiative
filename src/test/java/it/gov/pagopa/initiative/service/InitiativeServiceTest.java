@@ -8,7 +8,6 @@ import it.gov.pagopa.initiative.connector.decrypt.DecryptRestConnector;
 import it.gov.pagopa.initiative.connector.encrypt.EncryptRestConnector;
 import it.gov.pagopa.initiative.connector.file_storage.FileStorageConnector;
 import it.gov.pagopa.initiative.connector.group.GroupRestConnector;
-import it.gov.pagopa.initiative.connector.io_service.IOBackEndRestConnector;
 import it.gov.pagopa.initiative.connector.io_service.IOManageBackEndRestConnector;
 import it.gov.pagopa.initiative.connector.onboarding.OnboardingRestConnector;
 import it.gov.pagopa.initiative.connector.ranking.RankingRestConnector;
@@ -17,10 +16,8 @@ import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.Internal
 import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.NotFound;
 import it.gov.pagopa.initiative.constants.InitiativeConstants.Status;
 import it.gov.pagopa.initiative.dto.*;
-import it.gov.pagopa.initiative.dto.io.service.ServiceMetadataDTO;
-import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
-import it.gov.pagopa.initiative.dto.io.service.ServiceResponseDTO;
-import it.gov.pagopa.initiative.dto.io.service.ServiceResponseErrorDTO;
+import it.gov.pagopa.initiative.dto.io.service.*;
+import it.gov.pagopa.initiative.dto.io.service.OrganizationDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardGroupsDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.*;
@@ -67,6 +64,7 @@ import java.util.*;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.ADMIN;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.PAGOPA_ADMIN;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -129,10 +127,6 @@ class InitiativeServiceTest {
 
     @MockBean
     InitiativeAdditionalDTOsToIOServiceRequestDTOMapper initiativeAdditionalDTOsToIOServiceRequestDTOMapper;
-
-    @MockBean
-    IOBackEndRestConnector ioBackEndRestConnector;
-
     @MockBean
     IOManageBackEndRestConnector ioManageBackEndRestConnector;
 
@@ -1291,20 +1285,19 @@ class InitiativeServiceTest {
 
         ServiceRequestDTO serviceRequestDTOexpected = createServiceRequestDTO();
         ServiceResponseDTO serviceResponseDTOexpected = createServiceResponseDTO();
-        String serviceId = serviceResponseDTOexpected.getServiceId();
+        String serviceId = serviceResponseDTOexpected.getId();
 
         when(initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(initiativeAdditional, initiativeOrganizationInfoDTO)).thenReturn(serviceRequestDTOexpected);
-        when(ioBackEndRestConnector.createService(serviceRequestDTOexpected)).thenReturn(serviceResponseDTOexpected);
+        when(ioManageBackEndRestConnector.createService(serviceRequestDTOexpected)).thenReturn(serviceResponseDTOexpected);
         when(ioTokenService.encrypt(anyString())).thenReturn(ANY_KEY_TOKEN_IO);
-        when(ioBackEndRestConnector.updateService(serviceId,serviceRequestDTOexpected)).thenReturn(serviceResponseDTOexpected);
+        when(ioManageBackEndRestConnector.updateService(serviceId,serviceRequestDTOexpected)).thenReturn(serviceResponseDTOexpected);
 
         Initiative initiativeActual = initiativeService.sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(initiative, initiativeOrganizationInfoDTO);
         assertEquals(SERVICE_ID, initiativeActual.getAdditionalInfo().getServiceId());
-        assertEquals(ANY_KEY_TOKEN_IO, initiativeActual.getAdditionalInfo().getPrimaryTokenIO());
 
         //Expecting connector to be called once with correct param
-        verify(ioBackEndRestConnector, times(1)).createService(serviceRequestDTOexpected);
-        verify(ioBackEndRestConnector, times(1)).updateService(serviceId,serviceRequestDTOexpected);
+        verify(ioManageBackEndRestConnector, times(1)).createService(serviceRequestDTOexpected);
+        verify(ioManageBackEndRestConnector, times(1)).updateService(serviceId,serviceRequestDTOexpected);
     }
 
     @Test
@@ -1313,8 +1306,6 @@ class InitiativeServiceTest {
         InitiativeAdditional initiativeAdditional = createInitiativeAdditional();
         initiativeAdditional.setLogoFileName("logo file name");
         initiativeAdditional.setServiceId(SERVICE_ID);
-        initiativeAdditional.setPrimaryTokenIO(ANY_KEY_TOKEN_IO);
-        initiativeAdditional.setSecondaryTokenIO(ANY_KEY_TOKEN_IO);
         initiative.setAdditionalInfo(initiativeAdditional);
         InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = InitiativeOrganizationInfoDTO.builder()
                 .organizationName(ORGANIZATION_NAME)
@@ -1324,17 +1315,16 @@ class InitiativeServiceTest {
 
         ServiceRequestDTO serviceRequestDTOexpected = createServiceRequestDTO();
         ServiceResponseDTO serviceResponseDTOexpected = createServiceResponseDTO();
-        String serviceId = serviceResponseDTOexpected.getServiceId();
+        String serviceId = serviceResponseDTOexpected.getId();
 
         when(initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(initiativeAdditional, initiativeOrganizationInfoDTO)).thenReturn(serviceRequestDTOexpected);
-        when(ioBackEndRestConnector.updateService(serviceId,serviceRequestDTOexpected)).thenReturn(serviceResponseDTOexpected);
-        Mockito.doNothing().when(ioBackEndRestConnector).sendLogoIo(anyString(),any());
+        when(ioManageBackEndRestConnector.updateService(serviceId,serviceRequestDTOexpected)).thenReturn(serviceResponseDTOexpected);
+        Mockito.doNothing().when(ioManageBackEndRestConnector).sendLogoIo(anyString(),any());
 
         Initiative initiativeActual = initiativeService.sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(initiative, initiativeOrganizationInfoDTO);
         assertEquals(SERVICE_ID, initiativeActual.getAdditionalInfo().getServiceId());
-        assertEquals(ANY_KEY_TOKEN_IO, initiativeActual.getAdditionalInfo().getPrimaryTokenIO());
 
-        verify(ioBackEndRestConnector, times(1)).updateService(serviceId,serviceRequestDTOexpected);
+        verify(ioManageBackEndRestConnector, times(1)).updateService(serviceId,serviceRequestDTOexpected);
     }
 
     @Test
@@ -1641,6 +1631,53 @@ class InitiativeServiceTest {
         }
     }
 
+    @Test
+    void getTokenKeys_ok(){
+        try{
+            KeysDTO expectedKeysDTO= KeysDTO.builder()
+                    .primaryKey("key1")
+                    .secondaryKey("key2")
+                    .build();
+            Initiative initiative = createFullInitiative();
+            initiative.getAdditionalInfo().setServiceId("test");
+            when(initiativeRepository.findById(INITIATIVE_ID)).thenReturn(Optional.of(initiative));
+            when(ioManageBackEndRestConnector.getServiceKeys("test")).thenReturn(expectedKeysDTO);
+            KeysDTO actualKeysDTO = initiativeService.getTokenKeys(INITIATIVE_ID);
+            assertEquals(expectedKeysDTO, actualKeysDTO);
+        } catch (Exception e) {
+            Assertions.fail();
+        }
+    }
+
+    @Test
+    void getTokenKeys_not_found(){
+        try{
+            initiativeService.getTokenKeys(INITIATIVE_ID);
+            Assertions.fail();
+        } catch (InitiativeException e) {
+            assertEquals(InitiativeConstants.Exception.NotFound.CODE, e.getCode());
+            assertEquals(String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID), e.getMessage());
+            assertEquals(HttpStatus.NOT_FOUND, e.getHttpStatus());
+        }
+    }
+
+    @Test
+    void getTokenKeys_exception(){
+        Initiative initiative = createFullInitiative();
+        initiative.getAdditionalInfo().setServiceId("test");
+        when(initiativeRepository.findById(INITIATIVE_ID)).thenReturn(Optional.of(initiative));
+        Mockito.doThrow(new RuntimeException())
+                .when(ioManageBackEndRestConnector)
+                .getServiceKeys(Mockito.any());
+        try{
+            initiativeService.getTokenKeys(INITIATIVE_ID);
+            Assertions.fail();
+        } catch (InitiativeException e) {
+            assertEquals(InternalServerError.CODE, e.getCode());
+            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, e.getHttpStatus());
+        }
+    }
+
     private ServiceResponseErrorDTO createServiceResponseErrorDTO(int httpStatus) {
         return ServiceResponseErrorDTO.builder()
                 .type("https://example.com/problem/constraint-violation")
@@ -1656,10 +1693,8 @@ class InitiativeServiceTest {
         return ServiceRequestDTO.builder()
                 .serviceMetadata(serviceMetadataDTO)
                 .serviceName(SERVICE_NAME)
-                .departmentName(PRODUCT_DEPARTMENT_NAME)
-                .organizationName(ORGANIZATION_NAME)
-                .organizationFiscalCode(ORGANIZATION_VAT_NOT_VALID)
-                .isVisible(IS_VISIBLE)
+                .description(DESCRIPTION)
+                .organization(createOrganizationDTO())
                 .build();
     }
 
@@ -1668,10 +1703,8 @@ class InitiativeServiceTest {
         return ServiceRequestDTO.builder()
                 .serviceMetadata(serviceMetadataDTO)
                 .serviceName(SERVICE_NAME)
-                .departmentName(PRODUCT_DEPARTMENT_NAME)
-                .organizationName(ORGANIZATION_NAME)
-                .organizationFiscalCode(ORGANIZATION_VAT)
-                .isVisible(IS_VISIBLE)
+                .description(DESCRIPTION)
+                .organization(createOrganizationDTO())
                 .build();
     }
 
@@ -1682,15 +1715,21 @@ class InitiativeServiceTest {
                 .supportUrl(SUPPORT_URL)
                 .privacyUrl(PRIVACY_URL)
                 .tosUrl(TOS_URL)
-                .description(DESCRIPTION)
                 .scope(SCOPE)
+                .build();
+    }
+
+    private OrganizationDTO createOrganizationDTO() {
+        return OrganizationDTO.builder()
+                .departmentName(PRODUCT_DEPARTMENT_NAME)
+                .organizationName(ORGANIZATION_NAME)
+                .organizationFiscalCode(ORGANIZATION_VAT)
                 .build();
     }
 
     private ServiceResponseDTO createServiceResponseDTO() {
         return ServiceResponseDTO.builder()
-                .serviceId(SERVICE_ID)
-                .primaryKey(ANY_KEY_TOKEN_IO)
+                .id(SERVICE_ID)
                 .build();
     }
 

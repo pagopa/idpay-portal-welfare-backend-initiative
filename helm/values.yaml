@@ -94,7 +94,6 @@ microservice-chart:
     idpay-common:
       TZ: TZ
     rest-client:
-      IO_BACKEND_SERVICE_BASE_URL: io_backend_base_url
       IO_MANAGE_BACKEND_SERVICE_BASE_URL: io_manage_backend_base_url
       GROUP_MS_HOST: idpay_group_host
       EMAIL_NOTIFICATION_MS_HOST: email_notification_ms_host

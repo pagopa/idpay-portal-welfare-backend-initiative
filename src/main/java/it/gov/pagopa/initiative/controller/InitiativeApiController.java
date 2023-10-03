@@ -2,6 +2,7 @@ package it.gov.pagopa.initiative.controller;
 
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.*;
+import it.gov.pagopa.initiative.dto.io.service.KeysDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
 import it.gov.pagopa.initiative.exception.InitiativeException;
 import it.gov.pagopa.initiative.exception.IntegrationException;
@@ -324,9 +325,9 @@ public class InitiativeApiController implements InitiativeApi {
 
     @ResponseStatus(HttpStatus.OK)
     @Override
-    public ResponseEntity<InitiativeAdditionalDTO> getPrimaryAndSecondaryTokenIO(String initiativeId){
+    public ResponseEntity<KeysDTO> getPrimaryAndSecondaryTokenIO(String initiativeId){
         log.info("[GET_PRIMARY_AND_SECONDARY_TOKEN] - Start searching tokens for initiativeId {}...", initiativeId);
-        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeAdditionalDTOOnlyTokens(this.initiativeService.getPrimaryAndSecondaryTokenIO(initiativeId)));
+        return ResponseEntity.ok(this.initiativeService.getTokenKeys(initiativeId));
     }
 
     @Override
