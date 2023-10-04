@@ -9,7 +9,6 @@ import feign.FeignException;
 import feign.RetryableException;
 import it.gov.pagopa.initiative.config.IOBackEndRestConnectorConfig;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
-import it.gov.pagopa.initiative.dto.io.service.KeysDTO;
 import it.gov.pagopa.initiative.dto.io.service.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;

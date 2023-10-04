@@ -19,15 +19,12 @@ import java.util.stream.Collectors;
 public class InitiativeAdditionalDTOsToIOServiceRequestDTOMapper {
 
     private final String productDepartmentName;
-    private final Boolean isVisible;
     private final List<String> authorizedRecipients;
 
     public InitiativeAdditionalDTOsToIOServiceRequestDTOMapper(
             @Value("${rest-client.backend-io.service.request.departmentName}") String productDepartmentName,
-            @Value("${rest-client.backend-io.service.request.isVisible}") Boolean isVisible,
             @Value("${rest-client.backend-io.service.request.authorizedRecipients}") List<String> authorizedRecipients) {
         this.productDepartmentName = productDepartmentName;
-        this.isVisible = isVisible;
         this.authorizedRecipients = authorizedRecipients;
     }
 

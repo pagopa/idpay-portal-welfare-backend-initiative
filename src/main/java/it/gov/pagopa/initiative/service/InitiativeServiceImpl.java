@@ -21,7 +21,10 @@ import it.gov.pagopa.initiative.event.InitiativeProducer;
 import it.gov.pagopa.initiative.exception.InitiativeException;
 import it.gov.pagopa.initiative.mapper.InitiativeAdditionalDTOsToIOServiceRequestDTOMapper;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
-import it.gov.pagopa.initiative.model.*;
+import it.gov.pagopa.initiative.model.AutomatedCriteria;
+import it.gov.pagopa.initiative.model.Initiative;
+import it.gov.pagopa.initiative.model.InitiativeAdditional;
+import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
 import it.gov.pagopa.initiative.utils.AuditUtilities;
 import it.gov.pagopa.initiative.utils.InitiativeUtils;
@@ -62,7 +65,6 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     private final DecryptRestConnector decryptRestConnector;
     private final FileStorageConnector fileStorageConnector;
     private final EmailNotificationService emailNotificationService;
-    private final AESTokenService ioTokenService;
     private final InitiativeValidationService initiativeValidationService;
     private final InitiativeUtils initiativeUtils;
     private final AuditUtilities auditUtilities;
@@ -84,7 +86,6 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             DecryptRestConnector decryptRestConnector,
             FileStorageConnector fileStorageConnector,
             EmailNotificationService emailNotificationService,
-            AESTokenService ioTokenService,
             InitiativeValidationService initiativeValidationService,
             InitiativeUtils initiativeUtils,
             AuditUtilities auditUtilities,
@@ -101,7 +102,6 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         this.decryptRestConnector = decryptRestConnector;
         this.fileStorageConnector = fileStorageConnector;
         this.emailNotificationService = emailNotificationService;
-        this.ioTokenService = ioTokenService;
         this.initiativeValidationService = initiativeValidationService;
         this.initiativeUtils = initiativeUtils;
         this.auditUtilities = auditUtilities;

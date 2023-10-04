@@ -16,8 +16,8 @@ import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.Internal
 import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.NotFound;
 import it.gov.pagopa.initiative.constants.InitiativeConstants.Status;
 import it.gov.pagopa.initiative.dto.*;
-import it.gov.pagopa.initiative.dto.io.service.*;
 import it.gov.pagopa.initiative.dto.io.service.OrganizationDTO;
+import it.gov.pagopa.initiative.dto.io.service.*;
 import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardGroupsDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.*;
@@ -64,7 +64,6 @@ import java.util.*;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.ADMIN;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.PAGOPA_ADMIN;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -84,7 +83,6 @@ class InitiativeServiceTest {
     public static final String INITIATIVE_ID = "initiativeId";
     private static final String ORGANIZATION_NAME = "organizationName";
     private static final String ORGANIZATION_VAT = "organizationVat";
-    private static final String ORGANIZATION_VAT_NOT_VALID = "organizationVatNotValid";
     private static final String ORGANIZATION_USER_ROLE = "organizationUserRole";
     private static final String EMAIL = "test@pagopa.it";
     private static final String PHONE = "0123456789";
@@ -93,11 +91,9 @@ class InitiativeServiceTest {
     private static final String TOS_URL = "tos.url.it";
     private static final String DESCRIPTION = "description";
     private static final String SCOPE = "LOCAL";
-    private static final boolean IS_VISIBLE = false;
     private static final String SERVICE_NAME = "serviceName";
     private static final String PRODUCT_DEPARTMENT_NAME = "productDepartmentName";
     private static final String SERVICE_ID = "serviceId";
-    public static final String ANY_KEY_TOKEN_IO = "ANY_KEY_TOKEN_IO";
     private static final String ROLE = "ROLE";
     private static final String CF = "CF";
     private static final String USER_ID = "USER_ID";
@@ -150,9 +146,6 @@ class InitiativeServiceTest {
 
     @MockBean
     EmailNotificationService emailNotificationService;
-
-    @MockBean
-    AESTokenService ioTokenService;
 
     @MockBean
     InitiativeValidationService initiativeValidationService;
@@ -1289,7 +1282,6 @@ class InitiativeServiceTest {
 
         when(initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(initiativeAdditional, initiativeOrganizationInfoDTO)).thenReturn(serviceRequestDTOexpected);
         when(ioManageBackEndRestConnector.createService(serviceRequestDTOexpected)).thenReturn(serviceResponseDTOexpected);
-        when(ioTokenService.encrypt(anyString())).thenReturn(ANY_KEY_TOKEN_IO);
         when(ioManageBackEndRestConnector.updateService(serviceId,serviceRequestDTOexpected)).thenReturn(serviceResponseDTOexpected);
 
         Initiative initiativeActual = initiativeService.sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(initiative, initiativeOrganizationInfoDTO);
@@ -1357,8 +1349,6 @@ class InitiativeServiceTest {
     @Test
     void getRankingList_ko_encrypt() {
         Initiative initiative = this.createFullInitiative();
-        OnboardingStatusCitizenDTO onboardingStatusCitizenDTO = new OnboardingStatusCitizenDTO(USER_ID, STATUS, LocalDateTime.now().toString(), null);
-        EncryptedCfDTO encryptedCfDTO = new EncryptedCfDTO(USER_ID);
         Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
         Mockito.doThrow(new InitiativeException(InternalServerError.CODE, "", HttpStatus.INTERNAL_SERVER_ERROR)).when(encryptRestConnector).upsertToken(Mockito.any());
         try {
