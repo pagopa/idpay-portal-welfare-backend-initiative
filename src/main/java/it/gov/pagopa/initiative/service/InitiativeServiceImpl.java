@@ -425,14 +425,14 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         if (StringUtils.isBlank(serviceId)) {
             ServiceResponseDTO serviceResponseDTO = ioManageBackEndRestConnector.createService(serviceRequestDTO);
             serviceId = serviceResponseDTO.getId();
-            log.debug("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Created new service to ServiceIO", initiative.getInitiativeId());
+            log.info("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Created new service to ServiceIO", initiative.getInitiativeId());
             additionalInfo.setServiceId(serviceId);
             this.updateInitiative(initiative);
         }
 
         if (additionalInfo.getLogoFileName() != null) {
             try {
-                log.debug("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Update logo to ServiceIO", initiative.getInitiativeId());
+                log.info("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Update logo to ServiceIO", initiative.getInitiativeId());
                 ByteArrayOutputStream byteArrayOutputStream = fileStorageConnector.downloadInitiativeLogo(
                         initiativeUtils.getPathLogo(initiative.getOrganizationId(),
                                 initiative.getInitiativeId()));
@@ -446,7 +446,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             }
         }
 
-        log.debug("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Update CTA to ServiceIO", initiative.getInitiativeId());
+        log.info("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Update CTA to ServiceIO", initiative.getInitiativeId());
         serviceRequestDTO.getServiceMetadata().setCta(
                 InitiativeConstants.CtaConstant.START +
                         InitiativeConstants.CtaConstant.IT + InitiativeConstants.CtaConstant.CTA_1_IT + InitiativeConstants.CtaConstant.TEXT_IT + InitiativeConstants.CtaConstant.ACTION_IT + serviceId +
