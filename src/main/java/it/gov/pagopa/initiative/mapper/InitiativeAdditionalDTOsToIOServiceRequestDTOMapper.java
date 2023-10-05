@@ -22,8 +22,8 @@ public class InitiativeAdditionalDTOsToIOServiceRequestDTOMapper {
     private final List<String> authorizedRecipients;
 
     public InitiativeAdditionalDTOsToIOServiceRequestDTOMapper(
-            @Value("${rest-client.backend-io.service.request.departmentName}") String productDepartmentName,
-            @Value("${rest-client.backend-io.service.request.authorizedRecipients}") List<String> authorizedRecipients) {
+            @Value("${rest-client.backend-io-manage.service.request.departmentName}") String productDepartmentName,
+            @Value("${rest-client.backend-io-manage.service.request.authorizedRecipients}") List<String> authorizedRecipients) {
         this.productDepartmentName = productDepartmentName;
         this.authorizedRecipients = authorizedRecipients;
     }

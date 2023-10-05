@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 //@TestPropertySource(
 //        locations = "classpath:application.yml",
 //        properties = {
-//                "rest-client.backend-io.service.request.departmentName=productDepartmentName",
+//                "rest-client.backend-io-manage.service.request.departmentName=productDepartmentName",
 //        })
 //@WebMvcTest(value = {
 //        InitiativeAdditionalDTOsToIOServiceRequestDTOMapper.class})
