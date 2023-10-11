@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface IOManageBackEndRestConnector {
 
   ServiceResponseDTO createService(@RequestBody @Valid ServiceRequestDTO serviceRequestDTO);
-  void sendLogoIo(String serviceId,  LogoIODTO logo);
+  void sendLogoIo(String serviceId, LogoIODTO logo);
   ServiceResponseDTO updateService(String serviceId, ServiceRequestDTO serviceRequestDTO);
   ResponseEntity<Void> deleteService(String serviceId);
   KeysDTO getServiceKeys(@PathVariable("serviceId") String serviceId);
