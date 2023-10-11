@@ -436,6 +436,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                 ByteArrayOutputStream byteArrayOutputStream = fileStorageConnector.downloadInitiativeLogo(
                         initiativeUtils.getPathLogo(initiative.getOrganizationId(),
                                 initiative.getInitiativeId()));
+                log.info("Body Logo: {}", new String(Base64.getEncoder().encode(byteArrayOutputStream.toByteArray())));
                 ioManageBackEndRestConnector.sendLogoIo(serviceId, LogoIODTO.builder().logo(new String(
                                 Base64.getEncoder().encode(byteArrayOutputStream.toByteArray())))
                         .build());
