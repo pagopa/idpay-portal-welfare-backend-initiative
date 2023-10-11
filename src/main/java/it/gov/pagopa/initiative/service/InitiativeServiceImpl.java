@@ -443,6 +443,8 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                 ByteArrayOutputStream byteArrayOutputStream = fileStorageConnector.downloadInitiativeLogo(
                         initiativeUtils.getPathLogo(initiative.getOrganizationId(),
                                 initiative.getInitiativeId()));
+                log.info("Body Logo: {}", LogoIODTO.builder().logo(new String(
+                                Base64.getEncoder().encode(byteArrayOutputStream.toByteArray()))).build());
                 ioManageBackEndRestConnector.sendLogoIo(serviceId, LogoIODTO.builder().logo(new String(
                                 Base64.getEncoder().encode(byteArrayOutputStream.toByteArray())))
                         .build());
