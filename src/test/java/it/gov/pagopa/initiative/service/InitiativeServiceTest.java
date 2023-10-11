@@ -1586,8 +1586,7 @@ class InitiativeServiceTest {
         initiative.getAdditionalInfo().setServiceId("test");
         when(initiativeRepository.findById(INITIATIVE_ID)).thenReturn(Optional.of(initiative));
 
-        when(ioManageBackEndRestConnector.deleteService("test")).thenThrow(new RuntimeException());
-
+        Mockito.doThrow(new RuntimeException()).when(ioManageBackEndRestConnector).deleteService("test");
 
         when(commandsProducer.sendCommand(any()))
                 .thenReturn(true);
