@@ -28,8 +28,8 @@ public class IOManageBackEndRestConnectorImpl implements IOManageBackEndRestConn
   }
 
   @Override
-  public void sendLogoIo(String serviceId, LogoIODTO logo) {
-    ioManageBackEndFeignRestClient.sendLogo(serviceId, logo, subscriptionKey);
+  public ResponseEntity<Void> sendLogoIo(String serviceId, LogoIODTO logo) {
+    return ioManageBackEndFeignRestClient.sendLogo(serviceId, logo, subscriptionKey);
   }
 
   @Override
