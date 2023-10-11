@@ -32,7 +32,7 @@ public interface IOManageBackEndFeignRestClient {
   @ResponseBody
   ResponseEntity<Void> sendLogo(
           @PathVariable("serviceId") String serviceId,
-          @RequestBody @Valid LogoIODTO logo,
+          @RequestBody LogoIODTO logo,
           @RequestHeader("Ocp-Apim-Subscription-Key") String subscriptionKey);
 
   @PutMapping(
