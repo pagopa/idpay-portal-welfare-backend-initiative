@@ -430,21 +430,12 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             this.updateInitiative(initiative);
         }
 
-        try {
-            Thread.sleep(7000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            log.error("An error has occurred while waiting {}", e.getMessage());
-        }
-
         if (additionalInfo.getLogoFileName() != null) {
             try {
                 log.info("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Update logo to ServiceIO", initiative.getInitiativeId());
                 ByteArrayOutputStream byteArrayOutputStream = fileStorageConnector.downloadInitiativeLogo(
                         initiativeUtils.getPathLogo(initiative.getOrganizationId(),
                                 initiative.getInitiativeId()));
-                log.info("Body Logo: {}", LogoIODTO.builder().logo(new String(
-                                Base64.getEncoder().encode(byteArrayOutputStream.toByteArray()))).build());
                 ioManageBackEndRestConnector.sendLogoIo(serviceId, LogoIODTO.builder().logo(new String(
                                 Base64.getEncoder().encode(byteArrayOutputStream.toByteArray())))
                         .build());
