@@ -28,7 +28,8 @@ public interface IOManageBackEndFeignRestClient {
 
   @PutMapping(
           value = "/manage/services/{serviceId}/logo",
-          produces = MediaType.APPLICATION_JSON_VALUE)
+          produces = MediaType.ALL_VALUE,
+          consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseBody
   ResponseEntity<Void> sendLogo(
           @PathVariable("serviceId") String serviceId,
