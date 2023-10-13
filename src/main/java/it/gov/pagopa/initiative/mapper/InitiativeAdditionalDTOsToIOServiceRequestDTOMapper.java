@@ -1,6 +1,7 @@
 package it.gov.pagopa.initiative.mapper;
 
 import it.gov.pagopa.initiative.dto.InitiativeOrganizationInfoDTO;
+import it.gov.pagopa.initiative.dto.io.service.OrganizationDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceMetadataDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
 import it.gov.pagopa.initiative.model.Channel;
@@ -18,15 +19,12 @@ import java.util.stream.Collectors;
 public class InitiativeAdditionalDTOsToIOServiceRequestDTOMapper {
 
     private final String productDepartmentName;
-    private final Boolean isVisible;
     private final List<String> authorizedRecipients;
 
     public InitiativeAdditionalDTOsToIOServiceRequestDTOMapper(
-            @Value("${rest-client.backend-io.service.request.departmentName}") String productDepartmentName,
-            @Value("${rest-client.backend-io.service.request.isVisible}") Boolean isVisible,
-            @Value("${rest-client.backend-io.service.request.authorizedRecipients}") List<String> authorizedRecipients) {
+            @Value("${rest-client.backend-io-manage.service.request.departmentName}") String productDepartmentName,
+            @Value("${rest-client.backend-io-manage.service.request.authorizedRecipients}") List<String> authorizedRecipients) {
         this.productDepartmentName = productDepartmentName;
-        this.isVisible = isVisible;
         this.authorizedRecipients = authorizedRecipients;
     }
 
@@ -38,16 +36,18 @@ public class InitiativeAdditionalDTOsToIOServiceRequestDTOMapper {
                 .supportUrl(channelMap.get(Channel.TypeEnum.WEB))
                 .privacyUrl(initiativeAdditional.getPrivacyLink())
                 .tosUrl(initiativeAdditional.getTcLink())
-                .description(initiativeAdditional.getDescription())
                 .scope(initiativeAdditional.getServiceScope().name())
+                .build();
+        OrganizationDTO organizationDTO = OrganizationDTO.builder()
+                .departmentName(StringUtils.isNotBlank(initiativeOrganizationInfoDTO.getOrganizationName()) ? initiativeOrganizationInfoDTO.getOrganizationName() : productDepartmentName)
+                .organizationName(initiativeOrganizationInfoDTO.getOrganizationName())
+                .organizationFiscalCode(initiativeOrganizationInfoDTO.getOrganizationVat())
                 .build();
         ServiceRequestDTO.ServiceRequestDTOBuilder serviceRequestDTOBuilder = ServiceRequestDTO.builder()
                 .serviceMetadata(serviceMetadataDTO)
                 .serviceName(initiativeAdditional.getServiceName())
-                .departmentName(StringUtils.isNotBlank(initiativeOrganizationInfoDTO.getOrganizationName()) ? initiativeOrganizationInfoDTO.getOrganizationName() : productDepartmentName)
-                .organizationName(initiativeOrganizationInfoDTO.getOrganizationName())
-                .organizationFiscalCode(initiativeOrganizationInfoDTO.getOrganizationVat())
-                .isVisible(isVisible);
+                .description(initiativeAdditional.getDescription())
+                .organization(organizationDTO);
         return CollectionUtils.isEmpty(authorizedRecipients) ? serviceRequestDTOBuilder.build() : serviceRequestDTOBuilder.authorizedRecipients(authorizedRecipients).build();
     }
 

@@ -98,26 +98,20 @@ spring:
           default:
             errorDecoder: it.gov.pagopa.initiative.connector.error.decoder.Custom5xxErrorDecoder
             retryer: feign.Retryer.Default
-          backend-io:
+          backend-io-manage:
             loggerLevel: ${FEIGN_CLIENT_CONFIG_IO_LOG_LEVEL:basic}
           ms-group:
             loggerLevel: ${FEIGN_CLIENT_CONFIG_IO_LOG_LEVEL:basic}
 
 rest-client:
-  backend-io:
-    service:
-      base-url: ${IO_BACKEND_SERVICE_BASE_URL:}/api/v1
-      name: backend-io
-      subscriptionKey: ${IO_BACKEND_SERVICE_SUBSCRIPTION_API_KEY:}
-      request:
-        departmentName: ${IO_BACKEND_SERVICE_DEPARTMENT_NAME:}
-        isVisible: ${IO_BACKEND_SERVICE_IS_VISIBLE:false}
-        authorizedRecipients: ${IO_BACKEND_SERVICE_AUTHORIZED_RECIPIENTS:}
   backend-io-manage:
     service:
       base-url: ${IO_MANAGE_BACKEND_SERVICE_BASE_URL:}/api/v1
       name: backend-io-manage
       subscriptionKey: ${IO_BACKEND_SERVICE_SUBSCRIPTION_API_KEY:}
+      request:
+        departmentName: ${IO_BACKEND_SERVICE_DEPARTMENT_NAME:}
+        authorizedRecipients: ${IO_BACKEND_SERVICE_AUTHORIZED_RECIPIENTS:}
   onboarding:
     serviceCode: idpay-onboarding
     uri: ${ONBOARDING_URI:}

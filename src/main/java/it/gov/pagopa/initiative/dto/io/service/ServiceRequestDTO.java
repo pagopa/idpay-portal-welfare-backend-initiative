@@ -15,26 +15,18 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class ServiceRequestDTO {
-    private Integer version;
-    @JsonProperty("service_name")
+    @JsonProperty("name")
     private String serviceName;
-    @JsonProperty("is_visible")
-    private Boolean isVisible;
-    @JsonProperty("department_name")
-    private String departmentName;
-    @JsonProperty("organization_name")
-    private String organizationName;
-    @JsonProperty("organization_fiscal_code")
-    private String organizationFiscalCode;
-    @JsonProperty("require_secure_channels")
+    private String description;
+    private OrganizationDTO organization;
+    @JsonProperty("require_secure_channel")
     private Boolean requireSecureChannels;
     @JsonProperty("authorized_cidrs")
     private final List<String> authorizedCidrs = new ArrayList<>();
     @JsonProperty("authorized_recipients")
     private List<String> authorizedRecipients = new ArrayList<>();
-    @JsonProperty("service_metadata")
+    @JsonProperty("metadata")
     private ServiceMetadataDTO serviceMetadata;
-
 
 }
 

@@ -53,12 +53,6 @@ public class InitiativeAdditionalDTO extends InitiativeOrganizationInfoDTO {
   @NotBlank(groups = ValidationApiEnabledGroup.class)
   private String description;
 
-  @JsonProperty("primaryTokenIO")
-  private String primaryTokenIO;
-
-  @JsonProperty("secondaryTokenIO")
-  private String secondaryTokenIO;
-
   @JsonProperty("privacyLink")
   @URL(protocol = "https", regexp = VALID_LINK, groups = ValidationApiEnabledGroup.class)
   private String privacyLink;
