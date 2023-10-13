@@ -1293,6 +1293,35 @@ class InitiativeServiceTest {
     }
 
     @Test
+    void sendInitiativeInfoToIOBackendServiceAndUpdateInitiative_withUploadServiceIOKO() {
+        //Instruct Initiative
+        Initiative initiative = createStep5Initiative();
+
+        InitiativeAdditional initiativeAdditional = createInitiativeAdditional();
+
+        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = InitiativeOrganizationInfoDTO.builder()
+                .organizationName(ORGANIZATION_NAME)
+                .organizationVat(ORGANIZATION_VAT)
+                .organizationUserRole(ORGANIZATION_USER_ROLE)
+                .build();
+
+        ServiceRequestDTO serviceRequestDTOexpected = createServiceRequestDTO();
+        ServiceResponseDTO serviceResponseDTOexpected = createServiceResponseDTO();
+        String serviceId = serviceResponseDTOexpected.getId();
+
+        when(initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(initiativeAdditional, initiativeOrganizationInfoDTO)).thenReturn(serviceRequestDTOexpected);
+        when(ioManageBackEndRestConnector.createService(serviceRequestDTOexpected)).thenReturn(serviceResponseDTOexpected);
+        when(ioManageBackEndRestConnector.updateService(serviceId,serviceRequestDTOexpected)).thenThrow(new RuntimeException());
+
+        Initiative initiativeActual = initiativeService.sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(initiative, initiativeOrganizationInfoDTO);
+        assertEquals(SERVICE_ID, initiativeActual.getAdditionalInfo().getServiceId());
+
+        //Expecting connector to be called once with correct param
+        verify(ioManageBackEndRestConnector, times(1)).createService(serviceRequestDTOexpected);
+        verify(ioManageBackEndRestConnector, times(1)).updateService(serviceId,serviceRequestDTOexpected);
+    }
+
+    @Test
     void sendInitiativeInfoToIOBackEndServiceAndUpdateInitiativeWithLogo_serviceIdAlreadyExisting() {
         Initiative initiative = createStep5Initiative();
         InitiativeAdditional initiativeAdditional = createInitiativeAdditional();
