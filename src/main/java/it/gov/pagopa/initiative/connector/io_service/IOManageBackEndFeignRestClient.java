@@ -28,12 +28,11 @@ public interface IOManageBackEndFeignRestClient {
 
   @PutMapping(
           value = "/manage/services/{serviceId}/logo",
-          produces = MediaType.ALL_VALUE,
-          consumes = MediaType.ALL_VALUE)
+          consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseBody
   ResponseEntity<Void> sendLogo(
           @PathVariable("serviceId") String serviceId,
-          @RequestBody LogoIODTO logoDTO,
+          @RequestBody @Valid LogoIODTO logoDTO,
           @RequestHeader("Ocp-Apim-Subscription-Key") String subscriptionKey);
 
   @PutMapping(
