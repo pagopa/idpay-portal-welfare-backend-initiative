@@ -25,6 +25,7 @@ import it.gov.pagopa.initiative.dto.LogoDTO;
 import it.gov.pagopa.initiative.dto.OnboardingDTO;
 import it.gov.pagopa.initiative.dto.OrganizationDTO;
 import it.gov.pagopa.initiative.dto.OrganizationListDTO;
+import it.gov.pagopa.initiative.dto.io.service.KeysDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
 import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
 import java.io.IOException;
@@ -419,7 +420,7 @@ public interface InitiativeApi {
       @ApiResponse(responseCode = "500", description = "Server ERROR", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))})
   @GetMapping(value = "/idpay/initiative/{initiativeId}/token",
       produces = {"application/json"})
-  ResponseEntity<InitiativeAdditionalDTO> getPrimaryAndSecondaryTokenIO(
+  ResponseEntity<KeysDTO> getPrimaryAndSecondaryTokenIO(
       @PathVariable("initiativeId") String initiativeId);
 
   @Operation(summary = "Return ranking list onboarding status of the specified initiative", description = "", security = {

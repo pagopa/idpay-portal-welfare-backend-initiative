@@ -1,7 +1,7 @@
 {
   "request": {
-    "method": "PUT",
-    "urlPathPattern": "/manage/services/SERVICE_ID_500",
+    "method": "GET",
+    "urlPathPattern": "/manage/services/SERVICE_ID_500/keys",
     "headers": {
       "Ocp-Apim-Subscription-Key": {
         "matches": ".*"

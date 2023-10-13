@@ -12,8 +12,7 @@ import lombok.*;
 @EqualsAndHashCode
 @Builder
 public class ServiceMetadataDTO {
-  private String description;
-  @JsonProperty("require_secure_channels")
+  @JsonProperty("web_url")
   private String webUrl;
   @JsonProperty("app_ios")
   private String appIos;
@@ -33,8 +32,6 @@ public class ServiceMetadataDTO {
   @JsonProperty("support_url")
   private String supportUrl;
   private String scope;
-  private String category;
-  @JsonProperty("custom_special_flow")
-  private String customSpecialFlow;
+
 }
 
