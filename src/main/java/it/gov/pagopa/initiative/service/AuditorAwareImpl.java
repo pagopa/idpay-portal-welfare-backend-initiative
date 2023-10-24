@@ -1,7 +1,6 @@
 package it.gov.pagopa.initiative.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.AuditorAware;
 
@@ -16,7 +15,6 @@ public class AuditorAwareImpl implements AuditorAware<String> {
     @Autowired
     private HttpServletRequest request;
 
-    @NotNull
     @Override
     public Optional<String> getCurrentAuditor() {
         String method = request.getMethod();
