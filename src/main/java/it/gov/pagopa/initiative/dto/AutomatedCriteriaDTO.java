@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import it.gov.pagopa.initiative.model.IseeTypologyEnum;
 import it.gov.pagopa.initiative.utils.constraint.initiative.beneficiary.IseeCodeMustHaveFieldNullConstraint;
 import it.gov.pagopa.initiative.utils.constraint.SecondValueGreaterThanFirstWithBTW;
+import it.gov.pagopa.initiative.utils.constraint.initiative.beneficiary.IseeCodeMustHaveValueNumericConstraint;
 import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
 import lombok.*;
 import org.springframework.lang.Nullable;
@@ -20,6 +21,7 @@ import java.util.List;
 @Builder
 @SecondValueGreaterThanFirstWithBTW(groups = ValidationApiEnabledGroup.class)
 @IseeCodeMustHaveFieldNullConstraint(groups = ValidationApiEnabledGroup.class)
+@IseeCodeMustHaveValueNumericConstraint(groups = ValidationApiEnabledGroup.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AutomatedCriteriaDTO {
 
