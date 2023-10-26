@@ -498,6 +498,41 @@ class InitiativeApiTest {
         //doNothing only for Void method
         doNothing().when(initiativeService).updateStep3InitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule, ROLE, false);
 
+        // Base test
+        mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_BENEFICIARY_RULES_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(initiativeBeneficiaryRuleDTO))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    void updateInitiativeBeneficiaryISEEandNumber_statusNoContent() throws Exception {
+        objectMapper.registerModule(new JavaTimeModule());
+
+        InitiativeBeneficiaryRule initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
+        Boolean beneficiaryKnown = false;
+        //create Dummy Initiative
+        Initiative step2Initiative = createStep2Initiative(beneficiaryKnown);
+        InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
+        initiativeBeneficiaryRuleDTO.setOrganizationName(ORGANIZATION_NAME);
+        initiativeBeneficiaryRuleDTO.setOrganizationUserRole(ROLE);
+
+        // Instruct the Service to insert a Dummy Initiative
+        when(initiativeDTOsToModelMapper.toBeneficiaryRule(initiativeBeneficiaryRuleDTO)).thenReturn(initiativeBeneficiaryRule);
+
+        // Instruct the Service to get a Dummy Initiative
+        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step2Initiative);
+
+        //doNothing only for Void method
+        doNothing().when(initiativeService).updateStep3InitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule, ROLE, false);
+
+        // ISEE with decimal and field null
+        initiativeBeneficiaryRuleDTO.getAutomatedCriteria().get(0).setCode("ISEE");
+        initiativeBeneficiaryRuleDTO.getAutomatedCriteria().get(0).setValue("2.5");
+        initiativeBeneficiaryRuleDTO.getAutomatedCriteria().get(0).setField(null);
         mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_BENEFICIARY_RULES_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(initiativeBeneficiaryRuleDTO))
@@ -518,6 +553,37 @@ class InitiativeApiTest {
         InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
         initiativeBeneficiaryRuleDTO.setOrganizationName(ORGANIZATION_NAME);
         initiativeBeneficiaryRuleDTO.setOrganizationUserRole(ROLE);
+
+        // Instruct the Service to insert a Dummy Initiative
+        when(initiativeDTOsToModelMapper.toBeneficiaryRule(initiativeBeneficiaryRuleDTO)).thenReturn(initiativeBeneficiaryRule);
+
+        // Instruct the Service to get a Dummy Initiative
+        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step2Initiative);
+
+        //doNothing only for Void method
+        doNothing().when(initiativeService).updateStep3InitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule, ROLE, false);
+
+        mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_BENEFICIARY_RULES_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(initiativeBeneficiaryRuleDTO))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    void updateInitiativeBeneficiary_statusBadRequest_notValidCodeWithISEEInput() throws Exception {
+        objectMapper.registerModule(new JavaTimeModule());
+
+        InitiativeBeneficiaryRule initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
+        Boolean beneficiaryKnown = false;
+        //create Dummy Initiative
+        Initiative step2Initiative = createStep2Initiative(beneficiaryKnown);
+        InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
+        initiativeBeneficiaryRuleDTO.setOrganizationName(ORGANIZATION_NAME);
+        initiativeBeneficiaryRuleDTO.setOrganizationUserRole(ROLE);
+        initiativeBeneficiaryRuleDTO.getAutomatedCriteria().get(0).setCode("ISEE");
 
         // Instruct the Service to insert a Dummy Initiative
         when(initiativeDTOsToModelMapper.toBeneficiaryRule(initiativeBeneficiaryRuleDTO)).thenReturn(initiativeBeneficiaryRule);
@@ -1370,6 +1436,29 @@ class InitiativeApiTest {
 
     private InitiativeBeneficiaryRuleDTO createInitiativeBeneficiaryRuleDTO() {
         InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = new InitiativeBeneficiaryRuleDTO();
+
+        initiativeBeneficiaryRuleDTO.setSelfDeclarationCriteria(createAnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems());
+        initiativeBeneficiaryRuleDTO.setAutomatedCriteria(createAutomatedCriteriaDTO());
+
+        initiativeBeneficiaryRuleDTO.setApiKeyClientId(API_KEY_CLIENT_ID);
+        initiativeBeneficiaryRuleDTO.setApiKeyClientAssertion(API_KEY_CLIENT_ASSERTION);
+        return initiativeBeneficiaryRuleDTO;
+    }
+
+
+    private List<AutomatedCriteriaDTO> createAutomatedCriteriaDTO(){
+        AutomatedCriteriaDTO automatedCriteriaDTO = new AutomatedCriteriaDTO();
+        automatedCriteriaDTO.setAuthority("Authority_ISEE");
+        automatedCriteriaDTO.setCode("Code_ISEE");
+        automatedCriteriaDTO.setField("true");
+        automatedCriteriaDTO.setOperator(FilterOperatorEnum.EQ);
+        automatedCriteriaDTO.setValue("value");
+        List<AutomatedCriteriaDTO> automatedCriteriaList = new ArrayList<>();
+        automatedCriteriaList.add(automatedCriteriaDTO);
+        return automatedCriteriaList;
+    }
+
+    private List<AnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems> createAnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems(){
         SelfCriteriaBoolDTO selfCriteriaBoolDTO = new SelfCriteriaBoolDTO();
         selfCriteriaBoolDTO.setType(it.gov.pagopa.initiative.dto.TypeBoolEnum.BOOLEAN);
         selfCriteriaBoolDTO.setCode("B001");
@@ -1386,19 +1475,7 @@ class InitiativeApiTest {
         List<AnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems> anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems = new ArrayList<>();
         anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems.add(selfCriteriaBoolDTO);
         anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems.add(selfCriteriaMultiDTO);
-        initiativeBeneficiaryRuleDTO.setSelfDeclarationCriteria(anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems);
-        AutomatedCriteriaDTO automatedCriteriaDTO = new AutomatedCriteriaDTO();
-        automatedCriteriaDTO.setAuthority("Authority_ISEE");
-        automatedCriteriaDTO.setCode("Code_ISEE");
-        automatedCriteriaDTO.setField("true");
-        automatedCriteriaDTO.setOperator(FilterOperatorEnum.EQ);
-        automatedCriteriaDTO.setValue("value");
-        List<AutomatedCriteriaDTO> automatedCriteriaList = new ArrayList<>();
-        automatedCriteriaList.add(automatedCriteriaDTO);
-        initiativeBeneficiaryRuleDTO.setAutomatedCriteria(automatedCriteriaList);
-        initiativeBeneficiaryRuleDTO.setApiKeyClientId(API_KEY_CLIENT_ID);
-        initiativeBeneficiaryRuleDTO.setApiKeyClientAssertion(API_KEY_CLIENT_ASSERTION);
-        return initiativeBeneficiaryRuleDTO;
+        return anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems;
     }
 
     /*
