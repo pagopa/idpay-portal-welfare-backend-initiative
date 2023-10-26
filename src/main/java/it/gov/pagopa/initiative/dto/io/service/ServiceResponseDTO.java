@@ -16,32 +16,20 @@ public class ServiceResponseDTO {
 
     private String id;
     private Integer version;
-    @JsonProperty("service_id")
-    private String serviceId;
-    @JsonProperty("service_name")
+    @JsonProperty("name")
     private String serviceName;
-    @JsonProperty("service_metadata")
-    private ServiceMetadataDTO serviceMetadata;
-    @JsonProperty("is_visible")
-    private Boolean isVisible;
-    @JsonProperty("department_name")
-    private String departmentName;
-    @JsonProperty("organization_name")
-    private String organizationName;
-    @JsonProperty("organization_fiscal_code")
-    private String organizationFiscalCode;
-    @JsonProperty("require_secure_channels")
+    private String description;
+    private OrganizationDTO organization;
+    @JsonProperty("require_secure_channel")
     private Boolean requireSecureChannels;
-    @JsonProperty("max_allowed_payment_amount")
-    private Integer maxAllowedPaymentAmount;
     @JsonProperty("authorized_recipients")
     private List<String> authorizedRecipients;
     @JsonProperty("authorized_cidrs")
     private List<String> authorizedCidrs;
-    @JsonProperty("primary_key")
-    private String primaryKey;
-    @JsonProperty("secondary_key")
-    private String secondaryKey;
+    @JsonProperty("max_allowed_payment_amount")
+    private Integer maxAllowedPaymentAmount;
+    @JsonProperty("metadata")
+    private ServiceMetadataDTO serviceMetadata;
 
 }
 

@@ -1,6 +1,5 @@
 package it.gov.pagopa.initiative.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,6 +15,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Builder
 public class LogoIODTO {
-  @JsonProperty("logo")
+
   private String logo;
 }

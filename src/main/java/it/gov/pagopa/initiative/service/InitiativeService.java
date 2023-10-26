@@ -1,6 +1,7 @@
 package it.gov.pagopa.initiative.service;
 
 import it.gov.pagopa.initiative.dto.*;
+import it.gov.pagopa.initiative.dto.io.service.KeysDTO;
 import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeAdditional;
 import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
@@ -63,4 +64,5 @@ public interface InitiativeService {
     InitiativeDetailDTO getInitiativeBeneficiaryDetail(String initiativeId, Locale acceptLanguage);
     void deleteInitiative(String initiativeId);
     void initializeStatistics(String initiativeId, String organizationId);
+    KeysDTO getTokenKeys(String initiativeId);
 }
