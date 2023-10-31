@@ -6,7 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.InitiativeTrxConditionsDTO;
+import it.gov.pagopa.initiative.utils.constraint.initiative.general.TRXRuleNullIfDiscountConstraint;
 import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
+import it.gov.pagopa.initiative.utils.validator.ValidationTRXGroup;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,6 +24,7 @@ import jakarta.validation.constraints.NotNull;
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @SuperBuilder
+@TRXRuleNullIfDiscountConstraint(groups = ValidationTRXGroup.class)
 public class InitiativeRewardAndTrxRulesDTO extends InitiativeOrganizationInfoDTO {
 
     @JsonProperty("initiativeRewardType")

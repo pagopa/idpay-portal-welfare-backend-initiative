@@ -628,6 +628,32 @@ class InitiativeApiTest {
     }
 
     @Test
+    void updateTrxAndRewardRules_statusBadRequestDiscount() throws Exception {
+        objectMapper.registerModule(new JavaTimeModule());
+
+        //create Dummy Initiative
+        Initiative step1Initiative = createStep1Initiative();
+        InitiativeRewardAndTrxRulesDTO rewardAndTrxRulesDTO = createInitiativeRewardAndTrxRulesDTO();
+        rewardAndTrxRulesDTO.setInitiativeRewardType(InitiativeRewardAndTrxRulesDTO.InitiativeRewardTypeEnum.DISCOUNT);
+        rewardAndTrxRulesDTO.getTrxRule().getTrxCount().setFrom(0L);
+
+        // Instruct the Service to update a Dummy Initiative
+        when(initiativeDTOsToModelMapper.toInitiative(rewardAndTrxRulesDTO)).thenReturn(step1Initiative);
+
+        //doNothing only for Void method
+        doNothing().when(initiativeService).updateTrxAndRewardRules(ORGANIZATION_ID, INITIATIVE_ID, step1Initiative, ROLE, false);
+
+        mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_TRX_REWARD_RULE_URL,
+                                ORGANIZATION_ID, INITIATIVE_ID))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(rewardAndTrxRulesDTO))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
     void updateTrxAndRewardRulesDraft_statusNoContent() throws Exception {
         objectMapper.registerModule(new JavaTimeModule());
 

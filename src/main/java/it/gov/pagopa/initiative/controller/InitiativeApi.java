@@ -27,11 +27,13 @@ import it.gov.pagopa.initiative.dto.OrganizationDTO;
 import it.gov.pagopa.initiative.dto.OrganizationListDTO;
 import it.gov.pagopa.initiative.dto.io.service.KeysDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
+import it.gov.pagopa.initiative.utils.validator.OrderValidationGroup;
 import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -255,7 +257,7 @@ public interface InitiativeApi {
     public ResponseEntity<Void> updateTrxAndRewardRules(
             @PathVariable("organizationId") String organizationId,
             @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId,
-            @Parameter(in = ParameterIn.DEFAULT, schema = @Schema()) @RequestBody @Validated(ValidationApiEnabledGroup.class) InitiativeRewardAndTrxRulesDTO rewardAndTrxRulesDTO);
+            @Parameter(in = ParameterIn.DEFAULT, schema = @Schema()) @RequestBody @Validated(OrderValidationGroup.class) InitiativeRewardAndTrxRulesDTO rewardAndTrxRulesDTO);
 
     @Operation(summary = "Save the refund rule of the initiative", description = "", security = {
             @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
