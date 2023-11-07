@@ -1,5 +1,6 @@
 package it.gov.pagopa.initiative.repository;
 
+import it.gov.pagopa.common.mongo.singleinstance.AutoConfigureSingleInstanceMongodb;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.OrganizationDTO;
 import it.gov.pagopa.initiative.model.Initiative;
@@ -15,13 +16,15 @@ import org.springframework.test.context.TestPropertySource;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.IntStream;
 
 @DataMongoTest
 @TestPropertySource(properties = {
-        "de.flapdoodle.mongodb.embedded.version=4.0.21",
+        "de.flapdoodle.mongodb.embedded.version=4.2.24",
 })
+@AutoConfigureSingleInstanceMongodb
 class InitiativeRepositoryExtendedImplTest {
 
     private static final int DATA_LIST_SIZE = 4;
@@ -51,7 +54,7 @@ class InitiativeRepositoryExtendedImplTest {
                 ? Collections.emptyList()
                 : createOrganizationDTOList(role);
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(expectedResult, result);
+        Assertions.assertEquals(new HashSet<>(expectedResult), new HashSet<>(result));
     }
 
     private List<Initiative> createInitiativeList() {
