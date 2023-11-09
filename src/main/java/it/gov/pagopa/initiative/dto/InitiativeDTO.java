@@ -7,11 +7,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.InitiativeTrxConditionsDTO;
-import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 /**
@@ -91,7 +89,6 @@ public class InitiativeDTO   {
   private InitiativeBeneficiaryRuleDTO beneficiaryRule;
 
   @JsonProperty("initiativeRewardType")
-  @NotNull(groups = ValidationApiEnabledGroup.class)
   private InitiativeDTO.InitiativeRewardTypeEnum initiativeRewardType;
 
   @JsonProperty("rewardRule")
