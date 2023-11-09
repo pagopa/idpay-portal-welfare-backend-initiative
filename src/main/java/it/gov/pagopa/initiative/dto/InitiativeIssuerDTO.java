@@ -5,11 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
 import java.time.LocalDate;
 import java.util.Map;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.FutureOrPresent;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -39,16 +36,12 @@ public class InitiativeIssuerDTO {
   private String organizationName;
 
   @JsonProperty("descriptionMap")
-  @Valid
-  @NotEmpty(groups = ValidationApiEnabledGroup.class)
   private Map<String, String> descriptionMap;
 
   @JsonProperty("startDate")
-  @NotNull(groups = ValidationApiEnabledGroup.class)
   private LocalDate startDate;
 
   @JsonProperty("endDate")
-  @NotNull(groups = ValidationApiEnabledGroup.class)
   private LocalDate endDate;
 
   @JsonProperty("rankingEnabled")
