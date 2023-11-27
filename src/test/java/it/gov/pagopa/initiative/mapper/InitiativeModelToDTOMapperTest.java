@@ -561,12 +561,48 @@ class InitiativeModelToDTOMapperTest {
     }
 
     @Test
+    void testToInitiativeMilDTOList_empty() {
+        assertTrue(initiativeModelToDTOMapper.toInitiativeMilDTOList(new ArrayList<>()).isEmpty());
+    }
+
+    @Test
+    void testToInitiativeMilDTOList_OK() {
+        Initiative initiative = createFullInitiative();
+        initiative.getAdditionalInfo().setLogoFileName("file");
+
+        ArrayList<Initiative> initiativeList = new ArrayList<>();
+        initiativeList.add(initiative);
+
+        Map<String, String> language = new HashMap<>();
+        language.put(Locale.ITALIAN.getLanguage(), "it");
+
+        InitiativeMilDTO expectedDTO = InitiativeMilDTO.builder()
+                .initiativeId("Id1")
+                .initiativeName("initiativeName1")
+                .organizationId("organizationId1")
+                .descriptionMap(language)
+                .startDate(LocalDate.now().plusDays(2))
+                .endDate(LocalDate.now().plusDays(3))
+                .rankingStartDate(LocalDate.now())
+                .rankingEndDate(LocalDate.now().plusDays(1))
+                .beneficiaryKnown(true)
+                .status("DRAFT")
+                .tcLink("tcLink")
+                .privacyLink("privacyLink")
+                .initiativeRewardType("REFUND")
+                .beneficiaryType("PF")
+                .build();
+
+        assertEquals(List.of(expectedDTO), initiativeModelToDTOMapper.toInitiativeMilDTOList(initiativeList));
+    }
+
+    @Test
     void testLanguageMap() {
         Initiative initiative = createStep3Initiative();
         Map<String, String> language = new HashMap<>();
         language.put(Locale.ENGLISH.getLanguage(), "en");
         initiative.getGeneral().setDescriptionMap(language);
-        initiative.getAdditionalInfo().setLogoFileName("test.png");
+        initiative.getAdditionalInfo().setLogoFileName("test.png") ;
 
         ArrayList<Initiative> initiativeList = new ArrayList<>();
         initiativeList.add(initiative);

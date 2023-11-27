@@ -142,6 +142,7 @@ class InitiativeApiTest {
     private static final String BASE_URL = "http://localhost:8080/idpay";
     private static final String GET_INITIATIVES_SUMMARY_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/summary";
     private static final String GET_INITIATIVES_ISSUER = "/initiatives";
+    private static final String GET_INITIATIVES_MIL = "/mil/initiatives";
     private static final String GET_INITIATIVE_ACTIVE_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER;
     private static final String GET_INITIATIVE_ID_FROM_SERVICE_ID = "/initiative?serviceId=" + SERVICE_ID_PLACEHOLDER;
     private static final String GET_PRIMARY_AND_SECONDARY_TOKEN_FROM_INITIATIVE_ID = "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/token";
@@ -275,16 +276,42 @@ class InitiativeApiTest {
         List<Initiative> initiatives = Arrays.asList(step2Initiative, step2Initiative2);
 
         // Returning something from Repo by using ServiceMock
-        when(initiativeService.getInitiativesIssuerList()).thenReturn(initiatives);
+        when(initiativeService.getInitiativesPublishedList()).thenReturn(initiatives);
 
         // When
-        List<Initiative> initiativesIssuer = initiativeService.getInitiativesIssuerList();
+        List<Initiative> initiativesIssuer = initiativeService.getInitiativesPublishedList();
 
         // Then
         // you are expecting service to return whatever returned by repo
         assertThat("Reason of result", initiativesIssuer, is(sameInstance(initiatives)));
         mvc.perform(
                         MockMvcRequestBuilders.get(BASE_URL + GET_INITIATIVES_ISSUER)
+                                .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    void getInitiativesMIL_Ok() throws Exception {
+
+        Boolean beneficiaryKnown = false;
+        //create Dummy Initiative
+        Initiative step2Initiative = createStep2Initiative(beneficiaryKnown);
+        Initiative step2Initiative2 = createStep2Initiative(beneficiaryKnown);
+        List<Initiative> initiatives = Arrays.asList(step2Initiative, step2Initiative2);
+
+        // Returning something from Repo by using ServiceMock
+        when(initiativeService.getInitiativesPublishedList()).thenReturn(initiatives);
+
+        // When
+        List<Initiative> initiativesMIL = initiativeService.getInitiativesPublishedList();
+
+        // Then
+        // you are expecting service to return whatever returned by repo
+        assertThat("Reason of result", initiativesMIL, is(sameInstance(initiatives)));
+        mvc.perform(
+                        MockMvcRequestBuilders.get(BASE_URL + GET_INITIATIVES_MIL)
                                 .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(print())

@@ -84,7 +84,7 @@ public class InitiativeApiController implements InitiativeApi {
     @Override
     public ResponseEntity<List<InitiativeIssuerDTO>> getInitiativeIssuerList() {
         log.info("[GET_INITIATIVES] - Initiative issuer: Start processing...");
-        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeIssuerDTOList(this.initiativeService.getInitiativesIssuerList()));
+        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeIssuerDTOList(this.initiativeService.getInitiativesPublishedList()));
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -347,6 +347,12 @@ public class InitiativeApiController implements InitiativeApi {
         log.info("[DELETE_INITIATIVE] - Initiative: {}. Start processing...", initiativeId);
         this.initiativeService.deleteInitiative(initiativeId);
         return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<List<InitiativeMilDTO>> getInitiativeMilList() {
+        log.info("[GET_INITIATIVES] - Initiative MIL: Start processing...");
+        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeMilDTOList(this.initiativeService.getInitiativesPublishedList()));
     }
 
     private void performanceLog(long startTime, String service){
