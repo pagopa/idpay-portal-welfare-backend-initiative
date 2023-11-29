@@ -589,8 +589,8 @@ class InitiativeModelToDTOMapperTest {
                 .status("DRAFT")
                 .tcLink("tcLink")
                 .privacyLink("privacyLink")
-                .initiativeRewardType("REFUND")
-                .beneficiaryType("PF")
+                .initiativeRewardType(InitiativeDTO.InitiativeRewardTypeEnum.REFUND)
+                .beneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF)
                 .build();
 
         assertEquals(List.of(expectedDTO), initiativeModelToDTOMapper.toInitiativeMilDTOList(initiativeList));

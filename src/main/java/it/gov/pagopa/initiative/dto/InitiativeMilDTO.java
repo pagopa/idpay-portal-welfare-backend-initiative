@@ -2,6 +2,7 @@ package it.gov.pagopa.initiative.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import it.gov.pagopa.initiative.model.InitiativeGeneral;
 import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Future;
@@ -51,10 +52,10 @@ public class InitiativeMilDTO {
   private LocalDate endDate;
 
   @JsonProperty("initiativeRewardType")
-  private String initiativeRewardType;
+  private InitiativeDTO.InitiativeRewardTypeEnum initiativeRewardType;
 
   @JsonProperty("beneficiaryType")
-  private String beneficiaryType;
+  private InitiativeGeneral.BeneficiaryTypeEnum beneficiaryType;
 
   @JsonProperty("rankingEnabled")
   private Boolean rankingEnabled;

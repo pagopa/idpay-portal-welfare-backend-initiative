@@ -350,9 +350,11 @@ public class InitiativeApiController implements InitiativeApi {
     }
 
     @Override
-    public ResponseEntity<List<InitiativeMilDTO>> getInitiativeMilList() {
+    public ResponseEntity<List<InitiativeMilDTO>> getInitiativeMilList(String userId) {
         log.info("[GET_INITIATIVES] - Initiative MIL: Start processing...");
-        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeMilDTOList(this.initiativeService.getInitiativesPublishedList()));
+        List<InitiativeMilDTO> initiativeMilDTOList = this.initiativeModelToDTOMapper.toInitiativeMilDTOList(this.initiativeService.getInitiativesPublishedList());
+        log.info("[GET_INITIATIVES] - user %s requested initiatives list through MIL".formatted(userId));
+        return ResponseEntity.ok(initiativeMilDTOList);
     }
 
     private void performanceLog(long startTime, String service){
