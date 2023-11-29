@@ -89,7 +89,7 @@ microservice-chart:
     BLOB_STORAGE_CONTAINER_REFERENCE: $web
     RANKING_GRACE_PERIOD: "10"
 
-  envConfigMapExternals:
+  externalConfigMapValues:
     idpay-common:
       TZ: TZ
     rest-client:
@@ -121,6 +121,11 @@ microservice-chart:
     BLOB_STORAGE_CONNECTION_STRING: web-storage-connection-string
     KAFKA_COMMANDS_SASL_JAAS_CONFIG: evh-idpay-commands-idpay-commands-producer-jaas-config-idpay-01
 
+  externalConfigMapFiles:
+    create: true
+    configMaps:
+      - name: appinsights-config
+        key: applicationinsights.json
 
   # nodeSelector: {}
 
