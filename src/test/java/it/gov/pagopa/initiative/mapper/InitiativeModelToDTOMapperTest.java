@@ -561,6 +561,17 @@ class InitiativeModelToDTOMapperTest {
     }
 
     @Test
+    void testToInitiativeMilDTOList_OK_no_fields() {
+        Initiative initiative = new Initiative();
+
+        InitiativeMilDTO expectedDTO = InitiativeMilDTO.builder()
+                .initiativeName(StringUtils.EMPTY)
+                .build();
+
+        assertEquals(List.of(expectedDTO), initiativeModelToDTOMapper.toInitiativeListMilDTO(List.of(initiative)));
+    }
+
+    @Test
     void testToInitiativeMilDTOList_empty() {
         assertTrue(initiativeModelToDTOMapper.toInitiativeListMilDTO(new ArrayList<>()).isEmpty());
     }
