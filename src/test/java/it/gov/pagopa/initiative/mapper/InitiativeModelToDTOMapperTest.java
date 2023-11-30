@@ -562,7 +562,7 @@ class InitiativeModelToDTOMapperTest {
 
     @Test
     void testToInitiativeMilDTOList_empty() {
-        assertTrue(initiativeModelToDTOMapper.toInitiativeMilDTOList(new ArrayList<>()).isEmpty());
+        assertTrue(initiativeModelToDTOMapper.toInitiativeListMilDTO(new ArrayList<>()).isEmpty());
     }
 
     @Test
@@ -581,10 +581,10 @@ class InitiativeModelToDTOMapperTest {
                 .initiativeName("initiativeName1")
                 .organizationId("organizationId1")
                 .descriptionMap(language)
-                .startDate(LocalDate.now().plusDays(2))
-                .endDate(LocalDate.now().plusDays(3))
-                .rankingStartDate(LocalDate.now())
-                .rankingEndDate(LocalDate.now().plusDays(1))
+                .fruitionStartDate(LocalDate.now().plusDays(2))
+                .fruitionEndDate(LocalDate.now().plusDays(3))
+                .onboardingStartDate(LocalDate.now())
+                .onboardingEndDate(LocalDate.now().plusDays(1))
                 .beneficiaryKnown(true)
                 .status("DRAFT")
                 .tcLink("tcLink")
@@ -593,7 +593,7 @@ class InitiativeModelToDTOMapperTest {
                 .beneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF)
                 .build();
 
-        assertEquals(List.of(expectedDTO), initiativeModelToDTOMapper.toInitiativeMilDTOList(initiativeList));
+        assertEquals(List.of(expectedDTO), initiativeModelToDTOMapper.toInitiativeListMilDTO(initiativeList));
     }
 
     @Test

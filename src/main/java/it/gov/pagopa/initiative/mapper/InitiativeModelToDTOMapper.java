@@ -289,29 +289,29 @@ public class InitiativeModelToDTOMapper {
                 }).toList();
     }
 
-    public List<InitiativeMilDTO> toInitiativeMilDTOList(List<Initiative> initiatives) {
+    public List<InitiativeMilDTO> toInitiativeListMilDTO(List<Initiative> initiatives) {
         return Optional.ofNullable(initiatives)
                 .orElse(Collections.emptyList())
                 .stream().map(initiativeModel -> {
                     InitiativeMilDTO initiativeMilDTO = new InitiativeMilDTO();
                     String serviceName = StringUtils.EMPTY;
 
-                    if(initiativeModel.getAdditionalInfo() != null){
+                    if(initiativeModel.getAdditionalInfo() != null) {
                         initiativeMilDTO.setTcLink(initiativeModel.getAdditionalInfo().getTcLink());
                         initiativeMilDTO.setPrivacyLink(initiativeModel.getAdditionalInfo().getPrivacyLink());
                         initiativeMilDTO.setLogoURL(initiativeModel.getAdditionalInfo().getLogoFileName() != null
                                 ? initiativeUtils.createLogoUrl(initiativeModel.getOrganizationId(), initiativeModel.getInitiativeId()) : null);
                         serviceName = initiativeModel.getAdditionalInfo().getServiceName();
                     }
-                    if(initiativeModel.getGeneral() != null){
+                    if(initiativeModel.getGeneral() != null) {
                         initiativeMilDTO.setDescriptionMap(initiativeModel.getGeneral().getDescriptionMap() != null ?
                                 this.languageMap(initiativeModel.getGeneral().getDescriptionMap()) : null);
                         initiativeMilDTO.setBeneficiaryType(initiativeModel.getGeneral().getBeneficiaryType());
-                        initiativeMilDTO.setStartDate(initiativeModel.getGeneral().getStartDate());
-                        initiativeMilDTO.setEndDate(initiativeModel.getGeneral().getEndDate());
+                        initiativeMilDTO.setFruitionStartDate(initiativeModel.getGeneral().getStartDate());
+                        initiativeMilDTO.setFruitionEndDate(initiativeModel.getGeneral().getEndDate());
                         initiativeMilDTO.setRankingEnabled(initiativeModel.getGeneral().getRankingEnabled());
-                        initiativeMilDTO.setRankingStartDate(initiativeModel.getGeneral().getRankingStartDate());
-                        initiativeMilDTO.setRankingEndDate(initiativeModel.getGeneral().getRankingEndDate());
+                        initiativeMilDTO.setOnboardingStartDate(initiativeModel.getGeneral().getRankingStartDate());
+                        initiativeMilDTO.setOnboardingEndDate(initiativeModel.getGeneral().getRankingEndDate());
                         initiativeMilDTO.setBeneficiaryKnown(initiativeModel.getGeneral().getBeneficiaryKnown());
                     }
                     initiativeMilDTO.setInitiativeId(initiativeModel.getInitiativeId());
@@ -326,14 +326,14 @@ public class InitiativeModelToDTOMapper {
     }
 
     private Map<String,String> languageMap(Map<String,String> map){
-            Map<String, String> descriptionItaEng = new HashMap<>();
-            descriptionItaEng.put(Locale.ITALIAN.getLanguage(),
-                    map.get(map.get(Locale.ITALIAN.getLanguage())));
-            if (map.containsKey(Locale.ENGLISH.getLanguage())) {
-                descriptionItaEng.put(Locale.ENGLISH.getLanguage(),
-                        map.get(map.get(Locale.ENGLISH.getLanguage())));
-            }
-            return descriptionItaEng;
+        Map<String, String> descriptionItaEng = new HashMap<>();
+        descriptionItaEng.put(Locale.ITALIAN.getLanguage(),
+                map.get(map.get(Locale.ITALIAN.getLanguage())));
+        if (map.containsKey(Locale.ENGLISH.getLanguage())) {
+            descriptionItaEng.put(Locale.ENGLISH.getLanguage(),
+                    map.get(map.get(Locale.ENGLISH.getLanguage())));
+        }
+        return descriptionItaEng;
     }
 
     private InitiativeRewardRuleDTO toRewardRuleDTO(InitiativeRewardRule rewardRule) {

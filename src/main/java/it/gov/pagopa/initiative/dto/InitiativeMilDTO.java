@@ -43,13 +43,13 @@ public class InitiativeMilDTO {
   @NotEmpty(groups = ValidationApiEnabledGroup.class)
   private Map<String, String> descriptionMap;
 
-  @JsonProperty("startDate")
+  @JsonProperty("fruitionStartDate")
   @NotNull(groups = ValidationApiEnabledGroup.class)
-  private LocalDate startDate;
+  private LocalDate fruitionStartDate;
 
-  @JsonProperty("endDate")
+  @JsonProperty("fruitionEndDate")
   @NotNull(groups = ValidationApiEnabledGroup.class)
-  private LocalDate endDate;
+  private LocalDate fruitionEndDate;
 
   @JsonProperty("initiativeRewardType")
   private InitiativeDTO.InitiativeRewardTypeEnum initiativeRewardType;
@@ -60,13 +60,13 @@ public class InitiativeMilDTO {
   @JsonProperty("rankingEnabled")
   private Boolean rankingEnabled;
 
-  @JsonProperty("rankingStartDate")
+  @JsonProperty("onboardingStartDate")
   @FutureOrPresent(groups = ValidationApiEnabledGroup.class)
-  private LocalDate rankingStartDate;
+  private LocalDate onboardingStartDate;
 
-  @JsonProperty("rankingEndDate")
+  @JsonProperty("onboardingEndDate")
   @Future(groups = ValidationApiEnabledGroup.class)
-  private LocalDate rankingEndDate;
+  private LocalDate onboardingEndDate;
 
   @JsonProperty("beneficiaryKnown")
   private Boolean beneficiaryKnown;

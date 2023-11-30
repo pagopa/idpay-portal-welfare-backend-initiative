@@ -121,7 +121,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                 .toList() : initiatives;
     }
 
-    public List<Initiative> getInitiativesPublishedList() {
+    public List<Initiative> getPublishedInitiativesList() {
         return initiativeRepository.findByEnabledAndStatus(true, Status.PUBLISHED);
     }
     @Override

@@ -471,8 +471,9 @@ public interface InitiativeApi {
           @ApiResponse(responseCode = "500", description = "Server ERROR", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))})
   @GetMapping(value = "/idpay/mil/initiatives",
           produces = {"application/json"})
-  ResponseEntity<List<InitiativeMilDTO>> getInitiativeMilList(
-          @RequestParam() String userId
-          );
+  ResponseEntity<List<InitiativeMilDTO>> getInitiativeListMil(
+          @RequestHeader("user-id") String userId,
+          @RequestHeader("acquirer-id") String acquirerId
+  );
 }
 

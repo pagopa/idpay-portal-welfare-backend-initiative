@@ -242,7 +242,7 @@ class InitiativeServiceTest {
         when(initiativeRepository.findByEnabledAndStatus(true, "PUBLISHED")).thenReturn(initiativeList);
 
         //Try to call the Real Service (which is using the instructed Repo)
-        List<Initiative> initiatives = initiativeService.getInitiativesPublishedList();
+        List<Initiative> initiatives = initiativeService.getPublishedInitiativesList();
 
         //Check the equality of the results
         assertEquals(initiativeList, initiatives);

@@ -276,10 +276,10 @@ class InitiativeApiTest {
         List<Initiative> initiatives = Arrays.asList(step2Initiative, step2Initiative2);
 
         // Returning something from Repo by using ServiceMock
-        when(initiativeService.getInitiativesPublishedList()).thenReturn(initiatives);
+        when(initiativeService.getPublishedInitiativesList()).thenReturn(initiatives);
 
         // When
-        List<Initiative> initiativesIssuer = initiativeService.getInitiativesPublishedList();
+        List<Initiative> initiativesIssuer = initiativeService.getPublishedInitiativesList();
 
         // Then
         // you are expecting service to return whatever returned by repo
@@ -302,10 +302,10 @@ class InitiativeApiTest {
         List<Initiative> initiatives = Arrays.asList(step2Initiative, step2Initiative2);
 
         // Returning something from Repo by using ServiceMock
-        when(initiativeService.getInitiativesPublishedList()).thenReturn(initiatives);
+        when(initiativeService.getPublishedInitiativesList()).thenReturn(initiatives);
 
         // When
-        List<Initiative> initiativesMIL = initiativeService.getInitiativesPublishedList();
+        List<Initiative> initiativesMIL = initiativeService.getPublishedInitiativesList();
 
         // Then
         // you are expecting service to return whatever returned by repo
@@ -315,7 +315,8 @@ class InitiativeApiTest {
                         MockMvcRequestBuilders.get(BASE_URL + GET_INITIATIVES_MIL)
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .param("userId", "USER_ID_TEST"))
+                                .header("user-id", "USER_ID_TEST")
+                                .header("acquirer-id", "ACQUIRER_ID_TEST"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(print())
                 .andReturn();

@@ -84,7 +84,7 @@ public class InitiativeApiController implements InitiativeApi {
     @Override
     public ResponseEntity<List<InitiativeIssuerDTO>> getInitiativeIssuerList() {
         log.info("[GET_INITIATIVES] - Initiative issuer: Start processing...");
-        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeIssuerDTOList(this.initiativeService.getInitiativesPublishedList()));
+        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeIssuerDTOList(this.initiativeService.getPublishedInitiativesList()));
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -350,10 +350,10 @@ public class InitiativeApiController implements InitiativeApi {
     }
 
     @Override
-    public ResponseEntity<List<InitiativeMilDTO>> getInitiativeMilList(String userId) {
-        log.info("[GET_INITIATIVES] - Initiative MIL: Start processing...");
-        List<InitiativeMilDTO> initiativeMilDTOList = this.initiativeModelToDTOMapper.toInitiativeMilDTOList(this.initiativeService.getInitiativesPublishedList());
-        log.info("[GET_INITIATIVES] - user %s requested initiatives list through MIL".formatted(userId));
+    public ResponseEntity<List<InitiativeMilDTO>> getInitiativeListMil(String userId, String acquirerId) {
+        log.info("[GET_INITIATIVES] - Initiatives List MIL: Start processing...");
+        List<InitiativeMilDTO> initiativeMilDTOList = this.initiativeModelToDTOMapper.toInitiativeListMilDTO(this.initiativeService.getPublishedInitiativesList());
+        log.info("[GET_INITIATIVES] - User %s requested initiatives list through MIL with acquirerId: %s".formatted(userId, acquirerId));
         return ResponseEntity.ok(initiativeMilDTOList);
     }
 
