@@ -319,7 +319,6 @@ public class InitiativeModelToDTOMapper {
                             initiativeModel.getInitiativeName() : serviceName);
                     initiativeMilDTO.setOrganizationId(initiativeModel.getOrganizationId());
                     initiativeMilDTO.setOrganizationName(initiativeModel.getOrganizationName());
-                    initiativeMilDTO.setStatus(initiativeModel.getStatus());
                     initiativeMilDTO.setInitiativeRewardType(initiativeModel.getInitiativeRewardType());
                     return initiativeMilDTO;
                 }).toList();
