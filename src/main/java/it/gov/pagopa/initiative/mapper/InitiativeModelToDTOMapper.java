@@ -304,8 +304,6 @@ public class InitiativeModelToDTOMapper {
                         serviceName = initiativeModel.getAdditionalInfo().getServiceName();
                     }
                     if(initiativeModel.getGeneral() != null) {
-                        initiativeMilDTO.setDescriptionMap(initiativeModel.getGeneral().getDescriptionMap() != null ?
-                                this.languageMap(initiativeModel.getGeneral().getDescriptionMap()) : null);
                         initiativeMilDTO.setBeneficiaryType(initiativeModel.getGeneral().getBeneficiaryType());
                         initiativeMilDTO.setFruitionStartDate(initiativeModel.getGeneral().getStartDate());
                         initiativeMilDTO.setFruitionEndDate(initiativeModel.getGeneral().getEndDate());

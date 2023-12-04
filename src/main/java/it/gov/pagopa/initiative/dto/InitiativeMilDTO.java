@@ -4,16 +4,16 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import it.gov.pagopa.initiative.model.InitiativeGeneral;
 import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.FutureOrPresent;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
-import java.util.Map;
 
 /**
  * InitiativeDTO
@@ -37,11 +37,6 @@ public class InitiativeMilDTO {
 
   @JsonProperty("organizationName")
   private String organizationName;
-
-  @JsonProperty("descriptionMap")
-  @Valid
-  @NotEmpty(groups = ValidationApiEnabledGroup.class)
-  private Map<String, String> descriptionMap;
 
   @JsonProperty("onboardingStartDate")
   @FutureOrPresent(groups = ValidationApiEnabledGroup.class)

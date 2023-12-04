@@ -614,9 +614,6 @@ class InitiativeModelToDTOMapperTest {
         ArrayList<Initiative> initiativeList = new ArrayList<>();
         initiativeList.add(initiative);
 
-        Map<String, String> language = new HashMap<>();
-        language.put(Locale.ITALIAN.getLanguage(), "it");
-
         Mockito.when(initiativeUtilsMock.createLogoUrl(initiative.getOrganizationId(), initiative.getInitiativeId()))
                 .thenReturn("https://test" + String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE,
                         initiative.getOrganizationId(),initiative.getInitiativeId(), InitiativeConstants.Logo.LOGO_NAME));
@@ -625,7 +622,6 @@ class InitiativeModelToDTOMapperTest {
                 .initiativeId("Id1")
                 .initiativeName("initiativeName1")
                 .organizationId("organizationId1")
-                .descriptionMap(language)
                 .fruitionStartDate(LocalDate.now().plusDays(2))
                 .fruitionEndDate(LocalDate.now().plusDays(3))
                 .onboardingStartDate(LocalDate.now())
