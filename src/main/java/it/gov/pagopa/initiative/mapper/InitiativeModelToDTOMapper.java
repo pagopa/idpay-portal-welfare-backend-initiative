@@ -382,7 +382,7 @@ public class InitiativeModelToDTOMapper {
             return null;
         }
         return InitiativeTrxConditionsDTO.builder()
-                .daysOfWeek(this.toDaysOfWeekDTO(trxRules.getDaysOfWeek()))
+                .daysOfWeek(trxRules.getDaysOfWeek() != null ? this.toDaysOfWeekDTO(trxRules.getDaysOfWeek()) : null)
                 .mccFilter(this.toMccFilterDTO(trxRules.getMccFilter()))
                 .rewardLimits(this.toRewardLimitsDTO(trxRules.getRewardLimits()))
                 .trxCount(this.toTrxCountDTO(trxRules.getTrxCount()))
@@ -411,9 +411,6 @@ public class InitiativeModelToDTOMapper {
     }
 
     private DayOfWeekDTO toDaysOfWeekDTO(DayOfWeek dayOfWeek) {
-        if (dayOfWeek == null) {
-            return null;
-        }
         return new DayOfWeekDTO(dayOfWeek.stream().map(x -> DayOfWeekDTO.DayConfig.builder()
                         .daysOfWeek(x.getDaysOfWeek())
                         .intervals(x.getIntervals().stream().map(i -> DayOfWeekDTO.Interval.builder()
