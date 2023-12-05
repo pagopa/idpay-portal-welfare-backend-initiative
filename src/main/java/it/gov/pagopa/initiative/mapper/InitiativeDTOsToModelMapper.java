@@ -21,7 +21,6 @@ import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
 import it.gov.pagopa.initiative.model.rule.trx.*;
 import it.gov.pagopa.initiative.service.AESTokenService;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -32,8 +31,11 @@ import java.util.Optional;
 @Component
 public class InitiativeDTOsToModelMapper {
 
-    @Autowired
-    AESTokenService aesTokenService;
+    private final AESTokenService aesTokenService;
+
+    public InitiativeDTOsToModelMapper(AESTokenService aesTokenService) {
+        this.aesTokenService = aesTokenService;
+    }
 
     public Initiative toInitiative(InitiativeAdditionalDTO initiativeAdditionalDTO) {
         Initiative initiative = new Initiative();

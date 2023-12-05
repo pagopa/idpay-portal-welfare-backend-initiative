@@ -75,6 +75,7 @@ import it.gov.pagopa.initiative.model.rule.refund.AccumulatedAmount;
 import it.gov.pagopa.initiative.model.rule.refund.AdditionalInfo;
 import it.gov.pagopa.initiative.model.rule.refund.InitiativeRefundRule;
 import it.gov.pagopa.initiative.model.rule.refund.TimeParameter;
+import it.gov.pagopa.initiative.service.AESTokenServiceImpl;
 import it.gov.pagopa.initiative.service.InitiativeService;
 import it.gov.pagopa.initiative.service.OrganizationService;
 import java.io.ByteArrayInputStream;
@@ -99,6 +100,7 @@ import org.apache.kafka.common.KafkaException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -348,6 +350,12 @@ class InitiativeApiTest {
                 .andReturn();
     }
 
+    @InjectMocks
+    InitiativeDTOsToModelMapper initiativeDTOsToModelMapperTest;
+
+    @InjectMocks
+    InitiativeModelToDTOMapper initiativeModelToDTOMapperTest;
+
     @Test
     void testAddLogo() throws IOException {
 
@@ -355,16 +363,14 @@ class InitiativeApiTest {
         when(initiativeService.storeInitiativeLogo(any(), any(), any(), any(),
                 any())).thenReturn(new LogoDTO());
         OrganizationService organizationService = mock(OrganizationService.class);
-        InitiativeModelToDTOMapper initiativeModelToDTOMapper = new InitiativeModelToDTOMapper();
-        InitiativeDTOsToModelMapper initiativeDTOsToModelMapper = new InitiativeDTOsToModelMapper();
         InitiativeApiController initiativeApiController = new InitiativeApiController(
                 true,
                 true,
                 true,
                 initiativeService,
                 organizationService,
-                initiativeModelToDTOMapper,
-                initiativeDTOsToModelMapper
+                initiativeModelToDTOMapperTest,
+                initiativeDTOsToModelMapperTest
         );
         ResponseEntity<LogoDTO> actualAddLogoResult = initiativeApiController.addLogo("42", "42",
                 new MockMultipartFile("Name", new ByteArrayInputStream("AAAAAAAA".getBytes("UTF-8"))));
