@@ -24,7 +24,6 @@ import it.gov.pagopa.initiative.utils.InitiativeUtils;
 import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -32,11 +31,14 @@ import org.springframework.util.CollectionUtils;
 @Component
 public class InitiativeModelToDTOMapper {
 
-    @Autowired
-    AESTokenService aesTokenService;
+    private final AESTokenService aesTokenService;
 
-    @Autowired
-    InitiativeUtils initiativeUtils;
+    private final InitiativeUtils initiativeUtils;
+
+    public InitiativeModelToDTOMapper(AESTokenService aesTokenService, InitiativeUtils initiativeUtils) {
+        this.aesTokenService = aesTokenService;
+        this.initiativeUtils = initiativeUtils;
+    }
 
     public InitiativeDataDTO toInitiativeDataDTO(Initiative initiative, Locale acceptLanguage) {
         if (initiative == null) {

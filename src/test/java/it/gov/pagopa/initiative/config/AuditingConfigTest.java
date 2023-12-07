@@ -31,7 +31,7 @@ class AuditingConfigTest {
 
     @Test
     void testMyAuditorProvider() {
-        assertTrue(auditingConfig.myAuditorProvider() instanceof AuditorAwareImpl);
+        assertTrue(auditingConfig.myAuditorProvider(httpServletRequestMock) instanceof AuditorAwareImpl);
     }
 }
 

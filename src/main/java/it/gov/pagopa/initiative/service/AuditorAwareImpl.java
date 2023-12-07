@@ -1,7 +1,6 @@
 package it.gov.pagopa.initiative.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.AuditorAware;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,8 +11,11 @@ public class AuditorAwareImpl implements AuditorAware<String> {
 
     private static final String UNDEFINED = "UNDEFINED";
 
-    @Autowired
-    private HttpServletRequest request;
+    private final HttpServletRequest request;
+
+    public AuditorAwareImpl(HttpServletRequest request) {
+        this.request = request;
+    }
 
     @Override
     public Optional<String> getCurrentAuditor() {
