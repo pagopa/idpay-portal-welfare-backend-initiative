@@ -317,8 +317,7 @@ class InitiativeApiTest {
                         MockMvcRequestBuilders.get(BASE_URL + GET_INITIATIVES_MIL)
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("user-id", "USER_ID_TEST")
-                                .header("acquirer-id", "ACQUIRER_ID_TEST"))
+                                .header("x-user-id", "USER_ID_TEST"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(print())
                 .andReturn();

@@ -472,8 +472,7 @@ public interface InitiativeApi {
   @GetMapping(value = "/idpay/mil/initiatives",
           produces = {"application/json"})
   ResponseEntity<List<InitiativeMilDTO>> getInitiativeListMil(
-          @RequestHeader("user-id") String userId,
-          @RequestHeader("acquirer-id") String acquirerId
+          @RequestHeader("x-user-id") String userId
   );
 }
 
