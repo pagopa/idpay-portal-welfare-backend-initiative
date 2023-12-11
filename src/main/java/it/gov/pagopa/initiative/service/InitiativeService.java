@@ -17,7 +17,7 @@ import java.util.Locale;
 public interface InitiativeService {
 
     List<Initiative> retrieveInitiativeSummary(String organizationId, String role);
-    List<Initiative> getInitiativesIssuerList();
+    List<Initiative> getPublishedInitiativesList();
 
     Initiative insertInitiative(Initiative initiative, String organizationId, String organizationName, String role);
 
