@@ -561,12 +561,89 @@ class InitiativeModelToDTOMapperTest {
     }
 
     @Test
+    void testToInitiativeMilDTOList_OK_no_fields() {
+        Initiative initiative = new Initiative();
+
+        InitiativeMilDTO expectedDTO = InitiativeMilDTO.builder()
+                .initiativeName(StringUtils.EMPTY)
+                .build();
+
+        assertEquals(List.of(expectedDTO), initiativeModelToDTOMapper.toInitiativeListMilDTO(List.of(initiative)));
+    }
+
+    @Test
+    void testToInitiativeMilDTOList_empty() {
+        assertTrue(initiativeModelToDTOMapper.toInitiativeListMilDTO(new ArrayList<>()).isEmpty());
+    }
+
+    @Test
+    void testToInitiativeMilDTOList_KO_no_logo_and_description() {
+        Initiative initiative = createFullInitiative();
+        initiative.getGeneral().setDescriptionMap(null);
+
+        ArrayList<Initiative> initiativeList = new ArrayList<>();
+        initiativeList.add(initiative);
+
+        Mockito.when(initiativeUtilsMock.createLogoUrl(initiative.getOrganizationId(), initiative.getInitiativeId()))
+                .thenReturn("https://test" + String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE,
+                        initiative.getOrganizationId(),initiative.getInitiativeId(), InitiativeConstants.Logo.LOGO_NAME));
+
+        InitiativeMilDTO expectedDTO = InitiativeMilDTO.builder()
+                .initiativeId("Id1")
+                .initiativeName("initiativeName1")
+                .organizationId("organizationId1")
+                .fruitionStartDate(LocalDate.now().plusDays(2))
+                .fruitionEndDate(LocalDate.now().plusDays(3))
+                .onboardingStartDate(LocalDate.now())
+                .onboardingEndDate(LocalDate.now().plusDays(1))
+                .beneficiaryKnown(true)
+                .tcLink("tcLink")
+                .privacyLink("privacyLink")
+                .initiativeRewardType(InitiativeDTO.InitiativeRewardTypeEnum.REFUND)
+                .beneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF)
+                .build();
+
+        assertEquals(List.of(expectedDTO), initiativeModelToDTOMapper.toInitiativeListMilDTO(initiativeList));
+    }
+
+    @Test
+    void testToInitiativeMilDTOList_OK() {
+        Initiative initiative = createFullInitiative();
+        initiative.getAdditionalInfo().setLogoFileName("file");
+
+        ArrayList<Initiative> initiativeList = new ArrayList<>();
+        initiativeList.add(initiative);
+
+        Mockito.when(initiativeUtilsMock.createLogoUrl(initiative.getOrganizationId(), initiative.getInitiativeId()))
+                .thenReturn("https://test" + String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE,
+                        initiative.getOrganizationId(),initiative.getInitiativeId(), InitiativeConstants.Logo.LOGO_NAME));
+
+        InitiativeMilDTO expectedDTO = InitiativeMilDTO.builder()
+                .initiativeId("Id1")
+                .initiativeName("initiativeName1")
+                .organizationId("organizationId1")
+                .fruitionStartDate(LocalDate.now().plusDays(2))
+                .fruitionEndDate(LocalDate.now().plusDays(3))
+                .onboardingStartDate(LocalDate.now())
+                .onboardingEndDate(LocalDate.now().plusDays(1))
+                .beneficiaryKnown(true)
+                .tcLink("tcLink")
+                .privacyLink("privacyLink")
+                .initiativeRewardType(InitiativeDTO.InitiativeRewardTypeEnum.REFUND)
+                .beneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF)
+                .logoURL("https://testassets/logo/organizationId1/Id1/logo.png")
+                .build();
+
+        assertEquals(List.of(expectedDTO), initiativeModelToDTOMapper.toInitiativeListMilDTO(initiativeList));
+    }
+
+    @Test
     void testLanguageMap() {
         Initiative initiative = createStep3Initiative();
         Map<String, String> language = new HashMap<>();
         language.put(Locale.ENGLISH.getLanguage(), "en");
         initiative.getGeneral().setDescriptionMap(language);
-        initiative.getAdditionalInfo().setLogoFileName("test.png");
+        initiative.getAdditionalInfo().setLogoFileName("test.png") ;
 
         ArrayList<Initiative> initiativeList = new ArrayList<>();
         initiativeList.add(initiative);

@@ -290,15 +290,49 @@ public class InitiativeModelToDTOMapper {
                     return initiativeIssuerDTO;
                 }).toList();
     }
+
+    public List<InitiativeMilDTO> toInitiativeListMilDTO(List<Initiative> initiatives) {
+        return Optional.ofNullable(initiatives)
+                .orElse(Collections.emptyList())
+                .stream().map(initiativeModel -> {
+                    InitiativeMilDTO initiativeMilDTO = new InitiativeMilDTO();
+                    String serviceName = StringUtils.EMPTY;
+
+                    if(initiativeModel.getAdditionalInfo() != null) {
+                        initiativeMilDTO.setTcLink(initiativeModel.getAdditionalInfo().getTcLink());
+                        initiativeMilDTO.setPrivacyLink(initiativeModel.getAdditionalInfo().getPrivacyLink());
+                        initiativeMilDTO.setLogoURL(initiativeModel.getAdditionalInfo().getLogoFileName() != null
+                                ? initiativeUtils.createLogoUrl(initiativeModel.getOrganizationId(), initiativeModel.getInitiativeId()) : null);
+                        serviceName = initiativeModel.getAdditionalInfo().getServiceName();
+                    }
+                    if(initiativeModel.getGeneral() != null) {
+                        initiativeMilDTO.setBeneficiaryType(initiativeModel.getGeneral().getBeneficiaryType());
+                        initiativeMilDTO.setFruitionStartDate(initiativeModel.getGeneral().getStartDate());
+                        initiativeMilDTO.setFruitionEndDate(initiativeModel.getGeneral().getEndDate());
+                        initiativeMilDTO.setRankingEnabled(initiativeModel.getGeneral().getRankingEnabled());
+                        initiativeMilDTO.setOnboardingStartDate(initiativeModel.getGeneral().getRankingStartDate());
+                        initiativeMilDTO.setOnboardingEndDate(initiativeModel.getGeneral().getRankingEndDate());
+                        initiativeMilDTO.setBeneficiaryKnown(initiativeModel.getGeneral().getBeneficiaryKnown());
+                    }
+                    initiativeMilDTO.setInitiativeId(initiativeModel.getInitiativeId());
+                    initiativeMilDTO.setInitiativeName(StringUtils.isNotBlank(initiativeModel.getInitiativeName()) ?
+                            initiativeModel.getInitiativeName() : serviceName);
+                    initiativeMilDTO.setOrganizationId(initiativeModel.getOrganizationId());
+                    initiativeMilDTO.setOrganizationName(initiativeModel.getOrganizationName());
+                    initiativeMilDTO.setInitiativeRewardType(initiativeModel.getInitiativeRewardType());
+                    return initiativeMilDTO;
+                }).toList();
+    }
+
     private Map<String,String> languageMap(Map<String,String> map){
-            Map<String, String> descriptionItaEng = new HashMap<>();
-            descriptionItaEng.put(Locale.ITALIAN.getLanguage(),
-                    map.get(map.get(Locale.ITALIAN.getLanguage())));
-            if (map.containsKey(Locale.ENGLISH.getLanguage())) {
-                descriptionItaEng.put(Locale.ENGLISH.getLanguage(),
-                        map.get(map.get(Locale.ENGLISH.getLanguage())));
-            }
-            return descriptionItaEng;
+        Map<String, String> descriptionItaEng = new HashMap<>();
+        descriptionItaEng.put(Locale.ITALIAN.getLanguage(),
+                map.get(map.get(Locale.ITALIAN.getLanguage())));
+        if (map.containsKey(Locale.ENGLISH.getLanguage())) {
+            descriptionItaEng.put(Locale.ENGLISH.getLanguage(),
+                    map.get(map.get(Locale.ENGLISH.getLanguage())));
+        }
+        return descriptionItaEng;
     }
 
     private InitiativeRewardRuleDTO toRewardRuleDTO(InitiativeRewardRule rewardRule) {
@@ -348,7 +382,7 @@ public class InitiativeModelToDTOMapper {
             return null;
         }
         return InitiativeTrxConditionsDTO.builder()
-                .daysOfWeek(this.toDaysOfWeekDTO(trxRules.getDaysOfWeek()))
+                .daysOfWeek(trxRules.getDaysOfWeek() != null ? this.toDaysOfWeekDTO(trxRules.getDaysOfWeek()) : null)
                 .mccFilter(this.toMccFilterDTO(trxRules.getMccFilter()))
                 .rewardLimits(this.toRewardLimitsDTO(trxRules.getRewardLimits()))
                 .trxCount(this.toTrxCountDTO(trxRules.getTrxCount()))
@@ -377,9 +411,6 @@ public class InitiativeModelToDTOMapper {
     }
 
     private DayOfWeekDTO toDaysOfWeekDTO(DayOfWeek dayOfWeek) {
-        if (dayOfWeek == null) {
-            return null;
-        }
         return new DayOfWeekDTO(dayOfWeek.stream().map(x -> DayOfWeekDTO.DayConfig.builder()
                         .daysOfWeek(x.getDaysOfWeek())
                         .intervals(x.getIntervals().stream().map(i -> DayOfWeekDTO.Interval.builder()
