@@ -61,7 +61,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 
-import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest.INITIATIVE_CANNOT_BE_PUBLISHED_BC_FINISHED;
+import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_NOT_VALID_END_DATE;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.ADMIN;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.PAGOPA_ADMIN;
 import static org.junit.jupiter.api.Assertions.*;
@@ -1219,7 +1219,7 @@ class InitiativeServiceTest {
                 () -> initiativeService.isInitiativeAllowedToBeNextStatusThenThrows(initiative, Status.PUBLISHED, ROLE));
 
         assertEquals(InitiativeConstants.Exception.BadRequest.CODE, initiativeExceptionResult.getCode());
-        assertEquals(String.format(INITIATIVE_CANNOT_BE_PUBLISHED_BC_FINISHED, initiative.getInitiativeId(), initiative.getGeneral().getEndDate()), initiativeExceptionResult.getMessage());
+        assertEquals(String.format(INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_NOT_VALID_END_DATE, initiative.getInitiativeId(), initiative.getGeneral().getEndDate()), initiativeExceptionResult.getMessage());
         assertEquals(HttpStatus.BAD_REQUEST, initiativeExceptionResult.getHttpStatus());
     }
 

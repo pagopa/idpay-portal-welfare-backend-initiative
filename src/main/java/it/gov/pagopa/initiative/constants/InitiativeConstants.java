@@ -94,7 +94,7 @@ public class InitiativeConstants {
             public static final String REWARD_TYPE = "REWARD INVALID";
             public static final String REFUND_RULE_INVALID = "REFUND RULE INVALID";
             public static final String ISEE_TYPES_NOT_VALID = "Automated criteria not valid. ISEE typology is missing.";
-            public static final String INITIATIVE_CANNOT_BE_PUBLISHED_BC_FINISHED = "The initiative [%s] cannot be published because the end date [%s] has passed";
+            public static final String INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_NOT_VALID_END_DATE = "Initiative [%s] unprocessable because the end date [%s] has passed";
         }
         public static final class Publish {
             public static final String PUBLISH_CODE = BASE_CODE + ".published";

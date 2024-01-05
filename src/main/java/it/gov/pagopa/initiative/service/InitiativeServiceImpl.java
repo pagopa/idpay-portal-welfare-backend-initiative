@@ -47,7 +47,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Email.*;
-import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest.INITIATIVE_CANNOT_BE_PUBLISHED_BC_FINISHED;
+import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_NOT_VALID_END_DATE;
 
 
 @Service
@@ -387,7 +387,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         if(LocalDate.now().isAfter(initiativeEndDate)){
             throw new InitiativeException(
                     InitiativeConstants.Exception.BadRequest.CODE,
-                    String.format(INITIATIVE_CANNOT_BE_PUBLISHED_BC_FINISHED, initiative.getInitiativeId(), initiativeEndDate),
+                    String.format(INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_NOT_VALID_END_DATE, initiative.getInitiativeId(), initiativeEndDate),
                     HttpStatus.BAD_REQUEST);
         }
     }
