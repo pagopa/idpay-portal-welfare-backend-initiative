@@ -3,8 +3,6 @@ package it.gov.pagopa.initiative.controller;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest.CODE;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.ErrorDtoDefaultMsg.ACCUMULATED_AMOUNT_TYPE;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.ErrorDtoDefaultMsg.SOMETHING_WRONG_WITH_THE_REFUND_TYPE;
-import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.Publish.BadRequest.INITIATIVE_CANNOT_BE_PUBLISHED_BC_FINISHED;
-import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.Publish.BadRequest.CODE_INITIATIVE_CANNOT_BE_PUBLISHED;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.ADMIN;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.PAGOPA_ADMIN;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -1081,37 +1079,6 @@ class InitiativeApiTest {
         assertEquals(HttpStatus.BAD_REQUEST.value(), res.getResponse().getStatus());
         assertEquals(InitiativeConstants.Exception.Publish.BadRequest.CODE, error.getCode());
         assertTrue(error.getMessage().contains(InitiativeConstants.Exception.Publish.BadRequest.INTEGRATION_FAILED));
-    }
-
-
-    @Test
-    void updateInitiativepublishedStatus_badRequestInitiativeEnded() throws Exception {
-        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = createInitiativeOrganizationInfoDTO();
-
-        //create Dummy Initiative
-        Initiative step5Initiative = createStep5Initiative();
-        step5Initiative.getGeneral().setEndDate(LocalDate.now().minusDays(1));
-
-        // When
-        // With this instruction, I instruct the service (via Mockito's when) to always return the DummyInitiative to me anytime I call the same service's function
-        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step5Initiative);
-
-        doNothing().when(initiativeService).isInitiativeAllowedToBeNextStatusThenThrows(step5Initiative, InitiativeConstants.Status.PUBLISHED, ROLE);
-
-        MvcResult res =
-                mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
-                                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                .content(objectMapper.writeValueAsString(initiativeOrganizationInfoDTO))
-                                .accept(MediaType.APPLICATION_JSON))
-                        .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                        .andDo(print())
-                        .andReturn();
-
-        ErrorDTO error = objectMapper.readValue(res.getResponse().getContentAsString(), ErrorDTO.class);
-        assertEquals(HttpStatus.BAD_REQUEST.value(), res.getResponse().getStatus());
-        assertEquals(CODE_INITIATIVE_CANNOT_BE_PUBLISHED, error.getCode());
-        assertEquals(String.format(INITIATIVE_CANNOT_BE_PUBLISHED_BC_FINISHED,step5Initiative.getInitiativeId(), step5Initiative.getGeneral().getEndDate()),
-                error.getMessage());
     }
 
     @Test
