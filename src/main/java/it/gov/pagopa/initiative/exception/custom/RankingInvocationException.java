@@ -6,7 +6,7 @@ import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.Internal
 
 public class RankingInvocationException extends ServiceException {
     public RankingInvocationException(String message, boolean printStackTrace, Throwable ex) {
-        this(InternalServerError.INITIATIVE_GENERIC_ERROR, message, null, printStackTrace, ex);
+        this(InternalServerError.INITIATIVE_GENERIC_ERROR, message,null, printStackTrace, ex);
     }
 
     public RankingInvocationException(String code, String message, ServiceExceptionPayload payload, boolean printStackTrace, Throwable ex) {
