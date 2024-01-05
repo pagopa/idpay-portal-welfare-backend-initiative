@@ -244,6 +244,11 @@ public class InitiativeApiController implements InitiativeApi {
         Initiative initiative = this.initiativeService.getInitiative(organizationId, initiativeId, role);
         log.debug("Initiative retrieved");
 
+        //Validation for current Status
+        log.debug("Validating current Status");
+        initiativeService.isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED, role);
+        log.debug("Current Status validated");
+
         //validation end date
         log.debug("Validating initiative end date");
         LocalDate initiativeEndDate = initiative.getGeneral().getEndDate();
@@ -252,11 +257,6 @@ public class InitiativeApiController implements InitiativeApi {
                     CODE_INITIATIVE_CANNOT_BE_PUBLISHED,
                     String.format(INITIATIVE_CANNOT_BE_PUBLISHED_BC_FINISHED,initiativeId, initiativeEndDate));
         }
-
-        //Validation for current Status
-        log.debug("Validating current Status");
-        initiativeService.isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED, role);
-        log.debug("Current Status validated");
 
         log.debug("Retrieve current state and save it as TEMP");
         String statusTemp = initiative.getStatus();

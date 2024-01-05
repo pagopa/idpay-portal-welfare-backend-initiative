@@ -1096,6 +1096,8 @@ class InitiativeApiTest {
         // With this instruction, I instruct the service (via Mockito's when) to always return the DummyInitiative to me anytime I call the same service's function
         when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step5Initiative);
 
+        doNothing().when(initiativeService).isInitiativeAllowedToBeNextStatusThenThrows(step5Initiative, InitiativeConstants.Status.PUBLISHED, ROLE);
+
         MvcResult res =
                 mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
