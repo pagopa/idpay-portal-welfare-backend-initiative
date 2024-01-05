@@ -99,7 +99,9 @@ public class InitiativeConstants {
             public static final String PUBLISH_CODE = BASE_CODE + ".published";
             public static final class BadRequest { //400
                 public static final String CODE = PUBLISH_CODE + ".bad.request";
+                public static final String CODE_INITIATIVE_CANNOT_BE_PUBLISHED = "INITIATIVE_CANNOT_BE_PUBLISHED";
                 public static final String INTEGRATION_FAILED = "Something gone wrong while notify Initiative for publishing";
+                public static final String INITIATIVE_CANNOT_BE_PUBLISHED_BC_FINISHED = "The initiative [%s] cannot be published because the end date [%s] has passed";
             }
             public static final class InternalServerError{
                 public static final String CODE = PUBLISH_CODE + ".internal.server.error";

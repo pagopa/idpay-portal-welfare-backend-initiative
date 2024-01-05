@@ -1,5 +1,6 @@
 package it.gov.pagopa.initiative.controller;
 
+import it.gov.pagopa.common.web.exception.ClientExceptionWithBody;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.io.service.KeysDTO;
@@ -22,12 +23,15 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Email.SUBJECT_CHANGE_STATE;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Email.TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS;
+import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.Publish.BadRequest.INITIATIVE_CANNOT_BE_PUBLISHED_BC_FINISHED;
+import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.Publish.BadRequest.CODE_INITIATIVE_CANNOT_BE_PUBLISHED;
 
 @RestController
 @Slf4j
@@ -239,6 +243,15 @@ public class InitiativeApiController implements InitiativeApi {
         log.info("[{}][UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Start processing...", role, initiativeId);
         Initiative initiative = this.initiativeService.getInitiative(organizationId, initiativeId, role);
         log.debug("Initiative retrieved");
+
+        //validation end date
+        log.debug("Validating initiative end date");
+        LocalDate initiativeEndDate = initiative.getGeneral().getEndDate();
+        if(LocalDate.now().isAfter(initiativeEndDate)){
+            throw new ClientExceptionWithBody(HttpStatus.BAD_REQUEST,
+                    CODE_INITIATIVE_CANNOT_BE_PUBLISHED,
+                    String.format(INITIATIVE_CANNOT_BE_PUBLISHED_BC_FINISHED,initiativeId, initiativeEndDate));
+        }
 
         //Validation for current Status
         log.debug("Validating current Status");
