@@ -2,7 +2,6 @@ package it.gov.pagopa.initiative.service;
 
 import com.google.common.io.Files;
 import feign.FeignException;
-import it.gov.pagopa.common.web.exception.ClientExceptionWithBody;
 import it.gov.pagopa.initiative.connector.decrypt.DecryptRestConnector;
 import it.gov.pagopa.initiative.connector.encrypt.EncryptRestConnector;
 import it.gov.pagopa.initiative.connector.file_storage.FileStorageConnector;

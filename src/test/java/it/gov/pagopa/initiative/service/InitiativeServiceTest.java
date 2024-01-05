@@ -1221,8 +1221,6 @@ class InitiativeServiceTest {
         assertEquals(InitiativeConstants.Exception.BadRequest.CODE, initiativeExceptionResult.getCode());
         assertEquals(String.format(INITIATIVE_CANNOT_BE_PUBLISHED_BC_FINISHED, initiative.getInitiativeId(), initiative.getGeneral().getEndDate()), initiativeExceptionResult.getMessage());
         assertEquals(HttpStatus.BAD_REQUEST, initiativeExceptionResult.getHttpStatus());
-
-
     }
 
     @Test
