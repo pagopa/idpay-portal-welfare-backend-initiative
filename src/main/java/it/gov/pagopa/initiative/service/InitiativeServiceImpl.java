@@ -119,6 +119,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                                 initiative.getStatus().equals(InitiativeConstants.Status.IN_REVISION) ||
                                         initiative.getStatus().equals(InitiativeConstants.Status.TO_CHECK) ||
                                         initiative.getStatus().equals(InitiativeConstants.Status.APPROVED) ||
+                                        initiative.getStatus().equals(InitiativeConstants.Status.CLOSED) ||
                                         initiative.getStatus().equals(InitiativeConstants.Status.PUBLISHED)))
                 .toList() : initiatives;
     }

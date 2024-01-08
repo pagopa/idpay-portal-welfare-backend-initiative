@@ -540,7 +540,8 @@ class InitiativeModelToDTOMapperTest {
 
     @Test
     void toInitiativeSummaryDTOList_statusCLOSED() {
-        Initiative step2Initiative = createStep2Initiative();
+        Initiative step2Initiative = createFullInitiative();
+        step2Initiative.setStatus(InitiativeConstants.Status.PUBLISHED);
         step2Initiative.getGeneral().setEndDate(LocalDate.now().minusDays(1));
         List<Initiative> initiatives = List.of(step2Initiative);
 
