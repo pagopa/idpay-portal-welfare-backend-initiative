@@ -539,6 +539,17 @@ class InitiativeModelToDTOMapperTest {
     }
 
     @Test
+    void toInitiativeSummaryDTOList_statusCLOSED() {
+        Initiative step2Initiative = createStep2Initiative();
+        step2Initiative.getGeneral().setEndDate(LocalDate.now().minusDays(1));
+        List<Initiative> initiatives = List.of(step2Initiative);
+
+        List<InitiativeSummaryDTO> initiativeSummaryDTOS = initiativeModelToDTOMapper.toInitiativeSummaryDTOList(initiatives);
+        initiativeSummaryDTOS.forEach(initiativeSummaryDTO ->
+                assertEquals(InitiativeConstants.Status.CLOSED, initiativeSummaryDTO.getStatus()));
+    }
+
+    @Test
     void toInitiativeSummaryDTOList_equals() {
         List<InitiativeSummaryDTO> initiativeSummaryDTOListActual = initiativeModelToDTOMapper.toInitiativeSummaryDTOList(initiativeList);
         //Check the equality of the results

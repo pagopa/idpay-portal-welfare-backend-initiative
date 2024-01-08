@@ -1,5 +1,6 @@
 package it.gov.pagopa.initiative.mapper;
 
+import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.rule.refund.AccumulatedAmountDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
@@ -21,6 +22,7 @@ import it.gov.pagopa.initiative.model.rule.trx.*;
 import it.gov.pagopa.initiative.service.AESTokenService;
 import it.gov.pagopa.initiative.utils.InitiativeUtils;
 
+import java.time.LocalDate;
 import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
@@ -245,6 +247,8 @@ public class InitiativeModelToDTOMapper {
         return initiatives.stream().map(initiativeModel -> {
                     String serviceName = initiativeModel.getAdditionalInfo() != null ?
                             initiativeModel.getAdditionalInfo().getServiceName() : StringUtils.EMPTY;
+                    String status = initiativeModel.getGeneral().getEndDate() != null && LocalDate.now().isAfter(initiativeModel.getGeneral().getEndDate()) ?
+                    InitiativeConstants.Status.CLOSED : initiativeModel.getStatus();
                     return InitiativeSummaryDTO.builder()
                             .initiativeId(initiativeModel.getInitiativeId())
                             .initiativeName(StringUtils.isNotBlank(initiativeModel.getInitiativeName()) ?
@@ -252,7 +256,7 @@ public class InitiativeModelToDTOMapper {
                             )
                             .initiativeRewardType(initiativeModel.getInitiativeRewardType() != null ?
                                     initiativeModel.getInitiativeRewardType().name() : null)
-                            .status(initiativeModel.getStatus())
+                            .status(status)
                             .creationDate(initiativeModel.getCreationDate())
                             .updateDate(initiativeModel.getUpdateDate())
                             .rankingEnabled(initiativeModel.getGeneral() != null ? initiativeModel.getGeneral().getRankingEnabled() : null)
