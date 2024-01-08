@@ -42,10 +42,12 @@ import org.springframework.web.context.request.RequestContextHolder;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Email.*;
+import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_NOT_VALID_END_DATE;
 
 
 @Service
@@ -349,6 +351,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
     @Override
     public void isInitiativeAllowedToBeNextStatusThenThrows(Initiative initiative, String nextStatus, String role) {
+        //validation role
         if (InitiativeConstants.Role.PAGOPA_ADMIN.equals(role)) {
             log.info("[UPDATE_TO_{}_STATUS] - Initiative: {} Status: {}. Not processable status", nextStatus, initiative.getInitiativeId(), initiative.getStatus());
             auditUtilities.logInitiativeError(this.getUserId(), initiative.getInitiativeId(), initiative.getOrganizationId(),
@@ -358,6 +361,8 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                     String.format(InitiativeConstants.Exception.BadRequest.PERMISSION_NOT_VALID, role),
                     HttpStatus.BAD_REQUEST);
         }
+
+        //validation status
         if (InitiativeConstants.Status.PUBLISHED.equals(nextStatus)) {
             if (!Arrays.asList(InitiativeConstants.Status.Validation.INITIATIVE_ALLOWED_STATES_TO_BECOME_PUBLISHED_ARRAY).contains(initiative.getStatus())) {
                 log.info("[UPDATE_TO_{}_STATUS] - Initiative: {} Status: {}. Not processable status", nextStatus, initiative.getInitiativeId(), initiative.getStatus());
@@ -374,6 +379,15 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             throw new InitiativeException(
                     InitiativeConstants.Exception.BadRequest.CODE,
                     String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_STATUS_NOT_VALID, initiative.getInitiativeId()),
+                    HttpStatus.BAD_REQUEST);
+        }
+
+        //validation end date
+        LocalDate initiativeEndDate = initiative.getGeneral().getEndDate();
+        if(LocalDate.now().isAfter(initiativeEndDate)){
+            throw new InitiativeException(
+                    InitiativeConstants.Exception.BadRequest.CODE,
+                    String.format(INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_NOT_VALID_END_DATE, initiative.getInitiativeId(), initiativeEndDate),
                     HttpStatus.BAD_REQUEST);
         }
     }
