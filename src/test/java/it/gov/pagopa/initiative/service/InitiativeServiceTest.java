@@ -61,6 +61,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 
+import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_NOT_VALID_END_DATE;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.ADMIN;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.PAGOPA_ADMIN;
 import static org.junit.jupiter.api.Assertions.*;
@@ -1186,10 +1187,40 @@ class InitiativeServiceTest {
         Initiative initiative = createStep5Initiative();
         initiative.setStatus(InitiativeConstants.Status.APPROVED);
 
+        LocalDate localDateNow = LocalDate.now();
+        InitiativeGeneral initiativeGeneral = InitiativeGeneral.builder()
+                .startDate(localDateNow.minusDays(5))
+                .endDate(localDateNow)
+                .build();
+        initiative.setGeneral(initiativeGeneral);
+
         //Try to call the Real Service
         //Prepare Executable with invocation of the method on your system under test
         Executable executable = () -> initiativeService.isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED, ROLE);
         Assertions.assertDoesNotThrow(executable);
+    }
+
+    @Test
+    void givenInitiativeAPPROVEDandNextStatusPUBLISHED_whenInitiativeIsAllowedToBeNextStatus_thenKoEndDate() {
+        //Instruct Initiative to have a status Valid (APPROVED)
+        Initiative initiative = createStep5Initiative();
+        initiative.setStatus(InitiativeConstants.Status.APPROVED);
+
+        LocalDate localDateNow = LocalDate.now();
+        InitiativeGeneral initiativeGeneral = InitiativeGeneral.builder()
+                .startDate(localDateNow.minusDays(5))
+                .endDate(localDateNow.minusDays(3))
+                .build();
+        initiative.setGeneral(initiativeGeneral);
+
+        //Try to call the Real Service
+        //Prepare Executable with invocation of the method on your system under test
+        InitiativeException initiativeExceptionResult = assertThrows(InitiativeException.class,
+                () -> initiativeService.isInitiativeAllowedToBeNextStatusThenThrows(initiative, Status.PUBLISHED, ROLE));
+
+        assertEquals(InitiativeConstants.Exception.BadRequest.CODE, initiativeExceptionResult.getCode());
+        assertEquals(String.format(INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_NOT_VALID_END_DATE, initiative.getInitiativeId(), initiative.getGeneral().getEndDate()), initiativeExceptionResult.getMessage());
+        assertEquals(HttpStatus.BAD_REQUEST, initiativeExceptionResult.getHttpStatus());
     }
 
     @Test
