@@ -247,21 +247,29 @@ public class InitiativeModelToDTOMapper {
         return initiatives.stream().map(initiativeModel -> {
                     String serviceName = initiativeModel.getAdditionalInfo() != null ?
                             initiativeModel.getAdditionalInfo().getServiceName() : StringUtils.EMPTY;
-                    String status = initiativeModel.getGeneral().getEndDate() != null && LocalDate.now().isAfter(initiativeModel.getGeneral().getEndDate()) ?
-                    InitiativeConstants.Status.CLOSED : initiativeModel.getStatus();
-                    return InitiativeSummaryDTO.builder()
+            return InitiativeSummaryDTO.builder()
                             .initiativeId(initiativeModel.getInitiativeId())
                             .initiativeName(StringUtils.isNotBlank(initiativeModel.getInitiativeName()) ?
                                     initiativeModel.getInitiativeName() : serviceName
                             )
                             .initiativeRewardType(initiativeModel.getInitiativeRewardType() != null ?
                                     initiativeModel.getInitiativeRewardType().name() : null)
-                            .status(status)
+                            .status(checkEndDateToSetStatus(initiativeModel))
                             .creationDate(initiativeModel.getCreationDate())
                             .updateDate(initiativeModel.getUpdateDate())
                             .rankingEnabled(initiativeModel.getGeneral() != null ? initiativeModel.getGeneral().getRankingEnabled() : null)
                             .build();
         }).toList();
+    }
+
+    private static String checkEndDateToSetStatus(Initiative initiativeModel) {
+        if (!InitiativeConstants.Status.DRAFT.equals(initiativeModel.getStatus()) &&
+                initiativeModel.getGeneral().getEndDate() != null &&
+                LocalDate.now().isAfter(initiativeModel.getGeneral().getEndDate()))
+        {
+            return InitiativeConstants.Status.CLOSED;
+        }
+        return initiativeModel.getStatus();
     }
 
     public List<InitiativeIssuerDTO> toInitiativeIssuerDTOList(List<Initiative> initiatives) {
