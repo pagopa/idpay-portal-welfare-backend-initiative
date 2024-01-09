@@ -181,6 +181,7 @@ class InitiativeServiceTest {
                                 initiative.getStatus().equals(Status.IN_REVISION) ||
                                         initiative.getStatus().equals(Status.TO_CHECK) ||
                                         initiative.getStatus().equals(Status.APPROVED) ||
+                                        initiative.getStatus().equals(Status.CLOSED) ||
                                         initiative.getStatus().equals(Status.PUBLISHED)))
                 .toList() : initiativeList;
 
@@ -199,13 +200,11 @@ class InitiativeServiceTest {
 
     @Test
     void givenInitiativeList_when_RolePagopa_then_ListOfRetrieveInitiativeSummary_isEmpty() {
-        Initiative step2Initiative2 = createStep2Initiative();
-        step2Initiative2.setStatus(Status.CLOSED);
         Initiative step2Initiative3 = createStep2Initiative();
         step2Initiative3.setStatus(Status.SUSPENDED);
         Initiative step2Initiative4 = createStep2Initiative();
         step2Initiative4.setStatus(Status.DRAFT);
-        List<Initiative> initiativeList = Arrays.asList(step2Initiative2,step2Initiative3,step2Initiative4);
+        List<Initiative> initiativeList = Arrays.asList(step2Initiative3,step2Initiative4);
 
         //Instruct the Repo Mock to return Dummy Initiatives
         when(initiativeRepository.retrieveInitiativeSummary(ORGANIZATION_ID, true)).thenReturn(initiativeList);

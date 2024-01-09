@@ -20,12 +20,11 @@ import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
 import it.gov.pagopa.initiative.model.rule.trx.*;
 import it.gov.pagopa.initiative.service.AESTokenService;
 import it.gov.pagopa.initiative.utils.InitiativeUtils;
-
-import java.util.*;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+
+import java.util.*;
 
 
 @Component
@@ -104,13 +103,13 @@ public class InitiativeModelToDTOMapper {
                 .build();
     }
 
-    public InitiativeDTO toInitiativeDTO(Initiative initiative) {
+    public InitiativeDTO toInitiativeDTO(Initiative initiative, boolean checkEndDate) {
         if (initiative == null) {
             return null;
         }
         InitiativeDTO initiativeDto = this.toDtoOnlyId(initiative);
         initiativeDto.setInitiativeName(initiative.getInitiativeName());
-        initiativeDto.setStatus(initiative.getStatus());
+        initiativeDto.setStatus(checkEndDate ? InitiativeUtils.checkEndDateToSetStatus(initiative) : initiative.getStatus());
         initiativeDto.setOrganizationId(initiative.getOrganizationId());
         initiativeDto.setOrganizationName(initiative.getOrganizationName());
         initiativeDto.setCreationDate(initiative.getCreationDate());
@@ -245,14 +244,14 @@ public class InitiativeModelToDTOMapper {
         return initiatives.stream().map(initiativeModel -> {
                     String serviceName = initiativeModel.getAdditionalInfo() != null ?
                             initiativeModel.getAdditionalInfo().getServiceName() : StringUtils.EMPTY;
-                    return InitiativeSummaryDTO.builder()
+            return InitiativeSummaryDTO.builder()
                             .initiativeId(initiativeModel.getInitiativeId())
                             .initiativeName(StringUtils.isNotBlank(initiativeModel.getInitiativeName()) ?
                                     initiativeModel.getInitiativeName() : serviceName
                             )
                             .initiativeRewardType(initiativeModel.getInitiativeRewardType() != null ?
                                     initiativeModel.getInitiativeRewardType().name() : null)
-                            .status(initiativeModel.getStatus())
+                            .status(InitiativeUtils.checkEndDateToSetStatus(initiativeModel))
                             .creationDate(initiativeModel.getCreationDate())
                             .updateDate(initiativeModel.getUpdateDate())
                             .rankingEnabled(initiativeModel.getGeneral() != null ? initiativeModel.getGeneral().getRankingEnabled() : null)
