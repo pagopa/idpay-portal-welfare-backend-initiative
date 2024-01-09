@@ -549,6 +549,16 @@ class InitiativeModelToDTOMapperTest {
         initiativeSummaryDTOS.forEach(initiativeSummaryDTO ->
                 assertEquals(InitiativeConstants.Status.CLOSED, initiativeSummaryDTO.getStatus()));
     }
+    @Test
+    void toInitiativeSummaryDTOList_statusPUBLISHED() {
+        Initiative step2Initiative = createFullInitiative();
+        step2Initiative.setStatus(InitiativeConstants.Status.PUBLISHED);
+        List<Initiative> initiatives = List.of(step2Initiative);
+
+        List<InitiativeSummaryDTO> initiativeSummaryDTOS = initiativeModelToDTOMapper.toInitiativeSummaryDTOList(initiatives);
+        initiativeSummaryDTOS.forEach(initiativeSummaryDTO ->
+                assertEquals(InitiativeConstants.Status.PUBLISHED, initiativeSummaryDTO.getStatus()));
+    }
 
     @Test
     void toInitiativeSummaryDTOList_equals() {
