@@ -1,9 +1,11 @@
 package it.gov.pagopa.initiative.utils;
 
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
+import it.gov.pagopa.initiative.model.Initiative;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.Set;
 
 @Component
@@ -33,6 +35,16 @@ public class InitiativeUtils {
 
     public Set<String> getAllowedInitiativeLogoExtensions(){
         return allowedInitiativeLogoExtensions;
+    }
+
+    public static String checkEndDateToSetStatus(Initiative initiative) {
+        if (InitiativeConstants.Status.PUBLISHED.equals(initiative.getStatus()) &&
+                initiative.getGeneral().getEndDate() != null &&
+                LocalDate.now().isAfter(initiative.getGeneral().getEndDate()))
+        {
+            return InitiativeConstants.Status.CLOSED;
+        }
+        return initiative.getStatus();
     }
 
 }

@@ -1,6 +1,5 @@
 package it.gov.pagopa.initiative.mapper;
 
-import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.rule.refund.AccumulatedAmountDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
@@ -21,13 +20,11 @@ import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
 import it.gov.pagopa.initiative.model.rule.trx.*;
 import it.gov.pagopa.initiative.service.AESTokenService;
 import it.gov.pagopa.initiative.utils.InitiativeUtils;
-
-import java.time.LocalDate;
-import java.util.*;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+
+import java.util.*;
 
 
 @Component
@@ -106,13 +103,13 @@ public class InitiativeModelToDTOMapper {
                 .build();
     }
 
-    public InitiativeDTO toInitiativeDTO(Initiative initiative) {
+    public InitiativeDTO toInitiativeDTO(Initiative initiative, boolean checkEndDate) {
         if (initiative == null) {
             return null;
         }
         InitiativeDTO initiativeDto = this.toDtoOnlyId(initiative);
         initiativeDto.setInitiativeName(initiative.getInitiativeName());
-        initiativeDto.setStatus(initiative.getStatus());
+        initiativeDto.setStatus(checkEndDate ? InitiativeUtils.checkEndDateToSetStatus(initiative) : initiative.getStatus());
         initiativeDto.setOrganizationId(initiative.getOrganizationId());
         initiativeDto.setOrganizationName(initiative.getOrganizationName());
         initiativeDto.setCreationDate(initiative.getCreationDate());
@@ -254,22 +251,12 @@ public class InitiativeModelToDTOMapper {
                             )
                             .initiativeRewardType(initiativeModel.getInitiativeRewardType() != null ?
                                     initiativeModel.getInitiativeRewardType().name() : null)
-                            .status(checkEndDateToSetStatus(initiativeModel))
+                            .status(InitiativeUtils.checkEndDateToSetStatus(initiativeModel))
                             .creationDate(initiativeModel.getCreationDate())
                             .updateDate(initiativeModel.getUpdateDate())
                             .rankingEnabled(initiativeModel.getGeneral() != null ? initiativeModel.getGeneral().getRankingEnabled() : null)
                             .build();
         }).toList();
-    }
-
-    private static String checkEndDateToSetStatus(Initiative initiative) {
-        if (InitiativeConstants.Status.PUBLISHED.equals(initiative.getStatus()) &&
-                initiative.getGeneral().getEndDate() != null &&
-                LocalDate.now().isAfter(initiative.getGeneral().getEndDate()))
-        {
-            return InitiativeConstants.Status.CLOSED;
-        }
-        return initiative.getStatus();
     }
 
     public List<InitiativeIssuerDTO> toInitiativeIssuerDTOList(List<Initiative> initiatives) {
