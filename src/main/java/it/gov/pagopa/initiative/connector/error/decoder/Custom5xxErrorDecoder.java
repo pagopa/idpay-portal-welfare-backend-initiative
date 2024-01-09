@@ -24,7 +24,7 @@ public class Custom5xxErrorDecoder implements ErrorDecoder {
                     exception.getMessage(),
                     response.request().httpMethod(),
                     exception,
-                    null,
+                    (Long)null,
                     response.request());
         }
         return exception;
