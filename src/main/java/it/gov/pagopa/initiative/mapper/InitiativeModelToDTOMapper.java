@@ -262,14 +262,14 @@ public class InitiativeModelToDTOMapper {
         }).toList();
     }
 
-    private static String checkEndDateToSetStatus(Initiative initiativeModel) {
-        if (!InitiativeConstants.Status.DRAFT.equals(initiativeModel.getStatus()) &&
-                initiativeModel.getGeneral().getEndDate() != null &&
-                LocalDate.now().isAfter(initiativeModel.getGeneral().getEndDate()))
+    private static String checkEndDateToSetStatus(Initiative initiative) {
+        if (InitiativeConstants.Status.PUBLISHED.equals(initiative.getStatus()) &&
+                initiative.getGeneral().getEndDate() != null &&
+                LocalDate.now().isAfter(initiative.getGeneral().getEndDate()))
         {
             return InitiativeConstants.Status.CLOSED;
         }
-        return initiativeModel.getStatus();
+        return initiative.getStatus();
     }
 
     public List<InitiativeIssuerDTO> toInitiativeIssuerDTOList(List<Initiative> initiatives) {
