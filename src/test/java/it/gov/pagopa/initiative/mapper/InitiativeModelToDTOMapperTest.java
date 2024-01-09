@@ -676,6 +676,14 @@ class InitiativeModelToDTOMapperTest {
         assertNull(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true).getRewardRule());
     }
 
+    @Test
+    void testBeneficiaryView() {
+            Initiative step2Initiative = createStep2Initiative();
+
+            InitiativeDTO initiative = initiativeModelToDTOMapper.toInitiativeDTO(step2Initiative, false);
+                    assertEquals(InitiativeConstants.Status.DRAFT, initiative.getStatus());
+    }
+
     private Initiative createFullInitiative() {
         return createStep5Initiative();
     }

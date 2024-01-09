@@ -39,9 +39,7 @@ public class InitiativeUtils {
 
     public static String checkEndDateToSetStatus(Initiative initiative) {
         if (InitiativeConstants.Status.PUBLISHED.equals(initiative.getStatus()) &&
-                initiative.getGeneral().getEndDate() != null &&
-                LocalDate.now().isAfter(initiative.getGeneral().getEndDate()))
-        {
+                LocalDate.now().isAfter(initiative.getGeneral().getEndDate())) {
             return InitiativeConstants.Status.CLOSED;
         }
         return initiative.getStatus();
