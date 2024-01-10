@@ -36,7 +36,9 @@ public class ValidationExceptionHandler {
 
         String message = ex.getBindingResult().getAllErrors().stream()
                 .map(error -> {
-                    String fieldName = ((FieldError) error).getField();
+          String fieldName = error instanceof FieldError fieldErrorInput
+              ? fieldErrorInput.getField()
+              : error.getObjectName();
                     String errorMessage = error.getDefaultMessage();
                     return String.format("[%s]: %s", fieldName, errorMessage);
                 }).collect(Collectors.joining("; "));
