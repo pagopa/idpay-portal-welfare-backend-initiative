@@ -58,7 +58,6 @@ class MongoDBConfigTest {
         when(connectionString.isLoadBalanced()).thenReturn(true);
         when(connectionString.getApplicationName()).thenReturn("Application Name");
         when(connectionString.getHosts()).thenReturn(stringList);
-        when(connectionString.getProxyPort()).thenReturn(null);
         MongoTransactionManager transManager = mongoDBConfig.transactionManager(new SimpleMongoClientDatabaseFactory(connectionString));
         assertNotNull(transManager);
         verify(connectionString).isSrvProtocol();
