@@ -809,7 +809,7 @@ class InitiativeApiTest {
         InitiativeDTO initiativeDTO = createStep5InitiativeDTO();
 
         // Instruct the Service to insert a Dummy Initiative
-        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative)).thenReturn(initiativeDTO);
+        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative, false)).thenReturn(initiativeDTO);
         // When
         // With this instruction, I instruct the service (via Mockito's when) to always return the DummyInitiative to me anytime I call the same service's function
         when(initiativeService.getInitiativeBeneficiaryView(anyString())).thenReturn(initiative);
@@ -1000,7 +1000,7 @@ class InitiativeApiTest {
         doNothing().when(initiativeService).isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED, ROLE);
 
         // Instruct the Service to insert a Dummy Initiative
-        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative)).thenReturn(step5InitiativeDTO);
+        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true)).thenReturn(step5InitiativeDTO);
 
         doNothing().when(initiativeService).updateInitiative(any(Initiative.class));
 
@@ -1038,7 +1038,7 @@ class InitiativeApiTest {
         doNothing().when(initiativeService).isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED, ROLE);
 
         // Instruct the Service to insert a Dummy Initiative
-        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative)).thenReturn(step5InitiativeDTO);
+        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true)).thenReturn(step5InitiativeDTO);
 
         doNothing().when(initiativeService).updateInitiative(any(Initiative.class));
 
