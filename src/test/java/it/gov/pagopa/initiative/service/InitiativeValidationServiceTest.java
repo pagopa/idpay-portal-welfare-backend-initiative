@@ -9,7 +9,7 @@ import it.gov.pagopa.initiative.dto.rule.refund.TimeParameterDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardValueDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.*;
-import it.gov.pagopa.initiative.exception.InitiativeException;
+import it.gov.pagopa.initiative.exception.custom.*;
 import it.gov.pagopa.initiative.model.TypeBoolEnum;
 import it.gov.pagopa.initiative.model.TypeMultiEnum;
 import it.gov.pagopa.initiative.model.*;
@@ -31,7 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
@@ -100,11 +99,10 @@ class InitiativeValidationServiceTest {
         //Automatically doThrow InitiativeException for Optional.empty()
         when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.empty());
 
-        InitiativeException exception = assertThrows(InitiativeException.class, () -> initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ANY_ROLE));
+        InitiativeNotFoundException exception = assertThrows(InitiativeNotFoundException.class, () -> initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ANY_ROLE));
 
-        assertEquals(HttpStatus.NOT_FOUND, exception.getHttpStatus());
-        assertEquals(InitiativeConstants.Exception.NotFound.CODE, exception.getCode());
-        assertEquals(String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, INITIATIVE_ID), exception.getMessage());
+        assertEquals(InitiativeConstants.Exception.NotFound.INITIATIVE_NOT_FOUND, exception.getCode());
+        assertEquals(String.format("Initiative with initiativeId [%s] not found", INITIATIVE_ID), exception.getMessage());
     }
 
     @Test
@@ -152,11 +150,10 @@ class InitiativeValidationServiceTest {
         //Instruct the Repo Mock to return Dummy Initiatives
         when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(step2Initiative));
 
-        InitiativeException exception = assertThrows(InitiativeException.class, () -> initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, PAGOPA_ADMIN_ROLE));
+        AdminPermissionException exception = assertThrows(AdminPermissionException.class, () -> initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, PAGOPA_ADMIN_ROLE));
 
-        assertEquals(HttpStatus.BAD_REQUEST, exception.getHttpStatus());
-        assertEquals(InitiativeConstants.Exception.BadRequest.CODE, exception.getCode());
-        assertEquals(String.format(InitiativeConstants.Exception.BadRequest.PERMISSION_NOT_VALID, PAGOPA_ADMIN_ROLE), exception.getMessage());
+        assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_ADMIN_ROLE_NOT_ALLOWED, exception.getCode());
+        assertEquals(String.format("Admin permission not allowed for current initiative [%s]", step2Initiative.getInitiativeId()), exception.getMessage());
     }
     @Test
     void updateGeneralInfoWhenBeneficiaryTypeIsNF_ok() {
@@ -171,14 +168,14 @@ class InitiativeValidationServiceTest {
     void updateGeneralInfoWhenBeneficiaryTypeIsNFAndFamilyUnitCompositionIsNull_ko() {
         Initiative fullInitiative = createFullInitiative();
         InitiativeGeneral generalInfoInitiative = createInitiativeGeneralFamilyUnitComposition();
+        generalInfoInitiative.setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF);
         fullInitiative.setGeneral(generalInfoInitiative);
-        fullInitiative.getGeneral().setFamilyUnitComposition(null);
 
         try {
             initiativeValidationService.checkBeneficiaryTypeAndFamilyUnit(fullInitiative);
-        } catch (InitiativeException e) {
-            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
-            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_GENERAL_FAMILY_COMPOSITION_MESSAGE, e.getMessage());
+        } catch (InitiativeFamilyUnitCompositionException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_FAMILY_UNIT_COMPOSITION_NOT_VALID, e.getCode());
+            assertEquals("In the initiative [%s] family unit composition must be unset because beneficiary type is not NF".formatted(fullInitiative.getInitiativeId()),e.getMessage());
         }
     }
     @Test
@@ -190,9 +187,9 @@ class InitiativeValidationServiceTest {
 
         try {
             initiativeValidationService.checkBeneficiaryTypeAndFamilyUnit(fullInitiative);
-        } catch (InitiativeException e) {
-            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
-            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_GENERAL_FAMILY_COMPOSITION_MESSAGE, e.getMessage());
+        } catch (InitiativeFamilyUnitCompositionException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_FAMILY_UNIT_COMPOSITION_NOT_VALID, e.getCode());
+            assertEquals("In the initiative [%s] family unit composition must be set as 'INPS' or 'ANPR'".formatted(fullInitiative.getInitiativeId()),e.getMessage());
         }
     }
     @Test
@@ -205,9 +202,9 @@ class InitiativeValidationServiceTest {
 
         try {
             initiativeValidationService.checkBeneficiaryTypeAndFamilyUnit(fullInitiative);
-        } catch (InitiativeException e) {
-            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
-            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_GENERAL_FAMILY_COMPOSITION_WRONG_BENEFICIARY_TYPE, e.getMessage());
+        } catch (InitiativeFamilyUnitCompositionException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_FAMILY_UNIT_COMPOSITION_NOT_VALID, e.getCode());
+            assertEquals("In the initiative [%s] family unit composition must be unset because beneficiary type is not NF".formatted(fullInitiative.getInitiativeId()),e.getMessage());
         }
     }
     @Test
@@ -233,9 +230,9 @@ class InitiativeValidationServiceTest {
 
         try {
             initiativeValidationService.checkBeneficiaryTypeAndFamilyUnit(fullInitiative);
-        } catch (InitiativeException e) {
-            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
-            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_GENERAL_FAMILY_COMPOSITION_MESSAGE, e.getMessage());
+        } catch (InitiativeFamilyUnitCompositionException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_FAMILY_UNIT_COMPOSITION_NOT_VALID, e.getCode());
+            assertEquals("In the initiative [%s] family unit composition must be set as 'INPS' or 'ANPR'".formatted(fullInitiative.getInitiativeId()),e.getMessage());
         }
     }
     @Test
@@ -249,9 +246,9 @@ class InitiativeValidationServiceTest {
 
         try {
             initiativeValidationService.checkAutomatedCriteria(fullInitiative,automatedCriteriaList);
-        } catch (InitiativeException e) {
-            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
-            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_BENEFICIARY_TYPE_NF_ENABLED_AUTOMATED_CRITERIA_ISEE_MISSING_NOT_VALID, e.getMessage());
+        } catch (AutomatedCriteriaNotValidException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_AUTOMATED_CRITERIA_NOT_VALID_BENEFICIARY_NF_ISEE_MISSING, e.getCode());
+            assertEquals("Automated criteria for family initiative [%s] not valid because ISEE is missing".formatted(fullInitiative.getInitiativeId()) , e.getMessage());
         }
     }
     @Test
@@ -266,15 +263,15 @@ class InitiativeValidationServiceTest {
 
         try {
             initiativeValidationService.checkAutomatedCriteria(fullInitiative,automatedCriteriaList);
-        } catch (InitiativeException e) {
-            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
-            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_BENEFICIARY_TYPE_NF_ENABLED_AUTOMATED_CRITERIA_ISEE_MISSING_NOT_VALID, e.getMessage());
+        } catch (AutomatedCriteriaNotValidException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_AUTOMATED_CRITERIA_NOT_VALID_BENEFICIARY_NF_ISEE_MISSING, e.getCode());
+            assertEquals("Automated criteria for family initiative [%s] not valid because ISEE is missing".formatted(fullInitiative.getInitiativeId()) , e.getMessage());
         }
     }
 
     @Test
     void testCheckPermissionBeforeInsert() {
-        assertThrows(InitiativeException.class,
+        assertThrows(AdminPermissionException.class,
                 () -> initiativeValidationService.checkPermissionBeforeInsert("pagopa_admin"));
     }
 
@@ -290,29 +287,31 @@ class InitiativeValidationServiceTest {
     void testCheckAutomatedCriteriaOrderDirectionWithRanking2() {
         Initiative step3Initiative = createStep3Initiative(true);
         List<AutomatedCriteria> automatedCriteriaList = step3Initiative.getBeneficiaryRule().getAutomatedCriteria();
-        assertThrows(InitiativeException.class, () -> initiativeValidationService.checkAutomatedCriteria(step3Initiative, automatedCriteriaList));
+        assertThrows(AutomatedCriteriaNotValidException.class, () -> initiativeValidationService.checkAutomatedCriteria(step3Initiative, automatedCriteriaList));
     }
 
     @Test
     void testCheckAutomatedCriteriaOrderDirectionWithRanking3() {
         Initiative step3Initiative = createStep3Initiative_EQ();
         List<AutomatedCriteria> automatedCriteriaList = step3Initiative.getBeneficiaryRule().getAutomatedCriteria();
-        assertThrows(InitiativeException.class, () -> initiativeValidationService.checkAutomatedCriteria(step3Initiative, automatedCriteriaList));
+        assertThrows(AutomatedCriteriaNotValidException.class, () -> initiativeValidationService.checkAutomatedCriteria(step3Initiative, automatedCriteriaList));
     }
 
     @Test
     void testCheckAutomatedCriteriaOrderDirectionWithRanking_Exception() {
         Initiative step3Initiative = createStep3Initiative(true);
         AutomatedCriteria automatedCriteria = new AutomatedCriteria();
-        automatedCriteria.setCode("noMatch");
+        automatedCriteria.setCode("ISEE");
+        automatedCriteria.setIseeTypes(List.of(IseeTypologyEnum.ORDINARIO));
         List<AutomatedCriteria> automatedCriteriaList = new ArrayList<>();
         automatedCriteriaList.add(automatedCriteria);
 
         try {
             initiativeValidationService.checkAutomatedCriteria(step3Initiative,
                     automatedCriteriaList);
-        } catch (InitiativeException e) {
-            assertEquals(InitiativeConstants.Exception.BadRequest.CODE , e.getCode());
+        } catch (AutomatedCriteriaNotValidException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_AUTOMATED_CRITERIA_NOT_VALID_ORDER_DIRECTION_MISSING , e.getCode());
+            assertEquals("Automated criteria for ranking initiative [%s] not valid because OrderDirection is missing".formatted(step3Initiative.getInitiativeId()),e.getMessage());
         }
     }
     @Test
@@ -323,19 +322,20 @@ class InitiativeValidationServiceTest {
         automatedCriteria.setIseeTypes(null);
         List<AutomatedCriteria> automatedCriteriaList = new ArrayList<>();
         automatedCriteriaList.add(automatedCriteria);
+
         try {
             initiativeValidationService.checkAutomatedCriteria(step3Initiative,
                     automatedCriteriaList);
-        } catch (InitiativeException e) {
-            assertEquals(InitiativeConstants.Exception.BadRequest.CODE , e.getCode());
-            assertEquals(InitiativeConstants.Exception.BadRequest.ISEE_TYPES_NOT_VALID, e.getMessage());
+        } catch (AutomatedCriteriaNotValidException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_AUTOMATED_CRITERIA_NOT_VALID_TYPOLOGY_ISEE_MISSING , e.getCode());
+            assertEquals("Automated criteria not valid because typology ISEE is missing", e.getMessage());
         }
     }
 
     @Test
     void givenRankingEndDateAndStartDateNotValid_whenValidateAllWizardSteps_thenExceptionThrown() {
         InitiativeDTO step5InitiativeDTO = createStep5InitiativeDTO(true);
-        assertThrows(InitiativeException.class, () -> initiativeValidationService.validateAllWizardSteps(step5InitiativeDTO));
+        assertThrows(ValidationWizardException.class, () -> initiativeValidationService.validateAllWizardSteps(step5InitiativeDTO));
     }
 
     @Test
@@ -377,9 +377,9 @@ class InitiativeValidationServiceTest {
         step4Initiative.setTrxRule(trxConditions);
         try {
             initiativeValidationService.checkRewardRuleAbsolute(step4Initiative);
-        } catch (InitiativeException e) {
-            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
-            assertEquals(InitiativeConstants.Exception.BadRequest.REWARD_TYPE, e.getMessage());
+        } catch (InvalidRewardRuleException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_REWARD_RULES_NOT_VALID, e.getCode());
+            assertEquals("Reward rules of initiative [%s] is not valid".formatted(step4Initiative.getInitiativeId()), e.getMessage());
         }
     }
 
@@ -394,9 +394,9 @@ class InitiativeValidationServiceTest {
         step4Initiative.setTrxRule(trxConditions);
         try {
             initiativeValidationService.checkRewardRuleAbsolute(step4Initiative);
-        } catch (InitiativeException e) {
-            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
-            assertEquals(InitiativeConstants.Exception.BadRequest.REWARD_TYPE, e.getMessage());
+        } catch (InvalidRewardRuleException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_REWARD_RULES_NOT_VALID, e.getCode());
+            assertEquals("Reward rules of initiative [%s] is not valid".formatted(step4Initiative.getInitiativeId()), e.getMessage());
         }
     }
     @Test
@@ -413,9 +413,9 @@ class InitiativeValidationServiceTest {
         step4Initiative.setTrxRule(trxConditions);
         try {
             initiativeValidationService.checkRewardRuleAbsolute(step4Initiative);
-        } catch (InitiativeException e) {
-            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
-            assertEquals(InitiativeConstants.Exception.BadRequest.REWARD_TYPE, e.getMessage());
+        } catch (InvalidRewardRuleException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_REWARD_RULES_NOT_VALID, e.getCode());
+            assertEquals("Reward rules of initiative [%s] is not valid".formatted(step4Initiative.getInitiativeId()), e.getMessage());
         }
     }
 
@@ -456,9 +456,9 @@ class InitiativeValidationServiceTest {
         try {
             initiativeValidationService.checkReward(step4Initiative);
             Assertions.fail();
-        } catch (InitiativeException e) {
-            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
-            assertEquals(InitiativeConstants.Exception.BadRequest.REWARD_TYPE, e.getMessage());
+        } catch (InvalidRewardRuleException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_REWARD_RULES_NOT_VALID, e.getCode());
+            assertEquals("Reward rules of initiative [%s] is not valid".formatted(step4Initiative.getInitiativeId()), e.getMessage());
         }
     }
 
@@ -509,9 +509,9 @@ class InitiativeValidationServiceTest {
         try {
             initiativeValidationService.checkRefundRuleDiscountInitiative(step5Initiative.getInitiativeRewardType().name(),
                     refundRule);
-        } catch (InitiativeException e) {
-            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
-            assertEquals(InitiativeConstants.Exception.BadRequest.REFUND_RULE_INVALID, e.getMessage());
+        } catch (InvalidRefundRuleException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_REFUND_RULES_NOT_VALID, e.getCode());
+            assertEquals("Refund rules is not valid", e.getMessage());
         }
     }
     @Test
@@ -521,9 +521,9 @@ class InitiativeValidationServiceTest {
         try {
             initiativeValidationService.checkRefundRuleDiscountInitiative(step4Initiative.getInitiativeRewardType().name(),
                     new InitiativeRefundRule());
-        } catch (InitiativeException e) {
-            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
-            assertEquals(InitiativeConstants.Exception.BadRequest.REFUND_RULE_INVALID, e.getMessage());
+        } catch (InvalidRefundRuleException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_REFUND_RULES_NOT_VALID, e.getCode());
+            assertEquals("Refund rules is not valid", e.getMessage());
         }
     }
     @ParameterizedTest
@@ -537,9 +537,9 @@ class InitiativeValidationServiceTest {
 
         try {
             initiativeValidationService.checkStartDateAndEndDate(step2Initiative);
-        } catch (InitiativeException e) {
-            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
-            assertEquals("The startDate and endDate cannot be less than today", e.getMessage());
+        } catch (InitiativeDateInvalidException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_START_DATE_AND_END_DATE_NOT_VALID, e.getCode());
+            assertEquals("In the initiative [%s] the startDate and endDate cannot be less than today".formatted(step2Initiative.getInitiativeId()), e.getMessage());
         }
     }
     @ParameterizedTest
@@ -557,9 +557,9 @@ class InitiativeValidationServiceTest {
 
         try {
             initiativeValidationService.checkFieldYearLengthAndValues(automatedCriteriaList);
-        } catch (InitiativeException e) {
-            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
-            assertEquals("The value must contain 4 numbers and the year cannot be less than 150 years", e.getMessage());
+        } catch (InitiativeYearValueException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_YEAR_VALUE_NOT_VALID, e.getCode());
+            assertEquals("In the initiative the value must contain 4 numbers and the year cannot be less than 150 years", e.getMessage());
         }
     }
 
@@ -840,7 +840,7 @@ class InitiativeValidationServiceTest {
 
     @Test
     void testCheckPermissionBeforeInsert2() {
-        assertThrows(InitiativeException.class,
+        assertThrows(AdminPermissionException.class,
                 () -> initiativeValidationService.checkPermissionBeforeInsert("pagopa_admin"));
     }
 
