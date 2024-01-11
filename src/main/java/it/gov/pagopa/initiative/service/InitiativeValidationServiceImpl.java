@@ -51,7 +51,7 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
     @Override
     public Initiative  getInitiative(String organizationId, String initiativeId, String role){
         Initiative initiative = initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(organizationId, initiativeId, true)
-                .orElseThrow(() -> new InitiativeNotFoundException("Initiative with initiativeId [%s] not found".formatted(initiativeId)));
+                .orElseThrow(() -> new InitiativeNotFoundException(InitiativeConstants.Exception.NotFound.INITIATIVE_NOT_FOUND_MESSAGE.formatted(initiativeId)));
         if (InitiativeConstants.Role.PAGOPA_ADMIN.equals(role)){
             if (InitiativeConstants.Status.PUBLISHED.equals(initiative.getStatus()) || initiative.getStatus().equals(InitiativeConstants.Status.IN_REVISION) || initiative.getStatus().equals(InitiativeConstants.Status.TO_CHECK) || initiative.getStatus().equals(InitiativeConstants.Status.APPROVED)){
                 return initiative;
