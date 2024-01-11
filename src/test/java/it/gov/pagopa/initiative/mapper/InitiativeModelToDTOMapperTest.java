@@ -243,56 +243,56 @@ class InitiativeModelToDTOMapperTest {
     }
     @Test
     void toInitiativeGeneralDTOBeneficiaryTypeNull() {
-        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(initiativeStep2BeneficiaryTypeNull);
+        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(initiativeStep2BeneficiaryTypeNull, true);
         assertEquals(initiativeStep2DTOBeneficiaryTypeNull, initiativeDTO);
 
     }
     @Test
     void toInitiativeGeneralDTOFamilyUnitNotNull() {
-        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(initiativeStep2FamilyUnitNotNull);
+        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(initiativeStep2FamilyUnitNotNull, true);
         assertEquals(initiativeStep2DTOFamilyUnitNotNull, initiativeDTO);
 
     }
 
     @Test
     void toInitiativeDTOStep4WithRewardAndTrxRulesThresholdNull_equals() {
-        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiativeStep4ThresholdNull);
+        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiativeStep4ThresholdNull, true);
         assertEquals(fullInitiativeDTOStep4ThresholdNull, initiativeDTO);
     }
 
     @Test
     void toInitiativeDTOStep4WithRewardAndTrxRulesTrxCountNull_equals() {
-        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiativeStep4TrxCountNull);
+        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiativeStep4TrxCountNull, true);
         assertEquals(fullInitiativeDTOStep4TrxCountNull, initiativeDTO);
     }
 
     @Test
     void toInitiativeDTOStep4WithRewardAndTrxRulesMccFilterNull_equals() {
-        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiativeStep4MccFilterNull);
+        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiativeStep4MccFilterNull, true);
         assertEquals(fullInitiativeDTOStep4MccFilterNull, initiativeDTO);
     }
 
     @Test
     void toInitiativeDTOStep4WithRewardAndTrxRulesDayOfWeekNull_equals() {
-        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiativeStep4DayOfWeekNull);
+        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiativeStep4DayOfWeekNull, true);
         assertEquals(fullInitiativeDTOStep4DayOfWeekNull, initiativeDTO);
     }
 
     @Test
     void toInitiativeDTOStep4WithRewardAndTrxRulesRewardLimitEmpty_equals() {
-        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiativeStep4RewardLimitEmpty);
+        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiativeStep4RewardLimitEmpty, true);
         assertEquals(fullInitiativeDTOStep4RewardLimitEmpty, initiativeDTO);
     }
 
     @Test
     void toInitiativeDTOStep4WithRewardAndTrxRulesRewardGroup_equals() {
-        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiativeStep4RewardAndTrxRulesRewardGroup);
+        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiativeStep4RewardAndTrxRulesRewardGroup, true);
         assertEquals(getFullInitiativeDTOStep4RewardGroup, initiativeDTO);
     }
 
     @Test
     void toInitiativeDTOStep4WithRewardAndTrxRules_equals() {
-        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiativeStep4RewardAndTrxRules);
+        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiativeStep4RewardAndTrxRules, true);
         assertEquals(fullInitiativeDTOStep4, initiativeDTO);
     }
 
@@ -316,7 +316,7 @@ class InitiativeModelToDTOMapperTest {
 
     @Test
     void toInitiativeDTO_equals() {
-        InitiativeDTO initiativeDTOtoBeVerified = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiative);
+        InitiativeDTO initiativeDTOtoBeVerified = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiative, true);
 
         //Check the equality of the results
         assertEquals(fullInitiativeDTO, initiativeDTOtoBeVerified);
@@ -333,7 +333,7 @@ class InitiativeModelToDTOMapperTest {
 
         Mockito.when(initiativeUtilsMock.createLogoUrl(anyString(),anyString())).thenReturn("test.it");
 
-        InitiativeDTO initiativeDTOExpected = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiative);
+        InitiativeDTO initiativeDTOExpected = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiative, true);
 
         assertEquals(initiativeDTO,initiativeDTOExpected);
     }
@@ -439,7 +439,7 @@ class InitiativeModelToDTOMapperTest {
 
     @Test
     void toInitiativeDTONull_equals() {
-        assertNull(initiativeModelToDTOMapper.toInitiativeDTO(null));
+        assertNull(initiativeModelToDTOMapper.toInitiativeDTO(null, true));
     }
 
     @Test
@@ -464,7 +464,7 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void givenApiKeyClientIdNotPresent_toInitiativeDTO() {
         fullInitiative.getBeneficiaryRule().setApiKeyClientId(null);
-        InitiativeDTO initiativeDTOActual = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiative);
+        InitiativeDTO initiativeDTOActual = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiative, true);
         //Check the equality of the results
         assertEquals(fullInitiative.getBeneficiaryRule().getApiKeyClientId(), initiativeDTOActual.getBeneficiaryRule().getApiKeyClientId());
     }
@@ -472,7 +472,7 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void givenApiKeyClientAssertionNotPresent_toInitiativeDTO() {
         fullInitiative.getBeneficiaryRule().setApiKeyClientAssertion(null);
-        InitiativeDTO initiativeDTOActual = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiative);
+        InitiativeDTO initiativeDTOActual = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiative, true);
         //Check the equality of the results
         assertEquals(fullInitiative.getBeneficiaryRule().getApiKeyClientAssertion(), initiativeDTOActual.getBeneficiaryRule().getApiKeyClientAssertion());
     }
@@ -482,7 +482,7 @@ class InitiativeModelToDTOMapperTest {
         Initiative initiative = createStep1Initiative();
 
         initiative.setAdditionalInfo(null);
-        assertNull(initiativeModelToDTOMapper.toInitiativeDTO(initiative).getAdditionalInfo());
+        assertNull(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true).getAdditionalInfo());
     }
 
     @Test
@@ -495,7 +495,7 @@ class InitiativeModelToDTOMapperTest {
         additionalInfo.setServiceScope(InitiativeAdditional.ServiceScope.LOCAL);
         initiative.setAdditionalInfo(additionalInfo);
 
-        assertEquals(initiativeModelToDTOMapper.toInitiativeDTO(initiative).getAdditionalInfo().getChannels(), channelDTO);
+        assertEquals(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true).getAdditionalInfo().getChannels(), channelDTO);
     }
 
     @Test
@@ -536,6 +536,28 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void testToInitiativeSummaryDTOList_isEmpty() {
         assertTrue(initiativeModelToDTOMapper.toInitiativeSummaryDTOList(new ArrayList<>()).isEmpty());
+    }
+
+    @Test
+    void toInitiativeSummaryDTOList_statusCLOSED() {
+        Initiative step2Initiative = createFullInitiative();
+        step2Initiative.setStatus(InitiativeConstants.Status.PUBLISHED);
+        step2Initiative.getGeneral().setEndDate(LocalDate.now().minusDays(1));
+        List<Initiative> initiatives = List.of(step2Initiative);
+
+        List<InitiativeSummaryDTO> initiativeSummaryDTOS = initiativeModelToDTOMapper.toInitiativeSummaryDTOList(initiatives);
+        initiativeSummaryDTOS.forEach(initiativeSummaryDTO ->
+                assertEquals(InitiativeConstants.Status.CLOSED, initiativeSummaryDTO.getStatus()));
+    }
+    @Test
+    void toInitiativeSummaryDTOList_statusPUBLISHED() {
+        Initiative step2Initiative = createFullInitiative();
+        step2Initiative.setStatus(InitiativeConstants.Status.PUBLISHED);
+        List<Initiative> initiatives = List.of(step2Initiative);
+
+        List<InitiativeSummaryDTO> initiativeSummaryDTOS = initiativeModelToDTOMapper.toInitiativeSummaryDTOList(initiatives);
+        initiativeSummaryDTOS.forEach(initiativeSummaryDTO ->
+                assertEquals(InitiativeConstants.Status.PUBLISHED, initiativeSummaryDTO.getStatus()));
     }
 
     @Test
@@ -660,8 +682,16 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void testToRewardRuleDTO() {
         Initiative initiative = createStep3Initiative();
-        Mockito.when(initiativeModelToDTOMapper.toInitiativeDTO(initiative).getRewardRule()).thenReturn(null);
-        assertNull(initiativeModelToDTOMapper.toInitiativeDTO(initiative).getRewardRule());
+        Mockito.when(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true).getRewardRule()).thenReturn(null);
+        assertNull(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true).getRewardRule());
+    }
+
+    @Test
+    void testBeneficiaryView() {
+            Initiative step2Initiative = createStep2Initiative();
+
+            InitiativeDTO initiative = initiativeModelToDTOMapper.toInitiativeDTO(step2Initiative, false);
+                    assertEquals(InitiativeConstants.Status.DRAFT, initiative.getStatus());
     }
 
     private Initiative createFullInitiative() {
