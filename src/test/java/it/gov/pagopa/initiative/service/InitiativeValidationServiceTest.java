@@ -42,6 +42,7 @@ import java.time.Year;
 import java.util.*;
 import java.util.stream.Stream;
 
+import static it.gov.pagopa.initiative.model.InitiativeGeneral.BeneficiaryTypeEnum.PF;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -166,9 +167,9 @@ class InitiativeValidationServiceTest {
     }
     @Test
     void updateGeneralInfoWhenBeneficiaryTypeIsNFAndFamilyUnitCompositionIsNull_ko() {
-        Initiative fullInitiative = createFullInitiative();
+        Initiative fullInitiative = createFullInitiative(false);
         InitiativeGeneral generalInfoInitiative = createInitiativeGeneralFamilyUnitComposition();
-        generalInfoInitiative.setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF);
+        generalInfoInitiative.setBeneficiaryType(PF);
         fullInitiative.setGeneral(generalInfoInitiative);
 
         try {
@@ -180,7 +181,7 @@ class InitiativeValidationServiceTest {
     }
     @Test
     void updateGeneralInfoWhenBeneficiaryTypeIsNFAndFamilyUnitCompositionIsNotInpsOrAnpr_ko() {
-        Initiative fullInitiative = createFullInitiative();
+        Initiative fullInitiative = createFullInitiative(false);
         InitiativeGeneral generalInfoInitiative = createInitiativeGeneralFamilyUnitComposition();
         fullInitiative.setGeneral(generalInfoInitiative);
         fullInitiative.getGeneral().setFamilyUnitComposition("TEST");
@@ -194,10 +195,10 @@ class InitiativeValidationServiceTest {
     }
     @Test
     void updateGeneralInfoWhenBeneficiaryTypeIsPFAndFamilyUnitCompositionIsNotNull_ko() {
-        Initiative fullInitiative = createFullInitiative();
+        Initiative fullInitiative = createFullInitiative(false);
         InitiativeGeneral generalInfoInitiative = createInitiativeGeneralFamilyUnitComposition();
         fullInitiative.setGeneral(generalInfoInitiative);
-        fullInitiative.getGeneral().setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF);
+        fullInitiative.getGeneral().setBeneficiaryType(PF);
 
 
         try {
@@ -209,7 +210,7 @@ class InitiativeValidationServiceTest {
     }
     @Test
     void updateGeneralInfoWhenBeneficiaryTypeIsNFAndFieldISeeExist_ok() {
-        Initiative fullInitiative = createFullInitiative();
+        Initiative fullInitiative = createFullInitiative(false);
         InitiativeGeneral generalInfoInitiative = createInitiativeGeneralFamilyUnitComposition();
         fullInitiative.setGeneral(generalInfoInitiative);
         InitiativeBeneficiaryRule beneficiaryInfoInitiative = createInitiativeBeneficiaryRule();
@@ -222,10 +223,10 @@ class InitiativeValidationServiceTest {
     }
     @Test
     void updateGeneralInfoWhenBeneficiaryTypeIsPFAndFamilyUnitCompositionIsNull_ko() {
-        Initiative fullInitiative = createFullInitiative();
+        Initiative fullInitiative = createFullInitiative(false);
         InitiativeGeneral generalInfoInitiative = createInitiativeGeneralFamilyUnitComposition();
         fullInitiative.setGeneral(generalInfoInitiative);
-        fullInitiative.getGeneral().setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF);
+        fullInitiative.getGeneral().setBeneficiaryType(PF);
         fullInitiative.getGeneral().setFamilyUnitComposition(null);
 
         try {
@@ -237,7 +238,7 @@ class InitiativeValidationServiceTest {
     }
     @Test
     void updateGeneralInfoWhenBeneficiaryTypeIsNFAndISeeIsMissing_ko() {
-        Initiative fullInitiative = createFullInitiative();
+        Initiative fullInitiative = createFullInitiative(false);
         InitiativeGeneral generalInfoInitiative = createInitiativeGeneralFamilyUnitComposition();
         fullInitiative.setGeneral(generalInfoInitiative);
         InitiativeBeneficiaryRule beneficiaryInfoInitiative = createInitiativeBeneficiaryRuleWithoutISEE();
@@ -252,11 +253,29 @@ class InitiativeValidationServiceTest {
         }
     }
     @Test
+    void givenUpdateGeneralInfoWhenRankingInitiativeAndISeeIsMissing_ko() {
+        Initiative fullInitiative = createFullInitiative(true);
+        List<AutomatedCriteria> automatedCriteriaList = fullInitiative.getBeneficiaryRule().getAutomatedCriteria();
+        for(AutomatedCriteria automatedCriteria : automatedCriteriaList) {
+            automatedCriteria.setOperator(FilterOperatorEnumModel.NOT_EQ);
+            automatedCriteria.setOrderDirection(AutomatedCriteria.OrderDirection.ASC);
+            automatedCriteria.setCode("null");
+        }
+
+        try {
+            initiativeValidationService.checkAutomatedCriteria(fullInitiative,automatedCriteriaList);
+        } catch (AutomatedCriteriaNotValidException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_AUTOMATED_CRITERIA_NOT_VALID_ISEE_MISSING, e.getCode());
+            assertEquals("Automated criteria for ranking initiative [%s] not valid because ISEE is missing".formatted(fullInitiative.getInitiativeId()) , e.getMessage());
+        }
+    }
+
+    @Test
     void updateGeneralInfoWhenBeneficiaryTypeIsPFAndISeeIsMissing_ko() {
-        Initiative fullInitiative = createFullInitiative();
+        Initiative fullInitiative = createFullInitiative(false);
         InitiativeGeneral generalInfoInitiative = createInitiativeGeneralFamilyUnitComposition();
         fullInitiative.setGeneral(generalInfoInitiative);
-        fullInitiative.getGeneral().setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF);
+        fullInitiative.getGeneral().setBeneficiaryType(PF);
         InitiativeBeneficiaryRule beneficiaryInfoInitiative = createInitiativeBeneficiaryRuleWithoutISEE();
         fullInitiative.setBeneficiaryRule(beneficiaryInfoInitiative);
         List<AutomatedCriteria> automatedCriteriaList = fullInitiative.getBeneficiaryRule().getAutomatedCriteria();
@@ -353,13 +372,13 @@ class InitiativeValidationServiceTest {
 
     @Test
     void checkRewardRuleAbsolute_noInstanceOf(){
-        Initiative step4Initiative = createStep4Initiative();
+        Initiative step4Initiative = createStep4Initiative(false);
         Executable executable = () -> initiativeValidationService.checkRewardRuleAbsolute(step4Initiative);
         assertDoesNotThrow(executable);
     }
     @Test
     void checkRewardRuleAbsolute_noRewardAbsolute(){
-        Initiative step4Initiative = createStep4Initiative();
+        Initiative step4Initiative = createStep4Initiative(false);
         RewardValue rewardValue = new RewardValue();
         rewardValue.setRewardValueType(RewardValue.RewardValueTypeEnum.PERCENTAGE);
         step4Initiative.setRewardRule(rewardValue);
@@ -368,7 +387,7 @@ class InitiativeValidationServiceTest {
     }
     @Test
     void checkRewardRuleAbsolute_thresholdNull(){
-        Initiative step4Initiative = createStep4Initiative();
+        Initiative step4Initiative = createStep4Initiative(false);
         RewardValue rewardValue = new RewardValue();
         rewardValue.setRewardValueType(RewardValue.RewardValueTypeEnum.ABSOLUTE);
         step4Initiative.setRewardRule(rewardValue);
@@ -385,7 +404,7 @@ class InitiativeValidationServiceTest {
 
     @Test
     void checkRewardRuleAbsolute_thresholdFromNull(){
-        Initiative step4Initiative = createStep4Initiative();
+        Initiative step4Initiative = createStep4Initiative(false);
         RewardValue rewardValue = new RewardValue();
         rewardValue.setRewardValueType(RewardValue.RewardValueTypeEnum.ABSOLUTE);
         step4Initiative.setRewardRule(rewardValue);
@@ -401,7 +420,7 @@ class InitiativeValidationServiceTest {
     }
     @Test
     void checkRewardRuleAbsolute_thresholdFromWrong(){
-        Initiative step4Initiative = createStep4Initiative();
+        Initiative step4Initiative = createStep4Initiative(false);
         RewardValue rewardValue = new RewardValue();
         rewardValue.setRewardValueType(RewardValue.RewardValueTypeEnum.ABSOLUTE);
         rewardValue.setRewardValue(BigDecimal.valueOf(40));
@@ -421,7 +440,7 @@ class InitiativeValidationServiceTest {
 
     @Test
     void checkRewardRuleAbsolute_thresholdOK(){
-        Initiative step4Initiative = createStep4Initiative();
+        Initiative step4Initiative = createStep4Initiative(false);
         RewardValue rewardValue = new RewardValue();
         rewardValue.setRewardValueType(RewardValue.RewardValueTypeEnum.ABSOLUTE);
         rewardValue.setRewardValue(BigDecimal.valueOf(30));
@@ -437,7 +456,7 @@ class InitiativeValidationServiceTest {
 
     @Test
     void checkReward_PERCENTAGE_ok(){
-        Initiative step4Initiative = createStep4Initiative();
+        Initiative step4Initiative = createStep4Initiative(false);
         RewardValue rewardValue = new RewardValue();
         rewardValue.setRewardValueType(RewardValue.RewardValueTypeEnum.PERCENTAGE);
         rewardValue.setRewardValue(BigDecimal.valueOf(10));
@@ -448,7 +467,7 @@ class InitiativeValidationServiceTest {
 
     @Test
     void checkReward_PERCENTAGE_ko(){
-        Initiative step4Initiative = createStep4Initiative();
+        Initiative step4Initiative = createStep4Initiative(false);
         RewardValue rewardValue = new RewardValue();
         rewardValue.setRewardValueType(RewardValue.RewardValueTypeEnum.PERCENTAGE);
         rewardValue.setRewardValue(BigDecimal.valueOf(105));
@@ -464,7 +483,7 @@ class InitiativeValidationServiceTest {
 
     @Test
     void checkReward_ABSOLUTE_ok(){
-        Initiative step4Initiative = createStep4Initiative();
+        Initiative step4Initiative = createStep4Initiative(false);
         RewardValue rewardValue = new RewardValue();
         rewardValue.setRewardValueType(RewardValue.RewardValueTypeEnum.ABSOLUTE);
         rewardValue.setRewardValue(BigDecimal.valueOf(105));
@@ -475,14 +494,14 @@ class InitiativeValidationServiceTest {
 
     @Test
     void checkReward_noInstanceOf(){
-        Initiative step4Initiative = createStep4Initiative();
+        Initiative step4Initiative = createStep4Initiative(false);
         Executable executable = () -> initiativeValidationService.checkReward(step4Initiative);
         assertDoesNotThrow(executable);
     }
 
     @Test
     void checkRefundRuleDiscountInitiative_RefundType(){
-        Initiative step5Initiative = createStep5Initiative();
+        Initiative step5Initiative = createStep5Initiative(false);
         step5Initiative.setInitiativeRewardType(InitiativeDTO.InitiativeRewardTypeEnum.REFUND);
         Executable executable = () -> initiativeValidationService.checkRefundRuleDiscountInitiative(step5Initiative.getInitiativeRewardType().name(),
                 new InitiativeRefundRule());
@@ -490,7 +509,7 @@ class InitiativeValidationServiceTest {
     }
     @Test
     void checkRefundRuleDiscountInitiative_discountType_noAccumulatedAmount(){
-        Initiative step5Initiative = createStep5Initiative();
+        Initiative step5Initiative = createStep5Initiative(false);
         step5Initiative.setInitiativeRewardType(InitiativeDTO.InitiativeRewardTypeEnum.DISCOUNT);
         InitiativeRefundRule refundRule = new InitiativeRefundRule();
         refundRule.setTimeParameter(new TimeParameter(TimeParameter.TimeTypeEnum.DAILY));
@@ -500,7 +519,7 @@ class InitiativeValidationServiceTest {
     }
     @Test
     void checkRefundRuleDiscountInitiative_discountType_withAccumulatedAmount(){
-        Initiative step5Initiative = createStep5Initiative();
+        Initiative step5Initiative = createStep5Initiative(false);
         step5Initiative.setInitiativeRewardType(InitiativeDTO.InitiativeRewardTypeEnum.DISCOUNT);
         AccumulatedAmount accumulatedAmount = new AccumulatedAmount();
         accumulatedAmount.setAccumulatedType(AccumulatedAmount.AccumulatedTypeEnum.THRESHOLD_REACHED);
@@ -516,7 +535,7 @@ class InitiativeValidationServiceTest {
     }
     @Test
     void checkRefundRuleDiscountInitiative_discountType_noTimeParameter(){
-        Initiative step4Initiative = createStep4Initiative();
+        Initiative step4Initiative = createStep4Initiative(false);
         step4Initiative.setInitiativeRewardType(InitiativeDTO.InitiativeRewardTypeEnum.DISCOUNT);
         try {
             initiativeValidationService.checkRefundRuleDiscountInitiative(step4Initiative.getInitiativeRewardType().name(),
@@ -545,7 +564,7 @@ class InitiativeValidationServiceTest {
     @ParameterizedTest
     @MethodSource("fieldsAndDate")
     void checkValuesWhenCodeIsBirthdateAndFieldIsYear(String code, String field, String value) {
-        Initiative fullInitiative = createFullInitiative();
+        Initiative fullInitiative = createFullInitiative(false);
         InitiativeGeneral generalInfoInitiative = createInitiativeGeneralFamilyUnitComposition();
         fullInitiative.setGeneral(generalInfoInitiative);
         InitiativeBeneficiaryRule beneficiaryInfoInitiative = createInitiativeBeneficiaryRule();
@@ -644,7 +663,7 @@ class InitiativeValidationServiceTest {
         InitiativeGeneral initiativeGeneral = new InitiativeGeneral();
         initiativeGeneral.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneral.setBeneficiaryKnown(false);
-        initiativeGeneral.setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF);
+        initiativeGeneral.setBeneficiaryType(PF);
         initiativeGeneral.setBudget(new BigDecimal(1000000000));
         LocalDate rankingStartDate = LocalDate.now();
         LocalDate rankingEndDate = rankingStartDate.plusDays(1);
@@ -848,8 +867,8 @@ class InitiativeValidationServiceTest {
      * ############### Step 4 ###############
      */
 
-    private Initiative createStep4Initiative () {
-        return createStep3Initiative(false);
+    private Initiative createStep4Initiative (Boolean rankingEnabled) {
+        return createStep3Initiative(rankingEnabled);
     }
 
     private InitiativeDTO createStep4InitiativeDTO (Boolean rankingEnabled) {
@@ -940,8 +959,8 @@ class InitiativeValidationServiceTest {
      * ############### Step 5 ###############
      */
 
-    private Initiative createStep5Initiative () {
-        Initiative initiative = createStep4Initiative();
+    private Initiative createStep5Initiative (Boolean rankingEnabled) {
+        Initiative initiative = createStep4Initiative(rankingEnabled);
         initiative.setRefundRule(createRefundRuleValidWithTimeParameter());
         return initiative;
     }
@@ -1001,8 +1020,8 @@ class InitiativeValidationServiceTest {
         initiativeDTO.setRefundRule(createRefundRuleDTOValidWithTimeParameter());
         return initiativeDTO;
     }
-    Initiative createFullInitiative() {
-        return createStep5Initiative();
+    Initiative createFullInitiative(Boolean rankingEnabled) {
+        return createStep5Initiative(rankingEnabled);
     }
     private InitiativeGeneral createInitiativeGeneralFamilyUnitComposition() {
         Map<String, String> language = new HashMap<>();
