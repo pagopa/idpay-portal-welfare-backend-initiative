@@ -6,7 +6,7 @@ import feign.Request;
 import feign.RequestTemplate;
 import it.gov.pagopa.initiative.connector.decrypt.DecryptRestConnector;
 import it.gov.pagopa.initiative.connector.encrypt.EncryptRestConnector;
-import it.gov.pagopa.initiative.connector.file_storage.FileStorageConnector;
+import it.gov.pagopa.initiative.connector.file_storage.InitiativeFileStorageConnector;
 import it.gov.pagopa.initiative.connector.group.GroupRestConnector;
 import it.gov.pagopa.initiative.connector.io_service.IOManageBackEndRestConnector;
 import it.gov.pagopa.initiative.connector.onboarding.OnboardingRestConnector;
@@ -130,7 +130,7 @@ class InitiativeServiceTest {
     GroupRestConnector groupRestConnector;
 
     @MockBean
-    FileStorageConnector fileStorageConnector;
+    InitiativeFileStorageConnector initiativeFileStorageConnector;
 
     @MockBean
     OnboardingRestConnector onboardingRestConnector;
@@ -608,7 +608,7 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void storeInitiativeLogo_ok() throws Exception {
+    void storeInitiativeLogo_ok() {
         InputStream logo = new ByteArrayInputStream("logo.png".getBytes());
         Initiative initiative = this.createFullInitiative();
         Set <String> logoExtension = new HashSet<>();
@@ -618,7 +618,7 @@ class InitiativeServiceTest {
         InitiativeGeneral general = createInitiativeGeneral(true);
         initiative.setGeneral(general);
         Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
-        Mockito.doNothing().when(fileStorageConnector).uploadInitiativeLogo(Mockito.any(), Mockito.anyString(),
+        Mockito.doNothing().when(initiativeFileStorageConnector).uploadInitiativeLogo(Mockito.any(), Mockito.anyString(),
                 Mockito.anyString());
         Mockito.when(initiativeUtils.getAllowedInitiativeLogoExtensions()).thenReturn(logoExtension);
         Mockito.when(initiativeUtils.getAllowedInitiativeLogoMimeTypes()).thenReturn(logoMimeTypes);
@@ -629,7 +629,7 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void storeInitiativeLogo_koExtension() throws Exception {
+    void storeInitiativeLogo_koExtension() {
         InputStream logo = new ByteArrayInputStream("logo.png".getBytes());
         Initiative initiative = this.createFullInitiative();
         Set <String> logoExtension = new HashSet<>();
@@ -639,7 +639,7 @@ class InitiativeServiceTest {
         InitiativeGeneral general = createInitiativeGeneral(true);
         initiative.setGeneral(general);
         Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
-        Mockito.doNothing().when(fileStorageConnector).uploadInitiativeLogo(Mockito.any(), Mockito.anyString(),
+        Mockito.doNothing().when(initiativeFileStorageConnector).uploadInitiativeLogo(Mockito.any(), Mockito.anyString(),
                 Mockito.anyString());
         Mockito.when(initiativeUtils.getAllowedInitiativeLogoExtensions()).thenReturn(logoExtension);
         Mockito.when(initiativeUtils.getAllowedInitiativeLogoMimeTypes()).thenReturn(logoMimeTypes);
@@ -653,7 +653,7 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void storeInitiativeLogo_koMimeType() throws Exception {
+    void storeInitiativeLogo_koMimeType() {
         InputStream logo = new ByteArrayInputStream("logo.png".getBytes());
         Initiative initiative = this.createFullInitiative();
         Set <String> logoExtension = new HashSet<>();
@@ -663,7 +663,7 @@ class InitiativeServiceTest {
         InitiativeGeneral general = createInitiativeGeneral(true);
         initiative.setGeneral(general);
         Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
-        Mockito.doNothing().when(fileStorageConnector).uploadInitiativeLogo(Mockito.any(), Mockito.anyString(),
+        Mockito.doNothing().when(initiativeFileStorageConnector).uploadInitiativeLogo(Mockito.any(), Mockito.anyString(),
                 Mockito.anyString());
         Mockito.when(initiativeUtils.getAllowedInitiativeLogoExtensions()).thenReturn(logoExtension);
         Mockito.when(initiativeUtils.getAllowedInitiativeLogoMimeTypes()).thenReturn(logoMimeTypes);
@@ -676,12 +676,12 @@ class InitiativeServiceTest {
         }
     }
     @Test
-    void storeInitiativeLogo_initiativeNotFound() throws Exception {
+    void storeInitiativeLogo_initiativeNotFound() {
         InputStream logo = new ByteArrayInputStream("logo.png".getBytes());
         Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true))
                 .thenThrow(new InitiativeNotFoundException(NotFound.INITIATIVE_NOT_FOUND,
                         NotFound.INITIATIVE_NOT_FOUND_MESSAGE.formatted(INITIATIVE_ID)));
-        Mockito.doNothing().when(fileStorageConnector).uploadInitiativeLogo(Mockito.any(), Mockito.anyString(),
+        Mockito.doNothing().when(initiativeFileStorageConnector).uploadInitiativeLogo(Mockito.any(), Mockito.anyString(),
                 Mockito.anyString());
         try {
             initiativeService.storeInitiativeLogo(ORGANIZATION_ID, INITIATIVE_ID, logo, LOGO_MIME_TYPE,

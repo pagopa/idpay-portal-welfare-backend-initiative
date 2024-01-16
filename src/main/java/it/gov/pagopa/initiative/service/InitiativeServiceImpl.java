@@ -1,10 +1,9 @@
 package it.gov.pagopa.initiative.service;
 
-import com.google.common.io.Files;
 import feign.FeignException;
 import it.gov.pagopa.initiative.connector.decrypt.DecryptRestConnector;
 import it.gov.pagopa.initiative.connector.encrypt.EncryptRestConnector;
-import it.gov.pagopa.initiative.connector.file_storage.FileStorageConnector;
+import it.gov.pagopa.initiative.connector.file_storage.InitiativeFileStorageConnector;
 import it.gov.pagopa.initiative.connector.group.GroupRestConnector;
 import it.gov.pagopa.initiative.connector.io_service.IOManageBackEndRestConnector;
 import it.gov.pagopa.initiative.connector.onboarding.OnboardingRestConnector;
@@ -28,6 +27,7 @@ import it.gov.pagopa.initiative.repository.InitiativeRepository;
 import it.gov.pagopa.initiative.utils.AuditUtilities;
 import it.gov.pagopa.initiative.utils.InitiativeUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -63,7 +63,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     private final RankingRestConnector rankingRestConnector;
     private final EncryptRestConnector encryptRestConnector;
     private final DecryptRestConnector decryptRestConnector;
-    private final FileStorageConnector fileStorageConnector;
+    private final InitiativeFileStorageConnector initiativeFileStorageConnector;
     private final EmailNotificationService emailNotificationService;
     private final InitiativeValidationService initiativeValidationService;
     private final InitiativeUtils initiativeUtils;
@@ -84,7 +84,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             OnboardingRestConnector onboardingRestConnector,
             RankingRestConnector rankingRestConnector, EncryptRestConnector encryptRestConnector,
             DecryptRestConnector decryptRestConnector,
-            FileStorageConnector fileStorageConnector,
+            InitiativeFileStorageConnector initiativeFileStorageConnector,
             EmailNotificationService emailNotificationService,
             InitiativeValidationService initiativeValidationService,
             InitiativeUtils initiativeUtils,
@@ -100,7 +100,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         this.rankingRestConnector = rankingRestConnector;
         this.encryptRestConnector = encryptRestConnector;
         this.decryptRestConnector = decryptRestConnector;
-        this.fileStorageConnector = fileStorageConnector;
+        this.initiativeFileStorageConnector = initiativeFileStorageConnector;
         this.emailNotificationService = emailNotificationService;
         this.initiativeValidationService = initiativeValidationService;
         this.initiativeUtils = initiativeUtils;
@@ -389,7 +389,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
         try {
             this.validate(contentType, fileName);
-            fileStorageConnector.uploadInitiativeLogo(logo, String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE, organizationId, initiativeId, InitiativeConstants.Logo.LOGO_NAME), contentType);
+            initiativeFileStorageConnector.uploadInitiativeLogo(logo, String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE, organizationId, initiativeId, InitiativeConstants.Logo.LOGO_NAME), contentType);
             initiative.getAdditionalInfo().setLogoFileName(fileName);
             LocalDateTime localDateTime = LocalDateTime.now();
             initiative.getAdditionalInfo().setLogoUploadDate(localDateTime);
@@ -421,7 +421,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         if (additionalInfo.getLogoFileName() != null) {
             try {
                 log.info("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Update logo to ServiceIO", initiative.getInitiativeId());
-                ByteArrayOutputStream byteArrayOutputStream = fileStorageConnector.downloadInitiativeLogo(
+                ByteArrayOutputStream byteArrayOutputStream = initiativeFileStorageConnector.downloadInitiativeLogo(
                         initiativeUtils.getPathLogo(initiative.getOrganizationId(),
                                 initiative.getInitiativeId()));
                 ioManageBackEndRestConnector.sendLogoIo(serviceId, LogoIODTO.builder().logo(new String(
@@ -661,7 +661,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                     initiativeUtils.getAllowedInitiativeLogoMimeTypes()));
         }
 
-        String fileExtension = Files.getFileExtension(fileName).toLowerCase();
+        String fileExtension = FilenameUtils.getExtension(fileName).toLowerCase();
         if (!initiativeUtils.getAllowedInitiativeLogoExtensions().contains(fileExtension)) {
             throw new IllegalArgumentException(String.format("Invalid file extension \"%s\": allowed only %s", fileExtension,
                     initiativeUtils.getAllowedInitiativeLogoExtensions()));
