@@ -312,7 +312,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             log.error("[LOGICAL_DELETE_INITIATIVE] - Initiative: {}. Cannot be deleted. Current status is {}.", initiative.getInitiativeId(), initiative.getStatus());
             auditUtilities.logInitiativeError(this.getUserId(), initiativeId, organizationId, "initiative cannot be deleted");
             performanceLog(startTime, DELETE_INITIATIVE_SERVICE);
-            throw new DeleteInitiativeException("Initiative [%s] with current status [%s]  cannot be deleted".formatted(initiativeId,initiative.getStatus()));
+            throw new DeleteInitiativeException("Initiative [%s] with current status [%s] cannot be deleted".formatted(initiativeId,initiative.getStatus()));
         } else {
             initiative.setEnabled(false);
             this.initiativeRepository.save(initiative);
@@ -538,7 +538,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                         organizationId, initiativeId, true)
                 .orElseThrow(() -> new InitiativeNotFoundException(InitiativeConstants.Exception.NotFound.INITIATIVE_NOT_FOUND_MESSAGE.formatted(initiativeId)));
         if (initiative.getGeneral() != null && !initiative.getGeneral().getRankingEnabled()) {
-            throw new InitiativeNoRankingException("Initiative[%s] is without ranking".formatted(initiativeId));
+            throw new InitiativeNoRankingException("Initiative [%s] is without ranking".formatted(initiativeId));
         }
         String userId = null;
         if (beneficiary != null) {

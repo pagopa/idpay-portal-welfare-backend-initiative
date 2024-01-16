@@ -1015,7 +1015,7 @@ class InitiativeServiceTest {
         }
         catch (DeleteInitiativeException e){
             assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_CANNOT_BE_DELETED, e.getCode());
-            assertEquals("Initiative [%s] with current status [%s]  cannot be deleted".formatted(initiative.getInitiativeId(),initiative.getStatus()),e.getMessage());
+            assertEquals("Initiative [%s] with current status [%s] cannot be deleted".formatted(initiative.getInitiativeId(),initiative.getStatus()),e.getMessage());
         }
     }
 
@@ -1400,7 +1400,7 @@ class InitiativeServiceTest {
             Assertions.fail();
         } catch (InitiativeNoRankingException e) {
             assertEquals(InternalServerError.INITIATIVE_GENERIC_ERROR,e.getCode());
-            assertEquals("Initiative[%s] is without ranking".formatted(INITIATIVE_ID),e.getMessage());
+            assertEquals("Initiative [%s] is without ranking".formatted(INITIATIVE_ID),e.getMessage());
         }
     }
     @Test
