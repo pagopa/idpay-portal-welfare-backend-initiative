@@ -10,7 +10,7 @@ import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardGroupsDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardValueDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.*;
-import it.gov.pagopa.initiative.exception.InitiativeException;
+import it.gov.pagopa.initiative.exception.custom.InvalidRewardRuleException;
 import it.gov.pagopa.initiative.model.TypeBoolEnum;
 import it.gov.pagopa.initiative.model.TypeMultiEnum;
 import it.gov.pagopa.initiative.model.*;
@@ -248,9 +248,9 @@ class InitiativeDTOsToModelMapperTest {
         initiativeRewardAndTrxRulesDTO.setInitiativeRewardType(InitiativeRewardAndTrxRulesDTO.InitiativeRewardTypeEnum.REFUND);
         try {
             initiativeDTOsToModelMapper.toInitiative(initiativeRewardAndTrxRulesDTO);
-        } catch (InitiativeException e){
-            assertEquals(InitiativeConstants.Exception.BadRequest.CODE, e.getCode());
-            assertEquals(InitiativeConstants.Exception.BadRequest.REWARD_TYPE, e.getMessage());
+        } catch (InvalidRewardRuleException e){
+            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_REWARD_RULES_NOT_VALID, e.getCode());
+            assertEquals("Reward rules of initiative [%s] is not valid", e.getMessage());
         }
     }
     @Test
