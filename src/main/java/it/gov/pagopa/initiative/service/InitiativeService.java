@@ -3,7 +3,6 @@ package it.gov.pagopa.initiative.service;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.io.service.KeysDTO;
 import it.gov.pagopa.initiative.model.Initiative;
-import it.gov.pagopa.initiative.model.InitiativeAdditional;
 import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -57,7 +56,6 @@ public interface InitiativeService {
 
     Initiative getInitiativeIdFromServiceId(String serviceId);
 
-    InitiativeAdditional getPrimaryAndSecondaryTokenIO(String initiativeId);
     OnboardingDTO getOnboardingStatusList(String organizationId, String initiativeId, String cf, LocalDateTime startDate, LocalDateTime endDate, String status, Pageable pageable);
     BeneficiaryRankingPageDTO getRankingList(String organizationId, String initiativeId,  Pageable pageable, String beneficiary, String state);
     void validate(String contentType, String fileName);

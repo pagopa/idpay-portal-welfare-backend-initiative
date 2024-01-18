@@ -1,6 +1,6 @@
 package it.gov.pagopa.initiative.controller;
 
-import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest.CODE;
+import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest.INITIATIVE_INVALID_LOCALE_FORMAT;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.ErrorDtoDefaultMsg.ACCUMULATED_AMOUNT_TYPE;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.ErrorDtoDefaultMsg.SOMETHING_WRONG_WITH_THE_REFUND_TYPE;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.ADMIN;
@@ -26,6 +26,8 @@ import feign.Request;
 import feign.RequestTemplate;
 import feign.Response;
 import it.gov.pagopa.common.web.dto.ErrorDTO;
+import it.gov.pagopa.common.web.exception.ClientExceptionWithBody;
+import it.gov.pagopa.initiative.config.ServiceExceptionConfig;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.AnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems;
 import it.gov.pagopa.initiative.dto.AutomatedCriteriaDTO;
@@ -56,7 +58,7 @@ import it.gov.pagopa.initiative.dto.rule.trx.MccFilterDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.RewardLimitsDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.ThresholdDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.TrxCountDTO;
-import it.gov.pagopa.initiative.exception.InitiativeException;
+import it.gov.pagopa.initiative.exception.custom.InitiativeStatusNotValidException;
 import it.gov.pagopa.initiative.mapper.InitiativeDTOsToModelMapper;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.AutomatedCriteria;
@@ -75,13 +77,13 @@ import it.gov.pagopa.initiative.model.rule.refund.AccumulatedAmount;
 import it.gov.pagopa.initiative.model.rule.refund.AdditionalInfo;
 import it.gov.pagopa.initiative.model.rule.refund.InitiativeRefundRule;
 import it.gov.pagopa.initiative.model.rule.refund.TimeParameter;
-import it.gov.pagopa.initiative.service.AESTokenServiceImpl;
 import it.gov.pagopa.initiative.service.InitiativeService;
 import it.gov.pagopa.initiative.service.OrganizationService;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -124,7 +126,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
                 "app.initiative.ranking.gracePeriod=10"
         })
 @WebMvcTest(value = {
-        InitiativeApi.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
+        InitiativeApi.class, ServiceExceptionConfig.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
 class InitiativeApiTest {
 
     public static final String INITIATIVE_ID = "Id1";
@@ -147,7 +149,6 @@ class InitiativeApiTest {
     private static final String GET_INITIATIVES_MIL = "/mil/initiatives";
     private static final String GET_INITIATIVE_ACTIVE_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER;
     private static final String GET_INITIATIVE_ID_FROM_SERVICE_ID = "/initiative?serviceId=" + SERVICE_ID_PLACEHOLDER;
-    private static final String GET_PRIMARY_AND_SECONDARY_TOKEN_FROM_INITIATIVE_ID = "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/token";
     private static final String GET_INITIATIVE_BENEFICIARY_VIEW_URL = "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/beneficiary/view";
     private static final String POST_INITIATIVE_ADDITIONAL_INFO_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/info";
     private static final String GET_RANKING_LIST = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/ranking/exports";
@@ -372,7 +373,7 @@ class InitiativeApiTest {
                 initiativeDTOsToModelMapperTest
         );
         ResponseEntity<LogoDTO> actualAddLogoResult = initiativeApiController.addLogo("42", "42",
-                new MockMultipartFile("Name", new ByteArrayInputStream("AAAAAAAA".getBytes("UTF-8"))));
+                new MockMultipartFile("Name", new ByteArrayInputStream("AAAAAAAA".getBytes(StandardCharsets.UTF_8))));
         assertTrue(actualAddLogoResult.hasBody());
         assertTrue(actualAddLogoResult.getHeaders().isEmpty());
         assertEquals(HttpStatus.OK, actualAddLogoResult.getStatusCode());
@@ -398,24 +399,10 @@ class InitiativeApiTest {
     void getInitiativeIdFromServiceId_Exception() {
         try {
             initiativeApiController.getInitiativeIdFromServiceId(Locale.forLanguageTag("xxxx"), SERVICE_ID);
-        } catch (InitiativeException e) {
-            assertEquals(CODE, e.getCode());
-            assertEquals(String.format(InitiativeConstants.Exception.BadRequest.INVALID_LOCALE_FORMAT, "xxxx"), e.getMessage());
+        } catch (ClientExceptionWithBody e) {
+            assertEquals(INITIATIVE_INVALID_LOCALE_FORMAT, e.getCode());
+            assertEquals(String.format("The initiative could not be found for the current serviceId [%s], due to invalid locale format", SERVICE_ID), e.getMessage());
         }
-    }
-
-    @Test
-    void getPrimaryAndSecondaryTokenIO_statusOk() throws Exception {
-        InitiativeAdditional initiativeAdditional = createInitiativeAdditional();
-        when(initiativeService.getPrimaryAndSecondaryTokenIO(INITIATIVE_ID)).thenReturn(initiativeAdditional);
-        InitiativeAdditional additional = initiativeService.getPrimaryAndSecondaryTokenIO(INITIATIVE_ID);
-        assertThat("Reason of result", additional, is(sameInstance(initiativeAdditional)));
-        mvc.perform(
-                        MockMvcRequestBuilders.get(BASE_URL + String.format(GET_PRIMARY_AND_SECONDARY_TOKEN_FROM_INITIATIVE_ID, SERVICE_ID))
-                                .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andDo(print())
-                .andReturn();
     }
 
     @Test
@@ -720,13 +707,10 @@ class InitiativeApiTest {
         when(initiativeDTOsToModelMapper.toInitiative(refundRuleDTO)).thenReturn(initiative);
 
         //doThrow InitiativeException for Void method
-        doThrow(new InitiativeException(
-                CODE,
-                String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_STATUS_NOT_VALID, initiative.getInitiativeId()),
-                HttpStatus.BAD_REQUEST))
+        doThrow(new InitiativeStatusNotValidException("Initiative [%s] with status [%s] is unprocessable for status not valid".formatted(initiative.getInitiativeId(),initiative.getStatus())))
                 .when(initiativeService).updateInitiativeRefundRules(ORGANIZATION_ID, INITIATIVE_ID, ROLE, initiative, true);
 
-        mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_REFUND_RULES_INFO_URL, ORGANIZATION_ID, INITIATIVE_ID))
+        mvc.perform(MockMvcRequestBuilders.put(BASE_URL +"/organization/" +  ORGANIZATION_ID + "/initiative/"+ INITIATIVE_ID + "/refund")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(refundRuleDTO))
                         .accept(MediaType.APPLICATION_JSON))
@@ -825,7 +809,7 @@ class InitiativeApiTest {
         InitiativeDTO initiativeDTO = createStep5InitiativeDTO();
 
         // Instruct the Service to insert a Dummy Initiative
-        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative)).thenReturn(initiativeDTO);
+        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative, false)).thenReturn(initiativeDTO);
         // When
         // With this instruction, I instruct the service (via Mockito's when) to always return the DummyInitiative to me anytime I call the same service's function
         when(initiativeService.getInitiativeBeneficiaryView(anyString())).thenReturn(initiative);
@@ -854,7 +838,7 @@ class InitiativeApiTest {
 
         ErrorDTO error = objectMapper.readValue(res.getResponse().getContentAsString(), ErrorDTO.class);
         assertEquals(HttpStatus.BAD_REQUEST.value(), res.getResponse().getStatus());
-        assertEquals(CODE, error.getCode());
+        assertEquals("INVALID_REQUEST", error.getCode());
         assertTrue(error.getMessage().contains(ACCUMULATED_AMOUNT_TYPE));
     }
 
@@ -865,10 +849,7 @@ class InitiativeApiTest {
         initiativeOrganizationInfoDTO.setOrganizationUserRole(ROLE);
 
         doThrow(
-                new InitiativeException(
-                        InitiativeConstants.Exception.BadRequest.CODE,
-                        String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_IN_REVISION, INITIATIVE_ID),
-                        HttpStatus.BAD_REQUEST)
+                new InitiativeStatusNotValidException("The status of initiative [%s] is not IN_REVISION".formatted(INITIATIVE_ID))
         ).when(initiativeService).updateInitiativeToCheckStatus(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
 
         MvcResult res =
@@ -882,8 +863,8 @@ class InitiativeApiTest {
 
         ErrorDTO error = objectMapper.readValue(res.getResponse().getContentAsString(), ErrorDTO.class);
         assertEquals(HttpStatus.BAD_REQUEST.value(), res.getResponse().getStatus());
-        assertEquals(CODE, error.getCode());
-        assertTrue(error.getMessage().contains(InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_IN_REVISION.formatted(INITIATIVE_ID)));
+        assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_VALID, error.getCode());
+        assertEquals("The status of initiative [%s] is not IN_REVISION".formatted(INITIATIVE_ID),error.getMessage());
     }
 
     @Test
@@ -920,7 +901,7 @@ class InitiativeApiTest {
 
         ErrorDTO error = objectMapper.readValue(res.getResponse().getContentAsString(), ErrorDTO.class);
         assertEquals(HttpStatus.BAD_REQUEST.value(), res.getResponse().getStatus());
-        assertEquals(CODE, error.getCode());
+        assertEquals("INVALID_REQUEST", error.getCode());
         assertTrue(error.getMessage().contains(SOMETHING_WRONG_WITH_THE_REFUND_TYPE));
     }
 
@@ -1019,7 +1000,7 @@ class InitiativeApiTest {
         doNothing().when(initiativeService).isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED, ROLE);
 
         // Instruct the Service to insert a Dummy Initiative
-        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative)).thenReturn(step5InitiativeDTO);
+        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true)).thenReturn(step5InitiativeDTO);
 
         doNothing().when(initiativeService).updateInitiative(any(Initiative.class));
 
@@ -1057,7 +1038,7 @@ class InitiativeApiTest {
         doNothing().when(initiativeService).isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED, ROLE);
 
         // Instruct the Service to insert a Dummy Initiative
-        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative)).thenReturn(step5InitiativeDTO);
+        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true)).thenReturn(step5InitiativeDTO);
 
         doNothing().when(initiativeService).updateInitiative(any(Initiative.class));
 
@@ -1078,8 +1059,8 @@ class InitiativeApiTest {
 
         ErrorDTO error = objectMapper.readValue(res.getResponse().getContentAsString(), ErrorDTO.class);
         assertEquals(HttpStatus.BAD_REQUEST.value(), res.getResponse().getStatus());
-        assertEquals(InitiativeConstants.Exception.Publish.BadRequest.CODE, error.getCode());
-        assertTrue(error.getMessage().contains(InitiativeConstants.Exception.Publish.BadRequest.INTEGRATION_FAILED));
+        assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_ROLLBACK_TO_PREVIOUS_STATUS, error.getCode());
+        assertEquals("Something gone wrong while notify Initiative [%s] for publishing".formatted(initiative.getInitiativeId()), error.getMessage());
     }
 
     @Test

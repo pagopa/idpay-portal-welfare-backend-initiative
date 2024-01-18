@@ -4,7 +4,7 @@ import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.InitiativeTrxConditionsDTO;
-import it.gov.pagopa.initiative.exception.InitiativeException;
+import it.gov.pagopa.initiative.exception.custom.*;
 import it.gov.pagopa.initiative.model.AutomatedCriteria;
 import it.gov.pagopa.initiative.model.FilterOperatorEnumModel;
 import it.gov.pagopa.initiative.model.Initiative;
@@ -15,15 +15,13 @@ import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
 import it.gov.pagopa.initiative.model.rule.trx.Threshold;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
 import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
-
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validator;
 
 import java.time.LocalDate;
 import java.time.Year;
@@ -51,20 +49,15 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
     }
 
     @Override
-    public Initiative getInitiative(String organizationId, String initiativeId, String role){
+    public Initiative  getInitiative(String organizationId, String initiativeId, String role){
         Initiative initiative = initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(organizationId, initiativeId, true)
-                .orElseThrow(() -> new InitiativeException(
-                        InitiativeConstants.Exception.NotFound.CODE,
-                        String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
-                        HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new InitiativeNotFoundException(InitiativeConstants.Exception.NotFound.INITIATIVE_NOT_FOUND_MESSAGE.formatted(initiativeId)));
         if (InitiativeConstants.Role.PAGOPA_ADMIN.equals(role)){
             if (InitiativeConstants.Status.PUBLISHED.equals(initiative.getStatus()) || initiative.getStatus().equals(InitiativeConstants.Status.IN_REVISION) || initiative.getStatus().equals(InitiativeConstants.Status.TO_CHECK) || initiative.getStatus().equals(InitiativeConstants.Status.APPROVED)){
                 return initiative;
             }else {
-                throw new InitiativeException(
-                        InitiativeConstants.Exception.BadRequest.CODE,
-                        String.format(InitiativeConstants.Exception.BadRequest.PERMISSION_NOT_VALID, role),
-                        HttpStatus.BAD_REQUEST
+                throw new AdminPermissionException(
+                        "Admin permission not allowed for current initiative [%s]".formatted(initiative.getInitiativeId())
                 );
             }
         }else{
@@ -76,11 +69,7 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
     public void checkPermissionBeforeInsert(String role) {
         log.debug("[CHECK PERMISSION] role: {}", role);
         if (InitiativeConstants.Role.PAGOPA_ADMIN.equals(role)){
-            throw new InitiativeException(
-                        InitiativeConstants.Exception.BadRequest.CODE,
-                        String.format(InitiativeConstants.Exception.BadRequest.PERMISSION_NOT_VALID, role),
-                        HttpStatus.BAD_REQUEST
-            );
+            throw new AdminPermissionException("Admin role not allowed");
         }
     }
 
@@ -100,25 +89,22 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
                 if(ISEE.equals(code)) {
                     checkIsee=true;
                     if (orderDirection == null) {
-                        throw new InitiativeException(
-                                InitiativeConstants.Exception.BadRequest.CODE,
-                                InitiativeConstants.Exception.BadRequest.INITIATIVE_BENEFICIARY_RANKING_ENABLED_AUTOMATED_CRITERIA_ORDER_OPERATION_MISSING_NOT_VALID,
-                                HttpStatus.BAD_REQUEST
+                        throw new AutomatedCriteriaNotValidException(
+                                InitiativeConstants.Exception.BadRequest.INITIATIVE_AUTOMATED_CRITERIA_NOT_VALID_ORDER_DIRECTION_MISSING,
+                                "Automated criteria for ranking initiative [%s] not valid because OrderDirection is missing".formatted(initiative.getInitiativeId())
                         );
                     } else if (FilterOperatorEnumModel.EQ.equals(operator)) {
-                        throw new InitiativeException(
-                                InitiativeConstants.Exception.BadRequest.CODE,
-                                InitiativeConstants.Exception.BadRequest.INITIATIVE_BENEFICIARY_RANKING_ENABLED_AUTOMATED_CRITERIA_ORDER_OPERATION_ISEE_EQ_OP_NOT_VALID,
-                                HttpStatus.BAD_REQUEST
+                        throw new AutomatedCriteriaNotValidException(
+                                InitiativeConstants.Exception.BadRequest.INITIATIVE_AUTOMATED_CRITERIA_NOT_VALID_EQUALS_OPERATOR,
+                                "Automated criteria for ranking initiative [%s] not valid because is used an equals operator".formatted(initiative.getInitiativeId())
                         );
                     }
                 }
             }
             if(!checkIsee){
-                throw new InitiativeException(
-                        InitiativeConstants.Exception.BadRequest.CODE,
-                        InitiativeConstants.Exception.BadRequest.INITIATIVE_BENEFICIARY_RANKING_ENABLED_AUTOMATED_CRITERIA_ISEE_MISSING_NOT_VALID,
-                        HttpStatus.BAD_REQUEST
+                throw new AutomatedCriteriaNotValidException(
+                        InitiativeConstants.Exception.BadRequest.INITIATIVE_AUTOMATED_CRITERIA_NOT_VALID_ISEE_MISSING,
+                        "Automated criteria for ranking initiative [%s] not valid because ISEE is missing".formatted(initiative.getInitiativeId())
                 );
             }
         }
@@ -127,20 +113,20 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
     private void checkIseeTypes(List<AutomatedCriteria> automatedCriteriaList){
         for(AutomatedCriteria automatedCriteria : automatedCriteriaList){
             if(automatedCriteria.getCode().equals(ISEE) && CollectionUtils.isEmpty(automatedCriteria.getIseeTypes())){
-                throw new InitiativeException(
-                        InitiativeConstants.Exception.BadRequest.CODE,
-                        InitiativeConstants.Exception.BadRequest.ISEE_TYPES_NOT_VALID,
-                        HttpStatus.BAD_REQUEST);
+                throw new AutomatedCriteriaNotValidException(
+                        InitiativeConstants.Exception.BadRequest.INITIATIVE_AUTOMATED_CRITERIA_NOT_VALID_TYPOLOGY_ISEE_MISSING,
+                        "Automated criteria not valid because typology ISEE is missing"
+                );
             }
         }
     }
     private void checkIseeCriteriaForNF(Initiative initiative, List<AutomatedCriteria> automatedCriteriaList){
         if(InitiativeGeneral.BeneficiaryTypeEnum.NF.equals(initiative.getGeneral().getBeneficiaryType()) &&
                 automatedCriteriaList.stream().noneMatch(a -> a.getCode().equals(ISEE))){
-            throw new InitiativeException(
-                    InitiativeConstants.Exception.BadRequest.CODE,
-                    InitiativeConstants.Exception.BadRequest.INITIATIVE_BENEFICIARY_TYPE_NF_ENABLED_AUTOMATED_CRITERIA_ISEE_MISSING_NOT_VALID,
-                    HttpStatus.BAD_REQUEST);
+            throw new AutomatedCriteriaNotValidException(
+                    InitiativeConstants.Exception.BadRequest.INITIATIVE_AUTOMATED_CRITERIA_NOT_VALID_BENEFICIARY_NF_ISEE_MISSING,
+                    "Automated criteria for family initiative [%s] not valid because ISEE is missing".formatted(initiative.getInitiativeId())
+            );
         }
     }
 
@@ -169,7 +155,7 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
                     .filter(StringUtils::isNotBlank)
                     .collect(Collectors.toSet());
             String violations = s.toString();
-            throw new InitiativeException(InitiativeConstants.Exception.BadRequest.CODE, String.format(InitiativeConstants.Exception.BadRequest.WIZARD_VALIDATION, violations), HttpStatus.BAD_REQUEST);
+            throw new ValidationWizardException("Error on validation caused by following violations [%s]".formatted(violations));
         }
     }
 
@@ -180,8 +166,7 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
                 RewardValue.RewardValueTypeEnum.ABSOLUTE.equals(rewardValue.getRewardValueType())) {
             Threshold threshold = initiative.getTrxRule().getThreshold();
             if (threshold==null || threshold.getFrom()==null || threshold.getFrom().compareTo(rewardValue.getRewardValue()) < 0){
-                throw new InitiativeException(InitiativeConstants.Exception.BadRequest.CODE,
-                        InitiativeConstants.Exception.BadRequest.REWARD_TYPE, HttpStatus.BAD_REQUEST);
+                throw new InvalidRewardRuleException("Reward rules of initiative [%s] is not valid".formatted(initiative.getInitiativeId()));
             }
         }
     }
@@ -190,8 +175,7 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
     public void checkRefundRuleDiscountInitiative(String initiativeRewardType, InitiativeRefundRule refundRule){
         if (InitiativeRewardAndTrxRulesDTO.InitiativeRewardTypeEnum.DISCOUNT.name().equals(initiativeRewardType) &&
                 (refundRule.getAccumulatedAmount() != null || refundRule.getTimeParameter() == null)){
-                throw new InitiativeException(InitiativeConstants.Exception.BadRequest.CODE,
-                        InitiativeConstants.Exception.BadRequest.REFUND_RULE_INVALID, HttpStatus.BAD_REQUEST);
+                throw new InvalidRefundRuleException("Refund rules is not valid");
         }
     }
 
@@ -201,27 +185,18 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
                 (initiative.getGeneral().getFamilyUnitComposition() == null ||
                         !List.of(InitiativeConstants.FamilyUnitCompositionConstant.INPS,
                                 InitiativeConstants.FamilyUnitCompositionConstant.ANPR).contains(initiative.getGeneral().getFamilyUnitComposition()))) {
-            throw new InitiativeException(
-                    InitiativeConstants.Exception.BadRequest.CODE,
-                    InitiativeConstants.Exception.BadRequest.INITIATIVE_GENERAL_FAMILY_COMPOSITION_MESSAGE,
-                    HttpStatus.BAD_REQUEST);
+            throw new InitiativeFamilyUnitCompositionException("In the initiative [%s] family unit composition must be set as 'INPS' or 'ANPR'".formatted(initiative.getInitiativeId()));
         }
         if (!InitiativeGeneral.BeneficiaryTypeEnum.NF.equals(initiative.getGeneral().getBeneficiaryType()) &&
                 initiative.getGeneral().getFamilyUnitComposition() != null) {
-            throw new InitiativeException(
-                    InitiativeConstants.Exception.BadRequest.CODE,
-                    InitiativeConstants.Exception.BadRequest.INITIATIVE_GENERAL_FAMILY_COMPOSITION_WRONG_BENEFICIARY_TYPE,
-                    HttpStatus.BAD_REQUEST);
+            throw new InitiativeFamilyUnitCompositionException("In the initiative [%s] family unit composition must be unset because beneficiary type is not NF".formatted(initiative.getInitiativeId()));
         }
     }
 
     @Override
     public void checkStartDateAndEndDate(Initiative initiative) {
         if (initiative.getGeneral().getStartDate().isBefore(LocalDate.now()) || initiative.getGeneral().getEndDate().isBefore(LocalDate.now())) {
-            throw new InitiativeException(
-                    InitiativeConstants.Exception.BadRequest.CODE,
-                    InitiativeConstants.Exception.BadRequest.INITIATIVE_GENERAL_START_DATE_END_DATE_WRONG,
-                    HttpStatus.BAD_REQUEST);
+            throw new InitiativeDateInvalidException(InitiativeConstants.Exception.BadRequest.INITIATIVE_START_DATE_AND_END_DATE_NOT_VALID,"In the initiative [%s] the startDate and endDate cannot be less than today".formatted(initiative.getInitiativeId()));
         }
     }
 
@@ -230,10 +205,7 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
 
         if (initiativeBeneficiaryRuleModel.stream().anyMatch(a -> "BIRTHDATE".equals(a.getCode()) && "year".equalsIgnoreCase(a.getField()) &&
                 !(a.getValue().matches("\\d{4}") && Integer.parseInt(a.getValue()) >= Year.now().minusYears(150).getValue() && Integer.parseInt(a.getValue()) <= Year.now().getValue() ) )){
-            throw new InitiativeException(
-                    InitiativeConstants.Exception.BadRequest.CODE,
-                    InitiativeConstants.Exception.BadRequest.INITIATIVE_BENEFICIARY_FIELD_YEAR_VALUE_WRONG,
-                    HttpStatus.BAD_REQUEST);
+            throw new InitiativeYearValueException("In the initiative the value must contain 4 numbers and the year cannot be less than 150 years");
         }
 
     }
@@ -244,7 +216,7 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
         if (rewardRule instanceof RewardValue rewardValue &&
                 RewardValue.RewardValueTypeEnum.PERCENTAGE.equals(rewardValue.getRewardValueType()) &&
                 rewardValue.getRewardValue().intValue()>100){
-            throw new InitiativeException(InitiativeConstants.Exception.BadRequest.CODE, InitiativeConstants.Exception.BadRequest.REWARD_TYPE, HttpStatus.BAD_REQUEST);
+            throw new InvalidRewardRuleException("Reward rules of initiative [%s] is not valid".formatted(initiative.getInitiativeId()));
         }
     }
 }
