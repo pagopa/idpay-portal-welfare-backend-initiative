@@ -1,10 +1,10 @@
 {
 	"info": {
-		"_postman_id": "1755c910-d9b2-4638-b16a-5947073b936f",
-		"name": "idpay-initiative-e2e",
+		"_postman_id": "b0284a62-425d-4858-9076-529a18bcab99",
+		"name": "idpay-initiative-e2e with retry",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "26036679",
-		"_collection_link": "https://idpay-test-funzionali.postman.co/workspace/IDPay-Test-Funzionali~d5f80577-ab5d-4d50-87c4-a81b6bcba6bc/collection/26036736-1755c910-d9b2-4638-b16a-5947073b936f?action=share&source=collection_link&creator=26036679"
+		"_collection_link": "https://idpay-test-funzionali.postman.co/workspace/IDPay-Test-Funzionali~d5f80577-ab5d-4d50-87c4-a81b6bcba6bc/collection/26036679-b0284a62-425d-4858-9076-529a18bcab99?action=share&source=collection_link&creator=26036679"
 	},
 	"item": [
 		{
@@ -14073,7 +14073,7 @@
 											"listen": "prerequest",
 											"script": {
 												"exec": [
-													"setTimeout(() => {}, 7000);"
+													""
 												],
 												"type": "text/javascript"
 											}
@@ -14135,7 +14135,7 @@
 											"listen": "prerequest",
 											"script": {
 												"exec": [
-													"setTimeout(() => {}, 15000);"
+													""
 												],
 												"type": "text/javascript"
 											}
@@ -14308,17 +14308,20 @@
 											"listen": "test",
 											"script": {
 												"exec": [
-													"pm.test(\"Initiative with criteria - Onboarding - Unhappy case - APP IO - Onboarding user with wrong isee type - Status Onboarding KO - Status 200\", function () {\r",
-													"    pm.response.to.have.status(200);\r",
-													"});\r",
+													"let jsonResponse = pm.response.json()\r",
 													"\r",
-													"setTimeout(() => {\r",
+													"if (jsonResponse.status !== 'ONBOARDING_KO') {\r",
+													"    retryRequest(postman, pm, setTimeout, 5000);\r",
+													"} else {\r",
+													"\r",
+													"    pm.test(\"Initiative with criteria - Onboarding - Unhappy case - APP IO - Onboarding user with wrong isee type - Status Onboarding KO - Status 200\", function () {\r",
+													"        pm.response.to.have.status(200);\r",
+													"    });\r",
 													"\r",
 													"    pm.test(\"Initiative with criteria - Onboarding Unhappy is ONBOARDING_KO\", function () {\r",
-													"        let jsonResponse = pm.response.json()\r",
 													"        pm.expect(jsonResponse.status).to.eql(`ONBOARDING_KO`);\r",
 													"    });\r",
-													"}, 2000)"
+													"}"
 												],
 												"type": "text/javascript"
 											}
@@ -14327,7 +14330,7 @@
 											"listen": "prerequest",
 											"script": {
 												"exec": [
-													"setTimeout(() => { }, 30000);"
+													""
 												],
 												"type": "text/javascript"
 											}
@@ -15309,7 +15312,7 @@
 													"listen": "prerequest",
 													"script": {
 														"exec": [
-															"setTimeout(()=> {}, 30000)"
+															"//setTimeout(()=> {}, 15000)"
 														],
 														"type": "text/javascript"
 													}
@@ -19202,8 +19205,7 @@
 															"let moment = require('moment');\r",
 															"let yesterday = String(moment().subtract(1, 'days').format('YYYY-MM-DD'));\r",
 															"pm.collectionVariables.set('yesterday', yesterday);\r",
-															"\r",
-															"setTimeout(() => {}, 8000);"
+															"//setTimeout(() => {},10000);"
 														],
 														"type": "text/javascript"
 													}
@@ -19263,18 +19265,18 @@
 													"listen": "test",
 													"script": {
 														"exec": [
-															"pm.test(\"Initiative with ranking - Happy case - Forcing ranking creation - return status 200\", function () {\r",
-															"    pm.response.to.have.status(200);\r",
+															"let jsonResponse = pm.response.json()\r",
+															"const foundInitiative = jsonResponse.some((item) => {\r",
+															"    return item.initiativeId === pm.collectionVariables.get(\"initiativeId\")\r",
 															"});\r",
 															"\r",
+															"    pm.test(\"Initiative with ranking - Happy case - Forcing ranking creation - return status 200\", function () {\r",
+															"        pm.response.to.have.status(200);\r",
+															"    });\r",
 															"\r",
-															"pm.test(\"Initiative with ranking - Happy case - Forcing ranking creation - check initiativeId\", function () {\r",
-															"     let jsonResponse = pm.response.json()\r",
-															"     const foundInitiative = jsonResponse.some((item) =>{\r",
-															"         return item.initiativeId === pm.collectionVariables.get(\"initiativeId\")\r",
-															"     });\r",
-															"    pm.expect(foundInitiative).equals(true); \r",
-															"});"
+															"    pm.test(\"Initiative with ranking - Happy case - Forcing ranking creation - check initiativeId\", function () {\r",
+															"        pm.expect(foundInitiative).equals(true);\r",
+															"    });"
 														],
 														"type": "text/javascript"
 													}
@@ -19283,7 +19285,7 @@
 													"listen": "prerequest",
 													"script": {
 														"exec": [
-															"setTimeout(()=> {}, 50000)"
+															"setTimeout(()=> {}, 10000)"
 														],
 														"type": "text/javascript"
 													}
@@ -19332,7 +19334,7 @@
 													"listen": "prerequest",
 													"script": {
 														"exec": [
-															"setTimeout(()=> {}, 15000)"
+															"//setTimeout(()=> {}, 15000)"
 														],
 														"type": "text/javascript"
 													}
@@ -20503,7 +20505,7 @@
 													"listen": "prerequest",
 													"script": {
 														"exec": [
-															"setTimeout(()=> {}, 30000)"
+															"//setTimeout(()=> {}, 30000)"
 														],
 														"type": "text/javascript"
 													}
@@ -24397,7 +24399,7 @@
 															"let yesterday = String(moment().subtract(1, 'days').format('YYYY-MM-DD'));\r",
 															"pm.collectionVariables.set('yesterday', yesterday);\r",
 															"\r",
-															"setTimeout(() => {}, 8000);"
+															"//setTimeout(() => {}, 8000);"
 														],
 														"type": "text/javascript"
 													}
@@ -24477,7 +24479,7 @@
 													"listen": "prerequest",
 													"script": {
 														"exec": [
-															"setTimeout(()=> {}, 50000)"
+															"setTimeout(()=> {}, 10000)"
 														],
 														"type": "text/javascript"
 													}
@@ -24526,7 +24528,7 @@
 													"listen": "prerequest",
 													"script": {
 														"exec": [
-															"setTimeout(()=> {}, 15000)"
+															"//setTimeout(()=> {}, 15000)"
 														],
 														"type": "text/javascript"
 													}
@@ -24650,7 +24652,7 @@
 													"listen": "prerequest",
 													"script": {
 														"exec": [
-															"setTimeout(()=> {}, 10000)"
+															"//setTimeout(()=> {}, 10000)"
 														],
 														"type": "text/javascript"
 													}
@@ -28260,7 +28262,7 @@
 													"listen": "prerequest",
 													"script": {
 														"exec": [
-															"setTimeout(() => { }, 20000);"
+															"//setTimeout(() => { }, 20000);"
 														],
 														"type": "text/javascript"
 													}
@@ -29368,7 +29370,7 @@
 															"listen": "prerequest",
 															"script": {
 																"exec": [
-																	"setTimeout(()=> {}, 30000)"
+																	"//setTimeout(()=> {}, 30000)"
 																],
 																"type": "text/javascript"
 															}
@@ -33271,7 +33273,7 @@
 																	"let yesterday = String(moment().subtract(1, 'days').format('YYYY-MM-DD'));\r",
 																	"pm.collectionVariables.set('yesterday', yesterday);\r",
 																	"\r",
-																	"setTimeout(() => {}, 8000);"
+																	"//setTimeout(() => {}, 8000);"
 																],
 																"type": "text/javascript"
 															}
@@ -33351,7 +33353,7 @@
 															"listen": "prerequest",
 															"script": {
 																"exec": [
-																	"setTimeout(()=> {}, 40000)"
+																	"setTimeout(()=> {}, 10000)"
 																],
 																"type": "text/javascript"
 															}
@@ -33400,7 +33402,7 @@
 															"listen": "prerequest",
 															"script": {
 																"exec": [
-																	"setTimeout(()=> {}, 15000)"
+																	"//setTimeout(()=> {}, 15000)"
 																],
 																"type": "text/javascript"
 															}
@@ -33524,7 +33526,7 @@
 															"listen": "prerequest",
 															"script": {
 																"exec": [
-																	"setTimeout(()=> {}, 10000)"
+																	"//setTimeout(()=> {}, 10000)"
 																],
 																"type": "text/javascript"
 															}
@@ -34580,7 +34582,7 @@
 															"listen": "prerequest",
 															"script": {
 																"exec": [
-																	"setTimeout(()=> {}, 30000)"
+																	"//setTimeout(()=> {}, 30000)"
 																],
 																"type": "text/javascript"
 															}
@@ -38474,7 +38476,7 @@
 																	"let yesterday = String(moment().subtract(1, 'days').format('YYYY-MM-DD'));\r",
 																	"pm.collectionVariables.set('yesterday', yesterday);\r",
 																	"\r",
-																	"setTimeout(() => {}, 7000);"
+																	"//setTimeout(() => {}, 7000);"
 																],
 																"type": "text/javascript"
 															}
@@ -38554,7 +38556,7 @@
 															"listen": "prerequest",
 															"script": {
 																"exec": [
-																	"setTimeout(()=> {}, 40000)"
+																	"setTimeout(()=> {}, 10000)"
 																],
 																"type": "text/javascript"
 															}
@@ -38603,7 +38605,7 @@
 															"listen": "prerequest",
 															"script": {
 																"exec": [
-																	"setTimeout(()=> {}, 15000)"
+																	"//setTimeout(()=> {}, 15000)"
 																],
 																"type": "text/javascript"
 															}
@@ -40124,17 +40126,22 @@
 													"listen": "test",
 													"script": {
 														"exec": [
-															" pm.test(\"Initiative with discount - Initiative discount - Happy case - Initiative with criteria - Onboarding - Status Onboarding - return status 200\", function () {\r",
-															"    pm.response.to.have.status(200);\r",
-															"});\r",
+															"let jsonResponse = pm.response.json()\r",
 															"\r",
-															"setTimeout(()=>{ \r",
+															"if (jsonResponse.status !== 'ONBOARDING_OK') {\r",
+															"    retryRequest(postman, pm, setTimeout, 5000);\r",
+															"} else {\r",
+															"    pm.test(\"Initiative with discount - Initiative discount - Happy case - Initiative with criteria - Onboarding - Status Onboarding - return status 200\", function () {\r",
+															"        pm.response.to.have.status(200);\r",
+															"    });\r",
 															"\r",
-															"pm.test(\"Initiative with discount - Initiative discount - Happy case - Initiative with criteria - Onboarding - Status Onboarding - status ONBOARDING_OK\", function () {\r",
-															"    let jsonResponse = pm.response.json()\r",
-															"    pm.expect(jsonResponse.status).equals('ONBOARDING_OK');\r",
-															"});\r",
-															" },2000)"
+															"    setTimeout(() => {\r",
+															"\r",
+															"        pm.test(\"Initiative with discount - Initiative discount - Happy case - Initiative with criteria - Onboarding - Status Onboarding - status ONBOARDING_OK\", function () {\r",
+															"            pm.expect(jsonResponse.status).equals('ONBOARDING_OK');\r",
+															"        });\r",
+															"    }, 2000)\r",
+															"}"
 														],
 														"type": "text/javascript"
 													}
@@ -40143,7 +40150,7 @@
 													"listen": "prerequest",
 													"script": {
 														"exec": [
-															"setTimeout(()=> {}, 25000)"
+															"//setTimeout(()=> {}, 25000)"
 														],
 														"type": "text/javascript"
 													}
@@ -40214,14 +40221,19 @@
 											"listen": "test",
 											"script": {
 												"exec": [
-													"pm.test(\"Initiative discount - Happy case - Initiative with whitelist - Get wallet status - Response status is 200\", function () {\r",
-													"    pm.response.to.have.status(200);\r",
-													"});\r",
+													"let responseJson = pm.response.json()\r",
 													"\r",
-													"pm.test(\"Initiative discount - Happy case - Initiative with whitelist - Get wallet status - Response status is REFUNDABLE\", function () {\r",
-													"    let responseJson = pm.response.json()\r",
-													"    pm.expect(responseJson.status).to.be.eql('REFUNDABLE');\r",
-													"});"
+													"if (responseJson.status !== 'REFUNDABLE') {\r",
+													"    retryRequest(postman, pm, setTimeout, 5000);\r",
+													"} else {\r",
+													"    pm.test(\"Initiative discount - Happy case - Initiative with whitelist - Get wallet status - Response status is 200\", function () {\r",
+													"        pm.response.to.have.status(200);\r",
+													"    });\r",
+													"\r",
+													"    pm.test(\"Initiative discount - Happy case - Initiative with whitelist - Get wallet status - Response status is REFUNDABLE\", function () {\r",
+													"        pm.expect(responseJson.status).to.be.eql('REFUNDABLE');\r",
+													"    });\r",
+													"}"
 												],
 												"type": "text/javascript"
 											}
@@ -40230,7 +40242,7 @@
 											"listen": "prerequest",
 											"script": {
 												"exec": [
-													"setTimeout(() => {}, 5000);"
+													"//setTimeout(() => {}, 5000);"
 												],
 												"type": "text/javascript"
 											}
@@ -41365,17 +41377,22 @@
 													"listen": "test",
 													"script": {
 														"exec": [
-															" pm.test(\"Initiative discount - Happy case - Initiative with criteria - Onboarding - Status Onboarding - return status 200\", function () {\r",
-															"    pm.response.to.have.status(200);\r",
-															"});\r",
+															"let jsonResponse = pm.response.json()\r",
 															"\r",
-															"setTimeout(()=>{ \r",
+															"if (jsonResponse.status !== 'ONBOARDING_OK') {\r",
+															"    retryRequest(postman, pm, setTimeout, 5000);\r",
+															"} else {\r",
+															"    pm.test(\"Initiative discount - Happy case - Initiative with criteria - Onboarding - Status Onboarding - return status 200\", function () {\r",
+															"        pm.response.to.have.status(200);\r",
+															"    });\r",
 															"\r",
-															"pm.test(\"Initiative discount - Happy case - Initiative with criteria - Onboarding - Status Onboarding - status ONBOARDING_OK\", function () {\r",
-															"    let jsonResponse = pm.response.json()\r",
-															"    pm.expect(jsonResponse.status).equals('ONBOARDING_OK');\r",
-															"});\r",
-															" },2000)"
+															"    setTimeout(() => {\r",
+															"\r",
+															"        pm.test(\"Initiative discount - Happy case - Initiative with criteria - Onboarding - Status Onboarding - status ONBOARDING_OK\", function () {\r",
+															"            pm.expect(jsonResponse.status).equals('ONBOARDING_OK');\r",
+															"        });\r",
+															"    }, 2000)\r",
+															"}"
 														],
 														"type": "text/javascript"
 													}
@@ -41384,7 +41401,7 @@
 													"listen": "prerequest",
 													"script": {
 														"exec": [
-															"setTimeout(()=> {}, 25000)"
+															"//setTimeout(()=> {}, 25000)"
 														],
 														"type": "text/javascript"
 													}
@@ -41455,14 +41472,19 @@
 											"listen": "test",
 											"script": {
 												"exec": [
-													"pm.test(\"Initiative discount - Happy case - Initiative with criteria - Get wallet status - Response status is 200\", function () {\r",
-													"    pm.response.to.have.status(200);\r",
-													"});\r",
+													"let responseJson = pm.response.json()\r",
 													"\r",
-													"pm.test(\"Initiative discount - Happy case - Initiative with criteria - Get wallet status - Response status is REFUNDABLE\", function () {\r",
-													"    let responseJson = pm.response.json()\r",
-													"    pm.expect(responseJson.status).to.be.eql('REFUNDABLE');\r",
-													"});"
+													"if (responseJson.status !== 'REFUNDABLE') {\r",
+													"    retryRequest(postman, pm, setTimeout, 5000);\r",
+													"} else {\r",
+													"    pm.test(\"Initiative discount - Happy case - Initiative with criteria - Get wallet status - Response status is 200\", function () {\r",
+													"        pm.response.to.have.status(200);\r",
+													"    });\r",
+													"\r",
+													"    pm.test(\"Initiative discount - Happy case - Initiative with criteria - Get wallet status - Response status is REFUNDABLE\", function () {\r",
+													"        pm.expect(responseJson.status).to.be.eql('REFUNDABLE');\r",
+													"    });\r",
+													"}"
 												],
 												"type": "text/javascript"
 											}
@@ -41471,7 +41493,7 @@
 											"listen": "prerequest",
 											"script": {
 												"exec": [
-													"setTimeout(() => {}, 15000)"
+													"//setTimeout(() => {}, 15000)"
 												],
 												"type": "text/javascript"
 											}
@@ -41607,15 +41629,20 @@
 											"listen": "test",
 											"script": {
 												"exec": [
-													"pm.test(\"Initiative with discount - Initiative with criteria - Unhappy case - Enrollment of payment instrument - Responses with code 403\", function () {\r",
-													"    pm.response.to.have.status(403);\r",
-													"});\r",
+													"let jsonResponse = pm.response.json()\r",
 													"\r",
-													"pm.test(\"Initiative with discount - Initiative with criteria - Unhappy case -Enrollment of payment instrument - Responses with excpected code and message\", function () {\r",
-													"    let jsonResponse = pm.response.json();\r",
-													"    pm.expect(jsonResponse.code).eq(\r",
-													"        \"WALLET_ENROLL_INSTRUMENT_NOT_ALLOWED_FOR_DISCOUNT_INITIATIVE\");\r",
-													"});"
+													"if (jsonResponse.code !== 'WALLET_ENROLL_INSTRUMENT_NOT_ALLOWED_FOR_DISCOUNT_INITIATIVE') {\r",
+													"    retryRequest(postman, pm, setTimeout, 5000);\r",
+													"} else {\r",
+													"    pm.test(\"Initiative with discount - Initiative with criteria - Unhappy case - Enrollment of payment instrument - Responses with code 403\", function () {\r",
+													"        pm.response.to.have.status(403);\r",
+													"    });\r",
+													"\r",
+													"    pm.test(\"Initiative with discount - Initiative with criteria - Unhappy case -Enrollment of payment instrument - Responses with excpected code and message\", function () {\r",
+													"        pm.expect(jsonResponse.code).eq(\r",
+													"            \"WALLET_ENROLL_INSTRUMENT_NOT_ALLOWED_FOR_DISCOUNT_INITIATIVE\");\r",
+													"    });\r",
+													"}"
 												],
 												"type": "text/javascript"
 											}
@@ -46563,7 +46590,7 @@
 															"listen": "prerequest",
 															"script": {
 																"exec": [
-																	"setTimeout(()=> {}, 60000)"
+																	"//setTimeout(()=> {}, 60000)"
 																],
 																"type": "text/javascript"
 															}
@@ -46675,17 +46702,22 @@
 															"listen": "test",
 															"script": {
 																"exec": [
-																	"pm.test(\"Suspension/Readmission - Unhappy case - Try to suspend CIT in status ON_EVALUATION, ACCEPTED_TC (WALLET NOT FOUND) - Onboarding - Status Onboarding - return status 200\", function () {\r",
-																	"    pm.response.to.have.status(200);\r",
-																	"});\r",
+																	"let jsonResponse = pm.response.json()\r",
 																	"\r",
-																	"setTimeout(()=>{ \r",
+																	"if (jsonResponse.status !== 'ACCEPTED_TC') {\r",
+																	"    retryRequest(postman, pm, setTimeout, 5000);\r",
+																	"} else {\r",
+																	"    pm.test(\"Suspension/Readmission - Unhappy case - Try to suspend CIT in status ON_EVALUATION, ACCEPTED_TC (WALLET NOT FOUND) - Onboarding - Status Onboarding - return status 200\", function () {\r",
+																	"        pm.response.to.have.status(200);\r",
+																	"    });\r",
 																	"\r",
-																	"pm.test(\"Suspension/Readmission - Unhappy case - Try to suspend CIT in status ON_EVALUATION, ACCEPTED_TC (WALLET NOT FOUND) - Onboarding - Status Onboarding - status ON_EVALUATION\", function () {\r",
-																	"    let jsonResponse = pm.response.json()\r",
-																	"    pm.expect(jsonResponse.status).equals('ACCEPTED_TC');\r",
-																	"});\r",
-																	" },2000)"
+																	"    setTimeout(() => {\r",
+																	"\r",
+																	"        pm.test(\"Suspension/Readmission - Unhappy case - Try to suspend CIT in status ON_EVALUATION, ACCEPTED_TC (WALLET NOT FOUND) - Onboarding - Status Onboarding - status ON_EVALUATION\", function () {\r",
+																	"            pm.expect(jsonResponse.status).equals('ACCEPTED_TC');\r",
+																	"        });\r",
+																	"    }, 2000)\r",
+																	"}"
 																],
 																"type": "text/javascript"
 															}
@@ -46754,7 +46786,7 @@
 															"listen": "prerequest",
 															"script": {
 																"exec": [
-																	"setTimeout(()=> {}, 60000)"
+																	"//setTimeout(()=> {}, 60000)"
 																],
 																"type": "text/javascript"
 															}
@@ -46979,17 +47011,22 @@
 															"listen": "test",
 															"script": {
 																"exec": [
-																	"pm.test(\"Suspension/Readmission - Unhappy case - Try to suspend CIT in status ON_EVALUATION, ACCEPTED_TC (WALLET NOT FOUND) - Onboarding - Status Onboarding - return status 200\", function () {\r",
-																	"    pm.response.to.have.status(200);\r",
-																	"});\r",
+																	"let jsonResponse = pm.response.json()\r",
 																	"\r",
-																	"setTimeout(()=>{ \r",
+																	"if (jsonResponse.status !== 'ON_EVALUATION') {\r",
+																	"    retryRequest(postman, pm, setTimeout, 5000);\r",
+																	"} else {\r",
+																	"    pm.test(\"Suspension/Readmission - Unhappy case - Try to suspend CIT in status ON_EVALUATION, ACCEPTED_TC (WALLET NOT FOUND) - Onboarding - Status Onboarding - return status 200\", function () {\r",
+																	"        pm.response.to.have.status(200);\r",
+																	"    });\r",
 																	"\r",
-																	"pm.test(\"Suspension/Readmission - Unhappy case - Try to suspend CIT in status ON_EVALUATION, ACCEPTED_TC (WALLET NOT FOUND) - Onboarding - Status Onboarding - status ON_EVALUATION\", function () {\r",
-																	"    let jsonResponse = pm.response.json()\r",
-																	"    pm.expect(jsonResponse.status).equals('ON_EVALUATION');\r",
-																	"});\r",
-																	" },2000)"
+																	"    setTimeout(() => {\r",
+																	"\r",
+																	"        pm.test(\"Suspension/Readmission - Unhappy case - Try to suspend CIT in status ON_EVALUATION, ACCEPTED_TC (WALLET NOT FOUND) - Onboarding - Status Onboarding - status ON_EVALUATION\", function () {\r",
+																	"            pm.expect(jsonResponse.status).equals('ON_EVALUATION');\r",
+																	"        });\r",
+																	"    }, 2000)\r",
+																	"}"
 																],
 																"type": "text/javascript"
 															}
@@ -46998,7 +47035,7 @@
 															"listen": "prerequest",
 															"script": {
 																"exec": [
-																	"setTimeout(()=> {}, 15000)"
+																	"//setTimeout(()=> {}, 15000)"
 																],
 																"type": "text/javascript"
 															}
@@ -48718,17 +48755,22 @@
 													"listen": "test",
 													"script": {
 														"exec": [
-															"pm.test(\"Suspension - Unhappy case - Try to suspend CIT in status INVITED,ONBOARDING_KO,UNSUBSCRIBED (WALLET NOT FOUND) - Onboarding - Status Onboarding - return status 200\", function () {\r",
-															"    pm.response.to.have.status(200);\r",
-															"});\r",
+															"let jsonResponse = pm.response.json()\r",
 															"\r",
-															"setTimeout(()=>{ \r",
+															"if (jsonResponse.status !== 'ONBOARDING_KO') {\r",
+															"    retryRequest(postman, pm, setTimeout, 5000);\r",
+															"} else {\r",
+															"    pm.test(\"Suspension - Unhappy case - Try to suspend CIT in status INVITED,ONBOARDING_KO,UNSUBSCRIBED (WALLET NOT FOUND) - Onboarding - Status Onboarding - return status 200\", function () {\r",
+															"        pm.response.to.have.status(200);\r",
+															"    });\r",
 															"\r",
-															"pm.test(\"Initiative with discount - Suspension - Unhappy case - Try to suspend CIT in status INVITED,ONBOARDING_KO,UNSUBSCRIBED (WALLET NOT FOUND) - Onboarding - Status Onboarding - status ONBOARDING_KO\", function () {\r",
-															"    let jsonResponse = pm.response.json()\r",
-															"    pm.expect(jsonResponse.status).equals('ONBOARDING_KO');\r",
-															"});\r",
-															" },2000)"
+															"    setTimeout(() => {\r",
+															"\r",
+															"        pm.test(\"Initiative with discount - Suspension - Unhappy case - Try to suspend CIT in status INVITED,ONBOARDING_KO,UNSUBSCRIBED (WALLET NOT FOUND) - Onboarding - Status Onboarding - status ONBOARDING_KO\", function () {\r",
+															"            pm.expect(jsonResponse.status).equals('ONBOARDING_KO');\r",
+															"        });\r",
+															"    }, 2000)\r",
+															"}"
 														],
 														"type": "text/javascript"
 													}
@@ -48737,7 +48779,7 @@
 													"listen": "prerequest",
 													"script": {
 														"exec": [
-															"setTimeout(()=> {}, 15000)"
+															"//setTimeout(()=> {}, 15000)"
 														],
 														"type": "text/javascript"
 													}
@@ -49048,7 +49090,7 @@
 											"listen": "prerequest",
 											"script": {
 												"exec": [
-													"setTimeout(() => {}, 10000);"
+													"//setTimeout(() => {}, 10000);"
 												],
 												"type": "text/javascript"
 											}
@@ -49109,7 +49151,7 @@
 											"listen": "prerequest",
 											"script": {
 												"exec": [
-													"setTimeout(()=> {}, 15000)"
+													"//setTimeout(()=> {}, 15000)"
 												],
 												"type": "text/javascript"
 											}
@@ -49118,17 +49160,22 @@
 											"listen": "test",
 											"script": {
 												"exec": [
-													"pm.test(\"Suspension - Unhappy case - Try to suspend CIT in status INVITED,ONBOARDING_KO,UNSUBSCRIBED (WALLET NOT FOUND) - Onboarding - Status Onboarding - return status 200\", function () {\r",
-													"    pm.response.to.have.status(200);\r",
-													"});\r",
+													"let jsonResponse = pm.response.json()\r",
 													"\r",
-													"setTimeout(()=>{ \r",
+													"if (jsonResponse.status !== 'UNSUBSCRIBED') {\r",
+													"    retryRequest(postman, pm, setTimeout, 5000);\r",
+													"} else {\r",
+													"    pm.test(\"Suspension - Unhappy case - Try to suspend CIT in status INVITED,ONBOARDING_KO,UNSUBSCRIBED (WALLET NOT FOUND) - Onboarding - Status Onboarding - return status 200\", function () {\r",
+													"        pm.response.to.have.status(200);\r",
+													"    });\r",
 													"\r",
-													"pm.test(\"Suspension - Unhappy case - Try to suspend CIT in status INVITED,ONBOARDING_KO,UNSUBSCRIBED (WALLET NOT FOUND) - Onboarding - Status Onboarding - status UNSUBSCRIBED\", function () {\r",
-													"    let jsonResponse = pm.response.json()\r",
-													"    pm.expect(jsonResponse.status).equals('UNSUBSCRIBED');\r",
-													"});\r",
-													" },2000)"
+													"    setTimeout(() => {\r",
+													"\r",
+													"        pm.test(\"Suspension - Unhappy case - Try to suspend CIT in status INVITED,ONBOARDING_KO,UNSUBSCRIBED (WALLET NOT FOUND) - Onboarding - Status Onboarding - status UNSUBSCRIBED\", function () {\r",
+													"            pm.expect(jsonResponse.status).equals('UNSUBSCRIBED');\r",
+													"        });\r",
+													"    }, 2000)\r",
+													"}"
 												],
 												"type": "text/javascript"
 											}
@@ -49613,7 +49660,7 @@
 									"listen": "prerequest",
 									"script": {
 										"exec": [
-											"setTimeout(()=> {}, 10000)"
+											"// setTimeout(()=> {}, 10000)"
 										],
 										"type": "text/javascript"
 									}
@@ -49679,7 +49726,7 @@
 									"listen": "prerequest",
 									"script": {
 										"exec": [
-											"setTimeout(()=> {}, 10000)"
+											"// setTimeout(()=> {}, 10000)"
 										],
 										"type": "text/javascript"
 									}
@@ -51129,17 +51176,22 @@
 													"listen": "test",
 													"script": {
 														"exec": [
+															"let jsonResponse = pm.response.json()\r",
+															" \r",
+															"if (jsonResponse.status !== 'ACCEPTED_TC') {\r",
+															"    retryRequest(postman, pm, setTimeout, 5000);\r",
+															"} else {\r",
+															"\r",
 															"pm.test(\"Readmission - Unhappy case - Try to readmit CIT in status INVITED,ONBOARDING_KO,UNSUBSCRIBED (WALLET NOT FOUND) - Onboarding - Status Onboarding - return status 200\", function () {\r",
 															"    pm.response.to.have.status(200);\r",
 															"});\r",
 															"\r",
-															"setTimeout(()=>{ \r",
 															"\r",
 															"pm.test(\"Readmission - Unhappy case - Try to readmit CIT in status INVITED,ONBOARDING_KO,UNSUBSCRIBED (WALLET NOT FOUND) - Onboarding - Status Onboarding - status ACCEPTED_TC\", function () {\r",
 															"    let jsonResponse = pm.response.json()\r",
 															"    pm.expect(jsonResponse.status).equals('ACCEPTED_TC');\r",
 															"});\r",
-															" },2000)"
+															"}"
 														],
 														"type": "text/javascript"
 													}
@@ -51148,7 +51200,7 @@
 													"listen": "prerequest",
 													"script": {
 														"exec": [
-															"setTimeout(()=> {}, 15000)"
+															"// setTimeout(()=> {}, 15000)"
 														],
 														"type": "text/javascript"
 													}
@@ -51513,17 +51565,21 @@
 													"listen": "test",
 													"script": {
 														"exec": [
+															"let jsonResponse = pm.response.json()\r",
+															" \r",
+															"if (jsonResponse.status !== 'ONBOARDING_KO') {\r",
+															"    retryRequest(postman, pm, setTimeout, 5000);\r",
+															"} else {\r",
+															"\r",
 															"pm.test(\"Readmission - Unhappy case - Try to readmit CIT in status INVITED,ONBOARDING_KO,UNSUBSCRIBED (WALLET NOT FOUND) - Onboarding - Status Onboarding - return status 200\", function () {\r",
 															"    pm.response.to.have.status(200);\r",
 															"});\r",
-															"\r",
-															"setTimeout(()=>{ \r",
 															"\r",
 															"pm.test(\"Readmission - Unhappy case - Try to readmit CIT in status INVITED,ONBOARDING_KO,UNSUBSCRIBED (WALLET NOT FOUND) - Onboarding - Status Onboarding - status ONBOARDING_KO\", function () {\r",
 															"    let jsonResponse = pm.response.json()\r",
 															"    pm.expect(jsonResponse.status).equals('ONBOARDING_KO');\r",
 															"});\r",
-															" },2000)"
+															"}"
 														],
 														"type": "text/javascript"
 													}
@@ -51532,7 +51588,7 @@
 													"listen": "prerequest",
 													"script": {
 														"exec": [
-															"setTimeout(()=> {}, 15000)"
+															"// setTimeout(()=> {}, 15000)"
 														],
 														"type": "text/javascript"
 													}
@@ -51893,7 +51949,7 @@
 											"listen": "prerequest",
 											"script": {
 												"exec": [
-													"setTimeout(()=> {}, 15000)"
+													"// setTimeout(()=> {}, 15000)"
 												],
 												"type": "text/javascript"
 											}
@@ -51902,17 +51958,20 @@
 											"listen": "test",
 											"script": {
 												"exec": [
+													"let jsonResponse = pm.response.json()\r",
+													" \r",
+													"if (jsonResponse.status !== 'UNSUBSCRIBED') {\r",
+													"    retryRequest(postman, pm, setTimeout, 5000);\r",
+													"} else {\r",
 													"pm.test(\"Readmission - Unhappy case - Try to readmit CIT in status INVITED,ONBOARDING_KO,UNSUBSCRIBED (WALLET NOT FOUND) - Onboarding - Status Onboarding - return status 200\", function () {\r",
 													"    pm.response.to.have.status(200);\r",
 													"});\r",
-													"\r",
-													"setTimeout(()=>{ \r",
 													"\r",
 													"pm.test(\"Readmission - Unhappy case - Try to readmit CIT in status INVITED,ONBOARDING_KO,UNSUBSCRIBED (WALLET NOT FOUND) - Onboarding - Status Onboarding - status UNSUBSCRIBED\", function () {\r",
 													"    let jsonResponse = pm.response.json()\r",
 													"    pm.expect(jsonResponse.status).equals('UNSUBSCRIBED');\r",
 													"});\r",
-													" },2000)"
+													"}"
 												],
 												"type": "text/javascript"
 											}
@@ -52336,7 +52395,27 @@
 			"script": {
 				"type": "text/javascript",
 				"exec": [
-					""
+					"retryRequest = (postman, pm, setTimeout, waitingMillis = 500, maxAttempts = 10) => {",
+					"    if(!postman || !pm || !setTimeout){",
+					"        throw new Error(\"Invalid invoke to retryRequest function! Some required parameters are undefined: postman=\" + postman + \", pm=\" + pm + \", setTimeout=\" + setTimeout)",
+					"    }",
+					" ",
+					"    const retryVariableName = \"retry_\" + pm.info.requestId",
+					"    const attempt = (pm.variables.get(retryVariableName) ?? 0) + 1;",
+					"    if(attempt < maxAttempts) {",
+					"        console.info(pm.info.requestName + \" not ready, retrying [attempt \" + attempt + \"/\" + maxAttempts + \"] after \" + waitingMillis + \" ms\");",
+					"        pm.variables.set(retryVariableName, attempt)",
+					"        postman.setNextRequest(pm.info.requestId);",
+					"        return setTimeout(()=>{}, waitingMillis);",
+					"    } else {",
+					"        pm.test(pm.info.requestName + \" not ready\", () => pm.expect.fail(attempt + \" attempts\"));",
+					"    }",
+					"}",
+					"",
+					"if(pm.response.code == 429){",
+					"    console.log(\"Obtained 429! Performing retry...\")",
+					"    retryRequest(postman, pm, setTimeout);",
+					"}"
 				]
 			}
 		}
