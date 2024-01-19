@@ -1,11 +1,10 @@
 package it.gov.pagopa.initiative.controller;
 
+import it.gov.pagopa.common.web.exception.ClientExceptionWithBody;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.io.service.KeysDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
-import it.gov.pagopa.initiative.exception.InitiativeException;
-import it.gov.pagopa.initiative.exception.IntegrationException;
 import it.gov.pagopa.initiative.mapper.InitiativeDTOsToModelMapper;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.Initiative;
@@ -84,13 +83,13 @@ public class InitiativeApiController implements InitiativeApi {
     @Override
     public ResponseEntity<List<InitiativeIssuerDTO>> getInitiativeIssuerList() {
         log.info("[GET_INITIATIVES] - Initiative issuer: Start processing...");
-        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeIssuerDTOList(this.initiativeService.getInitiativesIssuerList()));
+        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeIssuerDTOList(this.initiativeService.getPublishedInitiativesList()));
     }
 
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<InitiativeDTO> getInitiativeDetail(String organizationId, String initiativeId, String role) {
         log.info("[{}][GET_INITIATIVE_DETAIL] - Initiative: {}. Start processing...", role, initiativeId);
-        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDTO(this.initiativeService.getInitiative(organizationId, initiativeId, role)));
+        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDTO(this.initiativeService.getInitiative(organizationId, initiativeId, role), true));
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -137,10 +136,11 @@ public class InitiativeApiController implements InitiativeApi {
         String role = beneficiaryRuleDto.getOrganizationUserRole();
         log.info("[{}][UPDATE_BENEFICIARY_RULE]-[UPDATE_TO_DRAFT_STATUS] - Initiative: {}. Start processing...", role, initiativeId);
         if(Boolean.TRUE.equals(this.initiativeService.getInitiative(organizationId, initiativeId, role).getGeneral().getBeneficiaryKnown())){
-            throw new InitiativeException(
-                    InitiativeConstants.Exception.BadRequest.CODE,
-                    String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_PROPERTIES_NOT_VALID, initiativeId),
-                    HttpStatus.BAD_REQUEST);
+            throw new ClientExceptionWithBody(
+                    HttpStatus.BAD_REQUEST,
+                    InitiativeConstants.Exception.BadRequest.INITIATIVE_WHITELIST_INVALID_PROPERTIES,
+                    "Initiative properties are not valid for this initiative [%s] with beneficiary known".formatted(initiativeId)
+            );
         }
         this.initiativeService.updateStep3InitiativeBeneficiary(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toBeneficiaryRule(beneficiaryRuleDto), role, false);
         return ResponseEntity.noContent().build();
@@ -227,7 +227,7 @@ public class InitiativeApiController implements InitiativeApi {
     @Override
     public ResponseEntity<InitiativeDTO> getInitiativeBeneficiaryView(String initiativeId) {
         log.info("[GET_INITIATIVE_DETAIL_FOR_BENEFICIARY] - Initiative: {}. Start processing...", initiativeId);
-        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDTO(this.initiativeService.getInitiativeBeneficiaryView(initiativeId)));
+        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDTO(this.initiativeService.getInitiativeBeneficiaryView(initiativeId), false));
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -279,7 +279,11 @@ public class InitiativeApiController implements InitiativeApi {
             initiativeService.updateInitiative(initiative);
             log.debug("Initiative Status has been roll-backed to {}", statusTemp);
             performanceLog(startTime, "UPDATE_INITIATIVE_PUBLISHED");
-            throw new IntegrationException(HttpStatus.BAD_REQUEST);
+            throw new ClientExceptionWithBody(
+                    HttpStatus.BAD_REQUEST,
+                    InitiativeConstants.Exception.BadRequest.INITIATIVE_ROLLBACK_TO_PREVIOUS_STATUS,
+                    "Something gone wrong while notify Initiative [%s] for publishing".formatted(initiativeId)
+            );
         }
 
         log.debug("Initiative saved in status PUBLISHED");
@@ -315,10 +319,11 @@ public class InitiativeApiController implements InitiativeApi {
         log.info("[GET_INITIATIVE_ID_FROM_SERVICE_ID] - Start searching the initiativeId for serviceId {}", serviceId);
         //check if valid locale, if not the utility throw an exception
         if(!LocaleUtils.isAvailableLocale(acceptLanguage)){
-            throw new InitiativeException(
-                    InitiativeConstants.Exception.BadRequest.CODE,
-                    String.format(InitiativeConstants.Exception.BadRequest.INVALID_LOCALE_FORMAT, acceptLanguage),
-                    HttpStatus.BAD_REQUEST);
+            throw new ClientExceptionWithBody(
+                    HttpStatus.BAD_REQUEST,
+                    InitiativeConstants.Exception.BadRequest.INITIATIVE_INVALID_LOCALE_FORMAT,
+                    String.format("The initiative could not be found for the current serviceId [%s], due to invalid locale format".formatted(serviceId))
+            );
         }
         return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDataDTO(this.initiativeService.getInitiativeIdFromServiceId(serviceId), acceptLanguage));
     }
@@ -347,6 +352,14 @@ public class InitiativeApiController implements InitiativeApi {
         log.info("[DELETE_INITIATIVE] - Initiative: {}. Start processing...", initiativeId);
         this.initiativeService.deleteInitiative(initiativeId);
         return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<List<InitiativeMilDTO>> getInitiativeListMil(String userId) {
+        log.info("[GET_INITIATIVES] - Initiatives List MIL: Start processing...");
+        List<InitiativeMilDTO> initiativeMilDTOList = this.initiativeModelToDTOMapper.toInitiativeListMilDTO(this.initiativeService.getPublishedInitiativesList());
+        log.info("[GET_INITIATIVES] - User %s requested initiatives list through MIL".formatted(userId));
+        return ResponseEntity.ok(initiativeMilDTOList);
     }
 
     private void performanceLog(long startTime, String service){

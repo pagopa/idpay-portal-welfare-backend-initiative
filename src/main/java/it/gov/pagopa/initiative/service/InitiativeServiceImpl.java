@@ -1,16 +1,14 @@
 package it.gov.pagopa.initiative.service;
 
-import com.google.common.io.Files;
 import feign.FeignException;
 import it.gov.pagopa.initiative.connector.decrypt.DecryptRestConnector;
 import it.gov.pagopa.initiative.connector.encrypt.EncryptRestConnector;
-import it.gov.pagopa.initiative.connector.file_storage.FileStorageConnector;
+import it.gov.pagopa.initiative.connector.file_storage.InitiativeFileStorageConnector;
 import it.gov.pagopa.initiative.connector.group.GroupRestConnector;
 import it.gov.pagopa.initiative.connector.io_service.IOManageBackEndRestConnector;
 import it.gov.pagopa.initiative.connector.onboarding.OnboardingRestConnector;
 import it.gov.pagopa.initiative.connector.ranking.RankingRestConnector;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
-import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.InternalServerError;
 import it.gov.pagopa.initiative.constants.InitiativeConstants.Status;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.io.service.KeysDTO;
@@ -18,7 +16,7 @@ import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceResponseDTO;
 import it.gov.pagopa.initiative.event.CommandsProducer;
 import it.gov.pagopa.initiative.event.InitiativeProducer;
-import it.gov.pagopa.initiative.exception.InitiativeException;
+import it.gov.pagopa.initiative.exception.custom.*;
 import it.gov.pagopa.initiative.mapper.InitiativeAdditionalDTOsToIOServiceRequestDTOMapper;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.AutomatedCriteria;
@@ -29,11 +27,11 @@ import it.gov.pagopa.initiative.repository.InitiativeRepository;
 import it.gov.pagopa.initiative.utils.AuditUtilities;
 import it.gov.pagopa.initiative.utils.InitiativeUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.InvalidMimeTypeException;
@@ -42,10 +40,12 @@ import org.springframework.web.context.request.RequestContextHolder;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Email.*;
+import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_NOT_VALID_END_DATE;
 
 
 @Service
@@ -63,7 +63,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     private final RankingRestConnector rankingRestConnector;
     private final EncryptRestConnector encryptRestConnector;
     private final DecryptRestConnector decryptRestConnector;
-    private final FileStorageConnector fileStorageConnector;
+    private final InitiativeFileStorageConnector initiativeFileStorageConnector;
     private final EmailNotificationService emailNotificationService;
     private final InitiativeValidationService initiativeValidationService;
     private final InitiativeUtils initiativeUtils;
@@ -84,7 +84,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             OnboardingRestConnector onboardingRestConnector,
             RankingRestConnector rankingRestConnector, EncryptRestConnector encryptRestConnector,
             DecryptRestConnector decryptRestConnector,
-            FileStorageConnector fileStorageConnector,
+            InitiativeFileStorageConnector initiativeFileStorageConnector,
             EmailNotificationService emailNotificationService,
             InitiativeValidationService initiativeValidationService,
             InitiativeUtils initiativeUtils,
@@ -100,7 +100,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         this.rankingRestConnector = rankingRestConnector;
         this.encryptRestConnector = encryptRestConnector;
         this.decryptRestConnector = decryptRestConnector;
-        this.fileStorageConnector = fileStorageConnector;
+        this.initiativeFileStorageConnector = initiativeFileStorageConnector;
         this.emailNotificationService = emailNotificationService;
         this.initiativeValidationService = initiativeValidationService;
         this.initiativeUtils = initiativeUtils;
@@ -117,21 +117,19 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                                 initiative.getStatus().equals(InitiativeConstants.Status.IN_REVISION) ||
                                         initiative.getStatus().equals(InitiativeConstants.Status.TO_CHECK) ||
                                         initiative.getStatus().equals(InitiativeConstants.Status.APPROVED) ||
+                                        initiative.getStatus().equals(InitiativeConstants.Status.CLOSED) ||
                                         initiative.getStatus().equals(InitiativeConstants.Status.PUBLISHED)))
                 .toList() : initiatives;
     }
 
-    public List<Initiative> getInitiativesIssuerList() {
+    public List<Initiative> getPublishedInitiativesList() {
         return initiativeRepository.findByEnabledAndStatus(true, Status.PUBLISHED);
     }
     @Override
     public InitiativeDetailDTO getInitiativeBeneficiaryDetail(String initiativeId, Locale acceptLanguage) {
 
-        Initiative initiativeDetail = initiativeRepository.findByInitiativeIdAndStatusIn(initiativeId, List.of(Status.PUBLISHED, Status.CLOSED)).orElseThrow(() -> new InitiativeException(
-                InitiativeConstants.Exception.NotFound.CODE,
-                String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
-                HttpStatus.NOT_FOUND));
-
+        Initiative initiativeDetail = initiativeRepository.findByInitiativeIdAndStatusIn(initiativeId, List.of(Status.PUBLISHED, Status.CLOSED))
+                .orElseThrow(() -> new InitiativeNotFoundException(InitiativeConstants.Exception.NotFound.INITIATIVE_NOT_FOUND_MESSAGE.formatted(initiativeId)));
 
         return initiativeModelToDTOMapper.toInitiativeDetailDTO(initiativeDetail, acceptLanguage);
 
@@ -165,10 +163,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     @Override
     public Initiative getInitiativeBeneficiaryView(String initiativeId) {
         return initiativeRepository.retrieveInitiativeBeneficiaryView(initiativeId, true)
-                .orElseThrow(() -> new InitiativeException(
-                        InitiativeConstants.Exception.NotFound.CODE,
-                        String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
-                        HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new InitiativeNotFoundException(InitiativeConstants.Exception.NotFound.INITIATIVE_NOT_FOUND_MESSAGE.formatted(initiativeId)));
     }
 
     @Override
@@ -258,12 +253,9 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             //Move this validation in [All Steps validation -> .validateAllWizardSteps()]
             if (initiative.getGeneral().getDescriptionMap().get(Locale.ITALIAN.getLanguage()) == null) {
                 auditUtilities.logInitiativeError(this.getUserId(), initiativeId, organizationId,
-                        InitiativeConstants.Exception.BadRequest.INITIATIVE_DESCRIPTION_LANGUAGE_MESSAGE);
+                        InitiativeConstants.Exception.BadRequest.INITIATIVE_ITALIAN_LANGUAGE_REQUIRED_FOR_DESCRIPTION);
                 performanceLog(startTime, "UPDATE_INITIATIVE_REFUND_RULES");
-                throw new InitiativeException(
-                        InitiativeConstants.Exception.BadRequest.CODE,
-                        InitiativeConstants.Exception.BadRequest.INITIATIVE_DESCRIPTION_LANGUAGE_MESSAGE,
-                        HttpStatus.BAD_REQUEST);
+                throw new InitiativeRequiredLanguageException("Italian language is required for initiative [%s] description".formatted(initiativeId));
             }
             initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
             auditUtilities.logInitiativeInRevision(this.getUserId(), initiativeId, organizationId);
@@ -320,11 +312,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             log.error("[LOGICAL_DELETE_INITIATIVE] - Initiative: {}. Cannot be deleted. Current status is {}.", initiative.getInitiativeId(), initiative.getStatus());
             auditUtilities.logInitiativeError(this.getUserId(), initiativeId, organizationId, "initiative cannot be deleted");
             performanceLog(startTime, DELETE_INITIATIVE_SERVICE);
-            throw new InitiativeException(
-                    InitiativeConstants.Exception.BadRequest.CODE,
-                    String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_CANNOT_BE_DELETED, initiativeId),
-                    HttpStatus.BAD_REQUEST
-            );
+            throw new DeleteInitiativeException("Initiative [%s] with current status [%s] cannot be deleted".formatted(initiativeId,initiative.getStatus()));
         } else {
             initiative.setEnabled(false);
             this.initiativeRepository.save(initiative);
@@ -349,32 +337,39 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
     @Override
     public void isInitiativeAllowedToBeNextStatusThenThrows(Initiative initiative, String nextStatus, String role) {
+        //validation role
         if (InitiativeConstants.Role.PAGOPA_ADMIN.equals(role)) {
             log.info("[UPDATE_TO_{}_STATUS] - Initiative: {} Status: {}. Not processable status", nextStatus, initiative.getInitiativeId(), initiative.getStatus());
             auditUtilities.logInitiativeError(this.getUserId(), initiative.getInitiativeId(), initiative.getOrganizationId(),
-                    String.format(InitiativeConstants.Exception.BadRequest.PERMISSION_NOT_VALID, role));
-            throw new InitiativeException(
-                    InitiativeConstants.Exception.BadRequest.CODE,
-                    String.format(InitiativeConstants.Exception.BadRequest.PERMISSION_NOT_VALID, role),
-                    HttpStatus.BAD_REQUEST);
+                    InitiativeConstants.Exception.BadRequest.INITIATIVE_ADMIN_ROLE_NOT_ALLOWED);
+            throw new AdminPermissionException("Admin permission not allowed for current initiative [%s]".formatted(initiative.getInitiativeId()));
         }
+
+        //validation status
         if (InitiativeConstants.Status.PUBLISHED.equals(nextStatus)) {
             if (!Arrays.asList(InitiativeConstants.Status.Validation.INITIATIVE_ALLOWED_STATES_TO_BECOME_PUBLISHED_ARRAY).contains(initiative.getStatus())) {
                 log.info("[UPDATE_TO_{}_STATUS] - Initiative: {} Status: {}. Not processable status", nextStatus, initiative.getInitiativeId(), initiative.getStatus());
                 auditUtilities.logInitiativeError(this.getUserId(), initiative.getInitiativeId(), initiative.getOrganizationId(),
-                        String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_STATUS_NOT_VALID, initiative.getInitiativeId()));
-                throw new InitiativeException(
-                        InitiativeConstants.Exception.BadRequest.CODE,
-                        String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_STATUS_NOT_VALID, initiative.getInitiativeId()),
-                        HttpStatus.BAD_REQUEST);
+                       InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_VALID);
+                throw new InitiativeStatusNotValidException(
+                        "Initiative [%s] with status [%s] is unprocessable for status not valid".formatted(initiative.getInitiativeId(),initiative.getStatus())
+                );
             }
         } else {
             auditUtilities.logInitiativeError(this.getUserId(), initiative.getInitiativeId(), initiative.getOrganizationId(),
-                    String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_STATUS_NOT_VALID, initiative.getInitiativeId()));
-            throw new InitiativeException(
-                    InitiativeConstants.Exception.BadRequest.CODE,
-                    String.format(InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_STATUS_NOT_VALID, initiative.getInitiativeId()),
-                    HttpStatus.BAD_REQUEST);
+                   InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_VALID);
+            throw new InitiativeStatusNotValidException(
+                    "Initiative [%s] with status [%s] is unprocessable for status not valid".formatted(initiative.getInitiativeId(),initiative.getStatus())
+            );
+        }
+
+        //validation end date
+        LocalDate initiativeEndDate = initiative.getGeneral().getEndDate();
+        if(LocalDate.now().isAfter(initiativeEndDate)){
+            throw new InitiativeDateInvalidException(
+                    INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_NOT_VALID_END_DATE,
+                    "Initiative [%s] unprocessable because the end date [%s] has passed".formatted(initiative.getInitiativeId(),initiativeEndDate)
+            );
         }
     }
 
@@ -390,16 +385,11 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         long startTime = System.currentTimeMillis();
         Initiative initiative = initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(
                         organizationId, initiativeId, true)
-                .orElseThrow(() -> new InitiativeException(
-                        InitiativeConstants.Exception.NotFound.CODE,
-                        String.format(
-                                InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE,
-                                initiativeId),
-                        HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new InitiativeNotFoundException(InitiativeConstants.Exception.NotFound.INITIATIVE_NOT_FOUND_MESSAGE.formatted(initiativeId)));
 
         try {
             this.validate(contentType, fileName);
-            fileStorageConnector.uploadInitiativeLogo(logo, String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE, organizationId, initiativeId, InitiativeConstants.Logo.LOGO_NAME), contentType);
+            initiativeFileStorageConnector.uploadInitiativeLogo(logo, String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE, organizationId, initiativeId, InitiativeConstants.Logo.LOGO_NAME), contentType);
             initiative.getAdditionalInfo().setLogoFileName(fileName);
             LocalDateTime localDateTime = LocalDateTime.now();
             initiative.getAdditionalInfo().setLogoUploadDate(localDateTime);
@@ -409,9 +399,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             return new LogoDTO(fileName, initiativeUtils.createLogoUrl(organizationId, initiativeId), localDateTime);
         } catch (Exception e) {
             performanceLog(startTime, "STORE_INITIATIVE_LOGO");
-            throw new InitiativeException(InternalServerError.CODE,
-                    e.getMessage(),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new InitiativeLogoException("An error occurred during the uploading logo");
         }
     }
 
@@ -433,7 +421,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         if (additionalInfo.getLogoFileName() != null) {
             try {
                 log.info("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Update logo to ServiceIO", initiative.getInitiativeId());
-                ByteArrayOutputStream byteArrayOutputStream = fileStorageConnector.downloadInitiativeLogo(
+                ByteArrayOutputStream byteArrayOutputStream = initiativeFileStorageConnector.downloadInitiativeLogo(
                         initiativeUtils.getPathLogo(initiative.getOrganizationId(),
                                 initiative.getInitiativeId()));
                 ioManageBackEndRestConnector.sendLogoIo(serviceId, LogoIODTO.builder().logo(new String(
@@ -491,20 +479,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     @Override
     public Initiative getInitiativeIdFromServiceId(String serviceId) {
         return initiativeRepository.retrieveByServiceId(serviceId)
-                .orElseThrow(() -> new InitiativeException(
-                        InitiativeConstants.Exception.NotFound.CODE,
-                        String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_ID_BY_SERVICE_ID_MESSAGE, serviceId),
-                        HttpStatus.NOT_FOUND));
-    }
-
-    @Override
-    public InitiativeAdditional getPrimaryAndSecondaryTokenIO(String initiativeId) {
-        Initiative initiative = initiativeRepository.findByInitiativeIdAndEnabled(initiativeId, true)
-                .orElseThrow(() -> new InitiativeException(
-                        InitiativeConstants.Exception.NotFound.CODE,
-                        String.format(InitiativeConstants.Exception.NotFound.PRIMARY_AND_SECONDARY_TOKEN_MESSAGE, initiativeId),
-                        HttpStatus.NOT_FOUND));
-        return initiative.getAdditionalInfo();
+                .orElseThrow(() -> new InitiativeNotFoundException("Initiative with serviceId [%s] not found".formatted(serviceId)));
     }
 
     @Override
@@ -521,10 +496,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                         new CFDTO(cf));
                 userId = encryptedCfDTO.getToken();
             } catch (Exception e) {
-                throw new InitiativeException(
-                        InternalServerError.CODE,
-                        e.getMessage(),
-                        HttpStatus.INTERNAL_SERVER_ERROR);
+                throw new EncryptInvocationException("An error occurred during the encrypt invocation",true,e);
             }
         }
         new ResponseOnboardingDTO();
@@ -536,10 +508,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             log.info("response onbording: " + responseOnboardingDTO);
         } catch (Exception e) {
             auditUtilities.logInitiativeError(this.getUserId(), initiativeId, organizationId, "request for onboarding list failed");
-            throw new InitiativeException(
-                    InternalServerError.CODE,
-                    e.getMessage(),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new OnboardingInvocationException("An error occurred in the microservice onboarding",true,e);
         }
         List<StatusOnboardingDTO> statusOnboardingDTOS = new ArrayList<>();
         for (OnboardingStatusCitizenDTO onboardingStatusCitizenDTO : responseOnboardingDTO.getOnboardingStatusCitizenDTOList()) {
@@ -552,10 +521,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                 statusOnboardingDTOS.add(statusOnboardingDTO);
 
             } catch (Exception e) {
-                throw new InitiativeException(
-                        InternalServerError.CODE,
-                        e.getMessage(),
-                        HttpStatus.INTERNAL_SERVER_ERROR);
+                throw new DecryptInvocationException("An error occurred during the decrypt invocation",true,e);
             }
         }
         auditUtilities.logOnboardingCitizen(this.getUserId(), initiativeId, organizationId);
@@ -570,17 +536,9 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         log.info("start get ranking, initiative: " + initiativeId);
         Initiative initiative = initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(
                         organizationId, initiativeId, true)
-                .orElseThrow(() -> new InitiativeException(
-                        InitiativeConstants.Exception.NotFound.CODE,
-                        String.format(
-                                InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE,
-                                initiativeId),
-                        HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new InitiativeNotFoundException(InitiativeConstants.Exception.NotFound.INITIATIVE_NOT_FOUND_MESSAGE.formatted(initiativeId)));
         if (initiative.getGeneral() != null && !initiative.getGeneral().getRankingEnabled()) {
-            throw new InitiativeException(
-                    InternalServerError.CODE,
-                    InternalServerError.NO_RANKING,
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new InitiativeNoRankingException("Initiative [%s] is without ranking".formatted(initiativeId));
         }
         String userId = null;
         if (beneficiary != null) {
@@ -589,10 +547,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                         new CFDTO(beneficiary));
                 userId = encryptedCfDTO.getToken();
             } catch (Exception e) {
-                throw new InitiativeException(
-                        InternalServerError.CODE,
-                        e.getMessage(),
-                        HttpStatus.INTERNAL_SERVER_ERROR);
+                throw new EncryptInvocationException("An error occurred during the encrypt invocation",true,e);
             }
         }
         RankingPageDTO rankingPageDTO;
@@ -601,10 +556,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             log.info("response ranking: " + rankingPageDTO);
         } catch (Exception e) {
             auditUtilities.logInitiativeError(this.getUserId(), initiativeId, organizationId, "request for ranking list failed");
-            throw new InitiativeException(
-                    InternalServerError.CODE,
-                    e.getMessage(),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new RankingInvocationException("An error occurred in the microservice ranking",true,e);
         }
         List<BeneficiaryRankingDTO> beneficiaryRankingDTOS = new ArrayList<>();
         for (RankingRequestDTO rankingRequestDTO : rankingPageDTO.getContent()) {
@@ -626,10 +578,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                 beneficiaryRankingDTOS.add(beneficiaryRankingDTO);
 
             } catch (Exception e) {
-                throw new InitiativeException(
-                        InternalServerError.CODE,
-                        e.getMessage(),
-                        HttpStatus.INTERNAL_SERVER_ERROR);
+                throw new DecryptInvocationException("An error occurred during the decrypt invocation",true,e);
             }
         }
         auditUtilities.logDetailUser(this.getUserId(), initiativeId, organizationId);
@@ -662,9 +611,10 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                 .build();
         if(!commandsProducer.sendCommand(deleteInitiativeCommand)){
             log.error("[DELETE_INITIATIVE] - Initiative: {}. Something went wrong while sending the message on Commands Queue", initiativeId);
-            throw new InitiativeException(InitiativeConstants.Exception.Publish.InternalServerError.CODE,
-                    String.format(InitiativeConstants.Exception.Publish.InternalServerError.COMMANDS_QUEUE, deleteInitiativeCommand.getEntityId(), deleteInitiativeCommand.getOperationType()),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new CommandProducerException(
+                    "Something went wrong while sending the message with entityId [%s] and operationType [%s] on the Commands Queue"
+                            .formatted(deleteInitiativeCommand.getEntityId(),deleteInitiativeCommand.getOperationType())
+            );
         }
 
         initiativeRepository.deleteById(initiativeId);
@@ -683,11 +633,10 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                 .build();
         if(!commandsProducer.sendCommand(createInitiativeStatistics)){
             log.error("[CREATE_INITIATIVE_STATISTICS] - Initiative: {}. Something went wrong while sending the message on Commands Queue", initiativeId);
-            throw new InitiativeException(InitiativeConstants.Exception.Publish.InternalServerError.CODE,
-                    String.format(InitiativeConstants.Exception.Publish.InternalServerError.COMMANDS_QUEUE,
-                            createInitiativeStatistics.getEntityId(),
-                            createInitiativeStatistics.getOperationType()),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new CommandProducerException(
+                    "Something went wrong while sending the message with entityId [%s] and operationType [%s] on the Commands Queue"
+                            .formatted(createInitiativeStatistics.getEntityId(),createInitiativeStatistics.getOperationType())
+            );
         }
     }
 
@@ -695,19 +644,15 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     public KeysDTO getTokenKeys(String initiativeId) {
         log.info("[GET_SERVICE_IO_TOKEN_KEYS] - Initiative: {}. Getting serviceIO token keys", initiativeId);
         Initiative initiative = initiativeRepository.findById(initiativeId)
-                .orElseThrow(() -> new InitiativeException(
-                        InitiativeConstants.Exception.NotFound.CODE,
-                        String.format(InitiativeConstants.Exception.NotFound.INITIATIVE_BY_INITIATIVE_ID_MESSAGE, initiativeId),
-                        HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new InitiativeNotFoundException(
+                        InitiativeConstants.Exception.NotFound.INITIATIVE_NOT_FOUND_MESSAGE.formatted(initiativeId)
+                ));
         try {
             return ioManageBackEndRestConnector.getServiceKeys(initiative.getAdditionalInfo().getServiceId());
         } catch (Exception e) {
-            throw new InitiativeException(InternalServerError.CODE,
-                        e.getMessage(),
-                        HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new IOBackEndInvocationException("An error occurred during the IO Back-end invocation", true, e);
         }
     }
-
     public void validate(String contentType, String fileName) {
         Assert.notNull(fileName, "file name cannot be null");
 
@@ -716,7 +661,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                     initiativeUtils.getAllowedInitiativeLogoMimeTypes()));
         }
 
-        String fileExtension = Files.getFileExtension(fileName).toLowerCase();
+        String fileExtension = FilenameUtils.getExtension(fileName).toLowerCase();
         if (!initiativeUtils.getAllowedInitiativeLogoExtensions().contains(fileExtension)) {
             throw new IllegalArgumentException(String.format("Invalid file extension \"%s\": allowed only %s", fileExtension,
                     initiativeUtils.getAllowedInitiativeLogoExtensions()));

@@ -2,7 +2,7 @@ package it.gov.pagopa.initiative.constants;
 
 
 import java.util.List;
-
+@SuppressWarnings("java:S1118")
 public class InitiativeConstants {
 
     private InitiativeConstants(){}
@@ -68,59 +68,39 @@ public class InitiativeConstants {
             public static final String SOMETHING_WRONG_WITH_THE_REFUND_TYPE = "Something wrong with the refund type";
         }
 
-        public static final class GeneralError { //500
-            public static final String CODE = BASE_CODE + ".general.error";
-        }
-
         public static final class BadRequest { //400
-            public static final String CODE = BASE_CODE + ".bad.request";
-            public static final String INITIATIVE_BENEFICIARY_RANKING_ENABLED_AUTOMATED_CRITERIA_ORDER_OPERATION_ISEE_EQ_OP_NOT_VALID = "Automated criteria not valid. OrderDirection not feasible. When Ranking enabled, It must be used ISEE only with non 'Equals' operator";
-            public static final String INITIATIVE_BENEFICIARY_RANKING_ENABLED_AUTOMATED_CRITERIA_ORDER_OPERATION_MISSING_NOT_VALID = "Automated criteria not valid. OrderDirection is Missing. Please check it when Ranking is enabled";
-            public static final String INITIATIVE_BENEFICIARY_RANKING_ENABLED_AUTOMATED_CRITERIA_ISEE_MISSING_NOT_VALID = "Automated criteria not valid. ISEE is Missing. Please check it when Ranking is enabled";
-            public static final String INITIATIVE_BENEFICIARY_TYPE_NF_ENABLED_AUTOMATED_CRITERIA_ISEE_MISSING_NOT_VALID = "Automated criteria not valid. ISEE is Missing. Please check it when beneficiary type 'NF' is selected";
-            public static final String INITIATIVE_BENEFICIARY_FIELD_YEAR_VALUE_WRONG = "The value must contain 4 numbers and the year cannot be less than 150 years";
-            public static final String INITIATIVE_STATUS_NOT_IN_REVISION = "The status of initiative [%s] is not IN_REVISION";
-            public static final String INITIATIVE_BY_INITIATIVE_ID_PROPERTIES_NOT_VALID = "Initiative %s properties are not valid for this request";
-            public static final String INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_STATUS_NOT_VALID = "Initiative %s unprocessable for status not valid";
-            public static final String INVALID_LOCALE_FORMAT = "Invalid locale format: %s";
-
-            public static final String INITIATIVE_CANNOT_BE_DELETED = "Initiative %s cannot be deleted";
-            public static final String PERMISSION_NOT_VALID= "Permission not valid for [%s]";
-            public static final String INITIATIVE_DESCRIPTION_LANGUAGE_MESSAGE = "Italian language is required for initiative description";
-            public static final String INITIATIVE_GENERAL_FAMILY_COMPOSITION_MESSAGE = "Family unit composition must be set as 'INPS' or 'ANPR'";
-            public static final String INITIATIVE_GENERAL_FAMILY_COMPOSITION_WRONG_BENEFICIARY_TYPE = "Family unit composition must be unset for this beneficiary type";
-            public static final String INITIATIVE_GENERAL_START_DATE_END_DATE_WRONG = "The startDate and endDate cannot be less than today";
-            public static final String WIZARD_VALIDATION = "Error on Validation caused by: %s";
-            public static final String REWARD_TYPE = "REWARD INVALID";
-            public static final String REFUND_RULE_INVALID = "REFUND RULE INVALID";
-            public static final String ISEE_TYPES_NOT_VALID = "Automated criteria not valid. ISEE typology is missing.";
+            public static final String INITIATIVE_ROLLBACK_TO_PREVIOUS_STATUS = "INITIATIVE_ROLLBACK_TO_PREVIOUS_STATUS";
+            public static final String INITIATIVE_WHITELIST_INVALID_PROPERTIES = "INITIATIVE_WHITELIST_INVALID_PROPERTIES";
+            public static final String INITIATIVE_INVALID_LOCALE_FORMAT = "INITIATIVE_INVALID_LOCALE_FORMAT";
+            public static final String INITIATIVE_ITALIAN_LANGUAGE_REQUIRED_FOR_DESCRIPTION = "INITIATIVE_ITALIAN_LANGUAGE_REQUIRED_FOR_DESCRIPTION";
+            public static final String INITIATIVE_CANNOT_BE_DELETED = "INITIATIVE_CANNOT_BE_DELETED";
+            public static final String INITIATIVE_ADMIN_ROLE_NOT_ALLOWED = "INITIATIVE_ADMIN_ROLE_NOT_ALLOWED";
+            public static final String INITIATIVE_STATUS_NOT_VALID = "INITIATIVE_STATUS_NOT_VALID";
+            public static final String INITIATIVE_AUTOMATED_CRITERIA_NOT_VALID_ORDER_DIRECTION_MISSING = "INITIATIVE_AUTOMATED_CRITERIA_NOT_VALID_ORDER_DIRECTION_MISSING";
+            public static final String INITIATIVE_AUTOMATED_CRITERIA_NOT_VALID_EQUALS_OPERATOR = "INITIATIVE_AUTOMATED_CRITERIA_NOT_VALID_EQUALS_OPERATOR";
+            public static final String INITIATIVE_AUTOMATED_CRITERIA_NOT_VALID_ISEE_MISSING = "INITIATIVE_AUTOMATED_CRITERIA_NOT_VALID_ISEE_MISSING";
+            public static final String INITIATIVE_AUTOMATED_CRITERIA_NOT_VALID_TYPOLOGY_ISEE_MISSING = "INITIATIVE_AUTOMATED_CRITERIA_NOT_VALID_TYPOLOGY_ISEE_MISSING";
+            public static final String INITIATIVE_AUTOMATED_CRITERIA_NOT_VALID_BENEFICIARY_NF_ISEE_MISSING = "INITIATIVE_AUTOMATED_CRITERIA_NOT_VALID_BENEFICIARY_NF_ISEE_MISSING";
+            public static final String INITIATIVE_VALIDATION_WIZARD_VIOLATIONS = "INITIATIVE_VALIDATION_WIZARD_VIOLATIONS";
+            public static final String INITIATIVE_REWARD_RULES_NOT_VALID = "INITIATIVE_REWARD_RULES_NOT_VALID";
+            public static final String INITIATIVE_REFUND_RULES_NOT_VALID = "INITIATIVE_REFUND_RULES_NOT_VALID";
+            public static final String INITIATIVE_FAMILY_UNIT_COMPOSITION_NOT_VALID = "INITIATIVE_FAMILY_UNIT_COMPOSITION_NOT_VALID";
+            public static final String INITIATIVE_START_DATE_AND_END_DATE_NOT_VALID = "INITIATIVE_START_DATE_AND_END_DATE_NOT_VALID";
+            public static final String INITIATIVE_YEAR_VALUE_NOT_VALID = "INITIATIVE_YEAR_VALUE_NOT_VALID";
+            public static final String INITIATIVE_INVALID_REQUEST = "INITIATIVE_INVALID_REQUEST";
+            public static final String INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_NOT_VALID_END_DATE = "INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_NOT_VALID_END_DATE";
         }
-        public static final class Publish {
-            public static final String PUBLISH_CODE = BASE_CODE + ".published";
-            public static final class BadRequest { //400
-                public static final String CODE = PUBLISH_CODE + ".bad.request";
-                public static final String INTEGRATION_FAILED = "Something gone wrong while notify Initiative for publishing";
-            }
-            public static final class InternalServerError{
-                public static final String CODE = PUBLISH_CODE + ".internal.server.error";
-                public static final String COMMANDS_QUEUE = "Something went wrong while sending the message with entityId %s and operationType %s on the Commands Queue";
-            }
 
-        }
         public static final class NotFound { //404
-            public static final String CODE = BASE_CODE + ".not.found";
-            public static final String INITIATIVE_LIST_BY_ORGANIZATION_MESSAGE = "List of Initiatives with organizationId %s not found.";
-            public static final String INITIATIVE_BY_INITIATIVE_ID_MESSAGE = "Initiative with initiativeId %s not found.";
-            public static final String INITIATIVE_ID_BY_SERVICE_ID_MESSAGE = "Initiative with serviceId %s not found.";
-            public static final String PRIMARY_AND_SECONDARY_TOKEN_MESSAGE = "Primary and secondary tokenIO not found for initiativeId %s.";
+            public static final String INITIATIVE_NOT_FOUND = "INITIATIVE_NOT_FOUND";
+            public static final String INITIATIVE_NOT_FOUND_MESSAGE = "Initiative with initiativeId [%s] not found";
         }
         public static final class UnprocessableEntity { //422
             public static final String CODE = BASE_CODE + ".unprocessable.entity";
         }
         public static final class InternalServerError { //500 (5xx)
-            public static final String CODE = BASE_CODE + ".internal-server-error";
-            public static final String NO_RANKING = "Initiative without ranking";
-            public static final String INTEGRATION_CODE = CODE + ".integration";
+            public static final String INITIATIVE_LOGO_ERROR = "INITIATIVE_LOGO_ERROR";
+            public static final String INITIATIVE_GENERIC_ERROR = "INITIATIVE_GENERIC_ERROR";
         }
     }
 }

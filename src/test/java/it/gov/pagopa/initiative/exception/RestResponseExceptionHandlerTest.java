@@ -25,7 +25,7 @@ class RestResponseExceptionHandlerTest {
         ErrorDTO body = actualHandleHttpMessageNotReadableExceptionResult.getBody();
         assert body != null;
         assertEquals("https://example.org/example", body.getMessage());
-        assertEquals("it.gov.pagopa.initiative.bad.request", body.getCode());
+        assertEquals("INITIATIVE_INVALID_REQUEST", body.getCode());
     }
 
     @Test
@@ -40,7 +40,7 @@ class RestResponseExceptionHandlerTest {
         ErrorDTO body = actualHandleHttpMessageNotReadableExceptionResult.getBody();
         assert body != null;
         assertEquals("https://example.org/example", body.getMessage());
-        assertEquals("it.gov.pagopa.initiative.bad.request", body.getCode());
+        assertEquals("INITIATIVE_INVALID_REQUEST", body.getCode());
     }
 }
 

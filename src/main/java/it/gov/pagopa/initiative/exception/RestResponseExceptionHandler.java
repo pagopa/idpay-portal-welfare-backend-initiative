@@ -1,7 +1,7 @@
 package it.gov.pagopa.initiative.exception;
 
 import it.gov.pagopa.common.web.dto.ErrorDTO;
-import it.gov.pagopa.initiative.constants.InitiativeConstants;
+import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.Ordered;
@@ -22,6 +22,6 @@ public class RestResponseExceptionHandler {
         log.error(ex.getMessage());
         String localizedMessage = StringUtils.split(ex.getMostSpecificCause().getLocalizedMessage(), System.lineSeparator())[0];
         return new ResponseEntity<>(
-                new ErrorDTO(InitiativeConstants.Exception.BadRequest.CODE, localizedMessage), HttpStatus.BAD_REQUEST);
+                new ErrorDTO(Exception.BadRequest.INITIATIVE_INVALID_REQUEST, localizedMessage), HttpStatus.BAD_REQUEST);
     }
 }
