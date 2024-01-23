@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
+import jakarta.validation.constraints.AssertTrue;
 import lombok.*;
 
 import jakarta.validation.constraints.NotBlank;
@@ -58,4 +59,14 @@ public class ChannelDTO   {
       return null;
     }
   }
+
+  private static final String VALID_WEB = "^https://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
+  @AssertTrue(message = "Invalid contact format for the web type", groups = ValidationApiEnabledGroup.class)
+  public boolean isContactValid() {
+    if (type == TypeEnum.WEB)
+      return contact.matches(VALID_WEB);
+    else
+      return true;
+  }
+
 }
