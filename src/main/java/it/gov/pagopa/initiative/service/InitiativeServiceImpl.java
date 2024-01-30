@@ -1,5 +1,6 @@
 package it.gov.pagopa.initiative.service;
 
+import ch.qos.logback.core.joran.spi.ElementSelector;
 import feign.FeignException;
 import it.gov.pagopa.initiative.connector.decrypt.DecryptRestConnector;
 import it.gov.pagopa.initiative.connector.encrypt.EncryptRestConnector;
@@ -38,6 +39,10 @@ import org.springframework.util.InvalidMimeTypeException;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 
+import javax.management.InvalidAttributeValueException;
+import javax.management.relation.InvalidRoleValueException;
+import javax.management.relation.RoleNotFoundException;
+import javax.management.relation.RoleUnresolved;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.time.LocalDate;
@@ -280,12 +285,20 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     @Override
     public void updateInitiativeApprovedStatus(String organizationId, String initiativeId, String role) {
         long startTime = System.currentTimeMillis();
-        Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
+        //Check role is not admin otherwise exception will be thrown
+        isRoleNotPagoPaThenThrow(role);
+        //Retrieve initiative, if not found exception will be thrown
+        Initiative initiative = initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(organizationId,initiativeId,true)
+                .orElseThrow(() -> new InitiativeNotFoundException(InitiativeConstants.Exception.NotFound.INITIATIVE_NOT_FOUND_MESSAGE.formatted(initiativeId)));
+        //Check initiative status is revision otherwise  exception will be thrown
         isInitiativeStatusNotInRevisionThenThrow(initiative, InitiativeConstants.Status.APPROVED);
+        //Update initiative status to approved
         initiative.setStatus(InitiativeConstants.Status.APPROVED);
+        //DB update
         this.initiativeRepository.save(initiative);
         auditUtilities.logInitiativeApproved(this.getUserId(), initiativeId, organizationId);
         log.info("[UPDATE_TO_APPROVED_STATUS] - Initiative: {}. Status successfully changed", initiative.getInitiativeId());
+        //Is tried to notify the organization of the update by email
         this.sendEmailToCurrentOrg(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
         performanceLog(startTime, "UPDATE_INITIATIVE_APPROVED");
     }
@@ -293,15 +306,32 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     @Override
     public void updateInitiativeToCheckStatus(String organizationId, String initiativeId, String role) {
         long startTime = System.currentTimeMillis();
-        Initiative initiative = initiativeValidationService.getInitiative(organizationId, initiativeId, role);
+        //Check role is not admin otherwise exception will be thrown
+        isRoleNotPagoPaThenThrow(role);
+        //Retrieve initiative, if not found exception will be thrown
+        Initiative initiative = initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(organizationId,initiativeId,true)
+                .orElseThrow(() -> new InitiativeNotFoundException(InitiativeConstants.Exception.NotFound.INITIATIVE_NOT_FOUND_MESSAGE.formatted(initiativeId)));
+        //Check initiative status is revision otherwise exception will be thrown
         isInitiativeStatusNotInRevisionThenThrow(initiative, InitiativeConstants.Status.TO_CHECK);
+        //Update initiative status to to_check
         initiative.setStatus(InitiativeConstants.Status.TO_CHECK);
+        //DB update
         this.initiativeRepository.save(initiative);
         auditUtilities.logInitiativeToCheck(this.getUserId(), initiativeId, organizationId);
         log.info("[UPDATE_TO_CHECK_STATUS] - Initiative: {}. Status successfully changed", initiative.getInitiativeId());
+        //Is tried to notify the organization of the update by email
         this.sendEmailToCurrentOrg(initiative, TEMPLATE_NAME_EMAIL_INITIATIVE_STATUS, SUBJECT_CHANGE_STATE);
         performanceLog(startTime, "UPDATE_INITIATIVE_TO_CHECK");
     }
+
+    private void isRoleNotPagoPaThenThrow(String role) {
+        //Check role is not admin otherwise exception will be thrown
+        if(!role.equals(InitiativeConstants.Role.PAGOPA_ADMIN)){
+            log.info("[ROLE_EXCEPTION] - Role: {}. Not allowed to this operation", role);
+            throw new OrgPermissionException("Organization permission not allowed to this operation");
+        }
+    }
+
 
     @Override
     public void logicallyDeleteInitiative(String organizationId, String initiativeId, String role) {

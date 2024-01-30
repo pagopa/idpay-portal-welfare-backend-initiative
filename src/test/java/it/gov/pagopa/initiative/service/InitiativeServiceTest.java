@@ -912,29 +912,28 @@ class InitiativeServiceTest {
 
     @Test
     void givenStatusIN_REVISION_updateInitiativeApprovedStatus_thenStatusIsChangedWithSuccess() {
+        //Build Dummy Initiatives
         Initiative initiative = createStep4Initiative();
         initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
-
-        //Instruct the initiativeValidationService Mock to return Dummy Initiatives
-        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(initiative);
+        //Instruct the initiativeRepository Mock to return Dummy Initiatives
+        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true))
+                .thenReturn(Optional.of(initiative));
         //Try to call the Real Service (which is using the instructed Repo)
-        initiativeService.updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
-        // you are expecting initiativeValidationService to be called once with correct param
-        verify(initiativeValidationService, times(1)).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
+        initiativeService.updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID, PAGOPA_ADMIN);
+        //You are expecting initiativeRepository to be called once with correct param
+        verify(initiativeRepository, times(1))
+                .findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true);
     }
 
     @Test
-    void givenStatusIN_REVISION_updateInitiativeApprovedStatus_thenThrowInitiativeException() {
-        Initiative initiative = createStep4Initiative();
-        initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
-
-        //doThrow InitiativeException for getInitiative method
+    void updateInitiativeApprovedStatus_throwInitiativeException() {
+        //DoThrow InitiativeNotFoundException for findByOrganizationIdAndInitiativeIdAndEnabled method
         doThrow(new InitiativeNotFoundException(NotFound.INITIATIVE_NOT_FOUND,
                 NotFound.INITIATIVE_NOT_FOUND_MESSAGE.formatted(INITIATIVE_ID)))
-                .when(initiativeValidationService).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
-
-        //prepare Executable with invocation of the method on your system under test
-        Executable executable = () -> initiativeService.updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
+                .when(initiativeRepository).findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true);
+        //Prepare Executable with invocation of the method on your system under test
+        Executable executable = () -> initiativeService.updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID, PAGOPA_ADMIN);
+        //You are expecting InitiativeNotFoundException to be thrown with correct attribute
         InitiativeNotFoundException exception = assertThrows(InitiativeNotFoundException.class, executable);
         assertEquals(NotFound.INITIATIVE_NOT_FOUND, exception.getCode());
         assertEquals(NotFound.INITIATIVE_NOT_FOUND_MESSAGE.formatted(INITIATIVE_ID), exception.getMessage());
@@ -942,14 +941,15 @@ class InitiativeServiceTest {
 
     @Test
     void givenStatusTO_CHECK_updateInitiativeApprovedStatus_whenStatusNotValid_thenThrowInitiativeException() {
+        //Build Dummy Initiatives
         Initiative initiative = createStep4Initiative();
         initiative.setStatus(InitiativeConstants.Status.TO_CHECK);
-
-        //Instruct the initiativeValidationService Mock to return Dummy Initiatives
-        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(initiative);
-
-        //prepare Executable with invocation of the method on your system under test
-        Executable executable = () -> initiativeService.updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
+        //Instruct the initiativeRepository Mock to return Dummy Initiatives
+        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true))
+                .thenReturn(Optional.of(initiative));
+        //Prepare Executable with invocation of the method on your system under test
+        Executable executable = () -> initiativeService.updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID, PAGOPA_ADMIN);
+        //You are expecting InitiativeStatusNotValidException to be thrown with correct attribute
         InitiativeStatusNotValidException exception = Assertions.assertThrows(InitiativeStatusNotValidException.class, executable);
         assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_VALID, exception.getCode());
         assertEquals("The status of initiative [%s] is not IN_REVISION".formatted(INITIATIVE_ID), exception.getMessage());
@@ -957,20 +957,25 @@ class InitiativeServiceTest {
 
     @Test
     void updateInitiativeApprovedStatus_emailException() {
+        //Build Dummy Initiatives
         Initiative step4Initiative = createStep4Initiative();
         step4Initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
-
-        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step4Initiative);
-
+        //Instruct the initiativeRepository Mock to return Dummy Initiatives
+        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true))
+                .thenReturn(Optional.of(step4Initiative));
+        //DoThrow FeignException for sendInitiativeToCurrentOrganization method
         Request request =
                 Request.create(Request.HttpMethod.PUT, "url", new HashMap<>(), null, new RequestTemplate());
         Mockito.doThrow(new FeignException.BadRequest("", request, new byte[0], null))
                 .when(emailNotificationService).sendInitiativeToCurrentOrganization(Mockito.any(), Mockito.anyString(),
                         Mockito.anyString());
+        //Execute the method on your system under test
+        //You are expecting FeignException to be caught otherwise the test fail
         try {
-            initiativeService.updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
+            initiativeService.updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID, PAGOPA_ADMIN);
         } catch (FeignException e) {
-            Assertions.fail();}
+            Assertions.fail();
+        }
     }
 
     @Test
@@ -1049,48 +1054,71 @@ class InitiativeServiceTest {
 
     @Test
     void updateInitiativeStatusToCheck_thenStatusIsUpdatedWithSuccess() {
+        //Build Dummy Initiatives
         Initiative step4Initiative = createStep4Initiative();
         step4Initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
-
-        //Instruct the initiativeValidationService Mock to return Dummy Initiatives
-        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step4Initiative);
-        //Try to call the Real Service (which is using the instructed Repo)
-        initiativeService.updateInitiativeToCheckStatus(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
-        // you are expecting initiativeValidationService to be called once with correct param
-        verify(initiativeValidationService, times(1)).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
+        //Instruct the initiativeRepository Mock to return Dummy Initiatives
+        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true))
+                .thenReturn(Optional.of(step4Initiative));
+        //Execute the method on your system under test
+        initiativeService.updateInitiativeToCheckStatus(ORGANIZATION_ID, INITIATIVE_ID, PAGOPA_ADMIN);
+        //You are expecting initiativeValidationService to be called once with correct param
+        verify(initiativeRepository, times(1))
+                .findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true);
     }
 
     @Test
     void updateInitiativeStatusToCheck_thenThrowInitiativeExceptionStatusIsNotInRevision() {
-        Initiative step4Initiative = createStep4Initiative();
-        step4Initiative.setStatus(InitiativeConstants.Status.TO_CHECK);
-
-        //doThrow InitiativeException for getInitiative method
+        //DoThrow InitiativeException for getInitiative method
         doThrow(new InitiativeNotFoundException(NotFound.INITIATIVE_NOT_FOUND,
                 NotFound.INITIATIVE_NOT_FOUND_MESSAGE.formatted(INITIATIVE_ID)))
-                .when(initiativeValidationService).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
-
-        //prepare Executable with invocation of the method on your system under test
-        Executable executable = () -> initiativeService.updateInitiativeToCheckStatus(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
+                .when(initiativeRepository).findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true);
+        //Prepare Executable with invocation of the method on your system under test
+        Executable executable = () -> initiativeService.updateInitiativeToCheckStatus(ORGANIZATION_ID, INITIATIVE_ID, PAGOPA_ADMIN);
+        //You are expecting InitiativeNotFoundException to be thrown with correct attribute
         InitiativeNotFoundException exception = assertThrows(InitiativeNotFoundException.class, executable);
         assertEquals(NotFound.INITIATIVE_NOT_FOUND, exception.getCode());
         assertEquals(NotFound.INITIATIVE_NOT_FOUND_MESSAGE.formatted(INITIATIVE_ID), exception.getMessage());
     }
 
     @Test
+    void updateInitiativeStatusToCheck_roleException() {
+        //Prepare Executable with invocation of the method on your system under test
+        Executable executable = () -> initiativeService.updateInitiativeToCheckStatus(ORGANIZATION_ID, INITIATIVE_ID, ADMIN);
+        //You are expecting OrgPermissionException to be thrown with correct attribute
+        OrgPermissionException exception = assertThrows(OrgPermissionException.class, executable);
+        assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_ORG_ROLE_NOT_ALLOWED, exception.getCode());
+        assertEquals("Organization permission not allowed to this operation",exception.getMessage());
+    }
+
+    @Test
+    void updateInitiativeApprovedStatus_roleException() {
+        //Prepare Executable with invocation of the method on your system under test
+        Executable executable = () -> initiativeService.updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID, ADMIN);
+        //You are expecting OrgPermissionException to be thrown with correct attribute
+        OrgPermissionException exception = assertThrows(OrgPermissionException.class, executable);
+        assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_ORG_ROLE_NOT_ALLOWED, exception.getCode());
+        assertEquals("Organization permission not allowed to this operation",exception.getMessage());
+    }
+
+    @Test
     void updateInitiativeStatusToCheck_emailException() {
+        //Build Dummy Initiatives
         Initiative step4Initiative = createStep4Initiative();
         step4Initiative.setStatus(InitiativeConstants.Status.IN_REVISION);
-
-        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step4Initiative);
-
+        //Instruct the initiativeRepository Mock to return Dummy Initiatives
+        when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true))
+                .thenReturn(Optional.of(step4Initiative));
+        //DoThrow FeignException for sendInitiativeToCurrentOrganization method
         Request request =
                 Request.create(Request.HttpMethod.PUT, "url", new HashMap<>(), null, new RequestTemplate());
         Mockito.doThrow(new FeignException.BadRequest("", request, new byte[0], null))
                 .when(emailNotificationService).sendInitiativeToCurrentOrganization(Mockito.any(), Mockito.anyString(),
                         Mockito.anyString());
+        //Execute the method on your system under test
+        //You are expecting FeignException to be caught otherwise the test fail
         try {
-            initiativeService.updateInitiativeToCheckStatus(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
+            initiativeService.updateInitiativeToCheckStatus(ORGANIZATION_ID, INITIATIVE_ID, PAGOPA_ADMIN);
         } catch (FeignException e) {
             Assertions.fail();}
     }
