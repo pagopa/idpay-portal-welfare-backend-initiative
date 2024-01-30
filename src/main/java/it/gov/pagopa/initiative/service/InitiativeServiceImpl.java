@@ -1,6 +1,5 @@
 package it.gov.pagopa.initiative.service;
 
-import ch.qos.logback.core.joran.spi.ElementSelector;
 import feign.FeignException;
 import it.gov.pagopa.initiative.connector.decrypt.DecryptRestConnector;
 import it.gov.pagopa.initiative.connector.encrypt.EncryptRestConnector;
@@ -39,10 +38,6 @@ import org.springframework.util.InvalidMimeTypeException;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 
-import javax.management.InvalidAttributeValueException;
-import javax.management.relation.InvalidRoleValueException;
-import javax.management.relation.RoleNotFoundException;
-import javax.management.relation.RoleUnresolved;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.time.LocalDate;
