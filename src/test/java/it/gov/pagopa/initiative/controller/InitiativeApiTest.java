@@ -59,6 +59,7 @@ import it.gov.pagopa.initiative.dto.rule.trx.RewardLimitsDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.ThresholdDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.TrxCountDTO;
 import it.gov.pagopa.initiative.exception.custom.InitiativeStatusNotValidException;
+import it.gov.pagopa.initiative.exception.custom.OrgPermissionException;
 import it.gov.pagopa.initiative.mapper.InitiativeDTOsToModelMapper;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.AutomatedCriteria;
@@ -822,6 +823,46 @@ class InitiativeApiTest {
                         .content(objectMapper.writeValueAsString(initiativeOrganizationInfoDTO))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    void updateInitiativeStatusApproved_roleException() throws Exception {
+        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = new InitiativeOrganizationInfoDTO();
+        initiativeOrganizationInfoDTO.setOrganizationName(ORGANIZATION_NAME);
+        initiativeOrganizationInfoDTO.setOrganizationUserRole(ROLE);
+
+        doThrow(new OrgPermissionException("Message"))
+                .when(initiativeService)
+                .updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
+
+        mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_STATUS_APPROVED_URL, ORGANIZATION_ID, INITIATIVE_ID))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(initiativeOrganizationInfoDTO))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andDo(print())
+                .andReturn();
+
+
+    }
+
+    @Test
+    void updateInitiativeStatusToCheck_roleException() throws Exception {
+        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = new InitiativeOrganizationInfoDTO();
+        initiativeOrganizationInfoDTO.setOrganizationName(ORGANIZATION_NAME);
+        initiativeOrganizationInfoDTO.setOrganizationUserRole(ROLE);
+
+        doThrow(new OrgPermissionException("Message"))
+                .when(initiativeService)
+                .updateInitiativeToCheckStatus(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
+
+        mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_CHECK_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(initiativeOrganizationInfoDTO))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andDo(print())
                 .andReturn();
     }

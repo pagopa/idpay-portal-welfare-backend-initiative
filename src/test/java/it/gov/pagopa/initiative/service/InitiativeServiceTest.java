@@ -1087,7 +1087,7 @@ class InitiativeServiceTest {
         Executable executable = () -> initiativeService.updateInitiativeToCheckStatus(ORGANIZATION_ID, INITIATIVE_ID, ADMIN);
         //You are expecting OrgPermissionException to be thrown with correct attribute
         OrgPermissionException exception = assertThrows(OrgPermissionException.class, executable);
-        assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_ORG_ROLE_NOT_ALLOWED, exception.getCode());
+        assertEquals(InitiativeConstants.Exception.Forbidden.INITIATIVE_ORG_ROLE_NOT_ALLOWED, exception.getCode());
         assertEquals("Organization permission not allowed to this operation",exception.getMessage());
     }
 
@@ -1097,7 +1097,7 @@ class InitiativeServiceTest {
         Executable executable = () -> initiativeService.updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID, ADMIN);
         //You are expecting OrgPermissionException to be thrown with correct attribute
         OrgPermissionException exception = assertThrows(OrgPermissionException.class, executable);
-        assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_ORG_ROLE_NOT_ALLOWED, exception.getCode());
+        assertEquals(InitiativeConstants.Exception.Forbidden.INITIATIVE_ORG_ROLE_NOT_ALLOWED, exception.getCode());
         assertEquals("Organization permission not allowed to this operation",exception.getMessage());
     }
 
