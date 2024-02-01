@@ -90,8 +90,7 @@
 													"\r",
 													"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 													"\r",
-													"pm.collectionVariables.set('channel_type', 'web');\r",
-													"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+													"pm.collectionVariables.set('channel_type', 'web');\r"
 												],
 												"type": "text/javascript"
 											}
@@ -142,7 +141,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+											"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -1044,9 +1043,15 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"exec": [
-													""
-												],
+                                              "exec": [
+                                                "let moment = require('moment');\r",
+                                                "const now = String(moment().format('DD-MM-YYYY hh:mm'));\r",
+                                                "const serviceName = 'Test funzionali App IO Initiative with criteria ' + now;\r",
+                                                "pm.collectionVariables.set('serviceName', serviceName);\r",
+                                                "pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
+                                                "\r",
+                                                "pm.collectionVariables.set('channel_type', 'web');\r"
+                                              ],
 												"type": "text/javascript"
 											}
 										},
@@ -1087,7 +1092,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+											"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -2131,8 +2136,7 @@
 																	"\r",
 																	"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 																	"\r",
-																	"pm.collectionVariables.set('channel_type', 'web');\r",
-																	"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+																	"pm.collectionVariables.set('channel_type', 'web');\r"
 																],
 																"type": "text/javascript"
 															}
@@ -2178,7 +2182,7 @@
 														],
 														"body": {
 															"mode": "raw",
-															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 															"options": {
 																"raw": {
 																	"language": "json"
@@ -2275,8 +2279,7 @@
 																	"pm.collectionVariables.set('serviceName', serviceName);\r",
 																	"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 																	"\r",
-																	"pm.collectionVariables.set('channel_type', 'web');\r",
-																	"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+																	"pm.collectionVariables.set('channel_type', 'web');\r"
 																],
 																"type": "text/javascript"
 															}
@@ -2322,7 +2325,7 @@
 														],
 														"body": {
 															"mode": "raw",
-															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"\",\n    \"serviceScope\": \"\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"\",\n    \"serviceScope\": \"\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 															"options": {
 																"raw": {
 																	"language": "json"
@@ -2425,8 +2428,7 @@
 																	"pm.collectionVariables.set('serviceName', serviceName);\r",
 																	"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 																	"\r",
-																	"pm.collectionVariables.set('channel_type', 'web');\r",
-																	"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+																	"pm.collectionVariables.set('channel_type', 'web');\r"
 																],
 																"type": "text/javascript"
 															}
@@ -2477,7 +2479,7 @@
 														],
 														"body": {
 															"mode": "raw",
-															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 															"options": {
 																"raw": {
 																	"language": "json"
@@ -2710,8 +2712,7 @@
 																	"pm.collectionVariables.set('serviceName', serviceName);\r",
 																	"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 																	"\r",
-																	"pm.collectionVariables.set('channel_type', 'web');\r",
-																	"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+																	"pm.collectionVariables.set('channel_type', 'web');\r"
 																],
 																"type": "text/javascript"
 															}
@@ -2762,7 +2763,7 @@
 														],
 														"body": {
 															"mode": "raw",
-															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 															"options": {
 																"raw": {
 																	"language": "json"
@@ -2995,8 +2996,7 @@
 																	"pm.collectionVariables.set('serviceName', serviceName);\r",
 																	"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 																	"\r",
-																	"pm.collectionVariables.set('channel_type', 'web');\r",
-																	"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+																	"pm.collectionVariables.set('channel_type', 'web');\r"
 																],
 																"type": "text/javascript"
 															}
@@ -3047,7 +3047,7 @@
 														],
 														"body": {
 															"mode": "raw",
-															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 															"options": {
 																"raw": {
 																	"language": "json"
@@ -3285,8 +3285,7 @@
 																	"pm.collectionVariables.set('serviceName', serviceName);\r",
 																	"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 																	"\r",
-																	"pm.collectionVariables.set('channel_type', 'web');\r",
-																	"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+																	"pm.collectionVariables.set('channel_type', 'web');\r"
 																],
 																"type": "text/javascript"
 															}
@@ -3337,7 +3336,7 @@
 														],
 														"body": {
 															"mode": "raw",
-															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 															"options": {
 																"raw": {
 																	"language": "json"
@@ -3660,8 +3659,7 @@
 																	"pm.collectionVariables.set('serviceName', serviceName);\r",
 																	"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 																	"\r",
-																	"pm.collectionVariables.set('channel_type', 'web');\r",
-																	"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+																	"pm.collectionVariables.set('channel_type', 'web');\r"
 																],
 																"type": "text/javascript"
 															}
@@ -3712,7 +3710,7 @@
 														],
 														"body": {
 															"mode": "raw",
-															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 															"options": {
 																"raw": {
 																	"language": "json"
@@ -4035,8 +4033,7 @@
 																	"pm.collectionVariables.set('serviceName', serviceName);\r",
 																	"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 																	"\r",
-																	"pm.collectionVariables.set('channel_type', 'web');\r",
-																	"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+																	"pm.collectionVariables.set('channel_type', 'web');\r"
 																],
 																"type": "text/javascript"
 															}
@@ -4087,7 +4084,7 @@
 														],
 														"body": {
 															"mode": "raw",
-															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 															"options": {
 																"raw": {
 																	"language": "json"
@@ -4410,8 +4407,7 @@
 																	"pm.collectionVariables.set('serviceName', serviceName);\r",
 																	"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 																	"\r",
-																	"pm.collectionVariables.set('channel_type', 'web');\r",
-																	"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+																	"pm.collectionVariables.set('channel_type', 'web');\r"
 																],
 																"type": "text/javascript"
 															}
@@ -4462,7 +4458,7 @@
 														],
 														"body": {
 															"mode": "raw",
-															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 															"options": {
 																"raw": {
 																	"language": "json"
@@ -4784,8 +4780,7 @@
 																	"pm.collectionVariables.set('serviceName', serviceName);\r",
 																	"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 																	"\r",
-																	"pm.collectionVariables.set('channel_type', 'web');\r",
-																	"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+																	"pm.collectionVariables.set('channel_type', 'web');\r"
 																],
 																"type": "text/javascript"
 															}
@@ -4836,7 +4831,7 @@
 														],
 														"body": {
 															"mode": "raw",
-															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 															"options": {
 																"raw": {
 																	"language": "json"
@@ -5164,8 +5159,7 @@
 																	"pm.collectionVariables.set('serviceName', serviceName);\r",
 																	"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 																	"\r",
-																	"pm.collectionVariables.set('channel_type', 'web');\r",
-																	"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+																	"pm.collectionVariables.set('channel_type', 'web');\r"
 																],
 																"type": "text/javascript"
 															}
@@ -5216,7 +5210,7 @@
 														],
 														"body": {
 															"mode": "raw",
-															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 															"options": {
 																"raw": {
 																	"language": "json"
@@ -5621,8 +5615,7 @@
 																	"pm.collectionVariables.set('serviceName', serviceName);\r",
 																	"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 																	"\r",
-																	"pm.collectionVariables.set('channel_type', 'web');\r",
-																	"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+																	"pm.collectionVariables.set('channel_type', 'web');\r"
 																],
 																"type": "text/javascript"
 															}
@@ -5673,7 +5666,7 @@
 														],
 														"body": {
 															"mode": "raw",
-															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 															"options": {
 																"raw": {
 																	"language": "json"
@@ -6078,8 +6071,7 @@
 																	"pm.collectionVariables.set('serviceName', serviceName);\r",
 																	"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 																	"\r",
-																	"pm.collectionVariables.set('channel_type', 'web');\r",
-																	"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+																	"pm.collectionVariables.set('channel_type', 'web');\r"
 																],
 																"type": "text/javascript"
 															}
@@ -6130,7 +6122,7 @@
 														],
 														"body": {
 															"mode": "raw",
-															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 															"options": {
 																"raw": {
 																	"language": "json"
@@ -6536,8 +6528,7 @@
 																	"\r",
 																	"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 																	"\r",
-																	"pm.collectionVariables.set('channel_type', 'web');\r",
-																	"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+																	"pm.collectionVariables.set('channel_type', 'web');\r"
 																],
 																"type": "text/javascript"
 															}
@@ -6588,7 +6579,7 @@
 														],
 														"body": {
 															"mode": "raw",
-															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 															"options": {
 																"raw": {
 																	"language": "json"
@@ -7021,8 +7012,7 @@
 																			"pm.collectionVariables.set('serviceName', serviceName);\r",
 																			"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 																			"\r",
-																			"pm.collectionVariables.set('channel_type', 'web');\r",
-																			"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+																			"pm.collectionVariables.set('channel_type', 'web');\r"
 																		],
 																		"type": "text/javascript"
 																	}
@@ -7073,7 +7063,7 @@
 																],
 																"body": {
 																	"mode": "raw",
-																	"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+																	"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 																	"options": {
 																		"raw": {
 																			"language": "json"
@@ -7647,8 +7637,7 @@
 															"pm.collectionVariables.set('serviceName', serviceName);\r",
 															"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 															"\r",
-															"pm.collectionVariables.set('channel_type', 'web');\r",
-															"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+															"pm.collectionVariables.set('channel_type', 'web');\r"
 														],
 														"type": "text/javascript"
 													}
@@ -7699,7 +7688,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+													"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -8382,8 +8371,7 @@
 																	"pm.collectionVariables.set('serviceName', serviceName);\r",
 																	"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 																	"\r",
-																	"pm.collectionVariables.set('channel_type', 'web');\r",
-																	"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+																	"pm.collectionVariables.set('channel_type', 'web');\r"
 																],
 																"type": "text/javascript"
 															}
@@ -8434,7 +8422,7 @@
 														],
 														"body": {
 															"mode": "raw",
-															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 															"options": {
 																"raw": {
 																	"language": "json"
@@ -9063,9 +9051,15 @@
 												{
 													"listen": "prerequest",
 													"script": {
-														"exec": [
-															""
-														],
+                                                      "exec": [
+                                                        "let moment = require('moment');\r",
+                                                        "const now = String(moment().format('DD-MM-YYYY hh:mm'));\r",
+                                                        "const serviceName = 'Test funzionali App IO Initiative with criteria ' + now;\r",
+                                                        "pm.collectionVariables.set('serviceName', serviceName);\r",
+                                                        "pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
+                                                        "\r",
+                                                        "pm.collectionVariables.set('channel_type', 'web');\r"
+                                                      ],
 														"type": "text/javascript"
 													}
 												},
@@ -9106,7 +9100,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+													"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -9444,8 +9438,7 @@
 																	"pm.collectionVariables.set('serviceName', serviceName);\r",
 																	"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 																	"\r",
-																	"pm.collectionVariables.set('channel_type', 'web');\r",
-																	"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+																	"pm.collectionVariables.set('channel_type', 'web');\r"
 																],
 																"type": "text/javascript"
 															}
@@ -9496,7 +9489,7 @@
 														],
 														"body": {
 															"mode": "raw",
-															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 															"options": {
 																"raw": {
 																	"language": "json"
@@ -10460,8 +10453,7 @@
 																	"pm.collectionVariables.set('serviceName', serviceName);\r",
 																	"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 																	"\r",
-																	"pm.collectionVariables.set('channel_type', 'web');\r",
-																	"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+																	"pm.collectionVariables.set('channel_type', 'web');\r"
 																],
 																"type": "text/javascript"
 															}
@@ -10512,7 +10504,7 @@
 														],
 														"body": {
 															"mode": "raw",
-															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 															"options": {
 																"raw": {
 																	"language": "json"
@@ -11196,8 +11188,7 @@
 													"pm.collectionVariables.set('serviceName', serviceName);\r",
 													"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 													"\r",
-													"pm.collectionVariables.set('channel_type', 'web');\r",
-													"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+													"pm.collectionVariables.set('channel_type', 'web');\r"
 												],
 												"type": "text/javascript"
 											}
@@ -11248,7 +11239,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+											"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -12178,8 +12169,7 @@
 													"pm.collectionVariables.set('serviceName', serviceName);\r",
 													"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 													"\r",
-													"pm.collectionVariables.set('channel_type', 'web');\r",
-													"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+													"pm.collectionVariables.set('channel_type', 'web');\r"
 												],
 												"type": "text/javascript"
 											}
@@ -12221,7 +12211,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+											"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -13335,8 +13325,7 @@
 															"pm.collectionVariables.set('serviceName', serviceName);\r",
 															"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 															"\r",
-															"pm.collectionVariables.set('channel_type', 'web');\r",
-															"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+															"pm.collectionVariables.set('channel_type', 'web');\r"
 														],
 														"type": "text/javascript"
 													}
@@ -13387,7 +13376,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+													"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -14563,8 +14552,7 @@
 																	"pm.collectionVariables.set('serviceName', serviceName);\r",
 																	"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 																	"\r",
-																	"pm.collectionVariables.set('channel_type', 'web');\r",
-																	"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+																	"pm.collectionVariables.set('channel_type', 'web');\r"
 																],
 																"type": "text/javascript"
 															}
@@ -14615,7 +14603,7 @@
 														],
 														"body": {
 															"mode": "raw",
-															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 															"options": {
 																"raw": {
 																	"language": "json"
@@ -19756,8 +19744,7 @@
 																	"pm.collectionVariables.set('serviceName', serviceName);\r",
 																	"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 																	"\r",
-																	"pm.collectionVariables.set('channel_type', 'web');\r",
-																	"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+																	"pm.collectionVariables.set('channel_type', 'web');\r"
 																],
 																"type": "text/javascript"
 															}
@@ -19808,7 +19795,7 @@
 														],
 														"body": {
 															"mode": "raw",
-															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 															"options": {
 																"raw": {
 																	"language": "json"
@@ -25130,8 +25117,7 @@
 																	"pm.collectionVariables.set('serviceName', serviceName);\r",
 																	"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 																	"\r",
-																	"pm.collectionVariables.set('channel_type', 'web');\r",
-																	"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+																	"pm.collectionVariables.set('channel_type', 'web');\r"
 																],
 																"type": "text/javascript"
 															}
@@ -25182,7 +25168,7 @@
 														],
 														"body": {
 															"mode": "raw",
-															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 															"options": {
 																"raw": {
 																	"language": "json"
@@ -25480,8 +25466,7 @@
 																	"pm.collectionVariables.set('serviceName', serviceName);\r",
 																	"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 																	"\r",
-																	"pm.collectionVariables.set('channel_type', 'web');\r",
-																	"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+																	"pm.collectionVariables.set('channel_type', 'web');\r"
 																],
 																"type": "text/javascript"
 															}
@@ -25532,7 +25517,7 @@
 														],
 														"body": {
 															"mode": "raw",
-															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 															"options": {
 																"raw": {
 																	"language": "json"
@@ -25830,8 +25815,7 @@
 																	"pm.collectionVariables.set('serviceName', serviceName);\r",
 																	"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 																	"\r",
-																	"pm.collectionVariables.set('channel_type', 'web');\r",
-																	"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+																	"pm.collectionVariables.set('channel_type', 'web');\r"
 																],
 																"type": "text/javascript"
 															}
@@ -25882,7 +25866,7 @@
 														],
 														"body": {
 															"mode": "raw",
-															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 															"options": {
 																"raw": {
 																	"language": "json"
@@ -26180,8 +26164,7 @@
 																	"pm.collectionVariables.set('serviceName', serviceName);\r",
 																	"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 																	"\r",
-																	"pm.collectionVariables.set('channel_type', 'web');\r",
-																	"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+																	"pm.collectionVariables.set('channel_type', 'web');\r"
 																],
 																"type": "text/javascript"
 															}
@@ -26232,7 +26215,7 @@
 														],
 														"body": {
 															"mode": "raw",
-															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 															"options": {
 																"raw": {
 																	"language": "json"
@@ -27178,8 +27161,7 @@
 																	"pm.collectionVariables.set('serviceName', serviceName);\r",
 																	"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 																	"\r",
-																	"pm.collectionVariables.set('channel_type', 'web');\r",
-																	"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+																	"pm.collectionVariables.set('channel_type', 'web');\r"
 																],
 																"type": "text/javascript"
 															}
@@ -27230,7 +27212,7 @@
 														],
 														"body": {
 															"mode": "raw",
-															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 															"options": {
 																"raw": {
 																	"language": "json"
@@ -28614,8 +28596,7 @@
 																			"pm.collectionVariables.set('serviceName', serviceName);\r",
 																			"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 																			"\r",
-																			"pm.collectionVariables.set('channel_type', 'web');\r",
-																			"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+																			"pm.collectionVariables.set('channel_type', 'web');\r"
 																		],
 																		"type": "text/javascript"
 																	}
@@ -28666,7 +28647,7 @@
 																],
 																"body": {
 																	"mode": "raw",
-																	"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+																	"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 																	"options": {
 																		"raw": {
 																			"language": "json"
@@ -33824,8 +33805,7 @@
 																			"pm.collectionVariables.set('serviceName', serviceName);\r",
 																			"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 																			"\r",
-																			"pm.collectionVariables.set('channel_type', 'web');\r",
-																			"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+																			"pm.collectionVariables.set('channel_type', 'web');\r"
 																		],
 																		"type": "text/javascript"
 																	}
@@ -33876,7 +33856,7 @@
 																],
 																"body": {
 																	"mode": "raw",
-																	"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+																	"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 																	"options": {
 																		"raw": {
 																			"language": "json"
@@ -39021,8 +39001,7 @@
 															"\r",
 															"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 															"\r",
-															"pm.collectionVariables.set('channel_type', 'web');\r",
-															"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+															"pm.collectionVariables.set('channel_type', 'web');\r"
 														],
 														"type": "text/javascript"
 													}
@@ -39073,7 +39052,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+													"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -40404,8 +40383,7 @@
 															"pm.collectionVariables.set('serviceName', serviceName);\r",
 															"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 															"\r",
-															"pm.collectionVariables.set('channel_type', 'web');\r",
-															"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+															"pm.collectionVariables.set('channel_type', 'web');\r"
 														],
 														"type": "text/javascript"
 													}
@@ -40456,7 +40434,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+													"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -41814,8 +41792,7 @@
 															"pm.collectionVariables.set('serviceName', serviceName);\r",
 															"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 															"\r",
-															"pm.collectionVariables.set('channel_type', 'web');\r",
-															"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+															"pm.collectionVariables.set('channel_type', 'web');\r"
 														],
 														"type": "text/javascript"
 													}
@@ -41866,7 +41843,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+													"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -42516,8 +42493,7 @@
 															"pm.collectionVariables.set('serviceName', serviceName);\r",
 															"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 															"\r",
-															"pm.collectionVariables.set('channel_type', 'web');\r",
-															"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+															"pm.collectionVariables.set('channel_type', 'web');\r"
 														],
 														"type": "text/javascript"
 													}
@@ -42568,7 +42544,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+													"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -43315,8 +43291,7 @@
 															"pm.collectionVariables.set('serviceName', serviceName);\r",
 															"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 															"\r",
-															"pm.collectionVariables.set('channel_type', 'web');\r",
-															"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+															"pm.collectionVariables.set('channel_type', 'web');\r"
 														],
 														"type": "text/javascript"
 													}
@@ -43367,7 +43342,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+													"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -43611,8 +43586,7 @@
 															"pm.collectionVariables.set('serviceName', serviceName);\r",
 															"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 															"\r",
-															"pm.collectionVariables.set('channel_type', 'web');\r",
-															"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+															"pm.collectionVariables.set('channel_type', 'web');\r"
 														],
 														"type": "text/javascript"
 													}
@@ -43663,7 +43637,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+													"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -43907,8 +43881,7 @@
 															"pm.collectionVariables.set('serviceName', serviceName);\r",
 															"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 															"\r",
-															"pm.collectionVariables.set('channel_type', 'web');\r",
-															"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+															"pm.collectionVariables.set('channel_type', 'web');\r"
 														],
 														"type": "text/javascript"
 													}
@@ -43959,7 +43932,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+													"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -44203,8 +44176,7 @@
 															"pm.collectionVariables.set('serviceName', serviceName);\r",
 															"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 															"\r",
-															"pm.collectionVariables.set('channel_type', 'web');\r",
-															"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+															"pm.collectionVariables.set('channel_type', 'web');\r"
 														],
 														"type": "text/javascript"
 													}
@@ -44255,7 +44227,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+													"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -44565,8 +44537,7 @@
 															"pm.collectionVariables.set('serviceName', serviceName);\r",
 															"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 															"\r",
-															"pm.collectionVariables.set('channel_type', 'web');\r",
-															"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+															"pm.collectionVariables.set('channel_type', 'web');\r"
 														],
 														"type": "text/javascript"
 													}
@@ -44617,7 +44588,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+													"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -45850,8 +45821,7 @@
 																			"pm.collectionVariables.set('serviceName', serviceName);\r",
 																			"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 																			"\r",
-																			"pm.collectionVariables.set('channel_type', 'web');\r",
-																			"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+																			"pm.collectionVariables.set('channel_type', 'web');\r"
 																		],
 																		"type": "text/javascript"
 																	}
@@ -45902,7 +45872,7 @@
 																],
 																"body": {
 																	"mode": "raw",
-																	"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+																	"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 																	"options": {
 																		"raw": {
 																			"language": "json"
@@ -47355,8 +47325,7 @@
 																	"\r",
 																	"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 																	"\r",
-																	"pm.collectionVariables.set('channel_type', 'web');\r",
-																	"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+																	"pm.collectionVariables.set('channel_type', 'web');\r"
 																],
 																"type": "text/javascript"
 															}
@@ -47407,7 +47376,7 @@
 														],
 														"body": {
 															"mode": "raw",
-															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 															"options": {
 																"raw": {
 																	"language": "json"
@@ -49321,7 +49290,7 @@
 											},
 											{
 												"key": "Fiscal-Code",
-												"value": "{{CF_1}}",
+												"value": "{{CF_fake}}",
 												"type": "text"
 											}
 										],
@@ -50159,8 +50128,7 @@
 																	"\r",
 																	"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomLoremSentence}}'));\r",
 																	"\r",
-																	"pm.collectionVariables.set('channel_type', 'web');\r",
-																	"pm.collectionVariables.set('channel_contact', pm.variables.replaceIn('{{$randomUrl}}'));"
+																	"pm.collectionVariables.set('channel_type', 'web');\r"
 																],
 																"type": "text/javascript"
 															}
@@ -50211,7 +50179,7 @@
 														],
 														"body": {
 															"mode": "raw",
-															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"{{channel_contact}}\"\n        }\n    ]\n}",
+															"raw": "{\n    \"serviceIO\": true,\n    \"serviceName\": \"{{serviceName}}\",\n    \"serviceScope\": \"LOCAL\",\n    \"description\": \"{{description}}\",\n    \"privacyLink\": \"https://www.google.it\",\n    \"tcLink\": \"https://www.google.com\",\n    \"channels\": [\n        {\n            \"type\": \"{{channel_type}}\",\n            \"contact\": \"https://www.google.com\"\n        }\n    ]\n}",
 															"options": {
 																"raw": {
 																	"language": "json"
@@ -52117,7 +52085,7 @@
 											},
 											{
 												"key": "Fiscal-Code",
-												"value": "{{CF_1}}",
+												"value": "{{CF_fake}}",
 												"type": "text"
 											}
 										],

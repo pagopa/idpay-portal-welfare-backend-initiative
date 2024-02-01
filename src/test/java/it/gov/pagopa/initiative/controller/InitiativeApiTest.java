@@ -59,6 +59,7 @@ import it.gov.pagopa.initiative.dto.rule.trx.RewardLimitsDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.ThresholdDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.TrxCountDTO;
 import it.gov.pagopa.initiative.exception.custom.InitiativeStatusNotValidException;
+import it.gov.pagopa.initiative.exception.custom.OrgPermissionException;
 import it.gov.pagopa.initiative.mapper.InitiativeDTOsToModelMapper;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.AutomatedCriteria;
@@ -408,7 +409,7 @@ class InitiativeApiTest {
     @Test
     void saveInitiativeServiceInfo_statusCreated() throws Exception {
         objectMapper.registerModule(new JavaTimeModule());
-//        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        //objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
         //create Dummy Initiative
         Initiative step1Initiative = createStep1Initiative();
@@ -425,6 +426,48 @@ class InitiativeApiTest {
                         .content(objectMapper.writeValueAsString(initiativeAdditionalDTO))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    void saveInitiativeServiceInfo_WebUrlContactValid() throws Exception {
+        objectMapper.registerModule(new JavaTimeModule());
+
+        Initiative step1Initiative = createStep1Initiative();
+        step1Initiative.getAdditionalInfo().getChannels().get(0).setType(Channel.TypeEnum.WEB);
+        step1Initiative.getAdditionalInfo().getChannels().get(0).setContact("https://www.google.it");
+
+        InitiativeAdditionalDTO initiativeAdditionalDTO = createStep1InitiativeAdditionalDTO();
+        initiativeAdditionalDTO.getChannels().get(0).setType(ChannelDTO.TypeEnum.WEB);
+        initiativeAdditionalDTO.getChannels().get(0).setContact("https://www.google.it");
+
+        when(initiativeService.insertInitiative(step1Initiative, ORGANIZATION_ID, ORGANIZATION_NAME, ROLE)).thenReturn(step1Initiative);
+
+        when(initiativeDTOsToModelMapper.toInitiative(initiativeAdditionalDTO)).thenReturn(step1Initiative);
+
+        mvc.perform(MockMvcRequestBuilders.post(BASE_URL + String.format(POST_INITIATIVE_ADDITIONAL_INFO_URL, ORGANIZATION_ID))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(initiativeAdditionalDTO))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    void saveInitiativeServiceInfo_WebUrlContactNotValid() throws Exception {
+        objectMapper.registerModule(new JavaTimeModule());
+
+        InitiativeAdditionalDTO initiativeAdditionalDTO = createStep1InitiativeAdditionalDTO();
+        initiativeAdditionalDTO.getChannels().get(0).setType(ChannelDTO.TypeEnum.WEB);
+        initiativeAdditionalDTO.getChannels().get(0).setContact("http://www.google.it");
+
+        mvc.perform(MockMvcRequestBuilders.post(BASE_URL + String.format(POST_INITIATIVE_ADDITIONAL_INFO_URL, ORGANIZATION_ID))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(initiativeAdditionalDTO))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andDo(print())
                 .andReturn();
     }
@@ -780,6 +823,46 @@ class InitiativeApiTest {
                         .content(objectMapper.writeValueAsString(initiativeOrganizationInfoDTO))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    void updateInitiativeStatusApproved_roleException() throws Exception {
+        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = new InitiativeOrganizationInfoDTO();
+        initiativeOrganizationInfoDTO.setOrganizationName(ORGANIZATION_NAME);
+        initiativeOrganizationInfoDTO.setOrganizationUserRole(ROLE);
+
+        doThrow(new OrgPermissionException("Message"))
+                .when(initiativeService)
+                .updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
+
+        mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_STATUS_APPROVED_URL, ORGANIZATION_ID, INITIATIVE_ID))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(initiativeOrganizationInfoDTO))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andDo(print())
+                .andReturn();
+
+
+    }
+
+    @Test
+    void updateInitiativeStatusToCheck_roleException() throws Exception {
+        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = new InitiativeOrganizationInfoDTO();
+        initiativeOrganizationInfoDTO.setOrganizationName(ORGANIZATION_NAME);
+        initiativeOrganizationInfoDTO.setOrganizationUserRole(ROLE);
+
+        doThrow(new OrgPermissionException("Message"))
+                .when(initiativeService)
+                .updateInitiativeToCheckStatus(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
+
+        mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_CHECK_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(initiativeOrganizationInfoDTO))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andDo(print())
                 .andReturn();
     }
