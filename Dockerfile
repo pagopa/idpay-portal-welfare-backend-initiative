@@ -28,3 +28,4 @@ RUN chown -R runner:runner /app
 USER 10000
 
 ENTRYPOINT ["java","-jar","/app/app.jar"]
+
