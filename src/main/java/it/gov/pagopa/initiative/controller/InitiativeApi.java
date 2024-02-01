@@ -13,6 +13,7 @@ import it.gov.pagopa.common.web.dto.ErrorDTO;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.io.service.KeysDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
+import it.gov.pagopa.initiative.utils.validator.OrderValidationURLGroup;
 import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -114,7 +115,7 @@ public interface InitiativeApi {
             consumes = {"application/json"})
     ResponseEntity<InitiativeDTO> saveInitiativeServiceInfo(
             @PathVariable("organizationId") String organizationId,
-            @Parameter(in = ParameterIn.DEFAULT, description = "Unique identifier of the subscribed initiative, IBAN of the citizen", schema = @Schema()) @RequestBody @Validated(ValidationApiEnabledGroup.class) InitiativeAdditionalDTO body);
+            @Parameter(in = ParameterIn.DEFAULT, description = "Unique identifier of the subscribed initiative, IBAN of the citizen", schema = @Schema()) @RequestBody @Validated(OrderValidationURLGroup.class) InitiativeAdditionalDTO body);
 
   @Operation(summary = "Update the additional info of the initiative", description = "", security = {
       @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})

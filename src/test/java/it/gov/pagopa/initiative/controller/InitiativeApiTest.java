@@ -430,6 +430,70 @@ class InitiativeApiTest {
     }
 
     @Test
+    void saveInitiativeServiceInfo_errorLink() throws Exception {
+        objectMapper.registerModule(new JavaTimeModule());
+
+        InitiativeAdditionalDTO initiativeAdditionalDTO = createStep1InitiativeAdditionalDTO();
+
+        initiativeAdditionalDTO.setPrivacyLink("http://www.google.it");
+        initiativeAdditionalDTO.setTcLink("http://www.google.it");
+
+        mvc.perform(MockMvcRequestBuilders.post(BASE_URL + String.format(POST_INITIATIVE_ADDITIONAL_INFO_URL, ORGANIZATION_ID))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(initiativeAdditionalDTO))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    void saveInitiativeServiceInfo_errorEmail() throws Exception {
+        objectMapper.registerModule(new JavaTimeModule());
+
+        InitiativeAdditionalDTO initiativeAdditionalDTO = createStep1InitiativeAdditionalDTO();
+
+        List<ChannelDTO> channelDTOS = new ArrayList<>();
+
+        ChannelDTO channelDTO = new ChannelDTO();
+        channelDTO.setType(ChannelDTO.TypeEnum.EMAIL);
+        channelDTO.setContact("usernamedomain.com");
+        channelDTOS.add(channelDTO);
+        initiativeAdditionalDTO.setChannels(channelDTOS);
+
+        mvc.perform(MockMvcRequestBuilders.post(BASE_URL + String.format(POST_INITIATIVE_ADDITIONAL_INFO_URL, ORGANIZATION_ID))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(initiativeAdditionalDTO))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    void saveInitiativeServiceInfo_errorMobile() throws Exception {
+        objectMapper.registerModule(new JavaTimeModule());
+
+        InitiativeAdditionalDTO initiativeAdditionalDTO = createStep1InitiativeAdditionalDTO();
+
+        List<ChannelDTO> channelDTOS = new ArrayList<>();
+
+        ChannelDTO channelDTO = new ChannelDTO();
+        channelDTO.setType(ChannelDTO.TypeEnum.MOBILE);
+        channelDTO.setContact("3363g");
+        channelDTOS.add(channelDTO);
+        initiativeAdditionalDTO.setChannels(channelDTOS);
+
+        mvc.perform(MockMvcRequestBuilders.post(BASE_URL + String.format(POST_INITIATIVE_ADDITIONAL_INFO_URL, ORGANIZATION_ID))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(initiativeAdditionalDTO))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
     void updateInitiativeGeneralInfo_statusNoContent() throws Exception {
         objectMapper.registerModule(new JavaTimeModule());
 
@@ -1337,9 +1401,20 @@ class InitiativeApiTest {
         initiativeAdditionalDTO.setTcLink("https://www.google.it");
         ChannelDTO channelDTO = new ChannelDTO();
         channelDTO.setType(ChannelDTO.TypeEnum.EMAIL);
-        channelDTO.setContact("contact");
+        channelDTO.setContact("username@domain.com");
         List<ChannelDTO> channelDTOS = new ArrayList<>();
         channelDTOS.add(channelDTO);
+
+        ChannelDTO channelDTOURL = new ChannelDTO();
+        channelDTOURL.setType(ChannelDTO.TypeEnum.WEB);
+        channelDTOURL.setContact("https://www.google.it");
+        channelDTOS.add(channelDTOURL);
+
+        ChannelDTO channelDTOmobile = new ChannelDTO();
+        channelDTOmobile.setType(ChannelDTO.TypeEnum.MOBILE);
+        channelDTOmobile.setContact("+39333333333");
+        channelDTOS.add(channelDTOmobile);
+
         initiativeAdditionalDTO.setChannels(channelDTOS);
         return initiativeAdditionalDTO;
     }
