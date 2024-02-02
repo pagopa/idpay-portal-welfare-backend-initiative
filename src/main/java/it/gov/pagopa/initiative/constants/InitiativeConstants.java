@@ -74,6 +74,7 @@ public class InitiativeConstants {
             public static final String INITIATIVE_INVALID_LOCALE_FORMAT = "INITIATIVE_INVALID_LOCALE_FORMAT";
             public static final String INITIATIVE_ITALIAN_LANGUAGE_REQUIRED_FOR_DESCRIPTION = "INITIATIVE_ITALIAN_LANGUAGE_REQUIRED_FOR_DESCRIPTION";
             public static final String INITIATIVE_CANNOT_BE_DELETED = "INITIATIVE_CANNOT_BE_DELETED";
+
             public static final String INITIATIVE_ADMIN_ROLE_NOT_ALLOWED = "INITIATIVE_ADMIN_ROLE_NOT_ALLOWED";
             public static final String INITIATIVE_STATUS_NOT_VALID = "INITIATIVE_STATUS_NOT_VALID";
             public static final String INITIATIVE_AUTOMATED_CRITERIA_NOT_VALID_ORDER_DIRECTION_MISSING = "INITIATIVE_AUTOMATED_CRITERIA_NOT_VALID_ORDER_DIRECTION_MISSING";
@@ -89,6 +90,10 @@ public class InitiativeConstants {
             public static final String INITIATIVE_YEAR_VALUE_NOT_VALID = "INITIATIVE_YEAR_VALUE_NOT_VALID";
             public static final String INITIATIVE_INVALID_REQUEST = "INITIATIVE_INVALID_REQUEST";
             public static final String INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_NOT_VALID_END_DATE = "INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_NOT_VALID_END_DATE";
+        }
+
+        public static final class Forbidden { //403
+            public static final String INITIATIVE_ORG_ROLE_NOT_ALLOWED = "INITIATIVE_ORGANIZATION_ROLE_NOT_ALLOWED";
         }
 
         public static final class NotFound { //404

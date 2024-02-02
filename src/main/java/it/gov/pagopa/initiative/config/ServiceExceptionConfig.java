@@ -27,6 +27,9 @@ public class ServiceExceptionConfig {
         exceptionMap.put(InitiativeDateInvalidException.class, HttpStatus.BAD_REQUEST);
         exceptionMap.put(InitiativeYearValueException.class, HttpStatus.BAD_REQUEST);
 
+        //Forbidden
+        exceptionMap.put(OrgPermissionException.class, HttpStatus.FORBIDDEN);
+
         // NotFound
         exceptionMap.put(InitiativeNotFoundException.class, HttpStatus.NOT_FOUND);
 
