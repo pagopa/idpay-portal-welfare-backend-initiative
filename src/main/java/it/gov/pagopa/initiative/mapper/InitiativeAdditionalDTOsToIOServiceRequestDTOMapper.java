@@ -2,8 +2,8 @@ package it.gov.pagopa.initiative.mapper;
 
 import it.gov.pagopa.initiative.dto.InitiativeOrganizationInfoDTO;
 import it.gov.pagopa.initiative.dto.io.service.OrganizationDTO;
-import it.gov.pagopa.initiative.dto.io.service.ServiceMetadataDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
+import it.gov.pagopa.initiative.dto.io.service.ServiceRequestMetadataDTO;
 import it.gov.pagopa.initiative.model.Channel;
 import it.gov.pagopa.initiative.model.InitiativeAdditional;
 import org.apache.commons.lang3.StringUtils;
@@ -30,13 +30,14 @@ public class InitiativeAdditionalDTOsToIOServiceRequestDTOMapper {
 
     public ServiceRequestDTO toServiceRequestDTO(InitiativeAdditional initiativeAdditional, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO){
         Map<Channel.TypeEnum, String> channelMap = initiativeAdditional.getChannels().stream().collect(Collectors.toMap(Channel::getType, Channel::getContact));
-        ServiceMetadataDTO serviceMetadataDTO = ServiceMetadataDTO.builder()
+        ServiceRequestMetadataDTO serviceMetadataDTO = ServiceRequestMetadataDTO.builder()
                 .email(channelMap.get(Channel.TypeEnum.EMAIL))
                 .phone(channelMap.get(Channel.TypeEnum.MOBILE))
                 .supportUrl(channelMap.get(Channel.TypeEnum.WEB))
                 .privacyUrl(initiativeAdditional.getPrivacyLink())
                 .tosUrl(initiativeAdditional.getTcLink())
                 .scope(initiativeAdditional.getServiceScope().name())
+                .topicId(0)
                 .build();
         OrganizationDTO organizationDTO = OrganizationDTO.builder()
                 .departmentName(StringUtils.isNotBlank(initiativeOrganizationInfoDTO.getOrganizationName()) ? initiativeOrganizationInfoDTO.getOrganizationName() : productDepartmentName)

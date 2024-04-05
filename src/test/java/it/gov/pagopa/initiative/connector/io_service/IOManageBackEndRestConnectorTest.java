@@ -43,6 +43,10 @@ class IOManageBackEndRestConnectorTest {
     private static final String PRIMARY_KEY = "primaryKey";
     private static final String SECONDARY_KEY = "secondaryKey";
 
+    private static final Integer TOPIC_ID = 0;
+
+    private static final TopicDTO TOPIC = new TopicDTO(TOPIC_ID,"Altro");
+
     @Autowired
     IOManageBackEndRestConnector ioManageBackEndRestConnector;
 
@@ -70,7 +74,7 @@ class IOManageBackEndRestConnectorTest {
 
 
     private ServiceRequestDTO createServiceRequestDTO() {
-        ServiceMetadataDTO serviceMetadataDTO = createServiceMetadataDTO();
+        ServiceRequestMetadataDTO serviceMetadataDTO = createServiceRequestMetadataDTO();
         return ServiceRequestDTO.builder()
                 .serviceName(SERVICE_NAME)
                 .description(DESCRIPTION)
@@ -79,14 +83,15 @@ class IOManageBackEndRestConnectorTest {
                 .build();
     }
 
-    private ServiceMetadataDTO createServiceMetadataDTO() {
-        return ServiceMetadataDTO.builder()
+    private ServiceRequestMetadataDTO createServiceRequestMetadataDTO() {
+        return ServiceRequestMetadataDTO.builder()
                 .email(EMAIL)
                 .phone(PHONE)
                 .supportUrl(SUPPORT_URL)
                 .privacyUrl(PRIVACY_URL)
                 .tosUrl(TOS_URL)
                 .scope(SCOPE)
+                .topicId(TOPIC_ID)
                 .build();
     }
 
@@ -98,13 +103,24 @@ class IOManageBackEndRestConnectorTest {
                 .build();
     }
     private ServiceResponseDTO createServiceResponseDTO() {
-        ServiceMetadataDTO serviceMetadataDTO = createServiceMetadataDTO();
+        ServiceResponseMetadataDTO serviceMetadataDTO = createServiceResponseMetadataDTO();
         return ServiceResponseDTO.builder()
                 .id(SERVICE_ID)
                 .serviceName(SERVICE_NAME)
-                .description(DESCRIPTION)
                 .organization(createOrganizationDTO())
                 .serviceMetadata(serviceMetadataDTO)
+                .build();
+    }
+
+    private ServiceResponseMetadataDTO createServiceResponseMetadataDTO() {
+        return ServiceResponseMetadataDTO.builder()
+                .email(EMAIL)
+                .phone(PHONE)
+                .supportUrl(SUPPORT_URL)
+                .privacyUrl(PRIVACY_URL)
+                .tosUrl(TOS_URL)
+                .scope(SCOPE)
+                .topic(TOPIC)
                 .build();
     }
 
@@ -114,6 +130,7 @@ class IOManageBackEndRestConnectorTest {
                 .secondaryKey(SECONDARY_KEY)
                 .build();
     }
+
 
     @Test
     void testSendLogoIo() {

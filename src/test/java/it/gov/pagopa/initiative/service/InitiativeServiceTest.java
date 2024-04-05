@@ -105,6 +105,9 @@ class InitiativeServiceTest {
     private static final String FILE_NAME = "logo.png";
     public static final String API_KEY_CLIENT_ID = "apiKeyClientId";
     public static final String API_KEY_CLIENT_ASSERTION = "apiKeyClientAssertion";
+    private static final Integer TOPIC_ID = 0;
+    private static final TopicDTO TOPIC = new TopicDTO(TOPIC_ID,"Altro");
+
 
     @Autowired
     InitiativeService initiativeService;
@@ -1702,7 +1705,7 @@ class InitiativeServiceTest {
     }
 
     private ServiceRequestDTO createServiceRequestDTOnotValid() {
-        ServiceMetadataDTO serviceMetadataDTO = createServiceMetadataDTO();
+        ServiceRequestMetadataDTO serviceMetadataDTO = createServiceRequestMetadataDTO();
         return ServiceRequestDTO.builder()
                 .serviceMetadata(serviceMetadataDTO)
                 .serviceName(SERVICE_NAME)
@@ -1712,23 +1715,24 @@ class InitiativeServiceTest {
     }
 
     private ServiceRequestDTO createServiceRequestDTO() {
-        ServiceMetadataDTO serviceMetadataDTO = createServiceMetadataDTO();
+        ServiceRequestMetadataDTO serviceMetadataDTO = createServiceRequestMetadataDTO();
         return ServiceRequestDTO.builder()
-                .serviceMetadata(serviceMetadataDTO)
                 .serviceName(SERVICE_NAME)
                 .description(DESCRIPTION)
                 .organization(createOrganizationDTO())
+                .serviceMetadata(serviceMetadataDTO)
                 .build();
     }
 
-    private ServiceMetadataDTO createServiceMetadataDTO() {
-        return ServiceMetadataDTO.builder()
+    private ServiceRequestMetadataDTO createServiceRequestMetadataDTO() {
+        return ServiceRequestMetadataDTO.builder()
                 .email(EMAIL)
                 .phone(PHONE)
                 .supportUrl(SUPPORT_URL)
                 .privacyUrl(PRIVACY_URL)
                 .tosUrl(TOS_URL)
                 .scope(SCOPE)
+                .topicId(TOPIC_ID)
                 .build();
     }
 
@@ -1739,10 +1743,25 @@ class InitiativeServiceTest {
                 .organizationFiscalCode(ORGANIZATION_VAT)
                 .build();
     }
-
     private ServiceResponseDTO createServiceResponseDTO() {
+        ServiceResponseMetadataDTO serviceMetadataDTO = createServiceResponseMetadataDTO();
         return ServiceResponseDTO.builder()
                 .id(SERVICE_ID)
+                .serviceName(SERVICE_NAME)
+                .organization(createOrganizationDTO())
+                .serviceMetadata(serviceMetadataDTO)
+                .build();
+    }
+
+    private ServiceResponseMetadataDTO createServiceResponseMetadataDTO() {
+        return ServiceResponseMetadataDTO.builder()
+                .email(EMAIL)
+                .phone(PHONE)
+                .supportUrl(SUPPORT_URL)
+                .privacyUrl(PRIVACY_URL)
+                .tosUrl(TOS_URL)
+                .scope(SCOPE)
+                .topic(TOPIC)
                 .build();
     }
 
