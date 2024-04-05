@@ -2,8 +2,8 @@ package it.gov.pagopa.initiative.mapper;
 
 import it.gov.pagopa.initiative.dto.InitiativeOrganizationInfoDTO;
 import it.gov.pagopa.initiative.dto.io.service.OrganizationDTO;
-import it.gov.pagopa.initiative.dto.io.service.ServiceMetadataDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
+import it.gov.pagopa.initiative.dto.io.service.ServiceRequestMetadataDTO;
 import it.gov.pagopa.initiative.model.Channel;
 import it.gov.pagopa.initiative.model.InitiativeAdditional;
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 //        InitiativeAdditionalDTOsToIOServiceRequestDTOMapper.class})
 class InitiativeAdditionalDTOsToIOServiceRequestDTOMapperTest {
 
+
     InitiativeAdditionalDTOsToIOServiceRequestDTOMapper initiativeAdditionalDTOsToIOServiceRequestDTOMapper;
 
     private static final String ORGANIZATION_NAME = "organizationName";
@@ -38,7 +39,7 @@ class InitiativeAdditionalDTOsToIOServiceRequestDTOMapperTest {
     private static final String SCOPE = "LOCAL";
     private static final String SERVICE_NAME = "serviceName";
     private static final String PRODUCT_DEPARTMENT_NAME = "productDepartmentName";
-
+    private static final Integer TOPIC_ID =0 ;
     private ServiceRequestDTO serviceRequestDTOexpected;
     private List<String> authorizedRecipients;
 
@@ -92,7 +93,7 @@ class InitiativeAdditionalDTOsToIOServiceRequestDTOMapperTest {
     }
 
     private ServiceRequestDTO createServiceRequestDTOexpected(String organizationName, List<String> authorizedRecipients) {
-        ServiceMetadataDTO serviceMetadataDTO = createServiceMetadataDTO();
+        ServiceRequestMetadataDTO serviceMetadataDTO = createServiceRequestMetadataDTO();
         ServiceRequestDTO.ServiceRequestDTOBuilder serviceRequestDTOBuilder = ServiceRequestDTO.builder()
                 .serviceMetadata(serviceMetadataDTO)
                 .serviceName(SERVICE_NAME)
@@ -109,12 +110,13 @@ class InitiativeAdditionalDTOsToIOServiceRequestDTOMapperTest {
                 .build();
     }
 
-    private ServiceMetadataDTO createServiceMetadataDTO() {
-        return ServiceMetadataDTO.builder()
+    private ServiceRequestMetadataDTO createServiceRequestMetadataDTO() {
+        return ServiceRequestMetadataDTO.builder()
                 .supportUrl(SUPPORT_URL)
                 .privacyUrl(PRIVACY_URL)
                 .tosUrl(TOS_URL)
                 .scope(SCOPE)
+                .topicId(TOPIC_ID)
                 .build();
     }
 

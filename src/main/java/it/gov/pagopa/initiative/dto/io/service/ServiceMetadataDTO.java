@@ -2,6 +2,7 @@ package it.gov.pagopa.initiative.dto.io.service;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 /**
  * ServiceMetadata
@@ -10,7 +11,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
-@Builder
+@SuperBuilder(toBuilder = true)
 public class ServiceMetadataDTO {
   @JsonProperty("web_url")
   private String webUrl;
