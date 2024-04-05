@@ -65,6 +65,9 @@ class IOManageBackEndFeignRestClientTest {
     private static final String PRODUCT_DEPARTMENT_NAME = "productDepartmentName";
     private static final String PRIMARY_KEY = "primaryKey";
     private static final String SECONDARY_KEY = "secondaryKey";
+    private static final Integer TOPIC_ID = 0;
+
+    private static final TopicDTO TOPIC = new TopicDTO(TOPIC_ID,"Altro");
 
 
     public static class WireMockInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
@@ -338,7 +341,7 @@ class IOManageBackEndFeignRestClientTest {
     }
 
     private ServiceRequestDTO createServiceRequestDTOnotValid() {
-        ServiceMetadataDTO serviceMetadataDTO = createServiceMetadataDTO();
+        ServiceRequestMetadataDTO serviceMetadataDTO = createServiceRequestMetadataDTO();
         return ServiceRequestDTO.builder()
                 .serviceMetadata(serviceMetadataDTO)
                 .serviceName(SERVICE_NAME)
@@ -364,7 +367,7 @@ class IOManageBackEndFeignRestClientTest {
     }
 
     private ServiceRequestDTO createServiceRequestDTO() {
-        ServiceMetadataDTO serviceMetadataDTO = createServiceMetadataDTO();
+        ServiceRequestMetadataDTO serviceMetadataDTO = createServiceRequestMetadataDTO();
         return ServiceRequestDTO.builder()
                 .serviceName(SERVICE_NAME)
                 .description(DESCRIPTION)
@@ -373,14 +376,15 @@ class IOManageBackEndFeignRestClientTest {
                 .build();
     }
 
-    private ServiceMetadataDTO createServiceMetadataDTO() {
-        return ServiceMetadataDTO.builder()
+    private ServiceRequestMetadataDTO createServiceRequestMetadataDTO() {
+        return ServiceRequestMetadataDTO.builder()
                 .email(EMAIL)
                 .phone(PHONE)
                 .supportUrl(SUPPORT_URL)
                 .privacyUrl(PRIVACY_URL)
                 .tosUrl(TOS_URL)
                 .scope(SCOPE)
+                .topicId(TOPIC_ID)
                 .build();
     }
     private OrganizationDTO createOrganizationDTO() {
@@ -392,12 +396,24 @@ class IOManageBackEndFeignRestClientTest {
     }
 
     private ServiceResponseDTO createServiceResponseDTO() {
-        ServiceMetadataDTO serviceMetadataDTO = createServiceMetadataDTO();
+        ServiceResponseMetadataDTO serviceMetadataDTO = createServiceResponseMetadataDTO();
         return ServiceResponseDTO.builder()
                 .id(SERVICE_ID)
                 .serviceName(SERVICE_NAME)
                 .organization(createOrganizationDTO())
                 .serviceMetadata(serviceMetadataDTO)
+                .build();
+    }
+
+    private ServiceResponseMetadataDTO createServiceResponseMetadataDTO() {
+        return ServiceResponseMetadataDTO.builder()
+                .email(EMAIL)
+                .phone(PHONE)
+                .supportUrl(SUPPORT_URL)
+                .privacyUrl(PRIVACY_URL)
+                .tosUrl(TOS_URL)
+                .scope(SCOPE)
+                .topic(TOPIC)
                 .build();
     }
 

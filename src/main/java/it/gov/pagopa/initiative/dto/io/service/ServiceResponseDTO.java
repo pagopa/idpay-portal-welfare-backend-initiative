@@ -29,7 +29,7 @@ public class ServiceResponseDTO {
     @JsonProperty("max_allowed_payment_amount")
     private Integer maxAllowedPaymentAmount;
     @JsonProperty("metadata")
-    private ServiceMetadataDTO serviceMetadata;
+    private ServiceResponseMetadataDTO serviceMetadata;
 
 }
 
