@@ -26,7 +26,7 @@ public class ServiceRequestDTO {
     @JsonProperty("authorized_recipients")
     private List<String> authorizedRecipients = new ArrayList<>();
     @JsonProperty("metadata")
-    private ServiceMetadataDTO serviceMetadata;
+    private ServiceRequestMetadataDTO serviceMetadata;
 
 }
 
