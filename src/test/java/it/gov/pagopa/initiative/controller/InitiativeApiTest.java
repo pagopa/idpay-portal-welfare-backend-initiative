@@ -1441,10 +1441,10 @@ class InitiativeApiTest {
         Map<String, String> language = new HashMap<>();
         language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneral initiativeGeneral = new InitiativeGeneral();
-        initiativeGeneral.setBeneficiaryBudget(new BigDecimal(10));
+        initiativeGeneral.setBeneficiaryBudgetCents(1000L);
         initiativeGeneral.setBeneficiaryKnown(beneficiaryKnown);
         initiativeGeneral.setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF);
-        initiativeGeneral.setBudget(new BigDecimal(1000000000));
+        initiativeGeneral.setBudgetCents(100000000000L);
         LocalDate rankingStartDate = LocalDate.now();
         LocalDate rankingEndDate = rankingStartDate.plusDays(1);
         LocalDate startDate = rankingEndDate.plusDays(1);
@@ -1468,10 +1468,10 @@ class InitiativeApiTest {
         Map<String, String> language = new HashMap<>();
         language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
-        initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
+        initiativeGeneralDTO.setBeneficiaryBudgetCents(1000L);
         initiativeGeneralDTO.setBeneficiaryKnown(beneficiaryKnown);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
-        initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
+        initiativeGeneralDTO.setBudgetCents(100000000000L);
         LocalDate rankingStartDate = LocalDate.now();
         LocalDate rankingEndDate = rankingStartDate.plusDays(1);
         LocalDate startDate = rankingEndDate.plusDays(1);
@@ -1610,7 +1610,7 @@ class InitiativeApiTest {
     private AccumulatedAmountDTO createAccumulatedAmountDTOValid() {
         AccumulatedAmountDTO amountDTO = new AccumulatedAmountDTO();
         amountDTO.setAccumulatedType(AccumulatedAmountDTO.AccumulatedTypeEnum.THRESHOLD_REACHED);
-        amountDTO.setRefundThreshold(BigDecimal.valueOf(100000));
+        amountDTO.setRefundThresholdCents(10000000L);
         return amountDTO;
     }
 
@@ -1653,7 +1653,7 @@ class InitiativeApiTest {
     private AccumulatedAmount createAccumulatedAmount_Valid() {
         AccumulatedAmount amount = new AccumulatedAmount();
         amount.setAccumulatedType(AccumulatedAmount.AccumulatedTypeEnum.THRESHOLD_REACHED);
-        amount.setRefundThreshold(BigDecimal.valueOf(100000));
+        amount.setRefundThresholdCents(10000000L);
         return amount;
     }
 
@@ -1693,7 +1693,7 @@ class InitiativeApiTest {
     private AccumulatedAmountDTO createAccumulatedAmountDTO_NotValid_ko() {
         AccumulatedAmountDTO amountDTO = new AccumulatedAmountDTO();
         amountDTO.setAccumulatedType(AccumulatedAmountDTO.AccumulatedTypeEnum.BUDGET_EXHAUSTED);
-        amountDTO.setRefundThreshold(BigDecimal.valueOf(100000));
+        amountDTO.setRefundThresholdCents(10000000L);
         return amountDTO;
     }
 

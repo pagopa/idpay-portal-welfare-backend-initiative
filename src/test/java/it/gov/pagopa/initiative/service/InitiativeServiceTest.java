@@ -1791,10 +1791,10 @@ class InitiativeServiceTest {
         Map<String, String> language = new HashMap<>();
         language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneral initiativeGeneral = new InitiativeGeneral();
-        initiativeGeneral.setBeneficiaryBudget(new BigDecimal(10));
+        initiativeGeneral.setBeneficiaryBudgetCents(1000L);
         initiativeGeneral.setBeneficiaryKnown(beneficiaryKnown);
         initiativeGeneral.setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF);
-        initiativeGeneral.setBudget(new BigDecimal(1000000000));
+        initiativeGeneral.setBudgetCents(100000000000L);
         initiativeGeneral.setEndDate(LocalDate.of(2022, 9, 8));
         initiativeGeneral.setStartDate(LocalDate.of(2022, 8, 8));
         initiativeGeneral.setRankingStartDate(LocalDate.of(2022, 9, 18));
@@ -1806,11 +1806,11 @@ class InitiativeServiceTest {
         Map<String, String> language = new HashMap<>();
         language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneral initiativeGeneral = new InitiativeGeneral();
-        initiativeGeneral.setBeneficiaryBudget(new BigDecimal(10));
+        initiativeGeneral.setBeneficiaryBudgetCents(1000L);
         initiativeGeneral.setBeneficiaryKnown(true);
         initiativeGeneral.setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.NF);
         initiativeGeneral.setFamilyUnitComposition(InitiativeConstants.FamilyUnitCompositionConstant.INPS);
-        initiativeGeneral.setBudget(new BigDecimal(1000000000));
+        initiativeGeneral.setBudgetCents(100000000000L);
         initiativeGeneral.setEndDate(LocalDate.of(2022, 9, 8));
         initiativeGeneral.setStartDate(LocalDate.of(2022, 8, 8));
         initiativeGeneral.setRankingStartDate(LocalDate.of(2022, 9, 18));
@@ -1850,10 +1850,10 @@ class InitiativeServiceTest {
         Map<String, String> language = new HashMap<>();
         language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
-        initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
+        initiativeGeneralDTO.setBeneficiaryBudgetCents(1000L);
         initiativeGeneralDTO.setBeneficiaryKnown(beneficiaryKnown);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
-        initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
+        initiativeGeneralDTO.setBudgetCents(100000000000L);
         LocalDate rankingStartDate = LocalDate.now();
         LocalDate rankingEndDate = rankingStartDate.plusDays(1);
         LocalDate startDate = rankingEndDate.plusDays(1);
@@ -1987,8 +1987,8 @@ class InitiativeServiceTest {
             return null;
         } else {
             RewardGroups rewardGroups = new RewardGroups();
-            RewardGroups.RewardGroup rewardGroup1 = new RewardGroups.RewardGroup(BigDecimal.valueOf(10), BigDecimal.valueOf(20), BigDecimal.valueOf(30));
-            RewardGroups.RewardGroup rewardGroup2 = new RewardGroups.RewardGroup(BigDecimal.valueOf(10), BigDecimal.valueOf(30), BigDecimal.valueOf(40));
+            RewardGroups.RewardGroup rewardGroup1 = new RewardGroups.RewardGroup(1000L, 2000L, BigDecimal.valueOf(30));
+            RewardGroups.RewardGroup rewardGroup2 = new RewardGroups.RewardGroup(1000L, 3000L, BigDecimal.valueOf(40));
             List<RewardGroups.RewardGroup> rewardGroupList = new ArrayList<>();
             rewardGroupList.add(rewardGroup1);
             rewardGroupList.add(rewardGroup2);
@@ -2039,10 +2039,10 @@ class InitiativeServiceTest {
         List<RewardLimits> rewardLimitsList = new ArrayList<>();
         RewardLimits rewardLimits1 = new RewardLimits();
         rewardLimits1.setFrequency(RewardLimits.RewardLimitFrequency.DAILY);
-        rewardLimits1.setRewardLimit(BigDecimal.valueOf(100));
+        rewardLimits1.setRewardLimitCents(10000L);
         RewardLimits rewardLimits2 = new RewardLimits();
         rewardLimits2.setFrequency(RewardLimits.RewardLimitFrequency.MONTHLY);
-        rewardLimits2.setRewardLimit(BigDecimal.valueOf(3000));
+        rewardLimits2.setRewardLimitCents(300000L);
         rewardLimitsList.add(rewardLimits1);
         rewardLimitsList.add(rewardLimits2);
 
@@ -2175,7 +2175,7 @@ class InitiativeServiceTest {
     AccumulatedAmount createAccumulatedAmountValid() {
         AccumulatedAmount amount = new AccumulatedAmount();
         amount.setAccumulatedType(AccumulatedAmount.AccumulatedTypeEnum.THRESHOLD_REACHED);
-        amount.setRefundThreshold(BigDecimal.valueOf(100000));
+        amount.setRefundThresholdCents(10000000L);
         return amount;
     }
 

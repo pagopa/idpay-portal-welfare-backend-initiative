@@ -11,7 +11,6 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
-import java.math.BigDecimal;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -168,7 +167,7 @@ class RefundRuleTest {
     private AccumulatedAmountDTO createAccumulatedAmountValid_ok(){
         AccumulatedAmountDTO amountDTO = new AccumulatedAmountDTO();
         amountDTO.setAccumulatedType(AccumulatedAmountDTO.AccumulatedTypeEnum.THRESHOLD_REACHED);
-        amountDTO.setRefundThreshold(BigDecimal.valueOf(100000));
+        amountDTO.setRefundThresholdCents(10000000L);
         return amountDTO;
     }
 
@@ -187,14 +186,14 @@ class RefundRuleTest {
     private AccumulatedAmountDTO createAccumulatedAmountNotValid_ko(){
         AccumulatedAmountDTO amountDTO = new AccumulatedAmountDTO();
         amountDTO.setAccumulatedType(AccumulatedAmountDTO.AccumulatedTypeEnum.BUDGET_EXHAUSTED);
-        amountDTO.setRefundThreshold(BigDecimal.valueOf(100000));
+        amountDTO.setRefundThresholdCents(10000000L);
         return amountDTO;
     }
 
     private AccumulatedAmountDTO createAccumulatedAmountNotValidNull_ko(){
         AccumulatedAmountDTO amountDTO = new AccumulatedAmountDTO();
         amountDTO.setAccumulatedType(null);
-        amountDTO.setRefundThreshold(null);
+        amountDTO.setRefundThresholdCents(null);
         return amountDTO;
     }
 

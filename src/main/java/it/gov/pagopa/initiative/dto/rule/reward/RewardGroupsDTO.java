@@ -3,6 +3,7 @@ package it.gov.pagopa.initiative.dto.rule.reward;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import it.gov.pagopa.initiative.utils.constraint.RewardGroupFromToValue;
 import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
+import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -44,5 +45,13 @@ public class RewardGroupsDTO implements InitiativeRewardRuleDTO {
         @Min(value = 0, message = "Reward value must be at least 0%", groups = ValidationApiEnabledGroup.class)
         @Max(value = 100, message = "Reward value must be at most 100%", groups = ValidationApiEnabledGroup.class)
         private BigDecimal rewardValue;
+    }
+
+    @PostConstruct
+    private void postConstruct(){
+        for(RewardGroupDTO g : rewardGroups){
+            g.from = g.from.multiply(BigDecimal.valueOf(100));
+            g.to = g.to.multiply(BigDecimal.valueOf(100));
+        }
     }
 }

@@ -1,6 +1,8 @@
 package it.gov.pagopa.initiative.dto.rule.trx;
 
+
 import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
+import jakarta.annotation.PostConstruct;
 import lombok.*;
 
 import jakarta.validation.constraints.NotNull;
@@ -24,5 +26,10 @@ public class RewardLimitsDTO {
         WEEKLY,
         MONTHLY,
         YEARLY
+    }
+
+    @PostConstruct
+    private void postConstruct(){
+        this.rewardLimit = this.rewardLimit.multiply(BigDecimal.valueOf(100));
     }
 }

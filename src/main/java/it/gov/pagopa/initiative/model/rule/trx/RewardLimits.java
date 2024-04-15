@@ -2,8 +2,6 @@ package it.gov.pagopa.initiative.model.rule.trx;
 
 import lombok.*;
 
-import java.math.BigDecimal;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -12,7 +10,7 @@ import java.math.BigDecimal;
 public class RewardLimits {
     private RewardLimitFrequency frequency;
 
-    private BigDecimal rewardLimit;
+    private Long rewardLimitCents;
 
     public enum RewardLimitFrequency {
         DAILY,

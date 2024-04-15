@@ -4,12 +4,14 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
+import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+
 import java.math.BigDecimal;
 
 @Data
@@ -55,6 +57,12 @@ public class RewardValueDTO implements InitiativeRewardRuleDTO {
                 }
             }
             return null;
+        }
+    }
+    @PostConstruct
+    private void postConstruct(){
+        if (this.rewardValueType.equals(RewardValueTypeEnum.ABSOLUTE)){
+            this.rewardValue = this.rewardValue.multiply(BigDecimal.valueOf(100));
         }
     }
 }

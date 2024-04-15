@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.*;
 
-import java.math.BigDecimal;
 
 @Data
 @AllArgsConstructor
@@ -42,5 +41,5 @@ public class AccumulatedAmount {
 
     private AccumulatedTypeEnum accumulatedType;
 
-    private BigDecimal refundThreshold;
+    private Long refundThresholdCents;
 }

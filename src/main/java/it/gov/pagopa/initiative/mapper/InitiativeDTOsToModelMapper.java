@@ -55,11 +55,11 @@ public class InitiativeDTOsToModelMapper {
         if (generalDTO == null) {
             return null;
         }
-        return InitiativeGeneral.builder().beneficiaryBudget(generalDTO.getBeneficiaryBudget())
+        return InitiativeGeneral.builder().beneficiaryBudgetCents(generalDTO.getBeneficiaryBudgetCents())
                 .beneficiaryKnown(generalDTO.getBeneficiaryKnown())
                 .beneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.valueOf(generalDTO.getBeneficiaryType().name()))
                 .familyUnitComposition(generalDTO.getFamilyUnitComposition()!=null?generalDTO.getFamilyUnitComposition():null)
-                .budget(generalDTO.getBudget())
+                .budgetCents(generalDTO.getBudgetCents())
                 .endDate(generalDTO.getEndDate())
                 .startDate(generalDTO.getStartDate())
                 .rankingEndDate(generalDTO.getRankingEndDate())
@@ -170,7 +170,10 @@ public class InitiativeDTOsToModelMapper {
             ret = RewardGroups.builder()
                     .type(rewardGroupsInput.getType())
                     .rewardGroups(rewardGroupsInput.getRewardGroups().stream().map(
-                    x -> RewardGroups.RewardGroup.builder().from(x.getFrom()).to(x.getTo()).rewardValue(x.getRewardValue()).build()
+                    x -> RewardGroups.RewardGroup.builder()
+                            .fromCents(x.getFrom().longValue())
+                            .toCents(x.getTo().longValue())
+                            .rewardValue(x.getRewardValue()).build()
             ).toList()).build();
         } else {
             throw new IllegalArgumentException("Initiative Reward Rule not handled: %s".formatted(rewardRuleDTO.getClass().getName()));
@@ -229,7 +232,7 @@ public class InitiativeDTOsToModelMapper {
         }
         return rewardLimitDTO.stream().map(x -> RewardLimits.builder()
                         .frequency(RewardLimits.RewardLimitFrequency.valueOf(x.getFrequency().name()))
-                        .rewardLimit(x.getRewardLimit())
+                        .rewardLimitCents(x.getRewardLimit().longValue())
                         .build())
                 .toList();
     }
@@ -265,7 +268,7 @@ public class InitiativeDTOsToModelMapper {
             return null;
         }
         return AccumulatedAmount.builder().accumulatedType(AccumulatedAmount.AccumulatedTypeEnum.valueOf(accumulatedAmountDTO.getAccumulatedType().name()))
-                .refundThreshold(accumulatedAmountDTO.getRefundThreshold()).build();
+                .refundThresholdCents(accumulatedAmountDTO.getRefundThresholdCents()).build();
     }
 
     private TimeParameter toTimeParameter(TimeParameterDTO timeParameterDTO){

@@ -24,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 
@@ -144,11 +145,11 @@ public class InitiativeModelToDTOMapper {
         if (general == null) {
             return null;
         }
-        return InitiativeGeneralDTO.builder().beneficiaryBudget(general.getBeneficiaryBudget())
+        return InitiativeGeneralDTO.builder().beneficiaryBudgetCents(general.getBeneficiaryBudgetCents())
                 .beneficiaryKnown(general.getBeneficiaryKnown())
                 .beneficiaryType(general.getBeneficiaryType()!=null?InitiativeGeneralDTO.BeneficiaryTypeEnum.valueOf(general.getBeneficiaryType().name()):null)
                 .familyUnitComposition(general.getFamilyUnitComposition()!=null?general.getFamilyUnitComposition():null)
-                .budget(general.getBudget())
+                .budgetCents(general.getBudgetCents())
                 .endDate(general.getEndDate())
                 .startDate(general.getStartDate())
                 .rankingEndDate(general.getRankingEndDate())
@@ -349,7 +350,10 @@ public class InitiativeModelToDTOMapper {
             dto = RewardGroupsDTO.builder()
                     .type(rewardGroupsInput.getType())
                     .rewardGroups(rewardGroupsInput.getRewardGroups().stream().map(
-                    x -> RewardGroupsDTO.RewardGroupDTO.builder().from(x.getFrom()).to(x.getTo()).rewardValue(x.getRewardValue()).build()
+                    x -> RewardGroupsDTO.RewardGroupDTO.builder()
+                            .from(BigDecimal.valueOf(x.getFromCents()))
+                            .to(BigDecimal.valueOf(x.getToCents()))
+                            .rewardValue(x.getRewardValue()).build()
             ).toList())
                     .build();
         }
@@ -369,7 +373,10 @@ public class InitiativeModelToDTOMapper {
         } else if (rewardRule instanceof RewardGroups rewardGroupsInput) {
             dto = RewardGroupsDTO.builder()
                     .rewardGroups(rewardGroupsInput.getRewardGroups().stream().map(
-                            x -> RewardGroupsDTO.RewardGroupDTO.builder().from(x.getFrom()).to(x.getTo()).rewardValue(x.getRewardValue()).build()
+                            x -> RewardGroupsDTO.RewardGroupDTO.builder()
+                                    .from(BigDecimal.valueOf(x.getFromCents()))
+                                    .to(BigDecimal.valueOf(x.getToCents()))
+                                    .rewardValue(x.getRewardValue()).build()
                     ).toList())
                     .build();
         }
@@ -427,7 +434,7 @@ public class InitiativeModelToDTOMapper {
         }
         return rewardLimit.stream().map(x -> RewardLimitsDTO.builder()
                         .frequency(RewardLimitsDTO.RewardLimitFrequency.valueOf(x.getFrequency().name()))
-                        .rewardLimit(x.getRewardLimit())
+                        .rewardLimit(BigDecimal.valueOf(x.getRewardLimitCents()))
                         .build())
                 .toList();
     }
@@ -467,7 +474,7 @@ public class InitiativeModelToDTOMapper {
             return null;
         }
         return AccumulatedAmountDTO.builder().accumulatedType(AccumulatedAmountDTO.AccumulatedTypeEnum.valueOf(accumulatedAmount.getAccumulatedType().name()))
-                .refundThreshold(accumulatedAmount.getRefundThreshold()).build();
+                .refundThresholdCents(accumulatedAmount.getRefundThresholdCents()).build();
     }
 
     private TimeParameterDTO toTimeParameterDTO(TimeParameter timeParameter){
