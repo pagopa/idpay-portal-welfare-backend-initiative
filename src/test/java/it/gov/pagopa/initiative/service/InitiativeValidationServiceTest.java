@@ -427,7 +427,7 @@ class InitiativeValidationServiceTest {
         step4Initiative.setRewardRule(rewardValue);
         InitiativeTrxConditions trxConditions = new InitiativeTrxConditions();
         Threshold threshold = new Threshold();
-        threshold.setFrom(BigDecimal.valueOf(30));
+        threshold.setFromCents(3000L);
         trxConditions.setThreshold(threshold);
         step4Initiative.setTrxRule(trxConditions);
         try {
@@ -447,7 +447,7 @@ class InitiativeValidationServiceTest {
         step4Initiative.setRewardRule(rewardValue);
         InitiativeTrxConditions trxConditions = new InitiativeTrxConditions();
         Threshold threshold = new Threshold();
-        threshold.setFrom(BigDecimal.valueOf(40));
+        threshold.setFromCents(4000L);
         trxConditions.setThreshold(threshold);
         step4Initiative.setTrxRule(trxConditions);
         Executable executable = () -> initiativeValidationService.checkRewardRuleAbsolute(step4Initiative);
@@ -916,9 +916,9 @@ class InitiativeValidationServiceTest {
 
         ThresholdDTO thresholdDTO = new ThresholdDTO();
 
-        thresholdDTO.setFrom(BigDecimal.valueOf(10));
+        thresholdDTO.setFromCents(1000L);
         thresholdDTO.setFromIncluded(true);
-        thresholdDTO.setTo(BigDecimal.valueOf(30));
+        thresholdDTO.setToCents(3000L);
         thresholdDTO.setToIncluded(true);
 
         TrxCountDTO trxCountDTO = new TrxCountDTO();

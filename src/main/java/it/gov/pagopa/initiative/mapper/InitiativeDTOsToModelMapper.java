@@ -241,8 +241,8 @@ public class InitiativeDTOsToModelMapper {
         if (thresholdDTO == null) {
             return null;
         }
-        return Threshold.builder().from(thresholdDTO.getFrom())
-                .to(thresholdDTO.getTo())
+        return Threshold.builder().fromCents(thresholdDTO.getFromCents())
+                .toCents(thresholdDTO.getToCents())
                 .fromIncluded(thresholdDTO.getFromIncluded())
                 .toIncluded(thresholdDTO.getToIncluded()).build();
     }

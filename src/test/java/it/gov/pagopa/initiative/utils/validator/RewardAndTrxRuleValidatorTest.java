@@ -152,8 +152,8 @@ class RewardAndTrxRuleValidatorTest {
     @Test
     void when_threshold_FromIsLessThanTo_then_ValidationAreOk(){
         ThresholdDTO thresholdDTO = ThresholdDTO.builder()
-                .from(BigDecimal.ONE)
-                .to(BigDecimal.TEN)
+                .fromCents(0L)
+                .toCents(1000L)
                 .fromIncluded(false)
                 .toIncluded(true).build();
         Set<ConstraintViolation<ThresholdDTO>> violations = validator.validate(thresholdDTO, ValidationApiEnabledGroup.class);
@@ -163,8 +163,8 @@ class RewardAndTrxRuleValidatorTest {
     @Test
     void when_threshold_FromIsGreaterThanTo_then_ValidationAreFailed(){
         ThresholdDTO thresholdDTO = ThresholdDTO.builder()
-                .from(BigDecimal.TEN)
-                .to(BigDecimal.ZERO)
+                .fromCents(1000L)
+                .toCents(0L)
                 .fromIncluded(false)
                 .toIncluded(true).build();
         Set<ConstraintViolation<ThresholdDTO>> violations = validator.validate(thresholdDTO, ValidationApiEnabledGroup.class);
@@ -326,9 +326,9 @@ class RewardAndTrxRuleValidatorTest {
 
         ThresholdDTO thresholdDTO = new ThresholdDTO();
 
-        thresholdDTO.setFrom(BigDecimal.valueOf(10));
+        thresholdDTO.setFromCents(1000L);
         thresholdDTO.setFromIncluded(true);
-        thresholdDTO.setTo(BigDecimal.valueOf(30));
+        thresholdDTO.setToCents(3000L);
         thresholdDTO.setToIncluded(true);
 
         TrxCountDTO trxCountDTO = new TrxCountDTO();
@@ -392,9 +392,9 @@ class RewardAndTrxRuleValidatorTest {
 
         ThresholdDTO thresholdDTO = new ThresholdDTO();
 
-        thresholdDTO.setFrom(BigDecimal.valueOf(10));
+        thresholdDTO.setFromCents(1000L);
         thresholdDTO.setFromIncluded(true);
-        thresholdDTO.setTo(BigDecimal.valueOf(30));
+        thresholdDTO.setToCents(3000L);
         thresholdDTO.setToIncluded(true);
 
         TrxCountDTO trxCountDTO = new TrxCountDTO();
@@ -453,9 +453,9 @@ class RewardAndTrxRuleValidatorTest {
 
         ThresholdDTO thresholdDTO = new ThresholdDTO();
 
-        thresholdDTO.setFrom(BigDecimal.valueOf(-1));
+        thresholdDTO.setFromCents(-100L);
         thresholdDTO.setFromIncluded(true);
-        thresholdDTO.setTo(BigDecimal.valueOf(-1));
+        thresholdDTO.setToCents(-100L);
         thresholdDTO.setToIncluded(true);
 
         TrxCountDTO trxCountDTO = new TrxCountDTO();
@@ -514,9 +514,9 @@ class RewardAndTrxRuleValidatorTest {
 
         ThresholdDTO thresholdDTO = new ThresholdDTO();
 
-        thresholdDTO.setFrom(BigDecimal.valueOf(10));
+        thresholdDTO.setFromCents(1000L);
         thresholdDTO.setFromIncluded(true);
-        thresholdDTO.setTo(BigDecimal.valueOf(30));
+        thresholdDTO.setToCents(3000L);
         thresholdDTO.setToIncluded(true);
 
         TrxCountDTO trxCountDTO = new TrxCountDTO();
@@ -575,9 +575,9 @@ class RewardAndTrxRuleValidatorTest {
 
         ThresholdDTO thresholdDTO = new ThresholdDTO();
 
-        thresholdDTO.setFrom(BigDecimal.valueOf(10));
+        thresholdDTO.setFromCents(1000L);
         thresholdDTO.setFromIncluded(true);
-        thresholdDTO.setTo(BigDecimal.valueOf(30));
+        thresholdDTO.setToCents(3000L);
         thresholdDTO.setToIncluded(true);
 
         TrxCountDTO trxCountDTO = new TrxCountDTO();

@@ -6,7 +6,6 @@ import lombok.*;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import java.math.BigDecimal;
 
 @Data
 @AllArgsConstructor
@@ -17,14 +16,14 @@ import java.math.BigDecimal;
 public class ThresholdDTO {
     @NotNull(groups = ValidationApiEnabledGroup.class)
     @Min(value = 0, message = "from must be at least 0", groups = ValidationApiEnabledGroup.class)
-    private BigDecimal from;
+    private Long fromCents;
 
     @NotNull(groups = ValidationApiEnabledGroup.class)
     private Boolean fromIncluded;
 
     @NotNull(groups = ValidationApiEnabledGroup.class)
     @Min(value = 1, message = "to must be at least 1", groups = ValidationApiEnabledGroup.class)
-    private BigDecimal to;
+    private Long toCents;
 
     @NotNull(groups = ValidationApiEnabledGroup.class)
     private Boolean toIncluded;

@@ -1304,9 +1304,9 @@ class InitiativeApiTest {
 
         ThresholdDTO thresholdDTO = new ThresholdDTO();
 
-        thresholdDTO.setFrom(BigDecimal.valueOf(10));
+        thresholdDTO.setFromCents(1000L);
         thresholdDTO.setFromIncluded(true);
-        thresholdDTO.setTo(BigDecimal.valueOf(30));
+        thresholdDTO.setToCents(3000L);
         thresholdDTO.setToIncluded(true);
 
         TrxCountDTO trxCountDTO = new TrxCountDTO();

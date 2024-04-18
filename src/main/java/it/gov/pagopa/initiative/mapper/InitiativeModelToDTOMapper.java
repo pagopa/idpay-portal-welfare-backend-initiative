@@ -443,8 +443,8 @@ public class InitiativeModelToDTOMapper {
         if (threshold == null) {
             return null;
         }
-        return ThresholdDTO.builder().from(threshold.getFrom())
-                .to(threshold.getTo())
+        return ThresholdDTO.builder().fromCents(threshold.getFromCents())
+                .toCents(threshold.getToCents())
                 .fromIncluded(threshold.isFromIncluded())
                 .toIncluded(threshold.isToIncluded()).build();
     }

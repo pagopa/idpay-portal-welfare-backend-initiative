@@ -682,9 +682,9 @@ class InitiativeDTOsToModelMapperTest {
 
         ThresholdDTO thresholdDTO = new ThresholdDTO();
 
-        thresholdDTO.setFrom(BigDecimal.valueOf(10));
+        thresholdDTO.setFromCents(1000L);
         thresholdDTO.setFromIncluded(true);
-        thresholdDTO.setTo(BigDecimal.valueOf(30));
+        thresholdDTO.setToCents(3000L);
         thresholdDTO.setToIncluded(true);
 
         TrxCountDTO trxCountDTO = new TrxCountDTO();
@@ -795,9 +795,9 @@ class InitiativeDTOsToModelMapperTest {
 
         ThresholdDTO thresholdDTO = new ThresholdDTO();
 
-        thresholdDTO.setFrom(BigDecimal.valueOf(10));
+        thresholdDTO.setFromCents(1000L);
         thresholdDTO.setFromIncluded(true);
-        thresholdDTO.setTo(BigDecimal.valueOf(30));
+        thresholdDTO.setToCents(3000L);
         thresholdDTO.setToIncluded(true);
 
         TrxCountDTO trxCountDTO = new TrxCountDTO();
@@ -845,9 +845,9 @@ class InitiativeDTOsToModelMapperTest {
 
         ThresholdDTO thresholdDTO = new ThresholdDTO();
 
-        thresholdDTO.setFrom(BigDecimal.valueOf(10));
+        thresholdDTO.setFromCents(1000L);
         thresholdDTO.setFromIncluded(true);
-        thresholdDTO.setTo(BigDecimal.valueOf(30));
+        thresholdDTO.setToCents(3000L);
         thresholdDTO.setToIncluded(true);
 
         TrxCountDTO trxCountDTO = new TrxCountDTO();
@@ -905,9 +905,9 @@ class InitiativeDTOsToModelMapperTest {
 
         ThresholdDTO thresholdDTO = new ThresholdDTO();
 
-        thresholdDTO.setFrom(BigDecimal.valueOf(10));
+        thresholdDTO.setFromCents(1000L);
         thresholdDTO.setFromIncluded(true);
-        thresholdDTO.setTo(BigDecimal.valueOf(30));
+        thresholdDTO.setToCents(3000L);
         thresholdDTO.setToIncluded(true);
 
         TrxCountDTO trxCountDTO = new TrxCountDTO();
@@ -958,9 +958,9 @@ class InitiativeDTOsToModelMapperTest {
 
         ThresholdDTO thresholdDTO = new ThresholdDTO();
 
-        thresholdDTO.setFrom(BigDecimal.valueOf(10));
+        thresholdDTO.setFromCents(1000L);
         thresholdDTO.setFromIncluded(true);
-        thresholdDTO.setTo(BigDecimal.valueOf(30));
+        thresholdDTO.setToCents(3000L);
         thresholdDTO.setToIncluded(true);
 
         MccFilterDTO mccFilterDTO = new MccFilterDTO();
@@ -1127,9 +1127,9 @@ class InitiativeDTOsToModelMapperTest {
 
         Threshold threshold = new Threshold();
 
-        threshold.setFrom(BigDecimal.valueOf(10));
+        threshold.setFromCents(1000L);
         threshold.setFromIncluded(true);
-        threshold.setTo(BigDecimal.valueOf(30));
+        threshold.setToCents(3000L);
         threshold.setToIncluded(true);
 
         TrxCount trxCount = new TrxCount();
@@ -1240,9 +1240,9 @@ class InitiativeDTOsToModelMapperTest {
 
         Threshold threshold = new Threshold();
 
-        threshold.setFrom(BigDecimal.valueOf(10));
+        threshold.setFromCents(1000L);
         threshold.setFromIncluded(true);
-        threshold.setTo(BigDecimal.valueOf(30));
+        threshold.setToCents(3000L);
         threshold.setToIncluded(true);
 
         TrxCount trxCount = new TrxCount();
@@ -1290,9 +1290,9 @@ class InitiativeDTOsToModelMapperTest {
 
         Threshold threshold = new Threshold();
 
-        threshold.setFrom(BigDecimal.valueOf(10));
+        threshold.setFromCents(1000L);
         threshold.setFromIncluded(true);
-        threshold.setTo(BigDecimal.valueOf(30));
+        threshold.setToCents(3000L);
         threshold.setToIncluded(true);
 
         TrxCount trxCount = new TrxCount();
@@ -1350,9 +1350,9 @@ class InitiativeDTOsToModelMapperTest {
 
         Threshold threshold = new Threshold();
 
-        threshold.setFrom(BigDecimal.valueOf(10));
+        threshold.setFromCents(1000L);
         threshold.setFromIncluded(true);
-        threshold.setTo(BigDecimal.valueOf(30));
+        threshold.setToCents(3000L);
         threshold.setToIncluded(true);
 
         TrxCount trxCount = new TrxCount();
@@ -1403,9 +1403,9 @@ class InitiativeDTOsToModelMapperTest {
 
         Threshold threshold = new Threshold();
 
-        threshold.setFrom(BigDecimal.valueOf(10));
+        threshold.setFromCents(1000L);
         threshold.setFromIncluded(true);
-        threshold.setTo(BigDecimal.valueOf(30));
+        threshold.setToCents(3000L);
         threshold.setToIncluded(true);
 
         MccFilter mccFilter = new MccFilter();
