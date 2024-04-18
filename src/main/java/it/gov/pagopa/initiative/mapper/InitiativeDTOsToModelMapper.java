@@ -171,8 +171,8 @@ public class InitiativeDTOsToModelMapper {
                     .type(rewardGroupsInput.getType())
                     .rewardGroups(rewardGroupsInput.getRewardGroups().stream().map(
                     x -> RewardGroups.RewardGroup.builder()
-                            .fromCents(x.getFrom().longValue())
-                            .toCents(x.getTo().longValue())
+                            .fromCents(x.getFromCents())
+                            .toCents(x.getToCents())
                             .rewardValue(x.getRewardValue()).build()
             ).toList()).build();
         } else {
@@ -232,7 +232,7 @@ public class InitiativeDTOsToModelMapper {
         }
         return rewardLimitDTO.stream().map(x -> RewardLimits.builder()
                         .frequency(RewardLimits.RewardLimitFrequency.valueOf(x.getFrequency().name()))
-                        .rewardLimitCents(x.getRewardLimit().longValue())
+                        .rewardLimitCents(x.getRewardLimitCents())
                         .build())
                 .toList();
     }

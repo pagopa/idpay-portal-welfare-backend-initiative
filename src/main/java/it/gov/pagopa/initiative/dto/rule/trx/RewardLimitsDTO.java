@@ -2,11 +2,10 @@ package it.gov.pagopa.initiative.dto.rule.trx;
 
 
 import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
-import jakarta.annotation.PostConstruct;
 import lombok.*;
 
 import jakarta.validation.constraints.NotNull;
-import java.math.BigDecimal;
+
 
 @Data
 @AllArgsConstructor
@@ -19,7 +18,7 @@ public class RewardLimitsDTO {
     private RewardLimitFrequency frequency;
 
     @NotNull(groups = ValidationApiEnabledGroup.class)
-    private BigDecimal rewardLimit;
+    private Long rewardLimitCents;
 
     public enum RewardLimitFrequency {
         DAILY,
@@ -28,8 +27,4 @@ public class RewardLimitsDTO {
         YEARLY
     }
 
-    @PostConstruct
-    private void postConstruct(){
-        this.rewardLimit = this.rewardLimit.multiply(BigDecimal.valueOf(100));
-    }
 }

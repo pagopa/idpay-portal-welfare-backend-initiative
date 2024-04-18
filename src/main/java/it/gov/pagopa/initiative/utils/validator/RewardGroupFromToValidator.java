@@ -27,10 +27,10 @@ public class RewardGroupFromToValidator implements ConstraintValidator<RewardGro
             return false;
         }
         for (int j = 0; j < listTmp.size()-1; j++){
-            if(listTmp.get(j).getFrom().compareTo(listTmp.get(j).getTo()) > 0)
+            if(listTmp.get(j).getFromCents().compareTo(listTmp.get(j).getToCents()) > 0)
                 return false;
             for (int i = j+1; i <= listTmp.size()-1; i++){
-                if ((listTmp.get(j).getFrom().equals(listTmp.get(i).getFrom()) && listTmp.get(j).getTo().equals(listTmp.get(i).getTo()))){
+                if ((listTmp.get(j).getFromCents().equals(listTmp.get(i).getFromCents()) && listTmp.get(j).getToCents().equals(listTmp.get(i).getToCents()))){
                     return false;
                 }
             }

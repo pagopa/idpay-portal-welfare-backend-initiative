@@ -24,7 +24,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.math.BigDecimal;
 import java.util.*;
 
 
@@ -145,7 +144,8 @@ public class InitiativeModelToDTOMapper {
         if (general == null) {
             return null;
         }
-        return InitiativeGeneralDTO.builder().beneficiaryBudgetCents(general.getBeneficiaryBudgetCents())
+        return InitiativeGeneralDTO.builder()
+                .beneficiaryBudgetCents(general.getBeneficiaryBudgetCents())
                 .beneficiaryKnown(general.getBeneficiaryKnown())
                 .beneficiaryType(general.getBeneficiaryType()!=null?InitiativeGeneralDTO.BeneficiaryTypeEnum.valueOf(general.getBeneficiaryType().name()):null)
                 .familyUnitComposition(general.getFamilyUnitComposition()!=null?general.getFamilyUnitComposition():null)
@@ -351,8 +351,8 @@ public class InitiativeModelToDTOMapper {
                     .type(rewardGroupsInput.getType())
                     .rewardGroups(rewardGroupsInput.getRewardGroups().stream().map(
                     x -> RewardGroupsDTO.RewardGroupDTO.builder()
-                            .from(BigDecimal.valueOf(x.getFromCents()))
-                            .to(BigDecimal.valueOf(x.getToCents()))
+                            .fromCents(x.getFromCents())
+                            .toCents(x.getToCents())
                             .rewardValue(x.getRewardValue()).build()
             ).toList())
                     .build();
@@ -374,8 +374,8 @@ public class InitiativeModelToDTOMapper {
             dto = RewardGroupsDTO.builder()
                     .rewardGroups(rewardGroupsInput.getRewardGroups().stream().map(
                             x -> RewardGroupsDTO.RewardGroupDTO.builder()
-                                    .from(BigDecimal.valueOf(x.getFromCents()))
-                                    .to(BigDecimal.valueOf(x.getToCents()))
+                                    .fromCents(x.getFromCents())
+                                    .toCents(x.getToCents())
                                     .rewardValue(x.getRewardValue()).build()
                     ).toList())
                     .build();
@@ -434,7 +434,7 @@ public class InitiativeModelToDTOMapper {
         }
         return rewardLimit.stream().map(x -> RewardLimitsDTO.builder()
                         .frequency(RewardLimitsDTO.RewardLimitFrequency.valueOf(x.getFrequency().name()))
-                        .rewardLimit(BigDecimal.valueOf(x.getRewardLimitCents()))
+                        .rewardLimitCents(x.getRewardLimitCents())
                         .build())
                 .toList();
     }

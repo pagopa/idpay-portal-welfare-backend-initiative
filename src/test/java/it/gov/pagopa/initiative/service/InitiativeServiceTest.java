@@ -2088,8 +2088,8 @@ class InitiativeServiceTest {
             return null;
         } else {
             RewardGroupsDTO rewardGroupsDTO = new RewardGroupsDTO();
-            RewardGroupsDTO.RewardGroupDTO rewardGroupDTO1 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(10), BigDecimal.valueOf(20), BigDecimal.valueOf(30));
-            RewardGroupsDTO.RewardGroupDTO rewardGroupDTO2 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(10), BigDecimal.valueOf(30), BigDecimal.valueOf(40));
+            RewardGroupsDTO.RewardGroupDTO rewardGroupDTO1 = new RewardGroupsDTO.RewardGroupDTO(1000L, 2000L, BigDecimal.valueOf(30));
+            RewardGroupsDTO.RewardGroupDTO rewardGroupDTO2 = new RewardGroupsDTO.RewardGroupDTO(1000L, 3000L, BigDecimal.valueOf(40));
             List<RewardGroupsDTO.RewardGroupDTO> rewardGroupDTOList = new ArrayList<>();
             rewardGroupDTOList.add(rewardGroupDTO1);
             rewardGroupDTOList.add(rewardGroupDTO2);
@@ -2140,10 +2140,10 @@ class InitiativeServiceTest {
         List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<>();
         RewardLimitsDTO rewardLimitsDTO1 = new RewardLimitsDTO();
         rewardLimitsDTO1.setFrequency(RewardLimitsDTO.RewardLimitFrequency.DAILY);
-        rewardLimitsDTO1.setRewardLimit(BigDecimal.valueOf(100));
+        rewardLimitsDTO1.setRewardLimitCents(10000L);
         RewardLimitsDTO rewardLimitsDTO2 = new RewardLimitsDTO();
         rewardLimitsDTO2.setFrequency(RewardLimitsDTO.RewardLimitFrequency.MONTHLY);
-        rewardLimitsDTO2.setRewardLimit(BigDecimal.valueOf(3000));
+        rewardLimitsDTO2.setRewardLimitCents(300000L);
         rewardLimitsDTOList.add(rewardLimitsDTO1);
         rewardLimitsDTOList.add(rewardLimitsDTO2);
 
