@@ -6,7 +6,7 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-
+import java.math.BigDecimal;
 
 public class AccumulatedAmountTypeValidator implements ConstraintValidator<AccumulatedAmountType, AccumulatedAmountDTO> {
     private static final SpelExpressionParser PARSER = new SpelExpressionParser();
@@ -25,10 +25,10 @@ public class AccumulatedAmountTypeValidator implements ConstraintValidator<Accum
     @Override
     public boolean isValid(AccumulatedAmountDTO value, ConstraintValidatorContext context) {
         AccumulatedAmountDTO.AccumulatedTypeEnum accumulatedType1 = null;
-        Long refundThreshold1 = null;
+        BigDecimal refundThreshold1 = null;
         if (PARSER.parseExpression(accumulatedType).getValue(value) instanceof AccumulatedAmountDTO.AccumulatedTypeEnum accumulatedTypeEnum)
             accumulatedType1 = accumulatedTypeEnum;
-        if (PARSER.parseExpression(refundThreshold).getValue(value) instanceof Long bigDecimalInput){
+        if (PARSER.parseExpression(refundThreshold).getValue(value) instanceof BigDecimal bigDecimalInput){
             refundThreshold1 = bigDecimalInput;
         }
         if (accumulatedType1 == AccumulatedAmountDTO.AccumulatedTypeEnum.THRESHOLD_REACHED && refundThreshold1 == null){

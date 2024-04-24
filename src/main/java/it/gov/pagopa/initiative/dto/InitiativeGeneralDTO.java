@@ -17,7 +17,7 @@ import lombok.experimental.SuperBuilder;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
-
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Map;
 
@@ -30,17 +30,17 @@ import java.util.Map;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
-@BeneficiaryBudgetValue(budget1 = "beneficiaryBudgetCents", budget2 = "budgetCents", groups = ValidationApiEnabledGroup.class)
+@BeneficiaryBudgetValue(budget1 = "beneficiaryBudget", budget2 = "budget", groups = ValidationApiEnabledGroup.class)
 @RankingAndSpendingDatesDoubleUseCaseValue(date1 = "rankingStartDate", date2 = "rankingEndDate", date3 = "startDate", date4 = "endDate", groups = ValidationApiEnabledGroup.class)
 @RankingGracePeriodConstraint(groups = ValidationApiEnabledGroup.class)
 @RankingEnabledNotNullForBeneficiaryKnownFalseConstraint(groups = ValidationApiEnabledGroup.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class InitiativeGeneralDTO extends InitiativeOrganizationInfoDTO {
 
-    @JsonProperty("budgetCents")
+    @JsonProperty("budget")
     @Min(value = 1, message = "budget should have an amount of at least 1", groups = ValidationApiEnabledGroup.class)
     @NotNull(groups = ValidationApiEnabledGroup.class)
-    private Long budgetCents;
+    private BigDecimal budget;
 
     /**
      * Gets or Sets beneficiaryType
@@ -82,10 +82,10 @@ public class InitiativeGeneralDTO extends InitiativeOrganizationInfoDTO {
     @NotNull(groups = ValidationApiEnabledGroup.class)
     private Boolean beneficiaryKnown;
 
-    @JsonProperty("beneficiaryBudgetCents")
+    @JsonProperty("beneficiaryBudget")
     @Min(value = 1, message = "Beneficiary budget should have an amount of at least 1", groups = ValidationApiEnabledGroup.class)
     @NotNull(groups = ValidationApiEnabledGroup.class)
-    private Long beneficiaryBudgetCents;
+    private BigDecimal beneficiaryBudget;
 
     /**
      * Start of period of spending funds in an initiative

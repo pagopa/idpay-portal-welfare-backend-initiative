@@ -10,7 +10,7 @@ import lombok.*;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-
+import java.math.BigDecimal;
 
 @Data
 @AllArgsConstructor
@@ -18,7 +18,7 @@ import jakarta.validation.constraints.NotNull;
 @Builder
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@AccumulatedAmountType(value1 = "accumulatedType", value2 = "refundThresholdCents", groups = ValidationApiEnabledGroup.class)
+@AccumulatedAmountType(value1 = "accumulatedType", value2 = "refundThreshold", groups = ValidationApiEnabledGroup.class)
 public class AccumulatedAmountDTO {
     public enum AccumulatedTypeEnum {
         BUDGET_EXHAUSTED("BUDGET_EXHAUSTED"),
@@ -50,6 +50,6 @@ public class AccumulatedAmountDTO {
     private AccumulatedTypeEnum accumulatedType;
 
     @Min(value = 0, groups = ValidationApiEnabledGroup.class)
-    @JsonProperty("refundThresholdCents")
-    private Long refundThresholdCents;
+    @JsonProperty("refundThreshold")
+    private BigDecimal refundThreshold;
 }

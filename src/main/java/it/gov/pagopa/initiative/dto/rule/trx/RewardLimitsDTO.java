@@ -6,6 +6,8 @@ import lombok.*;
 
 import jakarta.validation.constraints.NotNull;
 
+import java.math.BigDecimal;
+
 
 @Data
 @AllArgsConstructor
@@ -18,7 +20,7 @@ public class RewardLimitsDTO {
     private RewardLimitFrequency frequency;
 
     @NotNull(groups = ValidationApiEnabledGroup.class)
-    private Long rewardLimitCents;
+    private BigDecimal rewardLimit;
 
     public enum RewardLimitFrequency {
         DAILY,

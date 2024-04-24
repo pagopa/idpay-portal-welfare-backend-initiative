@@ -1850,10 +1850,10 @@ class InitiativeServiceTest {
         Map<String, String> language = new HashMap<>();
         language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
-        initiativeGeneralDTO.setBeneficiaryBudgetCents(1000L);
+        initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(beneficiaryKnown);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
-        initiativeGeneralDTO.setBudgetCents(100000000000L);
+        initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
         LocalDate rankingStartDate = LocalDate.now();
         LocalDate rankingEndDate = rankingStartDate.plusDays(1);
         LocalDate startDate = rankingEndDate.plusDays(1);
@@ -2088,8 +2088,8 @@ class InitiativeServiceTest {
             return null;
         } else {
             RewardGroupsDTO rewardGroupsDTO = new RewardGroupsDTO();
-            RewardGroupsDTO.RewardGroupDTO rewardGroupDTO1 = new RewardGroupsDTO.RewardGroupDTO(1000L, 2000L, BigDecimal.valueOf(30));
-            RewardGroupsDTO.RewardGroupDTO rewardGroupDTO2 = new RewardGroupsDTO.RewardGroupDTO(1000L, 3000L, BigDecimal.valueOf(40));
+            RewardGroupsDTO.RewardGroupDTO rewardGroupDTO1 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(10), BigDecimal.valueOf(20), BigDecimal.valueOf(30));
+            RewardGroupsDTO.RewardGroupDTO rewardGroupDTO2 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(10), BigDecimal.valueOf(30), BigDecimal.valueOf(40));
             List<RewardGroupsDTO.RewardGroupDTO> rewardGroupDTOList = new ArrayList<>();
             rewardGroupDTOList.add(rewardGroupDTO1);
             rewardGroupDTOList.add(rewardGroupDTO2);
@@ -2119,9 +2119,9 @@ class InitiativeServiceTest {
         DayOfWeekDTO dayOfWeekDTO = new DayOfWeekDTO(dayConfigs);
 
         ThresholdDTO thresholdDTO = new ThresholdDTO();
-        thresholdDTO.setFromCents(1000L);
+        thresholdDTO.setFrom(BigDecimal.valueOf(10));
         thresholdDTO.setFromIncluded(true);
-        thresholdDTO.setToCents(3000L);
+        thresholdDTO.setTo(BigDecimal.valueOf(30));
         thresholdDTO.setToIncluded(true);
 
         TrxCountDTO trxCountDTO = new TrxCountDTO();
@@ -2140,10 +2140,10 @@ class InitiativeServiceTest {
         List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<>();
         RewardLimitsDTO rewardLimitsDTO1 = new RewardLimitsDTO();
         rewardLimitsDTO1.setFrequency(RewardLimitsDTO.RewardLimitFrequency.DAILY);
-        rewardLimitsDTO1.setRewardLimitCents(10000L);
+        rewardLimitsDTO1.setRewardLimit(BigDecimal.valueOf(100));
         RewardLimitsDTO rewardLimitsDTO2 = new RewardLimitsDTO();
         rewardLimitsDTO2.setFrequency(RewardLimitsDTO.RewardLimitFrequency.MONTHLY);
-        rewardLimitsDTO2.setRewardLimitCents(300000L);
+        rewardLimitsDTO2.setRewardLimit(BigDecimal.valueOf(3000));
         rewardLimitsDTOList.add(rewardLimitsDTO1);
         rewardLimitsDTOList.add(rewardLimitsDTO2);
 

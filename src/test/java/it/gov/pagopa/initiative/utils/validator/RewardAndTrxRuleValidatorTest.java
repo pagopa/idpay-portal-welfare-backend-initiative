@@ -152,8 +152,8 @@ class RewardAndTrxRuleValidatorTest {
     @Test
     void when_threshold_FromIsLessThanTo_then_ValidationAreOk(){
         ThresholdDTO thresholdDTO = ThresholdDTO.builder()
-                .fromCents(0L)
-                .toCents(1000L)
+                .from(BigDecimal.ONE)
+                .to(BigDecimal.TEN)
                 .fromIncluded(false)
                 .toIncluded(true).build();
         Set<ConstraintViolation<ThresholdDTO>> violations = validator.validate(thresholdDTO, ValidationApiEnabledGroup.class);
@@ -163,8 +163,8 @@ class RewardAndTrxRuleValidatorTest {
     @Test
     void when_threshold_FromIsGreaterThanTo_then_ValidationAreFailed(){
         ThresholdDTO thresholdDTO = ThresholdDTO.builder()
-                .fromCents(1000L)
-                .toCents(0L)
+                .from(BigDecimal.TEN)
+                .to(BigDecimal.ZERO)
                 .fromIncluded(false)
                 .toIncluded(true).build();
         Set<ConstraintViolation<ThresholdDTO>> violations = validator.validate(thresholdDTO, ValidationApiEnabledGroup.class);
@@ -237,8 +237,8 @@ class RewardAndTrxRuleValidatorTest {
     InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardGroupsDTO_ok(){
         RewardGroupsDTO rewardGroupsDTO = new RewardGroupsDTO();
         rewardGroupsDTO.setType("rewardGroups");
-        RewardGroupsDTO.RewardGroupDTO rewardGroupDTO1 = new RewardGroupsDTO.RewardGroupDTO(1000L, 2000L, BigDecimal.valueOf(30));
-        RewardGroupsDTO.RewardGroupDTO rewardGroupDTO2 = new RewardGroupsDTO.RewardGroupDTO(1000L, 3000L, BigDecimal.valueOf(40));
+        RewardGroupsDTO.RewardGroupDTO rewardGroupDTO1 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(10), BigDecimal.valueOf(20), BigDecimal.valueOf(30));
+        RewardGroupsDTO.RewardGroupDTO rewardGroupDTO2 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(10), BigDecimal.valueOf(30), BigDecimal.valueOf(40));
         List<RewardGroupsDTO.RewardGroupDTO> rewardGroupDTOList = new ArrayList<>();
         rewardGroupDTOList.add(rewardGroupDTO1);
         rewardGroupDTOList.add(rewardGroupDTO2);
@@ -248,8 +248,8 @@ class RewardAndTrxRuleValidatorTest {
     InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardGroupsDTO_ko(){
         RewardGroupsDTO rewardGroupsDTO = new RewardGroupsDTO();
         rewardGroupsDTO.setType("rewardGroups");
-        RewardGroupsDTO.RewardGroupDTO rewardGroupDTO1 = new RewardGroupsDTO.RewardGroupDTO(1000L , 2000L, BigDecimal.valueOf(30));
-        RewardGroupsDTO.RewardGroupDTO rewardGroupDTO2 = new RewardGroupsDTO.RewardGroupDTO(1000L,2000L, BigDecimal.valueOf(40));
+        RewardGroupsDTO.RewardGroupDTO rewardGroupDTO1 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(10), BigDecimal.valueOf(20), BigDecimal.valueOf(30));
+        RewardGroupsDTO.RewardGroupDTO rewardGroupDTO2 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(10), BigDecimal.valueOf(20), BigDecimal.valueOf(40));
         List<RewardGroupsDTO.RewardGroupDTO> rewardGroupDTOList = new ArrayList<>();
         rewardGroupDTOList.add(rewardGroupDTO1);
         rewardGroupDTOList.add(rewardGroupDTO2);
@@ -260,8 +260,8 @@ class RewardAndTrxRuleValidatorTest {
     InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardGroupsDTORateNotValid_ko(){
         RewardGroupsDTO rewardGroupsDTO = new RewardGroupsDTO();
         rewardGroupsDTO.setType("rewardGroups");
-        RewardGroupsDTO.RewardGroupDTO rewardGroupDTO1 = new RewardGroupsDTO.RewardGroupDTO(1000L, 2000L, BigDecimal.valueOf(230));
-        RewardGroupsDTO.RewardGroupDTO rewardGroupDTO2 = new RewardGroupsDTO.RewardGroupDTO(500L,2000L, BigDecimal.valueOf(140));
+        RewardGroupsDTO.RewardGroupDTO rewardGroupDTO1 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(10), BigDecimal.valueOf(20), BigDecimal.valueOf(230));
+        RewardGroupsDTO.RewardGroupDTO rewardGroupDTO2 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(5), BigDecimal.valueOf(20), BigDecimal.valueOf(140));
         List<RewardGroupsDTO.RewardGroupDTO> rewardGroupDTOList = new ArrayList<>();
         rewardGroupDTOList.add(rewardGroupDTO1);
         rewardGroupDTOList.add(rewardGroupDTO2);
@@ -271,10 +271,10 @@ class RewardAndTrxRuleValidatorTest {
     InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardGroupsDTOFromAndToNotValid_ko(){
         RewardGroupsDTO rewardGroupsDTO = new RewardGroupsDTO();
         rewardGroupsDTO.setType("rewardGroups");
-        RewardGroupsDTO.RewardGroupDTO rewardGroupDTO1 = new RewardGroupsDTO.RewardGroupDTO(-1000L, -2000L, BigDecimal.valueOf(-30));
-        RewardGroupsDTO.RewardGroupDTO rewardGroupDTO2 = new RewardGroupsDTO.RewardGroupDTO(3000L, 2000L, BigDecimal.valueOf(40));
-        RewardGroupsDTO.RewardGroupDTO rewardGroupDTO3 = new RewardGroupsDTO.RewardGroupDTO(3000L, 2000L, BigDecimal.valueOf(40));
-        RewardGroupsDTO.RewardGroupDTO rewardGroupDTO4 = new RewardGroupsDTO.RewardGroupDTO(4000L, 2000L, BigDecimal.valueOf(40));
+        RewardGroupsDTO.RewardGroupDTO rewardGroupDTO1 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(-10), BigDecimal.valueOf(-20), BigDecimal.valueOf(-30));
+        RewardGroupsDTO.RewardGroupDTO rewardGroupDTO2 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(40), BigDecimal.valueOf(20), BigDecimal.valueOf(40));
+        RewardGroupsDTO.RewardGroupDTO rewardGroupDTO3 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(30), BigDecimal.valueOf(20), BigDecimal.valueOf(40));
+        RewardGroupsDTO.RewardGroupDTO rewardGroupDTO4 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(40), BigDecimal.valueOf(20), BigDecimal.valueOf(40));
         List<RewardGroupsDTO.RewardGroupDTO> rewardGroupDTOList = new ArrayList<>();
         rewardGroupDTOList.add(rewardGroupDTO1);
         rewardGroupDTOList.add(rewardGroupDTO2);
@@ -326,9 +326,9 @@ class RewardAndTrxRuleValidatorTest {
 
         ThresholdDTO thresholdDTO = new ThresholdDTO();
 
-        thresholdDTO.setFromCents(1000L);
+        thresholdDTO.setFrom(BigDecimal.valueOf(10));
         thresholdDTO.setFromIncluded(true);
-        thresholdDTO.setToCents(3000L);
+        thresholdDTO.setTo(BigDecimal.valueOf(30));
         thresholdDTO.setToIncluded(true);
 
         TrxCountDTO trxCountDTO = new TrxCountDTO();
@@ -348,10 +348,10 @@ class RewardAndTrxRuleValidatorTest {
         List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<>();
         RewardLimitsDTO rewardLimitsDTO1 = new RewardLimitsDTO();
         rewardLimitsDTO1.setFrequency(RewardLimitsDTO.RewardLimitFrequency.DAILY);
-        rewardLimitsDTO1.setRewardLimitCents(10000L);
+        rewardLimitsDTO1.setRewardLimit(BigDecimal.valueOf(100));
         RewardLimitsDTO rewardLimitsDTO2 = new RewardLimitsDTO();
         rewardLimitsDTO2.setFrequency(RewardLimitsDTO.RewardLimitFrequency.MONTHLY);
-        rewardLimitsDTO2.setRewardLimitCents(300000L);
+        rewardLimitsDTO2.setRewardLimit(BigDecimal.valueOf(3000));
         rewardLimitsDTOList.add(rewardLimitsDTO1);
         rewardLimitsDTOList.add(rewardLimitsDTO2);
 
@@ -392,9 +392,9 @@ class RewardAndTrxRuleValidatorTest {
 
         ThresholdDTO thresholdDTO = new ThresholdDTO();
 
-        thresholdDTO.setFromCents(1000L);
+        thresholdDTO.setFrom(BigDecimal.valueOf(10));
         thresholdDTO.setFromIncluded(true);
-        thresholdDTO.setToCents(3000L);
+        thresholdDTO.setTo(BigDecimal.valueOf(30));
         thresholdDTO.setToIncluded(true);
 
         TrxCountDTO trxCountDTO = new TrxCountDTO();
@@ -414,10 +414,10 @@ class RewardAndTrxRuleValidatorTest {
         List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<>();
         RewardLimitsDTO rewardLimitsDTO1 = new RewardLimitsDTO();
         rewardLimitsDTO1.setFrequency(RewardLimitsDTO.RewardLimitFrequency.DAILY);
-        rewardLimitsDTO1.setRewardLimitCents(10000L);
+        rewardLimitsDTO1.setRewardLimit(BigDecimal.valueOf(100));
         RewardLimitsDTO rewardLimitsDTO2 = new RewardLimitsDTO();
         rewardLimitsDTO2.setFrequency(RewardLimitsDTO.RewardLimitFrequency.MONTHLY);
-        rewardLimitsDTO2.setRewardLimitCents(300000L);
+        rewardLimitsDTO2.setRewardLimit(BigDecimal.valueOf(3000));
         rewardLimitsDTOList.add(rewardLimitsDTO1);
         rewardLimitsDTOList.add(rewardLimitsDTO2);
 
@@ -453,9 +453,9 @@ class RewardAndTrxRuleValidatorTest {
 
         ThresholdDTO thresholdDTO = new ThresholdDTO();
 
-        thresholdDTO.setFromCents(-100L);
+        thresholdDTO.setFrom(BigDecimal.valueOf(-1));
         thresholdDTO.setFromIncluded(true);
-        thresholdDTO.setToCents(-100L);
+        thresholdDTO.setTo(BigDecimal.valueOf(-1));
         thresholdDTO.setToIncluded(true);
 
         TrxCountDTO trxCountDTO = new TrxCountDTO();
@@ -475,10 +475,10 @@ class RewardAndTrxRuleValidatorTest {
         List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<>();
         RewardLimitsDTO rewardLimitsDTO1 = new RewardLimitsDTO();
         rewardLimitsDTO1.setFrequency(RewardLimitsDTO.RewardLimitFrequency.DAILY);
-        rewardLimitsDTO1.setRewardLimitCents(10000L);
+        rewardLimitsDTO1.setRewardLimit(BigDecimal.valueOf(100));
         RewardLimitsDTO rewardLimitsDTO2 = new RewardLimitsDTO();
         rewardLimitsDTO2.setFrequency(RewardLimitsDTO.RewardLimitFrequency.MONTHLY);
-        rewardLimitsDTO2.setRewardLimitCents(300000L);
+        rewardLimitsDTO2.setRewardLimit(BigDecimal.valueOf(3000));
         rewardLimitsDTOList.add(rewardLimitsDTO1);
         rewardLimitsDTOList.add(rewardLimitsDTO2);
 
@@ -514,9 +514,9 @@ class RewardAndTrxRuleValidatorTest {
 
         ThresholdDTO thresholdDTO = new ThresholdDTO();
 
-        thresholdDTO.setFromCents(1000L);
+        thresholdDTO.setFrom(BigDecimal.valueOf(10));
         thresholdDTO.setFromIncluded(true);
-        thresholdDTO.setToCents(3000L);
+        thresholdDTO.setTo(BigDecimal.valueOf(30));
         thresholdDTO.setToIncluded(true);
 
         TrxCountDTO trxCountDTO = new TrxCountDTO();
@@ -536,10 +536,10 @@ class RewardAndTrxRuleValidatorTest {
         List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<>();
         RewardLimitsDTO rewardLimitsDTO1 = new RewardLimitsDTO();
         rewardLimitsDTO1.setFrequency(RewardLimitsDTO.RewardLimitFrequency.DAILY);
-        rewardLimitsDTO1.setRewardLimitCents(10000L);
+        rewardLimitsDTO1.setRewardLimit(BigDecimal.valueOf(100));
         RewardLimitsDTO rewardLimitsDTO2 = new RewardLimitsDTO();
         rewardLimitsDTO2.setFrequency(RewardLimitsDTO.RewardLimitFrequency.MONTHLY);
-        rewardLimitsDTO2.setRewardLimitCents(300000L);
+        rewardLimitsDTO2.setRewardLimit(BigDecimal.valueOf(3000));
         rewardLimitsDTOList.add(rewardLimitsDTO1);
         rewardLimitsDTOList.add(rewardLimitsDTO2);
 
@@ -575,9 +575,9 @@ class RewardAndTrxRuleValidatorTest {
 
         ThresholdDTO thresholdDTO = new ThresholdDTO();
 
-        thresholdDTO.setFromCents(1000L);
+        thresholdDTO.setFrom(BigDecimal.valueOf(10));
         thresholdDTO.setFromIncluded(true);
-        thresholdDTO.setToCents(3000L);
+        thresholdDTO.setTo(BigDecimal.valueOf(30));
         thresholdDTO.setToIncluded(true);
 
         TrxCountDTO trxCountDTO = new TrxCountDTO();
@@ -597,10 +597,10 @@ class RewardAndTrxRuleValidatorTest {
         List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<>();
         RewardLimitsDTO rewardLimitsDTO1 = new RewardLimitsDTO();
         rewardLimitsDTO1.setFrequency(RewardLimitsDTO.RewardLimitFrequency.DAILY);
-        rewardLimitsDTO1.setRewardLimitCents(10000L);
+        rewardLimitsDTO1.setRewardLimit(BigDecimal.valueOf(100));
         RewardLimitsDTO rewardLimitsDTO2 = new RewardLimitsDTO();
         rewardLimitsDTO2.setFrequency(RewardLimitsDTO.RewardLimitFrequency.MONTHLY);
-        rewardLimitsDTO2.setRewardLimitCents(300000L);
+        rewardLimitsDTO2.setRewardLimit(BigDecimal.valueOf(3000));
         rewardLimitsDTOList.add(rewardLimitsDTO1);
         rewardLimitsDTOList.add(rewardLimitsDTO2);
 

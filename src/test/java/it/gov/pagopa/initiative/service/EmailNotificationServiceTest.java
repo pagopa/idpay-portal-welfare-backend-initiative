@@ -18,7 +18,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -220,10 +220,10 @@ class EmailNotificationServiceTest {
         Map<String, String> language = new HashMap<>();
         language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
-        initiativeGeneralDTO.setBeneficiaryBudgetCents(1000L);
+        initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(beneficiaryKnown);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
-        initiativeGeneralDTO.setBudgetCents(100000000000L);
+        initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
         LocalDate rankingStartDate = LocalDate.now();
         LocalDate rankingEndDate = rankingStartDate.plusDays(1);
         LocalDate startDate = rankingEndDate.plusDays(1);

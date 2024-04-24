@@ -36,10 +36,10 @@ public class RewardGroupsDTO implements InitiativeRewardRuleDTO {
     public static class RewardGroupDTO {
 
         @Min(value = 0, message = "from must be at least 0", groups = ValidationApiEnabledGroup.class)
-        private Long fromCents;
+        private BigDecimal from;
 
         @Min(value = 1, message = "to must be at least 1", groups = ValidationApiEnabledGroup.class)
-        private Long toCents;
+        private BigDecimal to;
 
         @Min(value = 0, message = "Reward value must be at least 0%", groups = ValidationApiEnabledGroup.class)
         @Max(value = 100, message = "Reward value must be at most 100%", groups = ValidationApiEnabledGroup.class)

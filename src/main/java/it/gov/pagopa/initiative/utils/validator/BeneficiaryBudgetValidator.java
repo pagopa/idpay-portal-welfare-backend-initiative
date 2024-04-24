@@ -6,7 +6,7 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-
+import java.math.BigDecimal;
 
 public class BeneficiaryBudgetValidator implements ConstraintValidator<BeneficiaryBudgetValue, InitiativeGeneralDTO> {
 
@@ -22,16 +22,15 @@ public class BeneficiaryBudgetValidator implements ConstraintValidator<Beneficia
 
     @Override
     public boolean isValid(InitiativeGeneralDTO value, ConstraintValidatorContext context) {
-        Long budget1 = null;
-        Long budget2 = null;
-        if (PARSER.parseExpression(budgetField1).getValue(value) instanceof Long longInput)
-            budget1 = longInput;
-        if (PARSER.parseExpression(budgetField2).getValue(value) instanceof Long longInput)
-            budget2 = longInput;
-
-        if (budget1 != null && budget2 != null)
-            return budget1 < budget2;
-
+        BigDecimal budget1 = null;
+        BigDecimal budget2 = null;
+        if (PARSER.parseExpression(budgetField1).getValue(value) instanceof BigDecimal bigDecimalInput)
+            budget1 = bigDecimalInput;
+        if (PARSER.parseExpression(budgetField2).getValue(value) instanceof BigDecimal bigDecimalInput){
+            budget2 = bigDecimalInput;
+        }
+        if(budget1 != null && budget2 != null)
+            return budget1.compareTo(budget2) < 0;
         return false;
     }
 

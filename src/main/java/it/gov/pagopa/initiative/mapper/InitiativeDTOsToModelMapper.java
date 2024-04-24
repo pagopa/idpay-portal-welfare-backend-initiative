@@ -20,6 +20,7 @@ import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
 import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
 import it.gov.pagopa.initiative.model.rule.trx.*;
 import it.gov.pagopa.initiative.service.AESTokenService;
+import it.gov.pagopa.initiative.utils.CommonUtilities;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -55,11 +56,11 @@ public class InitiativeDTOsToModelMapper {
         if (generalDTO == null) {
             return null;
         }
-        return InitiativeGeneral.builder().beneficiaryBudgetCents(generalDTO.getBeneficiaryBudgetCents())
+        return InitiativeGeneral.builder().beneficiaryBudgetCents(CommonUtilities.euroToCents(generalDTO.getBeneficiaryBudget()))
                 .beneficiaryKnown(generalDTO.getBeneficiaryKnown())
                 .beneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.valueOf(generalDTO.getBeneficiaryType().name()))
                 .familyUnitComposition(generalDTO.getFamilyUnitComposition()!=null?generalDTO.getFamilyUnitComposition():null)
-                .budgetCents(generalDTO.getBudgetCents())
+                .budgetCents(CommonUtilities.euroToCents(generalDTO.getBudget()))
                 .endDate(generalDTO.getEndDate())
                 .startDate(generalDTO.getStartDate())
                 .rankingEndDate(generalDTO.getRankingEndDate())
@@ -171,8 +172,8 @@ public class InitiativeDTOsToModelMapper {
                     .type(rewardGroupsInput.getType())
                     .rewardGroups(rewardGroupsInput.getRewardGroups().stream().map(
                     x -> RewardGroups.RewardGroup.builder()
-                            .fromCents(x.getFromCents())
-                            .toCents(x.getToCents())
+                            .fromCents(CommonUtilities.euroToCents(x.getFrom()))
+                            .toCents(CommonUtilities.euroToCents(x.getTo()))
                             .rewardValue(x.getRewardValue()).build()
             ).toList()).build();
         } else {
@@ -232,7 +233,7 @@ public class InitiativeDTOsToModelMapper {
         }
         return rewardLimitDTO.stream().map(x -> RewardLimits.builder()
                         .frequency(RewardLimits.RewardLimitFrequency.valueOf(x.getFrequency().name()))
-                        .rewardLimitCents(x.getRewardLimitCents())
+                        .rewardLimitCents(CommonUtilities.euroToCents(x.getRewardLimit()))
                         .build())
                 .toList();
     }
@@ -241,8 +242,8 @@ public class InitiativeDTOsToModelMapper {
         if (thresholdDTO == null) {
             return null;
         }
-        return Threshold.builder().fromCents(thresholdDTO.getFromCents())
-                .toCents(thresholdDTO.getToCents())
+        return Threshold.builder().fromCents(CommonUtilities.euroToCents(thresholdDTO.getFrom()))
+                .toCents(CommonUtilities.euroToCents(thresholdDTO.getTo()))
                 .fromIncluded(thresholdDTO.getFromIncluded())
                 .toIncluded(thresholdDTO.getToIncluded()).build();
     }
@@ -268,7 +269,7 @@ public class InitiativeDTOsToModelMapper {
             return null;
         }
         return AccumulatedAmount.builder().accumulatedType(AccumulatedAmount.AccumulatedTypeEnum.valueOf(accumulatedAmountDTO.getAccumulatedType().name()))
-                .refundThresholdCents(accumulatedAmountDTO.getRefundThresholdCents()).build();
+                .refundThresholdCents(CommonUtilities.euroToCents(accumulatedAmountDTO.getRefundThreshold())).build();
     }
 
     private TimeParameter toTimeParameter(TimeParameterDTO timeParameterDTO){
