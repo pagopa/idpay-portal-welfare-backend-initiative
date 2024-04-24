@@ -20,11 +20,11 @@ import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
 import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
 import it.gov.pagopa.initiative.model.rule.trx.*;
 import it.gov.pagopa.initiative.service.AESTokenService;
-import it.gov.pagopa.initiative.utils.CommonUtilities;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +36,10 @@ public class InitiativeDTOsToModelMapper {
 
     public InitiativeDTOsToModelMapper(AESTokenService aesTokenService) {
         this.aesTokenService = aesTokenService;
+    }
+
+    private static Long euroToCents(BigDecimal euro){
+        return euro == null? null : euro.multiply(BigDecimal.valueOf(100)).longValue();
     }
 
     public Initiative toInitiative(InitiativeAdditionalDTO initiativeAdditionalDTO) {
@@ -56,11 +60,11 @@ public class InitiativeDTOsToModelMapper {
         if (generalDTO == null) {
             return null;
         }
-        return InitiativeGeneral.builder().beneficiaryBudgetCents(CommonUtilities.euroToCents(generalDTO.getBeneficiaryBudget()))
+        return InitiativeGeneral.builder().beneficiaryBudgetCents(euroToCents(generalDTO.getBeneficiaryBudget()))
                 .beneficiaryKnown(generalDTO.getBeneficiaryKnown())
                 .beneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.valueOf(generalDTO.getBeneficiaryType().name()))
                 .familyUnitComposition(generalDTO.getFamilyUnitComposition()!=null?generalDTO.getFamilyUnitComposition():null)
-                .budgetCents(CommonUtilities.euroToCents(generalDTO.getBudget()))
+                .budgetCents(euroToCents(generalDTO.getBudget()))
                 .endDate(generalDTO.getEndDate())
                 .startDate(generalDTO.getStartDate())
                 .rankingEndDate(generalDTO.getRankingEndDate())
@@ -172,8 +176,8 @@ public class InitiativeDTOsToModelMapper {
                     .type(rewardGroupsInput.getType())
                     .rewardGroups(rewardGroupsInput.getRewardGroups().stream().map(
                     x -> RewardGroups.RewardGroup.builder()
-                            .fromCents(CommonUtilities.euroToCents(x.getFrom()))
-                            .toCents(CommonUtilities.euroToCents(x.getTo()))
+                            .fromCents(euroToCents(x.getFrom()))
+                            .toCents(euroToCents(x.getTo()))
                             .rewardValue(x.getRewardValue()).build()
             ).toList()).build();
         } else {
@@ -233,7 +237,7 @@ public class InitiativeDTOsToModelMapper {
         }
         return rewardLimitDTO.stream().map(x -> RewardLimits.builder()
                         .frequency(RewardLimits.RewardLimitFrequency.valueOf(x.getFrequency().name()))
-                        .rewardLimitCents(CommonUtilities.euroToCents(x.getRewardLimit()))
+                        .rewardLimitCents(euroToCents(x.getRewardLimit()))
                         .build())
                 .toList();
     }
@@ -242,8 +246,8 @@ public class InitiativeDTOsToModelMapper {
         if (thresholdDTO == null) {
             return null;
         }
-        return Threshold.builder().fromCents(CommonUtilities.euroToCents(thresholdDTO.getFrom()))
-                .toCents(CommonUtilities.euroToCents(thresholdDTO.getTo()))
+        return Threshold.builder().fromCents(euroToCents(thresholdDTO.getFrom()))
+                .toCents(euroToCents(thresholdDTO.getTo()))
                 .fromIncluded(thresholdDTO.getFromIncluded())
                 .toIncluded(thresholdDTO.getToIncluded()).build();
     }
@@ -269,7 +273,7 @@ public class InitiativeDTOsToModelMapper {
             return null;
         }
         return AccumulatedAmount.builder().accumulatedType(AccumulatedAmount.AccumulatedTypeEnum.valueOf(accumulatedAmountDTO.getAccumulatedType().name()))
-                .refundThresholdCents(CommonUtilities.euroToCents(accumulatedAmountDTO.getRefundThreshold())).build();
+                .refundThresholdCents(euroToCents(accumulatedAmountDTO.getRefundThreshold())).build();
     }
 
     private TimeParameter toTimeParameter(TimeParameterDTO timeParameterDTO){
