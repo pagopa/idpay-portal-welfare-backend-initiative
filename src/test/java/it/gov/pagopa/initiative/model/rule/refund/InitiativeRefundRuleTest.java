@@ -34,7 +34,7 @@ class InitiativeRefundRuleTest {
         assertSame(accumulatedAmount, actualInitiativeRefundRule.getAccumulatedAmount());
         assertSame(additionalInfo, actualInitiativeRefundRule.getAdditionalInfo());
         assertSame(timeParameter, actualInitiativeRefundRule.getTimeParameter());
-        assertEquals("InitiativeRefundRule(accumulatedAmount=AccumulatedAmount(accumulatedType=null, refundThreshold=null),"
+        assertEquals("InitiativeRefundRule(accumulatedAmount=AccumulatedAmount(accumulatedType=null, refundThresholdCents=null),"
                 + " timeParameter=TimeParameter(timeType=CLOSED), additionalInfo=AdditionalInfo(identificationCode"
                 + "=Identification Code))", actualToStringResult);
     }
@@ -63,7 +63,7 @@ class InitiativeRefundRuleTest {
         assertSame(timeParameter1, timeParameter2);
         assertEquals(timeParameter, timeParameter2);
         assertEquals(
-                "InitiativeRefundRule(accumulatedAmount=AccumulatedAmount(accumulatedType=null, refundThreshold=null),"
+                "InitiativeRefundRule(accumulatedAmount=AccumulatedAmount(accumulatedType=null, refundThresholdCents=null),"
                         + " timeParameter=TimeParameter(timeType=CLOSED), additionalInfo=AdditionalInfo(identificationCode"
                         + "=Identification Code))",
                 actualToStringResult);

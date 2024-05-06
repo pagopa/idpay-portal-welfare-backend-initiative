@@ -1441,10 +1441,10 @@ class InitiativeApiTest {
         Map<String, String> language = new HashMap<>();
         language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneral initiativeGeneral = new InitiativeGeneral();
-        initiativeGeneral.setBeneficiaryBudget(new BigDecimal(10));
+        initiativeGeneral.setBeneficiaryBudgetCents(1000L);
         initiativeGeneral.setBeneficiaryKnown(beneficiaryKnown);
         initiativeGeneral.setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF);
-        initiativeGeneral.setBudget(new BigDecimal(1000000000));
+        initiativeGeneral.setBudgetCents(100000000000L);
         LocalDate rankingStartDate = LocalDate.now();
         LocalDate rankingEndDate = rankingStartDate.plusDays(1);
         LocalDate startDate = rankingEndDate.plusDays(1);
@@ -1653,7 +1653,7 @@ class InitiativeApiTest {
     private AccumulatedAmount createAccumulatedAmount_Valid() {
         AccumulatedAmount amount = new AccumulatedAmount();
         amount.setAccumulatedType(AccumulatedAmount.AccumulatedTypeEnum.THRESHOLD_REACHED);
-        amount.setRefundThreshold(BigDecimal.valueOf(100000));
+        amount.setRefundThresholdCents(10000000L);
         return amount;
     }
 

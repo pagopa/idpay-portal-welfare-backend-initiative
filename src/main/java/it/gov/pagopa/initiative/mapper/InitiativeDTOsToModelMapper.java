@@ -24,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +36,10 @@ public class InitiativeDTOsToModelMapper {
 
     public InitiativeDTOsToModelMapper(AESTokenService aesTokenService) {
         this.aesTokenService = aesTokenService;
+    }
+
+    private static Long euroToCents(BigDecimal euro){
+        return euro == null? null : euro.multiply(BigDecimal.valueOf(100)).longValue();
     }
 
     public Initiative toInitiative(InitiativeAdditionalDTO initiativeAdditionalDTO) {
@@ -55,11 +60,11 @@ public class InitiativeDTOsToModelMapper {
         if (generalDTO == null) {
             return null;
         }
-        return InitiativeGeneral.builder().beneficiaryBudget(generalDTO.getBeneficiaryBudget())
+        return InitiativeGeneral.builder().beneficiaryBudgetCents(euroToCents(generalDTO.getBeneficiaryBudget()))
                 .beneficiaryKnown(generalDTO.getBeneficiaryKnown())
                 .beneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.valueOf(generalDTO.getBeneficiaryType().name()))
                 .familyUnitComposition(generalDTO.getFamilyUnitComposition()!=null?generalDTO.getFamilyUnitComposition():null)
-                .budget(generalDTO.getBudget())
+                .budgetCents(euroToCents(generalDTO.getBudget()))
                 .endDate(generalDTO.getEndDate())
                 .startDate(generalDTO.getStartDate())
                 .rankingEndDate(generalDTO.getRankingEndDate())
@@ -170,7 +175,10 @@ public class InitiativeDTOsToModelMapper {
             ret = RewardGroups.builder()
                     .type(rewardGroupsInput.getType())
                     .rewardGroups(rewardGroupsInput.getRewardGroups().stream().map(
-                    x -> RewardGroups.RewardGroup.builder().from(x.getFrom()).to(x.getTo()).rewardValue(x.getRewardValue()).build()
+                    x -> RewardGroups.RewardGroup.builder()
+                            .fromCents(euroToCents(x.getFrom()))
+                            .toCents(euroToCents(x.getTo()))
+                            .rewardValue(x.getRewardValue()).build()
             ).toList()).build();
         } else {
             throw new IllegalArgumentException("Initiative Reward Rule not handled: %s".formatted(rewardRuleDTO.getClass().getName()));
@@ -229,7 +237,7 @@ public class InitiativeDTOsToModelMapper {
         }
         return rewardLimitDTO.stream().map(x -> RewardLimits.builder()
                         .frequency(RewardLimits.RewardLimitFrequency.valueOf(x.getFrequency().name()))
-                        .rewardLimit(x.getRewardLimit())
+                        .rewardLimitCents(euroToCents(x.getRewardLimit()))
                         .build())
                 .toList();
     }
@@ -238,8 +246,8 @@ public class InitiativeDTOsToModelMapper {
         if (thresholdDTO == null) {
             return null;
         }
-        return Threshold.builder().from(thresholdDTO.getFrom())
-                .to(thresholdDTO.getTo())
+        return Threshold.builder().fromCents(euroToCents(thresholdDTO.getFrom()))
+                .toCents(euroToCents(thresholdDTO.getTo()))
                 .fromIncluded(thresholdDTO.getFromIncluded())
                 .toIncluded(thresholdDTO.getToIncluded()).build();
     }
@@ -265,7 +273,7 @@ public class InitiativeDTOsToModelMapper {
             return null;
         }
         return AccumulatedAmount.builder().accumulatedType(AccumulatedAmount.AccumulatedTypeEnum.valueOf(accumulatedAmountDTO.getAccumulatedType().name()))
-                .refundThreshold(accumulatedAmountDTO.getRefundThreshold()).build();
+                .refundThresholdCents(euroToCents(accumulatedAmountDTO.getRefundThreshold())).build();
     }
 
     private TimeParameter toTimeParameter(TimeParameterDTO timeParameterDTO){
