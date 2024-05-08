@@ -423,10 +423,10 @@ class InitiativeDTOsToModelMapperTest {
         Map<String, String> language = new HashMap<>();
         language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneral initiativeGeneral = new InitiativeGeneral();
-        initiativeGeneral.setBeneficiaryBudget(new BigDecimal(10));
+        initiativeGeneral.setBeneficiaryBudgetCents(1000L);
         initiativeGeneral.setBeneficiaryKnown(true);
         initiativeGeneral.setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF);
-        initiativeGeneral.setBudget(new BigDecimal(1000000000));
+        initiativeGeneral.setBudgetCents(100000000000L);
         LocalDate rankingStartDate = LocalDate.now();
         LocalDate rankingEndDate = rankingStartDate.plusDays(1);
         LocalDate startDate = rankingEndDate.plusDays(1);
@@ -681,6 +681,7 @@ class InitiativeDTOsToModelMapperTest {
         DayOfWeekDTO dayOfWeekDTO = new DayOfWeekDTO(dayConfigs);
 
         ThresholdDTO thresholdDTO = new ThresholdDTO();
+
 
         thresholdDTO.setFrom(BigDecimal.valueOf(10));
         thresholdDTO.setFromIncluded(true);
@@ -958,6 +959,7 @@ class InitiativeDTOsToModelMapperTest {
 
         ThresholdDTO thresholdDTO = new ThresholdDTO();
 
+
         thresholdDTO.setFrom(BigDecimal.valueOf(10));
         thresholdDTO.setFromIncluded(true);
         thresholdDTO.setTo(BigDecimal.valueOf(30));
@@ -1099,7 +1101,7 @@ class InitiativeDTOsToModelMapperTest {
         RewardGroups rewardGroups = new RewardGroups();
         rewardGroups.setType("rewardGroups");
         List<RewardGroups.RewardGroup> list = new ArrayList<>();
-        RewardGroups.RewardGroup group1 = new RewardGroups.RewardGroup(BigDecimal.valueOf(10), BigDecimal.valueOf(100), BigDecimal.valueOf(50));
+        RewardGroups.RewardGroup group1 = new RewardGroups.RewardGroup(1000L, 10000L, BigDecimal.valueOf(50));
         list.add(group1);
         rewardGroups.setRewardGroups(list);
         return rewardGroups;
@@ -1127,9 +1129,9 @@ class InitiativeDTOsToModelMapperTest {
 
         Threshold threshold = new Threshold();
 
-        threshold.setFrom(BigDecimal.valueOf(10));
+        threshold.setFromCents(1000L);
         threshold.setFromIncluded(true);
-        threshold.setTo(BigDecimal.valueOf(30));
+        threshold.setToCents(3000L);
         threshold.setToIncluded(true);
 
         TrxCount trxCount = new TrxCount();
@@ -1149,10 +1151,10 @@ class InitiativeDTOsToModelMapperTest {
         List<RewardLimits> rewardLimitsList = new ArrayList<>();
         RewardLimits rewardLimits1 = new RewardLimits();
         rewardLimits1.setFrequency(RewardLimits.RewardLimitFrequency.DAILY);
-        rewardLimits1.setRewardLimit(BigDecimal.valueOf(100));
+        rewardLimits1.setRewardLimitCents(10000L);
         RewardLimits rewardLimits2 = new RewardLimits();
         rewardLimits2.setFrequency(RewardLimits.RewardLimitFrequency.MONTHLY);
-        rewardLimits2.setRewardLimit(BigDecimal.valueOf(3000));
+        rewardLimits2.setRewardLimitCents(300000L);
         rewardLimitsList.add(rewardLimits1);
         rewardLimitsList.add(rewardLimits2);
 
@@ -1202,10 +1204,10 @@ class InitiativeDTOsToModelMapperTest {
         List<RewardLimits> rewardLimitsList = new ArrayList<>();
         RewardLimits rewardLimits1 = new RewardLimits();
         rewardLimits1.setFrequency(RewardLimits.RewardLimitFrequency.DAILY);
-        rewardLimits1.setRewardLimit(BigDecimal.valueOf(100));
+        rewardLimits1.setRewardLimitCents(10000L);
         RewardLimits rewardLimits2 = new RewardLimits();
         rewardLimits2.setFrequency(RewardLimits.RewardLimitFrequency.MONTHLY);
-        rewardLimits2.setRewardLimit(BigDecimal.valueOf(3000));
+        rewardLimits2.setRewardLimitCents(300000L);
         rewardLimitsList.add(rewardLimits1);
         rewardLimitsList.add(rewardLimits2);
 
@@ -1240,9 +1242,9 @@ class InitiativeDTOsToModelMapperTest {
 
         Threshold threshold = new Threshold();
 
-        threshold.setFrom(BigDecimal.valueOf(10));
+        threshold.setFromCents(1000L);
         threshold.setFromIncluded(true);
-        threshold.setTo(BigDecimal.valueOf(30));
+        threshold.setToCents(3000L);
         threshold.setToIncluded(true);
 
         TrxCount trxCount = new TrxCount();
@@ -1290,9 +1292,9 @@ class InitiativeDTOsToModelMapperTest {
 
         Threshold threshold = new Threshold();
 
-        threshold.setFrom(BigDecimal.valueOf(10));
+        threshold.setFromCents(1000L);
         threshold.setFromIncluded(true);
-        threshold.setTo(BigDecimal.valueOf(30));
+        threshold.setToCents(3000L);
         threshold.setToIncluded(true);
 
         TrxCount trxCount = new TrxCount();
@@ -1312,10 +1314,10 @@ class InitiativeDTOsToModelMapperTest {
         List<RewardLimits> rewardLimitsList = new ArrayList<>();
         RewardLimits rewardLimits1 = new RewardLimits();
         rewardLimits1.setFrequency(RewardLimits.RewardLimitFrequency.DAILY);
-        rewardLimits1.setRewardLimit(BigDecimal.valueOf(100));
+        rewardLimits1.setRewardLimitCents(10000L);
         RewardLimits rewardLimits2 = new RewardLimits();
         rewardLimits2.setFrequency(RewardLimits.RewardLimitFrequency.MONTHLY);
-        rewardLimits2.setRewardLimit(BigDecimal.valueOf(3000));
+        rewardLimits2.setRewardLimitCents(300000L);
         rewardLimitsList.add(rewardLimits1);
         rewardLimitsList.add(rewardLimits2);
 
@@ -1350,9 +1352,9 @@ class InitiativeDTOsToModelMapperTest {
 
         Threshold threshold = new Threshold();
 
-        threshold.setFrom(BigDecimal.valueOf(10));
+        threshold.setFromCents(1000L);
         threshold.setFromIncluded(true);
-        threshold.setTo(BigDecimal.valueOf(30));
+        threshold.setToCents(3000L);
         threshold.setToIncluded(true);
 
         TrxCount trxCount = new TrxCount();
@@ -1365,10 +1367,10 @@ class InitiativeDTOsToModelMapperTest {
         List<RewardLimits> rewardLimitsList = new ArrayList<>();
         RewardLimits rewardLimits1 = new RewardLimits();
         rewardLimits1.setFrequency(RewardLimits.RewardLimitFrequency.DAILY);
-        rewardLimits1.setRewardLimit(BigDecimal.valueOf(100));
+        rewardLimits1.setRewardLimitCents(10000L);
         RewardLimits rewardLimits2 = new RewardLimits();
         rewardLimits2.setFrequency(RewardLimits.RewardLimitFrequency.MONTHLY);
-        rewardLimits2.setRewardLimit(BigDecimal.valueOf(3000));
+        rewardLimits2.setRewardLimitCents(300000L);
         rewardLimitsList.add(rewardLimits1);
         rewardLimitsList.add(rewardLimits2);
 
@@ -1403,9 +1405,9 @@ class InitiativeDTOsToModelMapperTest {
 
         Threshold threshold = new Threshold();
 
-        threshold.setFrom(BigDecimal.valueOf(10));
+        threshold.setFromCents(1000L);
         threshold.setFromIncluded(true);
-        threshold.setTo(BigDecimal.valueOf(30));
+        threshold.setToCents(3000L);
         threshold.setToIncluded(true);
 
         MccFilter mccFilter = new MccFilter();
@@ -1418,10 +1420,10 @@ class InitiativeDTOsToModelMapperTest {
         List<RewardLimits> rewardLimitsList = new ArrayList<>();
         RewardLimits rewardLimits1 = new RewardLimits();
         rewardLimits1.setFrequency(RewardLimits.RewardLimitFrequency.DAILY);
-        rewardLimits1.setRewardLimit(BigDecimal.valueOf(100));
+        rewardLimits1.setRewardLimitCents(10000L);
         RewardLimits rewardLimits2 = new RewardLimits();
         rewardLimits2.setFrequency(RewardLimits.RewardLimitFrequency.MONTHLY);
-        rewardLimits2.setRewardLimit(BigDecimal.valueOf(3000));
+        rewardLimits2.setRewardLimitCents(300000L);
         rewardLimitsList.add(rewardLimits1);
         rewardLimitsList.add(rewardLimits2);
 
@@ -1580,7 +1582,7 @@ class InitiativeDTOsToModelMapperTest {
     private AccumulatedAmount createAccumulatedAmountValid() {
         AccumulatedAmount amount = new AccumulatedAmount();
         amount.setAccumulatedType(AccumulatedAmount.AccumulatedTypeEnum.THRESHOLD_REACHED);
-        amount.setRefundThreshold(BigDecimal.valueOf(100000));
+        amount.setRefundThresholdCents(10000000L);
         return amount;
     }
 

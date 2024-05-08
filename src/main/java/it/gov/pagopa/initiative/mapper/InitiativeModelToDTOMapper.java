@@ -24,6 +24,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 
@@ -130,7 +132,10 @@ public class InitiativeModelToDTOMapper {
         return initiativeDto;
     }
 
-
+    private static BigDecimal centsToEuro(Long cents) {
+        return BigDecimal.valueOf(cents).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_DOWN);
+    }
+    
     public InitiativeDTO toDtoOnlyId(Initiative initiative) {
         if (initiative == null) {
             return null;
@@ -144,11 +149,12 @@ public class InitiativeModelToDTOMapper {
         if (general == null) {
             return null;
         }
-        return InitiativeGeneralDTO.builder().beneficiaryBudget(general.getBeneficiaryBudget())
+        return InitiativeGeneralDTO.builder()
+                .beneficiaryBudget(centsToEuro(general.getBeneficiaryBudgetCents()))
                 .beneficiaryKnown(general.getBeneficiaryKnown())
                 .beneficiaryType(general.getBeneficiaryType()!=null?InitiativeGeneralDTO.BeneficiaryTypeEnum.valueOf(general.getBeneficiaryType().name()):null)
                 .familyUnitComposition(general.getFamilyUnitComposition()!=null?general.getFamilyUnitComposition():null)
-                .budget(general.getBudget())
+                .budget(centsToEuro(general.getBudgetCents()))
                 .endDate(general.getEndDate())
                 .startDate(general.getStartDate())
                 .rankingEndDate(general.getRankingEndDate())
@@ -349,7 +355,10 @@ public class InitiativeModelToDTOMapper {
             dto = RewardGroupsDTO.builder()
                     .type(rewardGroupsInput.getType())
                     .rewardGroups(rewardGroupsInput.getRewardGroups().stream().map(
-                    x -> RewardGroupsDTO.RewardGroupDTO.builder().from(x.getFrom()).to(x.getTo()).rewardValue(x.getRewardValue()).build()
+                    x -> RewardGroupsDTO.RewardGroupDTO.builder()
+                            .from(centsToEuro(x.getFromCents()))
+                            .to(centsToEuro(x.getToCents()))
+                            .rewardValue(x.getRewardValue()).build()
             ).toList())
                     .build();
         }
@@ -369,7 +378,10 @@ public class InitiativeModelToDTOMapper {
         } else if (rewardRule instanceof RewardGroups rewardGroupsInput) {
             dto = RewardGroupsDTO.builder()
                     .rewardGroups(rewardGroupsInput.getRewardGroups().stream().map(
-                            x -> RewardGroupsDTO.RewardGroupDTO.builder().from(x.getFrom()).to(x.getTo()).rewardValue(x.getRewardValue()).build()
+                            x -> RewardGroupsDTO.RewardGroupDTO.builder()
+                                    .from(centsToEuro(x.getFromCents()))
+                                    .to(centsToEuro(x.getToCents()))
+                                    .rewardValue(x.getRewardValue()).build()
                     ).toList())
                     .build();
         }
@@ -427,7 +439,7 @@ public class InitiativeModelToDTOMapper {
         }
         return rewardLimit.stream().map(x -> RewardLimitsDTO.builder()
                         .frequency(RewardLimitsDTO.RewardLimitFrequency.valueOf(x.getFrequency().name()))
-                        .rewardLimit(x.getRewardLimit())
+                        .rewardLimit(centsToEuro(x.getRewardLimitCents()))
                         .build())
                 .toList();
     }
@@ -436,8 +448,8 @@ public class InitiativeModelToDTOMapper {
         if (threshold == null) {
             return null;
         }
-        return ThresholdDTO.builder().from(threshold.getFrom())
-                .to(threshold.getTo())
+        return ThresholdDTO.builder().from(centsToEuro(threshold.getFromCents()))
+                .to(centsToEuro(threshold.getToCents()))
                 .fromIncluded(threshold.isFromIncluded())
                 .toIncluded(threshold.isToIncluded()).build();
     }
@@ -467,7 +479,7 @@ public class InitiativeModelToDTOMapper {
             return null;
         }
         return AccumulatedAmountDTO.builder().accumulatedType(AccumulatedAmountDTO.AccumulatedTypeEnum.valueOf(accumulatedAmount.getAccumulatedType().name()))
-                .refundThreshold(accumulatedAmount.getRefundThreshold()).build();
+                .refundThreshold(centsToEuro(accumulatedAmount.getRefundThresholdCents())).build();
     }
 
     private TimeParameterDTO toTimeParameterDTO(TimeParameter timeParameter){
