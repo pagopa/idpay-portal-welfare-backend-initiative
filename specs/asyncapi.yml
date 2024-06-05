@@ -1,0 +1,569 @@
+asyncapi: 2.0.0
+info:
+  title: Portal Welfare Backend Initiative Service
+  version: 1.0.0
+  description: >-
+    Its purpose is to notify other systems the rule update and delete initiative
+tags:
+  - name: "ruleUpdate"
+    description: "Notify rule update"
+  - name: "commandOperation"
+    description: "Cancel initiative"
+channels:
+  ruleUpdate:
+    publish:
+      message:
+        $ref: '#/components/messages/RuleUpdate'
+      bindings:
+        kafka:
+          topic: idpay-rule-update
+      tags:
+        - name: "ruleUpdate"
+  commandOperation:
+    publish:
+      message:
+        $ref: '#/components/messages/QueueCommandOperationDTO'
+      bindings:
+        kafka:
+          topic: idpay-commands
+      tags:
+        - name: "commandOperation"
+components:
+  messages:
+    RuleUpdate:
+      contentType: application/json
+      description: >-
+        Update initiative rule
+      summary: Informs applications of update initiative rule
+      payload:
+        $ref: "#/components/schemas/RuleUpdate"
+    QueueCommandOperationDTO:
+      contentType: application/json
+      description: >-
+        Notify other application that initiative cancel request
+      summary: Delete documents of the initiative
+      payload:
+        $ref: "#/components/schemas/QueueCommandOperationDTO"
+
+  schemas:
+    RuleUpdate:
+      type: object
+      properties:
+        initiativeId:
+          type: string
+          description: "The id of the initiative"
+          example: "66549249335f626497e098f2"
+        initiativeName:
+          type: string
+          description: "The name of the initiative"
+          example: "initiativeTest"
+        organizationId:
+          type: string
+          description: "The id of the organization"
+          example: "390cea38-f2de-4bcb-a181-d6eef99fe528"
+        organizationVat:
+          type: string
+          description: "The VAT (Value Added Tax) of the organization"
+          example: "ORGANIZATIONVAT"
+        createdBy:
+          type: string
+          description: "Organization user identified that create the service"
+          example: "83843864-f3c0-4def-badb-7f197471b72e"
+        updatedBy:
+          type: string
+          description: "Organization user identified that update the service"
+          example: "83843864-f3c0-4def-badb-7f197471b72e"
+        creationDate:
+          type: string
+          format: date-time
+          description: "Creation date"
+          example: "2024-04-10T07:41:38.644+02:00"
+        updateDate:
+          type: string
+          format: date-time
+          description: "Update date"
+          example: "2024-04-10T07:41:38.644+02:00"
+        status:
+          type: string
+          description: "Status of the initiative"
+          example: "PUBLISHED"
+        general:
+          $ref: "#/components/schemas/InitiativeGeneral"
+        additionalInfo:
+          $ref: "#/components/schemas/AdditionalInfo"
+        beneficiaryRule:
+          $ref: "#/components/schemas/InitiativeBeneficiaryRule"
+        initiativeRewardType:
+          type: string
+          enum:
+            - REFUND
+            - DISCOUNT
+          description: "Reward type of the initiative"
+        rewardRule:
+          $ref: "#/components/schemas/RewardRule"
+        trxRule:
+          $ref: "#/components/schemas/InitiativeTrxConditions"
+        refundRule:
+          $ref: "#/components/schemas/InitiativeRefundRule"
+        enabled:
+          type: boolean
+          description: "Field that indicate if the initiative isn't deleted before publication"
+          example: true
+    InitiativeGeneral:
+      type: object
+      properties:
+        budgetCents:
+          type: integer
+          description: "Budget of the initiative in cents"
+          example: 5000000
+        beneficiaryType:
+          type: string
+          enum:
+            - PF
+            - PG
+            - NF
+          description: "Type of beneficiary of the initiative"
+        beneficiaryKnown:
+          type: boolean
+          description: "Flag that indicates the presence of a whitelist"
+          example: true
+        beneficiaryBudgetCents:
+          type: integer
+          description: "Budget of the beneficiary in cents"
+          example: 2000000
+        startDate:
+          type: string
+          format: date
+          description: "Start of period of spending funds in an initiative"
+          example: "2024-05-01"
+        endDate:
+          type: string
+          format: date
+          description: "End of period of spending funds in an initiative"
+          example: "2024-12-31"
+        rankingStartDate:
+          type: string
+          format: date
+          description: "Start of period of participation/adhesion in an initiative"
+          example: "2024-06-01"
+        rankingEndDate:
+          type: string
+          format: date
+          description: "End of period of participation/adhesion in an initiative"
+          example: "2024-06-30"
+        rankingEnabled:
+          type: boolean
+          description: "Flag of period of participation/adhesion in an initiative"
+          example: true
+        descriptionMap:
+          type: object
+          descriptionProperties:
+            type: string
+          description: "A map that describe the rule of the initiative depending on the language"
+          example:
+            - key: "it"
+              value: "Descrizione delle regole"
+            - key: "en"
+              value: "Rule description"
+    AdditionalInfo:
+      type: object
+      properties:
+        serviceIO:
+          type: boolean
+          description: "Describe if the initiative must be show to IO application"
+          example: true
+        serviceId:
+          type: string
+          description: "ID of the service"
+          example: "JLCBZFP5X6997R5QRZM08Z1O1W"
+        serviceName:
+          type: string
+          description: "Name of the service"
+          example: "Service Name"
+        serviceScope:
+          type: string
+          enum:
+            - LOCAL
+            - NATIONAL
+          description: "The service scope of the initiative"
+        description:
+          type: string
+          description: "The description of the service"
+          example: "Description related to the service"
+        privacyLink:
+          type: string
+          description: "Privacy policy link"
+          example: "https://example.com/privacy-according"
+        tcLink:
+          type: string
+          description: "Terms and Conditions clauses link"
+          example: "https://example.com/terms-and-condition"
+        channels:
+          type: array
+          items:
+            $ref: "#/components/schemas/Channel"
+          description: "List of channels to contact the service"
+        logoFileName:
+          type: string
+          description: "Name of the logo file"
+          example: "logo.png"
+        logoUploadDate:
+          type: string
+          format: data-time
+          description: "Logo upload date"
+          example: "2024-04-11T07:23:08.874869466"
+    Channel:
+      type: object
+      properties:
+        type:
+          type: string
+          description: "One of the possible assistance contact type: web, email, mobile"
+          enum:
+            - web
+            - email
+            - mobile
+          example: email
+        contact:
+          type: string
+          description: "The assistance contact"
+          example: "email-channel@example.com"
+    InitiativeBeneficiaryRule:
+      type: object
+      properties:
+        selfDeclarationCriteria:
+          type: array
+          items:
+            - $ref: "#/components/schemas/SelfCriteriaBool"
+            - $ref: "#/components/schemas/SelfCriteriaMulti"
+          description: "List of self declaration criteria"
+        automatedCriteria:
+          type: array
+          items:
+            $ref: "#/components/schemas/AutomatedCriteria"
+          description: "List of automated criteria"
+        apiKeyClientId:
+          type: string
+          description: "Client Id of the API Key"
+          example: "ApiKeyCientId"
+        apiKeyClientAssertion:
+          type: string
+          description: "Client assertion of the API Key"
+          example: "ApiKeyCientAssertion"
+    SelfCriteriaBool:
+      type: object
+      properties:
+        _type:
+          type: string
+          enum:
+            - boolean
+          description: "The single choice"
+        description:
+          type: string
+          description: "The description's criteria"
+        value:
+          type: boolean
+          description: "A value always true"
+          example: true
+        code:
+          type: string
+          description: "The index, as string, of criteria"
+          example: "1"
+    SelfCriteriaMulti:
+      type: object
+      properties:
+        _type:
+          type: string
+          enum:
+            - multi
+          description: "The multiple choice"
+          example: multi
+        description:
+          type: string
+          description: "The description's criteria"
+          example: "The description's criteria"
+        value:
+          type: array
+          item:
+            type: string
+          description: "The possible values condition"
+          example: ["Value1", "Value2"]
+        code:
+          type: string
+          description: "The index, as string, of criteria"
+          example: "2"
+    AutomatedCriteria:
+      type: object
+      properties:
+        authority:
+          type: string
+          description: "The organization that provide the information"
+          example: "INPS"
+        code:
+          type: string
+          description: "The code that identify the criteria"
+          example: "ISEE"
+        field:
+          type: string
+          description: "The field that determines onboarding"
+          example: "ISEE"
+        operator:
+          type: string
+          description: "Determines how to take the value: GT: Greater than value, LT: Less than value, EQ: Equal, NOT_EQ: Not equal, GE: Greater equal, LE: Less equal, BTW_CLOSE: Between included delimiters, BTW_OPEN: Between excluded delimiters"
+          enum:
+            - EQ
+            - NOT_EQ
+            - LT
+            - LE
+            - GT
+            - GE
+            - INSTANCE_OF
+            - BTW_CLOSED
+            - BTW_OPEN
+          example: BTW_CLOSED
+        orderDirection:
+          type: string
+          description: "One of the possible order direction for the initiative criteria: ASC: Ascendent, DESC: Descendent"
+          enum:
+            - ASC
+            - DESC
+        value:
+          type: string
+          description: "The field's value"
+          example: "10000"
+        value2:
+          type: string
+          description: "The value of the second field, if required by the operator"
+          example: "25000"
+        iseeTypes:
+          type: array
+          description: "The possible ISEE types for the initiative criteria"
+          items:
+            type: string
+            enum:
+              - ORDINARIO
+              - MINORENNE
+              - UNIVERSITARIO
+              - SOCIOSANITARIO
+              - DOTTORATO
+              - RESIDENZIALE
+              - CORRENTE
+          example:
+            [
+              'ORDINARIO',
+              'MINORENNE',
+              'UNIVERSITARIO',
+              'SOCIOSANITARIO',
+              'DOTTORATO',
+              'RESIDENZIALE',
+              'CORRENTE',
+            ]
+    RewardRule:
+      oneOf:
+        - $ref: '#/components/schemas/RewardGroups'
+        - $ref: '#/components/schemas/RewardValueDTO'
+    RewardGroups:
+      type: object
+      description: "Define reward rule groups"
+      properties:
+        _type:
+          type: string
+          description: "Describe a type of reward"
+          example: "rewardGroups"
+        rewardGroups:
+          type: array
+          description: "List of reward rule groups"
+          items:
+            $ref: '#/components/schemas/RewardGroup'
+    RewardGroup:
+      type: object
+      description: "DTO for a single reward rule group"
+      properties:
+        fromCents:
+          type: integer
+          format: int64
+          description: "Minimum value in cents"
+          example: 100
+        toCents:
+          type: integer
+          format: int64
+          description: "Maximum value in cents"
+          example: 1000
+        rewardValue:
+          type: number
+          description: "Reward value"
+          example: 10
+    RewardValueDTO:
+      type: object
+      description: "DTO for a single reward value"
+      properties:
+        _type:
+          type: string
+          description: "Describe a type of reward"
+          example: "rewardValue"
+        rewardValue:
+          type: number
+          description: "Reward value"
+          example: 10
+        rewardValueType:
+          type: string
+          description: "Indicates if the reward represents a fixed value or a percentage"
+          enum:
+            - PERCENTAGE
+            - ABSOLUTE
+    InitiativeTrxConditions:
+      type: object
+      properties:
+        daysOfWeek:
+          $ref: "#/components/schemas/DayOfWeekDTO"
+          description: "Days of the week"
+        threshold:
+          $ref: "#/components/schemas/ThresholdDTO"
+          description: "Threshold for transactions"
+        mccFilter:
+          $ref: "#/components/schemas/MccFilterDTO"
+          description: "Merchant Category Code filter"
+        trxCount:
+          $ref: "#/components/schemas/TrxCountDTO"
+          description: "Transaction count"
+        rewardLimits:
+          type: array
+          items:
+            $ref: "#/components/schemas/RewardLimitsDTO"
+          description: "List of reward limits"
+    DayOfWeekDTO:
+      type: array
+      items:
+        $ref: "#/components/schemas/DayOfWeekDayConfig"
+      description: "List of day configurations"
+    DayOfWeekDayConfig:
+      type: object
+      properties:
+        daysOfWeek:
+          type: array
+          items:
+            type: string
+            enum: [ MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY ]
+          description: "Days of the week"
+        intervals:
+          type: array
+          items:
+            $ref: "#/components/schemas/DayOfWeekInterval"
+          description: "List of intervals"
+    DayOfWeekInterval:
+      type: object
+      properties:
+        startTime:
+          type: string
+          format: time
+          description: "Start time of the interval"
+        endTime:
+          type: string
+          format: time
+          description: "End time of the interval"
+    ThresholdDTO:
+      type: object
+      properties:
+        fromCents:
+          type: integer
+          description: "Minimum threshold in cents"
+          example: 1000
+        fromIncluded:
+          type: boolean
+          description: "Indicates if the minimum threshold is inclusive"
+          example: true
+        toCents:
+          type: integer
+          description: "Maximum threshold in cents"
+          example: 3000
+        toIncluded:
+          type: boolean
+          description: "Indicates if the maximum threshold is inclusive"
+          example: true
+    MccFilterDTO:
+      type: object
+      properties:
+        allowedList:
+          type: boolean
+          description: "Indicates if the MCC filter represents an allowed list"
+        values:
+          type: array
+          items:
+            type: string
+          description: "Set of MCC values"
+    TrxCountDTO:
+      type: object
+      properties:
+        from:
+          type: integer
+          description: "Minimum transaction count"
+        fromIncluded:
+          type: boolean
+          description: "Indicates if the minimum transaction count is inclusive"
+        to:
+          type: integer
+          description: "Maximum transaction count"
+        toIncluded:
+          type: boolean
+          description: "Indicates if the maximum transaction count is inclusive"
+    RewardLimitsDTO:
+      type: object
+      properties:
+        frequency:
+          type: string
+          enum: [ DAILY, WEEKLY, MONTHLY, YEARLY ]
+          description: "Frequency of reward limit"
+        rewardLimitCents:
+          type: integer
+          description: "Reward limit in cents"
+    InitiativeRefundRule:
+      type: object
+      properties:
+        accumulatedAmount:
+          type: object
+          properties:
+            accumulatedType:
+              type: string
+              description: "When charge reward type"
+              enum:
+                - BUDGET_EXHAUSTED
+                - THRESHOLD_REACHED
+            refundThresholdCents:
+              type: integer
+              format: Int64
+              description: "When threshold reached"
+        timeParameter:
+          type: object
+          properties:
+            timeType:
+              type: string
+              description: "Type for charge reward when option by timer"
+              enum:
+                - CLOSED
+                - DAILY
+                - WEEKLY
+                - MONTHLY
+                - QUARTERLY
+        additionalInfo:
+          type: object
+          properties:
+            identificationCode:
+              type: string
+              description: "Identification code"
+              example: "CodeId"
+
+    QueueCommandOperationDTO:
+      type: object
+      properties:
+        operationType:
+          type: string
+          description: "Constant that define operation type"
+          example: "DELETE_INITIATIVE"
+        entityId:
+          type: string
+          description: "Entity to be handled with operationType"
+          example: "661626073785876cb5aa7601"
+        operationTime:
+          type: string
+          format: date-time
+          description: "Operation time"
+          example: "2024-04-11T07:23:08.874869466"
