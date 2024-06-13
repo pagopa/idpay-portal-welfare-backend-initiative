@@ -22,7 +22,7 @@ channels:
   commandOperation:
     publish:
       message:
-        $ref: '#/components/messages/QueueCommandOperationDTO'
+        $ref: '#/components/messages/CommandOperation'
       bindings:
         kafka:
           topic: idpay-commands
@@ -37,7 +37,16 @@ components:
       summary: Informs applications of update initiative rule
       payload:
         $ref: "#/components/schemas/RuleUpdate"
-    QueueCommandOperationDTO:
+    CommandOperation:
+      contentType: application/json
+      description: >-
+        Notify other application the initiative cancel request, or create initiative statics
+      summary: >-
+        Notify other application the initiative cancel request (OperationType: DELETE_INITIATIVE), or create initiative statics (OperationType: CREATE_INITIATIVE_STATISTICS)
+      payload:
+        oneOf:
+          - $ref: "#/components/schemas/QueueCommandOperationDTO"
+    CreateInitiativeStatisticsQueueCommandOperationDTO:
       contentType: application/json
       description: >-
         Notify other application that initiative cancel request
@@ -556,7 +565,7 @@ components:
       properties:
         operationType:
           type: string
-          description: "Constant that define operation type"
+          description: "Constant that define operation type: DELETE_INITIATIVE, CREATE_INITIATIVE_STATISTICS"
           example: "DELETE_INITIATIVE"
         entityId:
           type: string
