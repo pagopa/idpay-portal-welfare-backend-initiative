@@ -44,8 +44,7 @@ components:
       summary: >-
         Notify other application the initiative cancel request (OperationType: DELETE_INITIATIVE), or create initiative statics (OperationType: CREATE_INITIATIVE_STATISTICS)
       payload:
-        oneOf:
-          - $ref: "#/components/schemas/QueueCommandOperationDTO"
+        $ref: "#/components/schemas/QueueCommandOperationDTO"
     CreateInitiativeStatisticsQueueCommandOperationDTO:
       contentType: application/json
       description: >-
