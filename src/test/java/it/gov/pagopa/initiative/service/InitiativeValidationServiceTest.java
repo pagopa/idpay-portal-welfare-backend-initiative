@@ -427,7 +427,7 @@ class InitiativeValidationServiceTest {
         step4Initiative.setRewardRule(rewardValue);
         InitiativeTrxConditions trxConditions = new InitiativeTrxConditions();
         Threshold threshold = new Threshold();
-        threshold.setFrom(BigDecimal.valueOf(30));
+        threshold.setFromCents(3000L);
         trxConditions.setThreshold(threshold);
         step4Initiative.setTrxRule(trxConditions);
         try {
@@ -447,7 +447,7 @@ class InitiativeValidationServiceTest {
         step4Initiative.setRewardRule(rewardValue);
         InitiativeTrxConditions trxConditions = new InitiativeTrxConditions();
         Threshold threshold = new Threshold();
-        threshold.setFrom(BigDecimal.valueOf(40));
+        threshold.setFromCents(4000L);
         trxConditions.setThreshold(threshold);
         step4Initiative.setTrxRule(trxConditions);
         Executable executable = () -> initiativeValidationService.checkRewardRuleAbsolute(step4Initiative);
@@ -661,10 +661,10 @@ class InitiativeValidationServiceTest {
         Map<String, String> language = new HashMap<>();
         language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneral initiativeGeneral = new InitiativeGeneral();
-        initiativeGeneral.setBeneficiaryBudget(new BigDecimal(10));
+        initiativeGeneral.setBeneficiaryBudgetCents(1000L);
         initiativeGeneral.setBeneficiaryKnown(false);
         initiativeGeneral.setBeneficiaryType(PF);
-        initiativeGeneral.setBudget(new BigDecimal(1000000000));
+        initiativeGeneral.setBudgetCents(100000000000L);
         LocalDate rankingStartDate = LocalDate.now();
         LocalDate rankingEndDate = rankingStartDate.plusDays(1);
         LocalDate startDate = rankingEndDate.plusDays(1);
@@ -1027,11 +1027,11 @@ class InitiativeValidationServiceTest {
         Map<String, String> language = new HashMap<>();
         language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneral initiativeGeneral = new InitiativeGeneral();
-        initiativeGeneral.setBeneficiaryBudget(new BigDecimal(10));
+        initiativeGeneral.setBeneficiaryBudgetCents(1000L);
         initiativeGeneral.setBeneficiaryKnown(true);
         initiativeGeneral.setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.NF);
         initiativeGeneral.setFamilyUnitComposition(InitiativeConstants.FamilyUnitCompositionConstant.INPS);
-        initiativeGeneral.setBudget(new BigDecimal(1000000000));
+        initiativeGeneral.setBudgetCents(100000000000L);
         initiativeGeneral.setEndDate(LocalDate.of(2022, 9, 8));
         initiativeGeneral.setStartDate(LocalDate.of(2022, 8, 8));
         initiativeGeneral.setRankingStartDate(LocalDate.of(2022, 9, 18));

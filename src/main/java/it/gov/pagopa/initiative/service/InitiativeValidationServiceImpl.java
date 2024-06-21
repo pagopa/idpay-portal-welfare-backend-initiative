@@ -165,7 +165,7 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
         if (rewardRule instanceof RewardValue rewardValue &&
                 RewardValue.RewardValueTypeEnum.ABSOLUTE.equals(rewardValue.getRewardValueType())) {
             Threshold threshold = initiative.getTrxRule().getThreshold();
-            if (threshold==null || threshold.getFrom()==null || threshold.getFrom().compareTo(rewardValue.getRewardValue()) < 0){
+            if (threshold==null || threshold.getFromCents()==null || threshold.getFromCents().compareTo(rewardValue.getRewardValue().longValue()) < 0){
                 throw new InvalidRewardRuleException("Reward rules of initiative [%s] is not valid".formatted(initiative.getInitiativeId()));
             }
         }

@@ -23,8 +23,8 @@ public class RewardGroups implements InitiativeRewardRule {
     @NoArgsConstructor
     @Builder
     public static class RewardGroup {
-        private BigDecimal from;
-        private BigDecimal to;
+        private Long fromCents;
+        private Long toCents;
         private BigDecimal rewardValue;
     }
 }
