@@ -24,7 +24,6 @@ import java.text.DateFormat;
 import org.junit.jupiter.api.Test;
 
 class JsonConfigTest {
-
     @Test
     void testObjectMapper() {
         ObjectMapper actualObjectMapperResult = (new JsonConfig()).objectMapper();
@@ -45,7 +44,7 @@ class JsonConfigTest {
         assertTrue(deserializationConfig.getAccessorNaming() instanceof DefaultAccessorNamingStrategy.Provider);
         assertTrue(dateFormat.isLenient());
         assertTrue(((StdDateFormat) dateFormat).isColonIncludedInTimeZone());
-        assertEquals(237020288, deserializationConfig.getDeserializationFeatures());
+        assertEquals(473998464, deserializationConfig.getDeserializationFeatures());
         assertTrue(deserializationConfig.getClassIntrospector() instanceof BasicClassIntrospector);
         assertTrue(deserializationConfig.getDateFormat() instanceof StdDateFormat);
         assertNull(deserializationConfig.getDefaultMergeable());
