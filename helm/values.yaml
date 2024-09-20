@@ -88,6 +88,7 @@ microservice-chart:
     SELC_UID: idpay
     BLOB_STORAGE_CONTAINER_REFERENCE: $web
     RANKING_GRACE_PERIOD: "10"
+    HEALTH_MONGO_ENABLED: "false"
 
   externalConfigMapValues:
     idpay-common:
