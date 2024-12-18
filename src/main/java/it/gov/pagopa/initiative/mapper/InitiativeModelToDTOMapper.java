@@ -133,7 +133,8 @@ public class InitiativeModelToDTOMapper {
     }
 
     private static BigDecimal centsToEuro(Long cents) {
-        return BigDecimal.valueOf(cents).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_DOWN);
+        Long value = cents != null ? cents : 0L;
+        return BigDecimal.valueOf(value).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_DOWN);
     }
     
     public InitiativeDTO toDtoOnlyId(Initiative initiative) {
