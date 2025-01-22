@@ -21,7 +21,7 @@ public enum TypeTextEnum {
     }
 
     TypeTextEnum() {
-        this.type = "multi";
+        this.type = "text";
     }
 
     @JsonValue
