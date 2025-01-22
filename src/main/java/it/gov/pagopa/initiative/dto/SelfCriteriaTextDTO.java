@@ -28,7 +28,6 @@ public class SelfCriteriaTextDTO implements AnyOfInitiativeBeneficiaryRuleDTOSel
   private String description;
 
   @JsonProperty("value")
-  @NotEmpty(groups = ValidationApiEnabledGroup.class)
   private String value;
 
   @JsonProperty("code")
