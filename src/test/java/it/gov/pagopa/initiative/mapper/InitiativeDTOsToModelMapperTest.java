@@ -459,7 +459,7 @@ class InitiativeDTOsToModelMapperTest {
     }
 
     private InitiativeBeneficiaryRule createInitiativeBeneficiaryRule() {
-        InitiativeBeneficiaryRule initiativeBeneficiaryRule = new InitiativeBeneficiaryRule();
+        InitiativeBeneficiaryRule localInitiativeBeneficiaryRule = new InitiativeBeneficiaryRule();
         SelfCriteriaBool selfCriteriaBool = new SelfCriteriaBool();
         selfCriteriaBool.set_type(TypeBoolEnum.BOOLEAN);
         selfCriteriaBool.setCode("B001");
@@ -483,7 +483,7 @@ class InitiativeDTOsToModelMapperTest {
         iSelfDeclarationCriteriaList.add(selfCriteriaMulti);
         iSelfDeclarationCriteriaList.add(selfCriteriaText);
         iSelfDeclarationCriteriaList.add(null);
-        initiativeBeneficiaryRule.setSelfDeclarationCriteria(iSelfDeclarationCriteriaList);
+        localInitiativeBeneficiaryRule.setSelfDeclarationCriteria(iSelfDeclarationCriteriaList);
         AutomatedCriteria automatedCriteria = new AutomatedCriteria();
         automatedCriteria.setAuthority("Authority_ISEE");
         automatedCriteria.setCode("Code_ISEE");
@@ -492,10 +492,10 @@ class InitiativeDTOsToModelMapperTest {
         automatedCriteria.setValue("value");
         List<AutomatedCriteria> automatedCriteriaList = new ArrayList<>();
         automatedCriteriaList.add(automatedCriteria);
-        initiativeBeneficiaryRule.setAutomatedCriteria(automatedCriteriaList);
-        initiativeBeneficiaryRule.setApiKeyClientId(ENCRYPTED_API_KEY_CLIENT_ID);
-        initiativeBeneficiaryRule.setApiKeyClientAssertion(ENCRYPTED_API_KEY_CLIENT_ASSERTION);
-        return initiativeBeneficiaryRule;
+        localInitiativeBeneficiaryRule.setAutomatedCriteria(automatedCriteriaList);
+        localInitiativeBeneficiaryRule.setApiKeyClientId(ENCRYPTED_API_KEY_CLIENT_ID);
+        localInitiativeBeneficiaryRule.setApiKeyClientAssertion(ENCRYPTED_API_KEY_CLIENT_ASSERTION);
+        return localInitiativeBeneficiaryRule;
     }
 
     private InitiativeDTO createStep1InitiativeDTO() {
@@ -586,14 +586,14 @@ class InitiativeDTOsToModelMapperTest {
     }
 
     private InitiativeDTO createStep2InitiativeDTO() {
-        InitiativeDTO initiativeDTO = createStep1InitiativeDTO();
+        InitiativeDTO localInitiativeDTO = createStep1InitiativeDTO();
         InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralDTO();
-        initiativeDTO.setGeneral(initiativeGeneralDTO);
-        return initiativeDTO;
+        localInitiativeDTO.setGeneral(initiativeGeneralDTO);
+        return localInitiativeDTO;
     }
 
     private InitiativeBeneficiaryRuleDTO createInitiativeBeneficiaryRuleDTO() {
-        InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = new InitiativeBeneficiaryRuleDTO();
+        InitiativeBeneficiaryRuleDTO localInitiativeBeneficiaryRuleDTO = new InitiativeBeneficiaryRuleDTO();
         SelfCriteriaBoolDTO selfCriteriaBoolDTO = new SelfCriteriaBoolDTO();
         selfCriteriaBoolDTO.setType(it.gov.pagopa.initiative.dto.TypeBoolEnum.BOOLEAN);
         selfCriteriaBoolDTO.setCode("B001");
@@ -617,7 +617,7 @@ class InitiativeDTOsToModelMapperTest {
         anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems.add(selfCriteriaMultiDTO);
         anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems.add(selfCriteriaTextDTO);
         anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems.add(null);
-        initiativeBeneficiaryRuleDTO.setSelfDeclarationCriteria(anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems);
+        localInitiativeBeneficiaryRuleDTO.setSelfDeclarationCriteria(anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems);
         AutomatedCriteriaDTO automatedCriteriaDTO = new AutomatedCriteriaDTO();
         automatedCriteriaDTO.setAuthority("Authority_ISEE");
         automatedCriteriaDTO.setCode("Code_ISEE");
@@ -626,24 +626,24 @@ class InitiativeDTOsToModelMapperTest {
         automatedCriteriaDTO.setValue("value");
         List<AutomatedCriteriaDTO> automatedCriteriaList = new ArrayList<>();
         automatedCriteriaList.add(automatedCriteriaDTO);
-        initiativeBeneficiaryRuleDTO.setAutomatedCriteria(automatedCriteriaList);
-        initiativeBeneficiaryRuleDTO.setApiKeyClientId(API_KEY_CLIENT_ID);
-        initiativeBeneficiaryRuleDTO.setApiKeyClientAssertion(API_KEY_CLIENT_ASSERTION);
-        return initiativeBeneficiaryRuleDTO;
+        localInitiativeBeneficiaryRuleDTO.setAutomatedCriteria(automatedCriteriaList);
+        localInitiativeBeneficiaryRuleDTO.setApiKeyClientId(API_KEY_CLIENT_ID);
+        localInitiativeBeneficiaryRuleDTO.setApiKeyClientAssertion(API_KEY_CLIENT_ASSERTION);
+        return localInitiativeBeneficiaryRuleDTO;
     }
 
     private Initiative createStep3Initiative() {
         Initiative initiative = createStep2Initiative();
-        InitiativeBeneficiaryRule initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
-        initiative.setBeneficiaryRule(initiativeBeneficiaryRule);
+        InitiativeBeneficiaryRule localInitiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
+        initiative.setBeneficiaryRule(localInitiativeBeneficiaryRule);
         return initiative;
     }
 
     private InitiativeDTO createStep3InitiativeDTO() {
-        InitiativeDTO initiativeDTO = createStep2InitiativeDTO();
-        InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
-        initiativeDTO.setBeneficiaryRule(initiativeBeneficiaryRuleDTO);
-        return initiativeDTO;
+        InitiativeDTO localInitiativeDTO = createStep2InitiativeDTO();
+        InitiativeBeneficiaryRuleDTO localInitiativeBeneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
+        localInitiativeDTO.setBeneficiaryRule(localInitiativeBeneficiaryRuleDTO);
+        return localInitiativeDTO;
     }
 
 
@@ -1088,11 +1088,11 @@ class InitiativeDTOsToModelMapperTest {
     }
 
     private InitiativeDTO createStep4InitiativeDTO() {
-        InitiativeDTO initiativeDTO = createStep3InitiativeDTO();
-        initiativeDTO.setRewardRule(createInitiativeRewardRuleDTORewardValueDTO());
-        initiativeDTO.setInitiativeRewardType(InitiativeDTO.InitiativeRewardTypeEnum.REFUND);
-        initiativeDTO.setTrxRule(createInitiativeTrxConditionsDTOValid());
-        return initiativeDTO;
+        InitiativeDTO localInitiativeDTO = createStep3InitiativeDTO();
+        localInitiativeDTO.setRewardRule(createInitiativeRewardRuleDTORewardValueDTO());
+        localInitiativeDTO.setInitiativeRewardType(InitiativeDTO.InitiativeRewardTypeEnum.REFUND);
+        localInitiativeDTO.setTrxRule(createInitiativeTrxConditionsDTOValid());
+        return localInitiativeDTO;
     }
 
     private InitiativeRewardRule createInitiativeRewardRuleRewardValue() {
