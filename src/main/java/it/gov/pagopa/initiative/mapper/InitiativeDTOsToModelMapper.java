@@ -11,6 +11,7 @@ import it.gov.pagopa.initiative.dto.rule.reward.RewardValueDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.*;
 import it.gov.pagopa.initiative.model.TypeMultiEnum;
 import it.gov.pagopa.initiative.model.*;
+import it.gov.pagopa.initiative.model.TypeTextEnum;
 import it.gov.pagopa.initiative.model.rule.refund.AccumulatedAmount;
 import it.gov.pagopa.initiative.model.rule.refund.AdditionalInfo;
 import it.gov.pagopa.initiative.model.rule.refund.InitiativeRefundRule;
@@ -140,6 +141,13 @@ public class InitiativeDTOsToModelMapper {
                                 .code(selfCriteriaMultiDTO.getCode())
                                 .description(selfCriteriaMultiDTO.getDescription())
                                 .value(selfCriteriaMultiDTO.getValue())
+                                .build();
+                    } else if (dto instanceof SelfCriteriaTextDTO selfCriteriaTextDTO) {
+                        return SelfCriteriaText.builder()
+                                ._type(TypeTextEnum.valueOf(selfCriteriaTextDTO.getType().name()))
+                                .code(selfCriteriaTextDTO.getCode())
+                                .description(selfCriteriaTextDTO.getDescription())
+                                .value(selfCriteriaTextDTO.getValue())
                                 .build();
                     }
                     return null;
