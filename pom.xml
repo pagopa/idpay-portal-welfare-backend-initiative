@@ -13,7 +13,7 @@
     <artifactId>idpay-portal-welfare-backend-initiative</artifactId>
     <name>idpay-portal-welfare-backend-initiative</name>
     <description>Project which handle initiative lifecycle</description>
-    <version>1.2.3</version>
+    <version>1.4.0</version>
 
     <properties>
         <java.version>17</java.version>
@@ -122,6 +122,13 @@
             <version>4.11.0</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-core</artifactId>
+            <version>10.1.34</version>
+        </dependency>
+
     </dependencies>
 
     <dependencyManagement>
