@@ -78,7 +78,7 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
     public void checkAutomatedCriteria(Initiative initiative, List<AutomatedCriteria> automatedCriteriaList) {
         InitiativeGeneral general = initiative.getGeneral();
         checkIseeTypes(automatedCriteriaList);
-        checkIseeCriteriaForNF(initiative, automatedCriteriaList);
+        checkIseeCriteriaForNFAndINPSChecked(initiative, automatedCriteriaList);
 
         if (Boolean.TRUE.equals(general.getRankingEnabled())){
             boolean checkIsee = false;
@@ -120,9 +120,10 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
             }
         }
     }
-    private void checkIseeCriteriaForNF(Initiative initiative, List<AutomatedCriteria> automatedCriteriaList){
-        if(InitiativeGeneral.BeneficiaryTypeEnum.NF.equals(initiative.getGeneral().getBeneficiaryType()) &&
-                automatedCriteriaList.stream().noneMatch(a -> a.getCode().equals(ISEE))){
+    private void checkIseeCriteriaForNFAndINPSChecked(Initiative initiative, List<AutomatedCriteria> automatedCriteriaList){
+        if(InitiativeGeneral.BeneficiaryTypeEnum.NF.equals(initiative.getGeneral().getBeneficiaryType())
+                && InitiativeConstants.FamilyUnitCompositionConstant.INPS.equals(initiative.getGeneral().getFamilyUnitComposition())
+                && automatedCriteriaList.stream().noneMatch(a -> a.getCode().equals(ISEE))){
             throw new AutomatedCriteriaNotValidException(
                     InitiativeConstants.Exception.BadRequest.INITIATIVE_AUTOMATED_CRITERIA_NOT_VALID_BENEFICIARY_NF_ISEE_MISSING,
                     "Automated criteria for family initiative [%s] not valid because ISEE is missing".formatted(initiative.getInitiativeId())
