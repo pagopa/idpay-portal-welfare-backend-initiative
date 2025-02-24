@@ -143,10 +143,28 @@
         </dependency>
 
         <!--CVE-2024-57699: Netplex Json-smart Uncontrolled Recursion vulnerability -->
+        <!-- https://mvnrepository.com/artifact/io.netty/netty-codec-http -->
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-codec-http</artifactId>
-            <version>4.1.115.Final</version>
+            <version>4.1.118.Final</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-handler</artifactId>
+            <version>4.1.118.Final</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.projectreactor.netty</groupId>
+            <artifactId>reactor-netty-http</artifactId>
+            <version>1.1.15</version>
+        </dependency>
+        <dependency>
+            <groupId>io.projectreactor.netty</groupId>
+            <artifactId>reactor-netty-core</artifactId>
+            <version>1.1.15</version>
         </dependency>
 
     </dependencies>
@@ -161,14 +179,7 @@
                 <scope>import</scope>
             </dependency>
 
-            <dependency>
-                <groupId>io.netty</groupId>
-                <artifactId>netty-bom</artifactId>
-                <!-- Forced to >= 4.1.106 due to https://nvd.nist.gov/vuln/detail/CVE-2024-47535 -->
-                <version>4.1.118.final</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
+
 
             <dependency>
                 <groupId>com.azure.spring</groupId>
