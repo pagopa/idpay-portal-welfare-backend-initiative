@@ -27,6 +27,7 @@ import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
@@ -160,6 +161,7 @@ class InitiativeValidationServiceTest {
     void updateGeneralInfoWhenBeneficiaryTypeIsNF_ok() {
         Initiative fullInitiative = createStep2Initiative(true);
         InitiativeGeneral generalInfoInitiative = createInitiativeGeneralFamilyUnitComposition();
+        generalInfoInitiative.setFamilyUnitComposition(InitiativeConstants.FamilyUnitCompositionConstant.ANPR);
         fullInitiative.setGeneral(generalInfoInitiative);
 
         Executable executable = () -> initiativeValidationService.checkBeneficiaryTypeAndFamilyUnit(fullInitiative);
@@ -208,10 +210,12 @@ class InitiativeValidationServiceTest {
             assertEquals("In the initiative [%s] family unit composition must be unset because beneficiary type is not NF".formatted(fullInitiative.getInitiativeId()),e.getMessage());
         }
     }
-    @Test
-    void updateGeneralInfoWhenBeneficiaryTypeIsNFAndFieldISeeExist_ok() {
+    @ParameterizedTest
+    @ValueSource(strings = {InitiativeConstants.FamilyUnitCompositionConstant.INPS, InitiativeConstants.FamilyUnitCompositionConstant.ANPR})
+    void updateGeneralInfoWhenBeneficiaryTypeIsNFAndFieldISeeExist_ok(String familyUnit) {
         Initiative fullInitiative = createFullInitiative(false);
         InitiativeGeneral generalInfoInitiative = createInitiativeGeneralFamilyUnitComposition();
+        generalInfoInitiative.setFamilyUnitComposition(familyUnit);
         fullInitiative.setGeneral(generalInfoInitiative);
         InitiativeBeneficiaryRule beneficiaryInfoInitiative = createInitiativeBeneficiaryRule();
         fullInitiative.setBeneficiaryRule(beneficiaryInfoInitiative);
@@ -237,7 +241,7 @@ class InitiativeValidationServiceTest {
         }
     }
     @Test
-    void updateGeneralInfoWhenBeneficiaryTypeIsNFAndISeeIsMissing_ko() {
+    void updateGeneralInfoWhenBeneficiaryTypeIsNFFamilyUnitINPSAndISeeIsMissing_ko() {
         Initiative fullInitiative = createFullInitiative(false);
         InitiativeGeneral generalInfoInitiative = createInitiativeGeneralFamilyUnitComposition();
         fullInitiative.setGeneral(generalInfoInitiative);
@@ -256,10 +260,10 @@ class InitiativeValidationServiceTest {
     void givenUpdateGeneralInfoWhenRankingInitiativeAndISeeIsMissing_ko() {
         Initiative fullInitiative = createFullInitiative(true);
         List<AutomatedCriteria> automatedCriteriaList = fullInitiative.getBeneficiaryRule().getAutomatedCriteria();
-        for(AutomatedCriteria automatedCriteria : automatedCriteriaList) {
-            automatedCriteria.setOperator(FilterOperatorEnumModel.NOT_EQ);
-            automatedCriteria.setOrderDirection(AutomatedCriteria.OrderDirection.ASC);
-            automatedCriteria.setCode("null");
+        for(AutomatedCriteria automatedCriteriaLocal : automatedCriteriaList) {
+            automatedCriteriaLocal.setOperator(FilterOperatorEnumModel.NOT_EQ);
+            automatedCriteriaLocal.setOrderDirection(AutomatedCriteria.OrderDirection.ASC);
+            automatedCriteriaLocal.setCode("null");
         }
 
         try {
@@ -319,11 +323,11 @@ class InitiativeValidationServiceTest {
     @Test
     void testCheckAutomatedCriteriaOrderDirectionWithRanking_Exception() {
         Initiative step3Initiative = createStep3Initiative(true);
-        AutomatedCriteria automatedCriteria = new AutomatedCriteria();
-        automatedCriteria.setCode("ISEE");
-        automatedCriteria.setIseeTypes(List.of(IseeTypologyEnum.ORDINARIO));
+        AutomatedCriteria automatedCriteriaLocal = new AutomatedCriteria();
+        automatedCriteriaLocal.setCode("ISEE");
+        automatedCriteriaLocal.setIseeTypes(List.of(IseeTypologyEnum.ORDINARIO));
         List<AutomatedCriteria> automatedCriteriaList = new ArrayList<>();
-        automatedCriteriaList.add(automatedCriteria);
+        automatedCriteriaList.add(automatedCriteriaLocal);
 
         try {
             initiativeValidationService.checkAutomatedCriteria(step3Initiative,
@@ -336,11 +340,11 @@ class InitiativeValidationServiceTest {
     @Test
     void testCheckAutomatedCriteria_iseeTypeNotValid() {
         Initiative step3Initiative = createStep3Initiative(false);
-        AutomatedCriteria automatedCriteria = new AutomatedCriteria();
-        automatedCriteria.setCode(ISEE);
-        automatedCriteria.setIseeTypes(null);
+        AutomatedCriteria automatedCriteriaLocal = new AutomatedCriteria();
+        automatedCriteriaLocal.setCode(ISEE);
+        automatedCriteriaLocal.setIseeTypes(null);
         List<AutomatedCriteria> automatedCriteriaList = new ArrayList<>();
-        automatedCriteriaList.add(automatedCriteria);
+        automatedCriteriaList.add(automatedCriteriaLocal);
 
         try {
             initiativeValidationService.checkAutomatedCriteria(step3Initiative,
@@ -740,15 +744,15 @@ class InitiativeValidationServiceTest {
         iSelfDeclarationCriteriaList.add(selfCriteriaBool);
         iSelfDeclarationCriteriaList.add(selfCriteriaMulti);
         initiativeBeneficiaryRule.setSelfDeclarationCriteria(iSelfDeclarationCriteriaList);
-        AutomatedCriteria automatedCriteria = new AutomatedCriteria();
-        automatedCriteria.setAuthority("INPS");
-        automatedCriteria.setCode(ISEE);
-        automatedCriteria.setField("true");
-        automatedCriteria.setOperator(FilterOperatorEnumModel.EQ);
-        automatedCriteria.setValue("value");
-        automatedCriteria.setIseeTypes(List.of(IseeTypologyEnum.CORRENTE, IseeTypologyEnum.DOTTORATO, IseeTypologyEnum.RESIDENZIALE));
+        AutomatedCriteria automatedCriteriaLocal = new AutomatedCriteria();
+        automatedCriteriaLocal.setAuthority("INPS");
+        automatedCriteriaLocal.setCode(ISEE);
+        automatedCriteriaLocal.setField("true");
+        automatedCriteriaLocal.setOperator(FilterOperatorEnumModel.EQ);
+        automatedCriteriaLocal.setValue("value");
+        automatedCriteriaLocal.setIseeTypes(List.of(IseeTypologyEnum.CORRENTE, IseeTypologyEnum.DOTTORATO, IseeTypologyEnum.RESIDENZIALE));
         List<AutomatedCriteria> automatedCriteriaList = new ArrayList<>();
-        automatedCriteriaList.add(automatedCriteria);
+        automatedCriteriaList.add(automatedCriteriaLocal);
         initiativeBeneficiaryRule.setAutomatedCriteria(automatedCriteriaList);
         return initiativeBeneficiaryRule;
     }
@@ -771,14 +775,14 @@ class InitiativeValidationServiceTest {
         iSelfDeclarationCriteriaList.add(selfCriteriaBool);
         iSelfDeclarationCriteriaList.add(selfCriteriaMulti);
         initiativeBeneficiaryRule.setSelfDeclarationCriteria(iSelfDeclarationCriteriaList);
-        AutomatedCriteria automatedCriteria = new AutomatedCriteria();
-        automatedCriteria.setCode("BIRTHDATE");
-        automatedCriteria.setField("Year");
-        automatedCriteria.setOperator(FilterOperatorEnumModel.EQ);
-        automatedCriteria.setValue("value");
-        automatedCriteria.setIseeTypes(List.of(IseeTypologyEnum.CORRENTE, IseeTypologyEnum.DOTTORATO, IseeTypologyEnum.RESIDENZIALE));
+        AutomatedCriteria automatedCriteriaLocal = new AutomatedCriteria();
+        automatedCriteriaLocal.setCode("BIRTHDATE");
+        automatedCriteriaLocal.setField("Year");
+        automatedCriteriaLocal.setOperator(FilterOperatorEnumModel.EQ);
+        automatedCriteriaLocal.setValue("value");
+        automatedCriteriaLocal.setIseeTypes(List.of(IseeTypologyEnum.CORRENTE, IseeTypologyEnum.DOTTORATO, IseeTypologyEnum.RESIDENZIALE));
         List<AutomatedCriteria> automatedCriteriaList = new ArrayList<>();
-        automatedCriteriaList.add(automatedCriteria);
+        automatedCriteriaList.add(automatedCriteriaLocal);
         initiativeBeneficiaryRule.setAutomatedCriteria(automatedCriteriaList);
         return initiativeBeneficiaryRule;
     }
@@ -802,16 +806,16 @@ class InitiativeValidationServiceTest {
         iSelfDeclarationCriteriaList.add(selfCriteriaBool);
         iSelfDeclarationCriteriaList.add(selfCriteriaMulti);
         initiativeBeneficiaryRule.setSelfDeclarationCriteria(iSelfDeclarationCriteriaList);
-        AutomatedCriteria automatedCriteria = new AutomatedCriteria();
-        automatedCriteria.setAuthority("INPS");
-        automatedCriteria.setCode(ISEE);
-        automatedCriteria.setField("true");
-        automatedCriteria.setOperator(FilterOperatorEnumModel.EQ);
-        automatedCriteria.setValue("value");
-        automatedCriteria.setOrderDirection(AutomatedCriteria.OrderDirection.ASC);
-        automatedCriteria.setIseeTypes(List.of(IseeTypologyEnum.CORRENTE, IseeTypologyEnum.MINORENNE));
+        AutomatedCriteria automatedCriteriaLocal = new AutomatedCriteria();
+        automatedCriteriaLocal.setAuthority("INPS");
+        automatedCriteriaLocal.setCode(ISEE);
+        automatedCriteriaLocal.setField("true");
+        automatedCriteriaLocal.setOperator(FilterOperatorEnumModel.EQ);
+        automatedCriteriaLocal.setValue("value");
+        automatedCriteriaLocal.setOrderDirection(AutomatedCriteria.OrderDirection.ASC);
+        automatedCriteriaLocal.setIseeTypes(List.of(IseeTypologyEnum.CORRENTE, IseeTypologyEnum.MINORENNE));
         List<AutomatedCriteria> automatedCriteriaList = new ArrayList<>();
-        automatedCriteriaList.add(automatedCriteria);
+        automatedCriteriaList.add(automatedCriteriaLocal);
         initiativeBeneficiaryRule.setAutomatedCriteria(automatedCriteriaList);
         initiativeBeneficiaryRule.setApiKeyClientId(API_KEY_CLIENT_ID);
         initiativeBeneficiaryRule.setApiKeyClientAssertion(API_KEY_CLIENT_ASSERTION);

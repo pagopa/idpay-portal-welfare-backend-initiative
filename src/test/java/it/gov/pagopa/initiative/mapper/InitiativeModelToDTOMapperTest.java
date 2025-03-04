@@ -13,6 +13,7 @@ import it.gov.pagopa.initiative.dto.rule.trx.*;
 import it.gov.pagopa.initiative.model.TypeBoolEnum;
 import it.gov.pagopa.initiative.model.TypeMultiEnum;
 import it.gov.pagopa.initiative.model.*;
+import it.gov.pagopa.initiative.model.TypeTextEnum;
 import it.gov.pagopa.initiative.model.rule.refund.AccumulatedAmount;
 import it.gov.pagopa.initiative.model.rule.refund.AdditionalInfo;
 import it.gov.pagopa.initiative.model.rule.refund.InitiativeRefundRule;
@@ -500,16 +501,16 @@ class InitiativeModelToDTOMapperTest {
 
     @Test
     void testToInitiativeBeneficiaryRuleDTO_CollectionUtils_isEmpty() {
-        InitiativeBeneficiaryRule initiativeBeneficiaryRule = mock(InitiativeBeneficiaryRule.class);
-        when(initiativeBeneficiaryRule.getAutomatedCriteria()).thenReturn(new ArrayList<>());
-        when(initiativeBeneficiaryRule.getSelfDeclarationCriteria()).thenReturn(new ArrayList<>());
+        InitiativeBeneficiaryRule localInitiativeBeneficiaryRule = mock(InitiativeBeneficiaryRule.class);
+        when(localInitiativeBeneficiaryRule.getAutomatedCriteria()).thenReturn(new ArrayList<>());
+        when(localInitiativeBeneficiaryRule.getSelfDeclarationCriteria()).thenReturn(new ArrayList<>());
         InitiativeBeneficiaryRuleDTO actualToInitiativeBeneficiaryRuleDTOResult = initiativeModelToDTOMapper
-                .toInitiativeBeneficiaryRuleDTO(initiativeBeneficiaryRule);
+                .toInitiativeBeneficiaryRuleDTO(localInitiativeBeneficiaryRule);
         List<AutomatedCriteriaDTO> automatedCriteria = actualToInitiativeBeneficiaryRuleDTOResult.getAutomatedCriteria();
         assertTrue(automatedCriteria.isEmpty());
         assertSame(automatedCriteria, actualToInitiativeBeneficiaryRuleDTOResult.getSelfDeclarationCriteria());
-        verify(initiativeBeneficiaryRule).getAutomatedCriteria();
-        verify(initiativeBeneficiaryRule).getSelfDeclarationCriteria();
+        verify(localInitiativeBeneficiaryRule).getAutomatedCriteria();
+        verify(localInitiativeBeneficiaryRule).getSelfDeclarationCriteria();
     }
 
     @Test
@@ -517,15 +518,15 @@ class InitiativeModelToDTOMapperTest {
         ArrayList<AutomatedCriteria> automatedCriteriaList = new ArrayList<>();
         automatedCriteriaList.add(new AutomatedCriteria("JaneDoe", "Code", "Field", FilterOperatorEnumModel.EQ, "42",
                 "42", AutomatedCriteria.OrderDirection.ASC, List.of(IseeTypologyEnum.CORRENTE, IseeTypologyEnum.MINORENNE)));
-        InitiativeBeneficiaryRule initiativeBeneficiaryRule = mock(InitiativeBeneficiaryRule.class);
-        when(initiativeBeneficiaryRule.getAutomatedCriteria()).thenReturn(automatedCriteriaList);
-        when(initiativeBeneficiaryRule.getSelfDeclarationCriteria()).thenReturn(new ArrayList<>());
+        InitiativeBeneficiaryRule localInitiativeBeneficiaryRule = mock(InitiativeBeneficiaryRule.class);
+        when(localInitiativeBeneficiaryRule.getAutomatedCriteria()).thenReturn(automatedCriteriaList);
+        when(localInitiativeBeneficiaryRule.getSelfDeclarationCriteria()).thenReturn(new ArrayList<>());
         InitiativeBeneficiaryRuleDTO actualToInitiativeBeneficiaryRuleDTOResult = initiativeModelToDTOMapper
-                .toInitiativeBeneficiaryRuleDTO(initiativeBeneficiaryRule);
+                .toInitiativeBeneficiaryRuleDTO(localInitiativeBeneficiaryRule);
         assertEquals(1, actualToInitiativeBeneficiaryRuleDTOResult.getAutomatedCriteria().size());
         assertTrue(actualToInitiativeBeneficiaryRuleDTOResult.getSelfDeclarationCriteria().isEmpty());
-        verify(initiativeBeneficiaryRule, atLeast(1)).getAutomatedCriteria();
-        verify(initiativeBeneficiaryRule).getSelfDeclarationCriteria();
+        verify(localInitiativeBeneficiaryRule, atLeast(1)).getAutomatedCriteria();
+        verify(localInitiativeBeneficiaryRule).getSelfDeclarationCriteria();
     }
 
     @Test
@@ -576,10 +577,10 @@ class InitiativeModelToDTOMapperTest {
     void testToInitiativeIssuerDTOList_OK() {
         Initiative initiative = createFullInitiative();
 
-        ArrayList<Initiative> initiativeList = new ArrayList<>();
-        initiativeList.add(initiative);
+        ArrayList<Initiative> localInitiativeList = new ArrayList<>();
+        localInitiativeList.add(initiative);
 
-        assertEquals(1, initiativeModelToDTOMapper.toInitiativeIssuerDTOList(initiativeList).size());
+        assertEquals(1, initiativeModelToDTOMapper.toInitiativeIssuerDTOList(localInitiativeList).size());
     }
 
     @Test
@@ -603,8 +604,8 @@ class InitiativeModelToDTOMapperTest {
         Initiative initiative = createFullInitiative();
         initiative.getGeneral().setDescriptionMap(null);
 
-        ArrayList<Initiative> initiativeList = new ArrayList<>();
-        initiativeList.add(initiative);
+        ArrayList<Initiative> localInitiativeList = new ArrayList<>();
+        localInitiativeList.add(initiative);
 
         Mockito.when(initiativeUtilsMock.createLogoUrl(initiative.getOrganizationId(), initiative.getInitiativeId()))
                 .thenReturn("https://test" + String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE,
@@ -625,7 +626,7 @@ class InitiativeModelToDTOMapperTest {
                 .beneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF)
                 .build();
 
-        assertEquals(List.of(expectedDTO), initiativeModelToDTOMapper.toInitiativeListMilDTO(initiativeList));
+        assertEquals(List.of(expectedDTO), initiativeModelToDTOMapper.toInitiativeListMilDTO(localInitiativeList));
     }
 
     @Test
@@ -633,8 +634,8 @@ class InitiativeModelToDTOMapperTest {
         Initiative initiative = createFullInitiative();
         initiative.getAdditionalInfo().setLogoFileName("file");
 
-        ArrayList<Initiative> initiativeList = new ArrayList<>();
-        initiativeList.add(initiative);
+        ArrayList<Initiative> localInitiativeList = new ArrayList<>();
+        localInitiativeList.add(initiative);
 
         Mockito.when(initiativeUtilsMock.createLogoUrl(initiative.getOrganizationId(), initiative.getInitiativeId()))
                 .thenReturn("https://test" + String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE,
@@ -656,7 +657,7 @@ class InitiativeModelToDTOMapperTest {
                 .logoURL("https://testassets/logo/organizationId1/Id1/logo.png")
                 .build();
 
-        assertEquals(List.of(expectedDTO), initiativeModelToDTOMapper.toInitiativeListMilDTO(initiativeList));
+        assertEquals(List.of(expectedDTO), initiativeModelToDTOMapper.toInitiativeListMilDTO(localInitiativeList));
     }
 
     @Test
@@ -667,13 +668,13 @@ class InitiativeModelToDTOMapperTest {
         initiative.getGeneral().setDescriptionMap(language);
         initiative.getAdditionalInfo().setLogoFileName("test.png") ;
 
-        ArrayList<Initiative> initiativeList = new ArrayList<>();
-        initiativeList.add(initiative);
+        ArrayList<Initiative> localInitiativeList = new ArrayList<>();
+        localInitiativeList.add(initiative);
         Mockito.when(initiativeUtilsMock.createLogoUrl(initiative.getOrganizationId(), initiative.getInitiativeId()))
                 .thenReturn("https://test" + String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE,
                 initiative.getOrganizationId(),initiative.getInitiativeId(), InitiativeConstants.Logo.LOGO_NAME));
 
-        List<InitiativeIssuerDTO> initiativeIssuerDTOList = initiativeModelToDTOMapper.toInitiativeIssuerDTOList(initiativeList);
+        List<InitiativeIssuerDTO> initiativeIssuerDTOList = initiativeModelToDTOMapper.toInitiativeIssuerDTOList(localInitiativeList);
         assertEquals(1, initiativeIssuerDTOList.size());
         assertFalse(initiativeIssuerDTOList.get(0).getDescriptionMap().isEmpty());
         assertFalse(initiativeIssuerDTOList.get(0).getLogoURL().isBlank());
@@ -756,7 +757,7 @@ class InitiativeModelToDTOMapperTest {
     }
 
     private InitiativeBeneficiaryRule createInitiativeBeneficiaryRule() {
-        InitiativeBeneficiaryRule initiativeBeneficiaryRule = new InitiativeBeneficiaryRule();
+        InitiativeBeneficiaryRule localInitiativeBeneficiaryRule = new InitiativeBeneficiaryRule();
         SelfCriteriaBool selfCriteriaBool = new SelfCriteriaBool();
         selfCriteriaBool.set_type(TypeBoolEnum.BOOLEAN);
         selfCriteriaBool.setCode("B001");
@@ -770,11 +771,17 @@ class InitiativeModelToDTOMapperTest {
         values.add("valore1");
         values.add("valore2");
         selfCriteriaMulti.setValue(values);
+        SelfCriteriaText selfCriteriaText = new SelfCriteriaText();
+        selfCriteriaText.set_type(TypeTextEnum.TEXT);
+        selfCriteriaText.setCode("T001");
+        selfCriteriaText.setDescription("Text");
+        selfCriteriaText.setValue("valore libero");
         List<ISelfDeclarationCriteria> iSelfDeclarationCriteriaList = new ArrayList<>();
         iSelfDeclarationCriteriaList.add(selfCriteriaBool);
         iSelfDeclarationCriteriaList.add(selfCriteriaMulti);
+        iSelfDeclarationCriteriaList.add(selfCriteriaText);
         iSelfDeclarationCriteriaList.add(null);
-        initiativeBeneficiaryRule.setSelfDeclarationCriteria(iSelfDeclarationCriteriaList);
+        localInitiativeBeneficiaryRule.setSelfDeclarationCriteria(iSelfDeclarationCriteriaList);
         AutomatedCriteria automatedCriteria = new AutomatedCriteria();
         automatedCriteria.setAuthority("Authority_ISEE");
         automatedCriteria.setCode("Code_ISEE");
@@ -784,10 +791,10 @@ class InitiativeModelToDTOMapperTest {
         automatedCriteria.setIseeTypes(List.of(IseeTypologyEnum.CORRENTE, IseeTypologyEnum.SOCIOSANITARIO));
         List<AutomatedCriteria> automatedCriteriaList = new ArrayList<>();
         automatedCriteriaList.add(automatedCriteria);
-        initiativeBeneficiaryRule.setAutomatedCriteria(automatedCriteriaList);
-        initiativeBeneficiaryRule.setApiKeyClientId(ENCRYPTED_API_KEY_CLIENT_ID);
-        initiativeBeneficiaryRule.setApiKeyClientAssertion((ENCRYPTED_API_KEY_CLIENT_ASSERTION));
-        return initiativeBeneficiaryRule;
+        localInitiativeBeneficiaryRule.setAutomatedCriteria(automatedCriteriaList);
+        localInitiativeBeneficiaryRule.setApiKeyClientId(ENCRYPTED_API_KEY_CLIENT_ID);
+        localInitiativeBeneficiaryRule.setApiKeyClientAssertion((ENCRYPTED_API_KEY_CLIENT_ASSERTION));
+        return localInitiativeBeneficiaryRule;
     }
 
     private InitiativeDTO createStep1InitiativeDTO() {
@@ -878,7 +885,7 @@ class InitiativeModelToDTOMapperTest {
     }
 
     private InitiativeBeneficiaryRuleDTO createInitiativeBeneficiaryRuleDTO() {
-        InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = new InitiativeBeneficiaryRuleDTO();
+        InitiativeBeneficiaryRuleDTO localInitiativeBeneficiaryRuleDTO = new InitiativeBeneficiaryRuleDTO();
         SelfCriteriaBoolDTO selfCriteriaBoolDTO = new SelfCriteriaBoolDTO();
         selfCriteriaBoolDTO.setType(it.gov.pagopa.initiative.dto.TypeBoolEnum.BOOLEAN);
         selfCriteriaBoolDTO.setCode("B001");
@@ -892,11 +899,17 @@ class InitiativeModelToDTOMapperTest {
         values.add("valore1");
         values.add("valore2");
         selfCriteriaMultiDTO.setValue(values);
+        SelfCriteriaTextDTO selfCriteriaTextDTO = new SelfCriteriaTextDTO();
+        selfCriteriaTextDTO.setType(it.gov.pagopa.initiative.dto.TypeTextEnum.TEXT);
+        selfCriteriaTextDTO.setCode("T001");
+        selfCriteriaTextDTO.setDescription("Text");
+        selfCriteriaTextDTO.setValue("valore libero");
         List<AnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems> anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems = new ArrayList<>();
         anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems.add(selfCriteriaBoolDTO);
         anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems.add(selfCriteriaMultiDTO);
+        anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems.add(selfCriteriaTextDTO);
         anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems.add(null);
-        initiativeBeneficiaryRuleDTO.setSelfDeclarationCriteria(anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems);
+        localInitiativeBeneficiaryRuleDTO.setSelfDeclarationCriteria(anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems);
         AutomatedCriteriaDTO automatedCriteriaDTO = new AutomatedCriteriaDTO();
         automatedCriteriaDTO.setAuthority("Authority_ISEE");
         automatedCriteriaDTO.setCode("Code_ISEE");
@@ -906,10 +919,10 @@ class InitiativeModelToDTOMapperTest {
         automatedCriteriaDTO.setIseeTypes(List.of(IseeTypologyEnum.CORRENTE, IseeTypologyEnum.SOCIOSANITARIO));
         List<AutomatedCriteriaDTO> automatedCriteriaList = new ArrayList<>();
         automatedCriteriaList.add(automatedCriteriaDTO);
-        initiativeBeneficiaryRuleDTO.setAutomatedCriteria(automatedCriteriaList);
-        initiativeBeneficiaryRuleDTO.setApiKeyClientId(API_KEY_CLIENT_ID);
-        initiativeBeneficiaryRuleDTO.setApiKeyClientAssertion(API_KEY_CLIENT_ASSERTION);
-        return initiativeBeneficiaryRuleDTO;
+        localInitiativeBeneficiaryRuleDTO.setAutomatedCriteria(automatedCriteriaList);
+        localInitiativeBeneficiaryRuleDTO.setApiKeyClientId(API_KEY_CLIENT_ID);
+        localInitiativeBeneficiaryRuleDTO.setApiKeyClientAssertion(API_KEY_CLIENT_ASSERTION);
+        return localInitiativeBeneficiaryRuleDTO;
     }
 
     private InitiativeSummaryDTO createInitiativeSummaryDTO() {
@@ -932,15 +945,15 @@ class InitiativeModelToDTOMapperTest {
 
     private Initiative createStep3Initiative() {
         Initiative initiative = createStep2Initiative();
-        InitiativeBeneficiaryRule initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
-        initiative.setBeneficiaryRule(initiativeBeneficiaryRule);
+        InitiativeBeneficiaryRule localInitiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
+        initiative.setBeneficiaryRule(localInitiativeBeneficiaryRule);
         return initiative;
     }
 
     private InitiativeDTO createStep3InitiativeDTO() {
         InitiativeDTO initiativeDTO = createStep2InitiativeDTO();
-        InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
-        initiativeDTO.setBeneficiaryRule(initiativeBeneficiaryRuleDTO);
+        InitiativeBeneficiaryRuleDTO localInitiativeBeneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
+        initiativeDTO.setBeneficiaryRule(localInitiativeBeneficiaryRuleDTO);
         initiativeDTO.setIsLogoPresent(false);
         return initiativeDTO;
     }

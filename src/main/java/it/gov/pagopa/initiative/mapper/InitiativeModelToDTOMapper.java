@@ -1,6 +1,7 @@
 package it.gov.pagopa.initiative.mapper;
 
 import it.gov.pagopa.initiative.dto.*;
+import it.gov.pagopa.initiative.dto.TypeTextEnum;
 import it.gov.pagopa.initiative.dto.rule.refund.AccumulatedAmountDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.RefundAdditionalInfoDTO;
@@ -133,7 +134,8 @@ public class InitiativeModelToDTOMapper {
     }
 
     private static BigDecimal centsToEuro(Long cents) {
-        return BigDecimal.valueOf(cents).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_DOWN);
+        Long value = cents != null ? cents : 0L;
+        return BigDecimal.valueOf(value).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_DOWN);
     }
     
     public InitiativeDTO toDtoOnlyId(Initiative initiative) {
@@ -232,6 +234,13 @@ public class InitiativeModelToDTOMapper {
                                 .code(selfCriteriaMulti.getCode())
                                 .description(selfCriteriaMulti.getDescription())
                                 .value(selfCriteriaMulti.getValue())
+                                .build();
+                    } else if (x instanceof SelfCriteriaText selfCriteriaText) {
+                        return SelfCriteriaTextDTO.builder()
+                                .type(TypeTextEnum.valueOf(selfCriteriaText.get_type().name()))
+                                .code(selfCriteriaText.getCode())
+                                .description(selfCriteriaText.getDescription())
+                                .value(selfCriteriaText.getValue())
                                 .build();
                     }
                     return null;
