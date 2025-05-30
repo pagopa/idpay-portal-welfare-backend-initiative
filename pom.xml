@@ -126,7 +126,7 @@
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
-            <version>10.1.34</version>
+            <version>10.1.41</version>
         </dependency>
 
         <!--GHSA-pq2g-wx69-c263 high vulnerability for json-smart package-->
