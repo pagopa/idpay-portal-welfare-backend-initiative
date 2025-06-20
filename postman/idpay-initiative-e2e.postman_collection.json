@@ -375,7 +375,7 @@
 												{
 													"key": "file",
 													"type": "file",
-													"src": "./postman/example_fiscal_code.csv"
+													"src": "{{basePath}}/example_fiscal_code.csv"
 												}
 											]
 										},
@@ -1077,7 +1077,7 @@
 												{
 													"key": "logo",
 													"type": "file",
-													"src": "./postman/logo_ok.PNG"
+													"src": "{{basePath}}/logo_ok.PNG"
 												}
 											]
 										},
@@ -1227,7 +1227,7 @@
 												{
 													"key": "file",
 													"type": "file",
-													"src": "./postman/example_fiscal_code.csv"
+													"src": "{{basePath}}/example_fiscal_code.csv"
 												}
 											]
 										},
@@ -3156,7 +3156,7 @@
 																{
 																	"key": "file",
 																	"type": "file",
-																	"src": "./postman/empty_file.csv"
+																	"src": "{{basePath}}/empty_file.csv"
 																}
 															]
 														},
@@ -3495,7 +3495,7 @@
 																{
 																	"key": "file",
 																	"type": "file",
-																	"src": "./postman/wrong_fiscal_code.csv"
+																	"src": "{{basePath}}/wrong_fiscal_code.csv"
 																}
 															]
 														},
@@ -3834,7 +3834,7 @@
 																{
 																	"key": "file",
 																	"type": "file",
-																	"src": "./postman/greater_than_beneficiary_budget_fiscal_code_.csv"
+																	"src": "{{basePath}}/greater_than_beneficiary_budget_fiscal_code_.csv"
 																}
 															]
 														},
@@ -4173,7 +4173,7 @@
 																{
 																	"key": "file",
 																	"type": "file",
-																	"src": "./postman/invalid_format.xlsx"
+																	"src": "{{basePath}}/invalid_format.xlsx"
 																}
 															]
 														},
@@ -4511,7 +4511,7 @@
 																{
 																	"key": "file",
 																	"type": "file",
-																	"src": "./postman/ps_fiscal_code_groups_file_large(+2mb).csv"
+																	"src": "{{basePath}}/ps_fiscal_code_groups_file_large(+2mb).csv"
 																}
 															]
 														},
@@ -4853,7 +4853,7 @@
 																{
 																	"key": "file",
 																	"type": "file",
-																	"src": "./postman/example_fiscal_code.csv"
+																	"src": "{{basePath}}/example_fiscal_code.csv"
 																}
 															]
 														},
@@ -5271,7 +5271,7 @@
 																{
 																	"key": "file",
 																	"type": "file",
-																	"src": "./postman/example_fiscal_code.csv"
+																	"src": "{{basePath}}/example_fiscal_code.csv"
 																}
 															]
 														},
@@ -5689,7 +5689,7 @@
 																{
 																	"key": "file",
 																	"type": "file",
-																	"src": "./postman/example_fiscal_code.csv"
+																	"src": "{{basePath}}/example_fiscal_code.csv"
 																}
 															]
 														},
@@ -6108,7 +6108,7 @@
 																{
 																	"key": "file",
 																	"type": "file",
-																	"src": "./postman/example_fiscal_code.csv"
+																	"src": "{{basePath}}/example_fiscal_code.csv"
 																}
 															]
 														},
@@ -6554,7 +6554,7 @@
 																		{
 																			"key": "file",
 																			"type": "file",
-																			"src": "./postman/example_fiscal_code.csv"
+																			"src": "{{basePath}}/example_fiscal_code.csv"
 																		}
 																	]
 																},
@@ -7138,7 +7138,7 @@
 														{
 															"key": "file",
 															"type": "file",
-															"src": "./postman/example_fiscal_code.csv"
+															"src": "{{basePath}}/example_fiscal_code.csv"
 														}
 													]
 												},
@@ -7818,7 +7818,7 @@
 																{
 																	"key": "file",
 																	"type": "file",
-																	"src": "./postman/example_fiscal_code.csv"
+																	"src": "{{basePath}}/example_fiscal_code.csv"
 																}
 															]
 														},
@@ -8350,7 +8350,7 @@
 														{
 															"key": "logo",
 															"type": "file",
-															"src": "./postman/logo_too_large.png"
+															"src": "{{basePath}}/logo_too_large.png"
 														}
 													]
 												},
@@ -8764,7 +8764,7 @@
 																{
 																	"key": "file",
 																	"type": "file",
-																	"src": "./postman/example_fiscal_code.csv"
+																	"src": "{{basePath}}/example_fiscal_code.csv"
 																}
 															]
 														},
@@ -9689,7 +9689,7 @@
 																{
 																	"key": "file",
 																	"type": "file",
-																	"src": "./postman/example_fiscal_code.csv"
+																	"src": "{{basePath}}/example_fiscal_code.csv"
 																}
 															]
 														},
@@ -34078,7 +34078,7 @@
 														{
 															"key": "file",
 															"type": "file",
-															"src": "./postman/example_fiscal_code.csv"
+															"src": "{{basePath}}/example_fiscal_code.csv"
 														}
 													]
 												},
@@ -41343,7 +41343,7 @@
 																{
 																	"key": "file",
 																	"type": "file",
-																	"src": "./postman/example_fiscal_code.csv"
+																	"src": "{{basePath}}/example_fiscal_code.csv"
 																}
 															]
 														},
@@ -45569,7 +45569,7 @@
 		},
 		{
 			"key": "basePath",
-			"value": "./postman"
+			"value": "."
 		},
 		{
 			"key": "rankingEnabled",
