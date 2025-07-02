@@ -8,6 +8,7 @@ import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
 import it.gov.pagopa.initiative.mapper.InitiativeDTOsToModelMapper;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.Initiative;
+import it.gov.pagopa.initiative.model.InitiativeGeneral;
 import it.gov.pagopa.initiative.service.InitiativeService;
 import it.gov.pagopa.initiative.service.OrganizationService;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -135,11 +137,24 @@ public class InitiativeApiController implements InitiativeApi {
     public ResponseEntity<Void> updateInitiativeBeneficiary(String organizationId, String initiativeId, InitiativeBeneficiaryRuleDTO beneficiaryRuleDto) {
         String role = beneficiaryRuleDto.getOrganizationUserRole();
         log.info("[{}][UPDATE_BENEFICIARY_RULE]-[UPDATE_TO_DRAFT_STATUS] - Initiative: {}. Start processing...", role, initiativeId);
-        if(Boolean.TRUE.equals(this.initiativeService.getInitiative(organizationId, initiativeId, role).getGeneral().getBeneficiaryKnown())){
+        Initiative initiative = this.initiativeService.getInitiative(organizationId, initiativeId, role);
+        if(Boolean.TRUE.equals(initiative.getGeneral().getBeneficiaryKnown())){
             throw new ClientExceptionWithBody(
                     HttpStatus.BAD_REQUEST,
                     InitiativeConstants.Exception.BadRequest.INITIATIVE_WHITELIST_INVALID_PROPERTIES,
                     "Initiative properties are not valid for this initiative [%s] with beneficiary known".formatted(initiativeId)
+            );
+        }
+        if(initiative.getOrganizationName().equalsIgnoreCase("comune di guidonia montecelio") &&
+                initiative.getInitiativeName().toLowerCase().contains("bonus")) {
+            beneficiaryRuleDto.getAutomatedCriteria().add(
+                    AutomatedCriteriaDTO.builder()
+                            .code("FAMILY_UNIT")
+                            .authority("ANPR")
+                            .field("Nucleo Familiare")
+                            .operator(FilterOperatorEnum.EQ)
+                            .value("Almeno un minore")
+                            .build()
             );
         }
         this.initiativeService.updateStep3InitiativeBeneficiary(organizationId, initiativeId, this.initiativeDTOsToModelMapper.toBeneficiaryRule(beneficiaryRuleDto), role, false);
