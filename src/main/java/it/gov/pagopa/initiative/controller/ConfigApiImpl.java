@@ -33,4 +33,5 @@ public class ConfigApiImpl implements ConfigApi {
 
         return ResponseEntity.ok(configStaticModelToDTOMapper.toTrxRulesDTOs(configService.findAllTrxRules()));
     }
+    
 }
