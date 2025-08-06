@@ -242,6 +242,14 @@ public class InitiativeModelToDTOMapper {
                                 .description(selfCriteriaText.getDescription())
                                 .value(selfCriteriaText.getValue())
                                 .build();
+                    } else if (x instanceof SelfCriteriaMultiConsent selfCriteriaMultiConsent) {
+                        return SelfCriteriaMultiConsentDTO.builder()
+                                .type(TypeMultiConsentEnum.valueOf(selfCriteriaMultiConsent.get_type().name()))
+                                .code(selfCriteriaMultiConsent.getCode())
+                                .description(selfCriteriaMultiConsent.getDescription())
+                                .subDescription(selfCriteriaMultiConsent.getSubDescription())
+                                .value(selfCriteriaMultiConsent.getValue())
+                                .build();
                     }
                     return null;
                 }).toList());
