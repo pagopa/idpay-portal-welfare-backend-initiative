@@ -29,6 +29,8 @@ public interface InitiativeRepository extends MongoRepository<Initiative, String
                     "'additionalInfo.serviceId' : 1, " +
                     "'additionalInfo.serviceScope' : 1, " +
                     "'additionalInfo.logoFileName' : 1, " +
+                    "'additionalInfo.tcLink' : 1, " +
+                    "'additionalInfo.privacyLink' : 1, " +
                     "'general' : 1, " +
                     "'beneficiaryRule' : 1, " +
                     "'initiativeRewardType' : 1}")
