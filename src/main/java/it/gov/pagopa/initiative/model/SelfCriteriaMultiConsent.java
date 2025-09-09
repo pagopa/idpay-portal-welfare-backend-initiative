@@ -17,6 +17,7 @@ public class SelfCriteriaMultiConsent implements ISelfDeclarationCriteria {
   private TypeMultiConsentEnum _type;
   private String description;
   private String subDescription;
+  private String thresholdCode;
   private List<SelfCriteriaMultiConsentValueDTO> value;
   private String code;
   

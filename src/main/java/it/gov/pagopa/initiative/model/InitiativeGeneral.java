@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.*;
 
-
 import java.time.LocalDate;
 import java.util.Map;
 
@@ -21,6 +20,7 @@ public class InitiativeGeneral {
     private String familyUnitComposition;
     private Boolean beneficiaryKnown;
     private Long beneficiaryBudgetCents;
+    private Long beneficiaryBudgetMaxCents;
     /**
      * Start of period of spending funds in an initiative
      */
