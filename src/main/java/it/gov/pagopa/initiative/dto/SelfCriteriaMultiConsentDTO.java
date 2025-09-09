@@ -44,8 +44,4 @@ public class SelfCriteriaMultiConsentDTO implements AnyOfInitiativeBeneficiaryRu
   @JsonProperty("code")
   @NotNull(groups = ValidationApiEnabledGroup.class)
   private String code;
-
-
-
-
 }

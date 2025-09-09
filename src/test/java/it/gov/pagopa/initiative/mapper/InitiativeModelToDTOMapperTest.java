@@ -56,7 +56,7 @@ class InitiativeModelToDTOMapperTest {
     public static final String ENCRYPTED_API_KEY_CLIENT_ID = "encryptedApiKeyClientId";
     public static final String ENCRYPTED_API_KEY_CLIENT_ASSERTION = "encryptedApiKeyClientAssertion";
     public static final String ITALIAN_LANGUAGE = "it";
-    private final static String SERVICE_ID = "SERVICE_ID";
+    private static final String SERVICE_ID = "SERVICE_ID";
 
     @Autowired
     private InitiativeModelToDTOMapper initiativeModelToDTOMapper;
@@ -92,8 +92,6 @@ class InitiativeModelToDTOMapperTest {
     private Initiative fullInitiativeStep4TrxCountNull;
     private InitiativeDTO fullInitiativeDTOStep4ThresholdNull;
     private Initiative fullInitiativeStep4ThresholdNull;
-    private InitiativeAdditionalDTO initiativeAdditionalDTOOnlyTokens;
-    private InitiativeAdditional initiativeAdditionalOnlyTokens;
     private InitiativeDetailDTO fullInitiativeDetailDTO;
     private Initiative initiativeStep2BeneficiaryTypeNull;
     private InitiativeDTO initiativeStep2DTOBeneficiaryTypeNull;
@@ -772,6 +770,15 @@ class InitiativeModelToDTOMapperTest {
         values.add("valore1");
         values.add("valore2");
         selfCriteriaMulti.setValue(values);
+        SelfCriteriaMultiConsent selfCriteriaMultiConsent = new SelfCriteriaMultiConsent();
+        selfCriteriaMultiConsent.set_type(TypeMultiConsentEnum.MULTI_CONSENT);
+        selfCriteriaMultiConsent.setCode("ISEE");
+        selfCriteriaMultiConsent.setDescription("Desc_Multi_Consent");
+        selfCriteriaMultiConsent.setSubDescription("Sub_Desc_Multi_Consent");
+        selfCriteriaMultiConsent.setThresholdCode("thresholdCode");
+        List<SelfCriteriaMultiConsentValueDTO> selfCriteriaMultiConsentValueDTO = new ArrayList<>();
+        selfCriteriaMultiConsentValueDTO.add(new SelfCriteriaMultiConsentValueDTO("description", "subDescription"));
+        selfCriteriaMultiConsent.setValue(selfCriteriaMultiConsentValueDTO);
         SelfCriteriaText selfCriteriaText = new SelfCriteriaText();
         selfCriteriaText.set_type(TypeTextEnum.TEXT);
         selfCriteriaText.setCode("T001");
@@ -780,6 +787,7 @@ class InitiativeModelToDTOMapperTest {
         List<ISelfDeclarationCriteria> iSelfDeclarationCriteriaList = new ArrayList<>();
         iSelfDeclarationCriteriaList.add(selfCriteriaBool);
         iSelfDeclarationCriteriaList.add(selfCriteriaMulti);
+        iSelfDeclarationCriteriaList.add(selfCriteriaMultiConsent);
         iSelfDeclarationCriteriaList.add(selfCriteriaText);
         iSelfDeclarationCriteriaList.add(null);
         localInitiativeBeneficiaryRule.setSelfDeclarationCriteria(iSelfDeclarationCriteriaList);
@@ -901,6 +909,15 @@ class InitiativeModelToDTOMapperTest {
         values.add("valore1");
         values.add("valore2");
         selfCriteriaMultiDTO.setValue(values);
+        SelfCriteriaMultiConsentDTO selfCriteriaMultiConsentDTO = new SelfCriteriaMultiConsentDTO();
+        selfCriteriaMultiConsentDTO.setType(TypeMultiConsentEnum.MULTI_CONSENT);
+        selfCriteriaMultiConsentDTO.setCode("ISEE");
+        selfCriteriaMultiConsentDTO.setDescription("Desc_Multi_Consent");
+        selfCriteriaMultiConsentDTO.setSubDescription("Sub_Desc_Multi_Consent");
+        selfCriteriaMultiConsentDTO.setThresholdCode("thresholdCode");
+        List<SelfCriteriaMultiConsentValueDTO> selfCriteriaMultiConsentValueDTO = new ArrayList<>();
+        selfCriteriaMultiConsentValueDTO.add(new SelfCriteriaMultiConsentValueDTO("description", "subDescription"));
+        selfCriteriaMultiConsentDTO.setValue(selfCriteriaMultiConsentValueDTO);
         SelfCriteriaTextDTO selfCriteriaTextDTO = new SelfCriteriaTextDTO();
         selfCriteriaTextDTO.setType(it.gov.pagopa.initiative.dto.TypeTextEnum.TEXT);
         selfCriteriaTextDTO.setCode("T001");
@@ -909,6 +926,7 @@ class InitiativeModelToDTOMapperTest {
         List<AnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems> anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems = new ArrayList<>();
         anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems.add(selfCriteriaBoolDTO);
         anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems.add(selfCriteriaMultiDTO);
+        anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems.add(selfCriteriaMultiConsentDTO);
         anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems.add(selfCriteriaTextDTO);
         anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems.add(null);
         localInitiativeBeneficiaryRuleDTO.setSelfDeclarationCriteria(anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems);
