@@ -10,7 +10,8 @@ parameters:
 trigger:
   branches:
     include:
-      - release-*
+      - develop
+      - uat
       - main
   paths:
     include:
@@ -37,7 +38,7 @@ variables:
   canDeploy: true
 
   # If the branch is developed or a feature branch starting with CEN, deploy in DEV environment
-  ${{ if startsWith(variables['Build.SourceBranch'], 'refs/heads/release-dev') }}:
+  ${{ if startsWith(variables['Build.SourceBranch'], 'refs/heads/develop') }}:
     environment: 'DEV'
     dockerRegistryServiceConnection: '$(DEV_CONTAINER_REGISTRY_SERVICE_CONN)'
     kubernetesServiceConnection: '$(DEV_KUBERNETES_SERVICE_CONN)'
@@ -46,7 +47,7 @@ variables:
     # postman environment secure file
     postmanEnvFile: idpay_dev.postman_environment.json
 
-  ${{ elseif startsWith(variables['Build.SourceBranch'], 'refs/heads/release-uat') }}:
+  ${{ elseif startsWith(variables['Build.SourceBranch'], 'refs/heads/uat') }}:
     environment: 'UAT'
     dockerRegistryServiceConnection: '$(UAT_CONTAINER_REGISTRY_SERVICE_CONN)'
     kubernetesServiceConnection: '$(UAT_KUBERNETES_SERVICE_CONN)'
