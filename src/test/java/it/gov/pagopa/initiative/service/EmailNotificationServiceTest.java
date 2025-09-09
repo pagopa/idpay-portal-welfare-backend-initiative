@@ -7,9 +7,9 @@ import it.gov.pagopa.initiative.connector.email_notification.EmailNotificationRe
 import it.gov.pagopa.initiative.connector.selc.SelcRestConnector;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.selc.UserResource;
+import it.gov.pagopa.initiative.model.*;
 import it.gov.pagopa.initiative.model.TypeBoolEnum;
 import it.gov.pagopa.initiative.model.TypeMultiEnum;
-import it.gov.pagopa.initiative.model.*;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -221,6 +221,7 @@ class EmailNotificationServiceTest {
         language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
+        initiativeGeneralDTO.setBeneficiaryBudgetMax(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(beneficiaryKnown);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));

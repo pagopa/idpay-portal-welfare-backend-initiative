@@ -33,6 +33,9 @@ public class SelfCriteriaMultiConsentDTO implements AnyOfInitiativeBeneficiaryRu
   //@NotBlank(groups = ValidationApiEnabledGroup.class)
   private String subDescription;
 
+  @JsonProperty("thresholdCode")
+  @NotBlank(groups = ValidationApiEnabledGroup.class)
+  private String thresholdCode;
 
   @JsonProperty("value")
   @NotEmpty(groups = ValidationApiEnabledGroup.class)

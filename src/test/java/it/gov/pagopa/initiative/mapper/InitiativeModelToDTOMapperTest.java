@@ -10,9 +10,9 @@ import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardGroupsDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardValueDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.*;
+import it.gov.pagopa.initiative.model.*;
 import it.gov.pagopa.initiative.model.TypeBoolEnum;
 import it.gov.pagopa.initiative.model.TypeMultiEnum;
-import it.gov.pagopa.initiative.model.*;
 import it.gov.pagopa.initiative.model.TypeTextEnum;
 import it.gov.pagopa.initiative.model.rule.refund.AccumulatedAmount;
 import it.gov.pagopa.initiative.model.rule.refund.AdditionalInfo;
@@ -723,6 +723,7 @@ class InitiativeModelToDTOMapperTest {
         language.put(Locale.ITALIAN.getLanguage(), ITALIAN_LANGUAGE);
         InitiativeGeneral initiativeGeneral = new InitiativeGeneral();
         initiativeGeneral.setBeneficiaryBudgetCents(1000L);
+        initiativeGeneral.setBeneficiaryBudgetMaxCents(1000L);
         initiativeGeneral.setBeneficiaryKnown(true);
         initiativeGeneral.setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF);
         initiativeGeneral.setBudgetCents(100000000000L);
@@ -811,6 +812,7 @@ class InitiativeModelToDTOMapperTest {
         language.put(Locale.ITALIAN.getLanguage(), ITALIAN_LANGUAGE);
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal("10.00"));
+        initiativeGeneralDTO.setBeneficiaryBudgetMax(new BigDecimal("10.00"));
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal("1000000000.00"));
