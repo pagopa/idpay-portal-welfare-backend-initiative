@@ -17,6 +17,7 @@
 
     <properties>
         <java.version>21</java.version>
+        <argLine>-Duser.timezone=Europe/Rome</argLine> <!-- placeholder to make works both the remote pipeline with sonar cloud and locally -->
     </properties>
 
     <dependencies>
@@ -179,8 +180,6 @@
                 <scope>import</scope>
             </dependency>
 
-
-
             <dependency>
                 <groupId>com.azure.spring</groupId>
                 <artifactId>spring-cloud-azure-dependencies</artifactId>
@@ -196,10 +195,8 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.2.3</version>
                 <configuration>
-                    <argLine>-Duser.timezone=Europe/Rome</argLine>
-                    <argLine>-Xmx1024m</argLine>
+                    <argLine>@{argLine} -Duser.timezone=Europe/Rome</argLine>
                 </configuration>
             </plugin>
             <plugin>
