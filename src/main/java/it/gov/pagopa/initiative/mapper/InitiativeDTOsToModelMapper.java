@@ -150,6 +150,15 @@ public class InitiativeDTOsToModelMapper {
                                 .description(selfCriteriaTextDTO.getDescription())
                                 .value(selfCriteriaTextDTO.getValue())
                                 .build();
+                    }else if (dto instanceof SelfCriteriaMultiConsentDTO selfCriteriaMultiConsentDTO) {
+                        return SelfCriteriaMultiConsent.builder()
+                                ._type(TypeMultiConsentEnum.valueOf(selfCriteriaMultiConsentDTO.getType().name()))
+                                .code(selfCriteriaMultiConsentDTO.getCode())
+                                .description(selfCriteriaMultiConsentDTO.getDescription())
+                                .subDescription(selfCriteriaMultiConsentDTO.getSubDescription())
+                                .thresholdCode(selfCriteriaMultiConsentDTO.getThresholdCode())
+                                .value(selfCriteriaMultiConsentDTO.getValue())
+                                .build();
                     }
                     return null;
                 }).toList());
