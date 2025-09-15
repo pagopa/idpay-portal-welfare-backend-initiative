@@ -9,8 +9,8 @@ import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardGroupsDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardValueDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.*;
-import it.gov.pagopa.initiative.model.TypeMultiEnum;
 import it.gov.pagopa.initiative.model.*;
+import it.gov.pagopa.initiative.model.TypeMultiEnum;
 import it.gov.pagopa.initiative.model.TypeTextEnum;
 import it.gov.pagopa.initiative.model.rule.refund.AccumulatedAmount;
 import it.gov.pagopa.initiative.model.rule.refund.AdditionalInfo;
@@ -62,6 +62,7 @@ public class InitiativeDTOsToModelMapper {
             return null;
         }
         return InitiativeGeneral.builder().beneficiaryBudgetCents(euroToCents(generalDTO.getBeneficiaryBudget()))
+                .beneficiaryBudgetMaxCents(euroToCents(generalDTO.getBeneficiaryBudgetMax()))
                 .beneficiaryKnown(generalDTO.getBeneficiaryKnown())
                 .beneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.valueOf(generalDTO.getBeneficiaryType().name()))
                 .familyUnitComposition(generalDTO.getFamilyUnitComposition()!=null?generalDTO.getFamilyUnitComposition():null)
@@ -148,6 +149,15 @@ public class InitiativeDTOsToModelMapper {
                                 .code(selfCriteriaTextDTO.getCode())
                                 .description(selfCriteriaTextDTO.getDescription())
                                 .value(selfCriteriaTextDTO.getValue())
+                                .build();
+                    }else if (dto instanceof SelfCriteriaMultiConsentDTO selfCriteriaMultiConsentDTO) {
+                        return SelfCriteriaMultiConsent.builder()
+                                ._type(TypeMultiConsentEnum.valueOf(selfCriteriaMultiConsentDTO.getType().name()))
+                                .code(selfCriteriaMultiConsentDTO.getCode())
+                                .description(selfCriteriaMultiConsentDTO.getDescription())
+                                .subDescription(selfCriteriaMultiConsentDTO.getSubDescription())
+                                .thresholdCode(selfCriteriaMultiConsentDTO.getThresholdCode())
+                                .value(selfCriteriaMultiConsentDTO.getValue())
                                 .build();
                     }
                     return null;
