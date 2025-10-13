@@ -88,6 +88,7 @@ public class InitiativeDTOsToModelMapper {
                 .privacyLink(additionalDTO.getPrivacyLink())
                 .tcLink(additionalDTO.getTcLink())
                 .channels(toInitiativeAdditionalChannels(additionalDTO.getChannels()))
+                .thumbnailUrl(additionalDTO.getThumbnailUrl())
                 .build();
     }
 

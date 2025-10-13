@@ -41,4 +41,7 @@ public class InitiativeDataDTO {
   @JsonProperty("logoURL")
   private String logoURL;
 
+  @JsonProperty("thumbnailUrl")
+  private String thumbnailUrl;
+
 }

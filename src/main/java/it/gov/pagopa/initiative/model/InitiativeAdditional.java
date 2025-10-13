@@ -32,5 +32,7 @@ public class InitiativeAdditional {
   private List<Channel> channels;
   private String logoFileName;
   private LocalDateTime logoUploadDate;
+  private String logoURL;
+  private String thumbnailUrl;
 
 }
