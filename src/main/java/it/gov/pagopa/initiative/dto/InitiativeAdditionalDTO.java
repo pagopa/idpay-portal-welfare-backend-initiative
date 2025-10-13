@@ -75,4 +75,8 @@ public class InitiativeAdditionalDTO extends InitiativeOrganizationInfoDTO {
   @JsonProperty("logoUploadDate")
   private LocalDateTime logoUploadDate;
 
+  @JsonProperty("thumbnailUrl")
+  private String thumbnailUrl;
+
+
 }

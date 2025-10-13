@@ -68,6 +68,7 @@ public class InitiativeModelToDTOMapper {
                 .tcLink(initiative.getAdditionalInfo().getTcLink())
                 .privacyLink(initiative.getAdditionalInfo().getPrivacyLink())
                 .logoURL(logoURL)
+                .thumbnailUrl(initiative.getAdditionalInfo().getThumbnailUrl())
                 .build();
     }
 
