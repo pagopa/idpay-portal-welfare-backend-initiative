@@ -68,6 +68,7 @@ public class InitiativeModelToDTOMapper {
                 .tcLink(initiative.getAdditionalInfo().getTcLink())
                 .privacyLink(initiative.getAdditionalInfo().getPrivacyLink())
                 .logoURL(logoURL)
+                .thumbnailUrl(initiative.getAdditionalInfo().getThumbnailUrl())
                 .build();
     }
 
@@ -153,6 +154,7 @@ public class InitiativeModelToDTOMapper {
         }
         return InitiativeGeneralDTO.builder()
                 .beneficiaryBudget(centsToEuro(general.getBeneficiaryBudgetCents()))
+                .beneficiaryBudgetMax(centsToEuro(general.getBeneficiaryBudgetMaxCents()))
                 .beneficiaryKnown(general.getBeneficiaryKnown())
                 .beneficiaryType(general.getBeneficiaryType()!=null?InitiativeGeneralDTO.BeneficiaryTypeEnum.valueOf(general.getBeneficiaryType().name()):null)
                 .familyUnitComposition(general.getFamilyUnitComposition()!=null?general.getFamilyUnitComposition():null)
@@ -241,6 +243,15 @@ public class InitiativeModelToDTOMapper {
                                 .code(selfCriteriaText.getCode())
                                 .description(selfCriteriaText.getDescription())
                                 .value(selfCriteriaText.getValue())
+                                .build();
+                    } else if (x instanceof SelfCriteriaMultiConsent selfCriteriaMultiConsent) {
+                        return SelfCriteriaMultiConsentDTO.builder()
+                                .type(TypeMultiConsentEnum.valueOf(selfCriteriaMultiConsent.get_type().name()))
+                                .code(selfCriteriaMultiConsent.getCode())
+                                .description(selfCriteriaMultiConsent.getDescription())
+                                .subDescription(selfCriteriaMultiConsent.getSubDescription())
+                                .thresholdCode(selfCriteriaMultiConsent.getThresholdCode())
+                                .value(selfCriteriaMultiConsent.getValue())
                                 .build();
                     }
                     return null;

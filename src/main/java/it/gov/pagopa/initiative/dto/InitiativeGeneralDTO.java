@@ -9,14 +9,14 @@ import it.gov.pagopa.initiative.utils.constraint.RankingAndSpendingDatesDoubleUs
 import it.gov.pagopa.initiative.utils.constraint.initiative.general.RankingEnabledNotNullForBeneficiaryKnownFalseConstraint;
 import it.gov.pagopa.initiative.utils.constraint.initiative.general.RankingGracePeriodConstraint;
 import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Map;
@@ -86,6 +86,11 @@ public class InitiativeGeneralDTO extends InitiativeOrganizationInfoDTO {
     @Min(value = 1, message = "Beneficiary budget should have an amount of at least 1", groups = ValidationApiEnabledGroup.class)
     @NotNull(groups = ValidationApiEnabledGroup.class)
     private BigDecimal beneficiaryBudget;
+
+    @JsonProperty("beneficiaryBudgetMax")
+    @Min(value = 1, message = "Beneficiary budget max should have an amount of at least 1", groups = ValidationApiEnabledGroup.class)
+    @NotNull(groups = ValidationApiEnabledGroup.class)
+    private BigDecimal beneficiaryBudgetMax;
 
     /**
      * Start of period of spending funds in an initiative
