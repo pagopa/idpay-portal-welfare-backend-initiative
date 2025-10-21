@@ -14,6 +14,7 @@ public class SelfCriteriaMulti implements ISelfDeclarationCriteria {
 
   private TypeMultiEnum _type;
   private String description;
+  private String subDescription;
   private List<String> value;
   private String code;
   

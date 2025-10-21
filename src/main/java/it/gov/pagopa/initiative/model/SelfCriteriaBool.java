@@ -12,6 +12,7 @@ public class SelfCriteriaBool implements ISelfDeclarationCriteria {
 
   private TypeBoolEnum _type;
   private String description;
+  private String subDescription;
   private Boolean value;
   private String code;
 
