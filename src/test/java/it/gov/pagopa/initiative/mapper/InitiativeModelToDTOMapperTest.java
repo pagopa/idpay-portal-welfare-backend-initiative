@@ -693,6 +693,16 @@ class InitiativeModelToDTOMapperTest {
                     assertEquals(InitiativeConstants.Status.DRAFT, initiative.getStatus());
     }
 
+    @Test
+    void testToInitiativeDataDto_onlyRuleDescription(){
+        Initiative initiative = createFullInitiative();
+
+        InitiativeDetailDTO result = initiativeModelToDTOMapper.toInitiativeDetailDTO(initiative, Locale.ITALIAN, true);
+        assertNotNull(result);
+        assertNotNull(result.getRuleDescription());
+        assertNull(result.getDescription());
+    }
+
     private Initiative createFullInitiative() {
         return createStep5Initiative();
     }
