@@ -395,8 +395,8 @@ class InitiativeServiceTest {
 
        when(initiativeRepository.findByInitiativeIdAndStatusIn(anyString(),anyList())).thenReturn(Optional.of(fullInitiative));
        InitiativeDetailDTO initiativeDetailDTO = createInitiativeDetailDTO();
-       when(initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative,acceptLanguage)).thenReturn(initiativeDetailDTO);
-       InitiativeDetailDTO initiativeDetailDTO1 = initiativeService.getInitiativeBeneficiaryDetail(INITIATIVE_ID,acceptLanguage);
+       when(initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative,acceptLanguage, false)).thenReturn(initiativeDetailDTO);
+       InitiativeDetailDTO initiativeDetailDTO1 = initiativeService.getInitiativeBeneficiaryDetail(INITIATIVE_ID,acceptLanguage, false);
 
        assertEquals(initiativeDetailDTO,initiativeDetailDTO1);
 
@@ -409,7 +409,7 @@ class InitiativeServiceTest {
 
         when(initiativeRepository.findByInitiativeIdAndStatusIn(anyString(),anyList())).thenReturn(Optional.empty());
         try {
-            initiativeService.getInitiativeBeneficiaryDetail(INITIATIVE_ID,acceptLanguage);
+            initiativeService.getInitiativeBeneficiaryDetail(INITIATIVE_ID,acceptLanguage, false);
         } catch (InitiativeNotFoundException e){
             assertEquals(NotFound.INITIATIVE_NOT_FOUND,e.getCode());
             assertEquals(NotFound.INITIATIVE_NOT_FOUND_MESSAGE.formatted(INITIATIVE_ID), e.getMessage());
