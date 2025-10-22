@@ -10,6 +10,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doNothing;
@@ -1228,7 +1229,7 @@ class InitiativeApiTest {
         when(initiativeModelToDTOMapper.toInitiativeDetailDTO(initiative,acceptLanguage, false)).thenReturn(initiativeDetailDTO);
         // When
         // With this instruction, I instruct the service (via Mockito's when) to always return the DummyInitiative to me anytime I call the same service's function
-        when(initiativeService.getInitiativeBeneficiaryDetail(anyString(),any(), any())).thenReturn(initiativeDetailDTO);
+        when(initiativeService.getInitiativeBeneficiaryDetail(anyString(),any(), anyBoolean())).thenReturn(initiativeDetailDTO);
 
         //The MVC perform should perform the API by returning the response based on the Service previously mocked.
         mvc.perform(
