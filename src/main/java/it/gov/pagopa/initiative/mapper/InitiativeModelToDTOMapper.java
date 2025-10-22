@@ -72,7 +72,7 @@ public class InitiativeModelToDTOMapper {
                 .build();
     }
 
-    public  InitiativeDetailDTO toInitiativeDetailDTO(Initiative initiative,Locale acceptLanguage) {
+    public  InitiativeDetailDTO toInitiativeDetailDTO(Initiative initiative,Locale acceptLanguage, Boolean viewOnlyRuleDescription) {
         String ruleDescription = StringUtils.EMPTY;
         String logoURL = null;
         if (initiative.getGeneral() != null && initiative.getGeneral().getDescriptionMap() != null) {
@@ -81,6 +81,11 @@ public class InitiativeModelToDTOMapper {
                     initiative.getGeneral().getDescriptionMap().get(acceptLanguage.getLanguage()),
                     initiative.getGeneral().getDescriptionMap().get(Locale.ITALIAN.getLanguage())
             );
+            if(Boolean.TRUE.equals(viewOnlyRuleDescription)){
+                return InitiativeDetailDTO.builder()
+                        .ruleDescription(ruleDescription)
+                        .build();
+            }
         }
         if(initiative.getAdditionalInfo() != null && initiative.getAdditionalInfo().getLogoFileName() != null){
             logoURL = initiativeUtils.createLogoUrl(initiative.getOrganizationId(),
