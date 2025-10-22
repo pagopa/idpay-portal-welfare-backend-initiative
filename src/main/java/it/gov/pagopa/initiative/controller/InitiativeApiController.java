@@ -58,8 +58,8 @@ public class InitiativeApiController implements InitiativeApi {
         this.initiativeDTOsToModelMapper = initiativeDTOsToModelMapper;
     }
     @Override
-    public ResponseEntity<InitiativeDetailDTO> getInitiativeBeneficiaryDetail(String initiativeId, Locale acceptLanguage) {
-        InitiativeDetailDTO initiativeDetailDTO = initiativeService.getInitiativeBeneficiaryDetail(initiativeId,acceptLanguage);
+    public ResponseEntity<InitiativeDetailDTO> getInitiativeBeneficiaryDetail(String initiativeId, Locale acceptLanguage, boolean viewOnlyRuleDescription) {
+        InitiativeDetailDTO initiativeDetailDTO = initiativeService.getInitiativeBeneficiaryDetail(initiativeId,acceptLanguage, viewOnlyRuleDescription);
         return new ResponseEntity<>(initiativeDetailDTO,HttpStatus.OK);
     }
     @Override

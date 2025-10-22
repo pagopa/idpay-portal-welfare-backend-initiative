@@ -126,12 +126,12 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         return initiativeRepository.findByEnabledAndStatus(true, Status.PUBLISHED);
     }
     @Override
-    public InitiativeDetailDTO getInitiativeBeneficiaryDetail(String initiativeId, Locale acceptLanguage) {
+    public InitiativeDetailDTO getInitiativeBeneficiaryDetail(String initiativeId, Locale acceptLanguage, boolean viewOnlyRuleDescription) {
 
         Initiative initiativeDetail = initiativeRepository.findByInitiativeIdAndStatusIn(initiativeId, List.of(Status.PUBLISHED, Status.CLOSED))
                 .orElseThrow(() -> new InitiativeNotFoundException(InitiativeConstants.Exception.NotFound.INITIATIVE_NOT_FOUND_MESSAGE.formatted(initiativeId)));
 
-        return initiativeModelToDTOMapper.toInitiativeDetailDTO(initiativeDetail, acceptLanguage);
+        return initiativeModelToDTOMapper.toInitiativeDetailDTO(initiativeDetail, acceptLanguage, viewOnlyRuleDescription);
 
     }
 

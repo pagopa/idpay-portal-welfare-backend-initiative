@@ -59,7 +59,7 @@ public interface InitiativeService {
     OnboardingDTO getOnboardingStatusList(String organizationId, String initiativeId, String cf, LocalDateTime startDate, LocalDateTime endDate, String status, Pageable pageable);
     BeneficiaryRankingPageDTO getRankingList(String organizationId, String initiativeId,  Pageable pageable, String beneficiary, String state);
     void validate(String contentType, String fileName);
-    InitiativeDetailDTO getInitiativeBeneficiaryDetail(String initiativeId, Locale acceptLanguage);
+    InitiativeDetailDTO getInitiativeBeneficiaryDetail(String initiativeId, Locale acceptLanguage, boolean viewOnlyRuleDescription);
     void deleteInitiative(String initiativeId);
     void initializeStatistics(String initiativeId, String organizationId);
     KeysDTO getTokenKeys(String initiativeId);
