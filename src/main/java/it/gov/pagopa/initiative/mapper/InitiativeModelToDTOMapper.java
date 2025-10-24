@@ -72,7 +72,7 @@ public class InitiativeModelToDTOMapper {
                 .build();
     }
 
-    public  InitiativeDetailDTO toInitiativeDetailDTO(Initiative initiative,Locale acceptLanguage, Boolean viewOnlyRuleDescription) {
+    public  InitiativeDetailDTO toInitiativeDetailDTO(Initiative initiative,Locale acceptLanguage, Boolean viewMinimalInfo) {
         String ruleDescription = StringUtils.EMPTY;
         String logoURL = null;
         if (initiative.getGeneral() != null && initiative.getGeneral().getDescriptionMap() != null) {
@@ -81,9 +81,10 @@ public class InitiativeModelToDTOMapper {
                     initiative.getGeneral().getDescriptionMap().get(acceptLanguage.getLanguage()),
                     initiative.getGeneral().getDescriptionMap().get(Locale.ITALIAN.getLanguage())
             );
-            if(Boolean.TRUE.equals(viewOnlyRuleDescription)){
+            if(Boolean.TRUE.equals(viewMinimalInfo)){
                 return InitiativeDetailDTO.builder()
                         .ruleDescription(ruleDescription)
+                        .serviceId(initiative.getAdditionalInfo().getServiceId())
                         .build();
             }
         }

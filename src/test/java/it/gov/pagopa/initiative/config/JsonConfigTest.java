@@ -44,7 +44,7 @@ class JsonConfigTest {
         assertTrue(deserializationConfig.getAccessorNaming() instanceof DefaultAccessorNamingStrategy.Provider);
         assertTrue(dateFormat.isLenient());
         assertTrue(((StdDateFormat) dateFormat).isColonIncludedInTimeZone());
-        assertEquals(473998464, deserializationConfig.getDeserializationFeatures());
+        assertEquals(947987584, deserializationConfig.getDeserializationFeatures());
         assertTrue(deserializationConfig.getClassIntrospector() instanceof BasicClassIntrospector);
         assertTrue(deserializationConfig.getDateFormat() instanceof StdDateFormat);
         assertNull(deserializationConfig.getDefaultMergeable());

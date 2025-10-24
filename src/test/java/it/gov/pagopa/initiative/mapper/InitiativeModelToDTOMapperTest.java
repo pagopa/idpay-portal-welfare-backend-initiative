@@ -700,6 +700,7 @@ class InitiativeModelToDTOMapperTest {
         InitiativeDetailDTO result = initiativeModelToDTOMapper.toInitiativeDetailDTO(initiative, Locale.ITALIAN, true);
         assertNotNull(result);
         assertNotNull(result.getRuleDescription());
+        assertNotNull(result.getServiceId());
         assertNull(result.getDescription());
     }
 
