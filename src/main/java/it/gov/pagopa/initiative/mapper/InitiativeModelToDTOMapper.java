@@ -72,7 +72,7 @@ public class InitiativeModelToDTOMapper {
                 .build();
     }
 
-    public  InitiativeDetailDTO toInitiativeDetailDTO(Initiative initiative,Locale acceptLanguage) {
+    public  InitiativeDetailDTO toInitiativeDetailDTO(Initiative initiative,Locale acceptLanguage, Boolean viewOnlyRuleDescription) {
         String ruleDescription = StringUtils.EMPTY;
         String logoURL = null;
         if (initiative.getGeneral() != null && initiative.getGeneral().getDescriptionMap() != null) {
@@ -81,6 +81,11 @@ public class InitiativeModelToDTOMapper {
                     initiative.getGeneral().getDescriptionMap().get(acceptLanguage.getLanguage()),
                     initiative.getGeneral().getDescriptionMap().get(Locale.ITALIAN.getLanguage())
             );
+            if(Boolean.TRUE.equals(viewOnlyRuleDescription)){
+                return InitiativeDetailDTO.builder()
+                        .ruleDescription(ruleDescription)
+                        .build();
+            }
         }
         if(initiative.getAdditionalInfo() != null && initiative.getAdditionalInfo().getLogoFileName() != null){
             logoURL = initiativeUtils.createLogoUrl(initiative.getOrganizationId(),
@@ -228,6 +233,7 @@ public class InitiativeModelToDTOMapper {
                                 .type(it.gov.pagopa.initiative.dto.TypeBoolEnum.valueOf(selfCriteriaBool.get_type().name()))
                                 .code(selfCriteriaBool.getCode())
                                 .description(selfCriteriaBool.getDescription())
+                                .subDescription(selfCriteriaBool.getSubDescription())
                                 .value(selfCriteriaBool.getValue())
                                 .build();
                     } else if (x instanceof SelfCriteriaMulti selfCriteriaMulti) {
@@ -235,6 +241,7 @@ public class InitiativeModelToDTOMapper {
                                 .type(it.gov.pagopa.initiative.dto.TypeMultiEnum.valueOf(selfCriteriaMulti.get_type().name()))
                                 .code(selfCriteriaMulti.getCode())
                                 .description(selfCriteriaMulti.getDescription())
+                                .subDescription(selfCriteriaMulti.getSubDescription())
                                 .value(selfCriteriaMulti.getValue())
                                 .build();
                     } else if (x instanceof SelfCriteriaText selfCriteriaText) {
@@ -242,6 +249,7 @@ public class InitiativeModelToDTOMapper {
                                 .type(TypeTextEnum.valueOf(selfCriteriaText.get_type().name()))
                                 .code(selfCriteriaText.getCode())
                                 .description(selfCriteriaText.getDescription())
+                                .subDescription(selfCriteriaText.getSubDescription())
                                 .value(selfCriteriaText.getValue())
                                 .build();
                     } else if (x instanceof SelfCriteriaMultiConsent selfCriteriaMultiConsent) {

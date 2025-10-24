@@ -29,6 +29,10 @@ public class SelfCriteriaMultiDTO implements AnyOfInitiativeBeneficiaryRuleDTOSe
   @NotBlank(groups = ValidationApiEnabledGroup.class)
   private String description;
 
+  @JsonProperty("subDescription")
+  @NotBlank(groups = ValidationApiEnabledGroup.class)
+  private String subDescription;
+
   @JsonProperty("value")
   @NotEmpty(groups = ValidationApiEnabledGroup.class)
   private List<String> value;

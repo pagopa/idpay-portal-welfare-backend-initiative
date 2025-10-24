@@ -27,6 +27,10 @@ public class SelfCriteriaBoolDTO implements AnyOfInitiativeBeneficiaryRuleDTOSel
   @NotBlank(groups = ValidationApiEnabledGroup.class)
   private String description;
 
+  @JsonProperty("subDescription")
+  @NotBlank(groups = ValidationApiEnabledGroup.class)
+  private String subDescription;
+
   @JsonProperty("value")
   @NotNull(groups = ValidationApiEnabledGroup.class)
   private Boolean value;

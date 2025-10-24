@@ -12,6 +12,7 @@ public class SelfCriteriaText implements ISelfDeclarationCriteria {
 
   private TypeTextEnum _type;
   private String description;
+  private String subDescription;
   private String value;
   private String code;
   

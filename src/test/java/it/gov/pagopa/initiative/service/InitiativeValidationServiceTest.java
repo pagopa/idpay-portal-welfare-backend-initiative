@@ -57,7 +57,6 @@ import static org.mockito.Mockito.*;
 class InitiativeValidationServiceTest {
 
     private static final String INITIATIVE_ID = "initiativeId";
-    private static final String INITIATIVE_NAME = "initiativeName1";
     private static final String ORGANIZATION_ID = "organizationId1";
     private static final String ORGANIZATION_NAME = "organizationName";
     private static final String SERVICE_ID = "serviceId";
@@ -75,8 +74,6 @@ class InitiativeValidationServiceTest {
     @MockBean
     InitiativeRepository initiativeRepository;
 
-    @MockBean
-    AutomatedCriteria automatedCriteria;
 
     @Test
     void givenAdminRole_whenInitiativeStatusIsValid_thenOk() {
@@ -835,11 +832,13 @@ class InitiativeValidationServiceTest {
         selfCriteriaBoolDTO.setType(it.gov.pagopa.initiative.dto.TypeBoolEnum.BOOLEAN);
         selfCriteriaBoolDTO.setCode("B001");
         selfCriteriaBoolDTO.setDescription("Desc_bool");
+        selfCriteriaBoolDTO.setSubDescription("subDesc_bool");
         selfCriteriaBoolDTO.setValue(true);
         SelfCriteriaMultiDTO selfCriteriaMultiDTO = new SelfCriteriaMultiDTO();
         selfCriteriaMultiDTO.setType(it.gov.pagopa.initiative.dto.TypeMultiEnum.MULTI);
         selfCriteriaMultiDTO.setCode("B001");
         selfCriteriaMultiDTO.setDescription("Desc_Multi");
+        selfCriteriaMultiDTO.setSubDescription("subDesc_Multi");
         List<String> values = new ArrayList<>();
         values.add("valore1");
         values.add("valore2");
