@@ -437,7 +437,7 @@ public interface InitiativeApi {
 
   @GetMapping(value = "/idpay/initiative/{initiativeId}/detail")
   ResponseEntity<InitiativeDetailDTO> getInitiativeBeneficiaryDetail(
-          @PathVariable("initiativeId") String initiativeId,@RequestHeader(value = "Accept-Language", defaultValue = "it_IT") Locale acceptLanguage, @RequestParam(required = false, defaultValue = "true") boolean viewOnlyRuleDescription);
+          @PathVariable("initiativeId") String initiativeId,@RequestHeader(value = "Accept-Language", defaultValue = "it_IT") Locale acceptLanguage, @RequestParam(required = false, defaultValue = "true") boolean viewMinimalInfo);
 
   @Operation(summary = "Delete of an initiative ", description = "")
   @ApiResponses(value = {
