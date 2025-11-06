@@ -1,6 +1,7 @@
 package it.gov.pagopa.assistance.connector;
 
 
+import it.gov.pagopa.assistance.costants.AssistanceConstants;
 import it.gov.pagopa.assistance.dto.request.PointOfSaleDTO;
 import it.gov.pagopa.common.web.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,7 @@ public class PointOfSaleRestClientImpl {
                     pointOfSaleRestClient.getPointOfSale(merchantId, pointOfSaleId);
             return response.getBody();
         } catch (Exception e) {
-            throw new ServiceException("code","message");
+            throw new ServiceException(AssistanceConstants.ConnectorError.ASSISTANCE_MERCHANT_ERROR,"Error While Call Merchant MS");
         }
     }
 }

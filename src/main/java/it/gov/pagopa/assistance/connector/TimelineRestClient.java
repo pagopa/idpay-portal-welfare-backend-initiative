@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.time.LocalDateTime;
 
 @FeignClient(
-        name = "${rest-client.timeline.serviceCode}",
-        url = "${rest-client.timeline.baseUrl}"
+        name = "${assistance.rest-client.timeline.serviceCode}",
+        url = "${assistance.rest-client.timeline.baseUrl}"
 )
 public interface TimelineRestClient {
 

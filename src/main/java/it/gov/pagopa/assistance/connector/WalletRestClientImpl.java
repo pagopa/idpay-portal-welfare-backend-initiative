@@ -1,5 +1,6 @@
 package it.gov.pagopa.assistance.connector;
 
+import it.gov.pagopa.assistance.costants.AssistanceConstants;
 import it.gov.pagopa.assistance.dto.request.WalletDTO;
 import it.gov.pagopa.common.web.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
@@ -16,10 +17,10 @@ public class WalletRestClientImpl   {
 
     public WalletDTO walletDetail(String initiativeId, String userId) {
         try {
-            ResponseEntity<WalletDTO> response = walletRestClient.walletDetail(initiativeId,userId);
+            ResponseEntity<WalletDTO> response = walletRestClient.walletDetail(initiativeId, userId);
             return response.getBody();
         } catch (Exception e) {
-            throw new ServiceException("code","message");
+            throw new ServiceException(AssistanceConstants.ConnectorError.ASSISTANCE_WALLET_ERROR, "Error While Call Wallet MS");
         }
     }
 }

@@ -1,16 +1,13 @@
 package it.gov.pagopa.assistance.service;
 
 import it.gov.pagopa.assistance.connector.*;
-import it.gov.pagopa.assistance.dto.request.PointOfSaleDTO;
-import it.gov.pagopa.assistance.dto.request.TimelineDTO;
-import it.gov.pagopa.assistance.dto.request.TransactionDTO;
-import it.gov.pagopa.assistance.dto.request.WalletDTO;
+import it.gov.pagopa.assistance.dto.request.*;
 import it.gov.pagopa.assistance.dto.response.OnboardingStatusDTO;
 import it.gov.pagopa.assistance.dto.response.VouchersStatusDTO;
-import it.gov.pagopa.common.web.exception.ServiceException;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Comparator;
+import java.util.Optional;
 
 @Service
 public class AssistanceServiceImpl implements AssistanceService {
@@ -29,19 +26,30 @@ public class AssistanceServiceImpl implements AssistanceService {
     @Override
     public VouchersStatusDTO vouchersStatus(String initiativeId, String userId) {
 
-
         WalletDTO wallet = walletClient.walletDetail(initiativeId, userId);
 
-        TimelineDTO timeline = timelineClient.getTimeline(initiativeId,userId);
+        TimelineDTO timeline = timelineClient.getTransactionOperation(initiativeId, userId);
 
-        List<TransactionDTO> transactionList = timeline.getOperationList().stream()
-                .map(event -> transactionsClient.findByTrxIdAndUserId(event.getEventId(), userId))
-                .toList();
-        TransactionDTO trx = transactionList.getLast();
-        PointOfSaleDTO pos = posClient.getPointOfSale(trx.getMerchantId(), trx.getPointOfSaleId());
+        Optional<Operation> lastTransactionOp = timeline.getOperationList().stream()
+                .max(Comparator.comparing(Operation::getOperationDate));
+
+        TransactionDTO latestTransaction = null;
+        PointOfSaleDTO pos = null;
+
+        if (lastTransactionOp.isPresent()) {
+            Operation op = lastTransactionOp.get();
+            latestTransaction = transactionsClient.findByTrxIdAndUserId(op.getEventId(), userId);
+
+            if (latestTransaction != null) {
+                pos = posClient.getPointOfSale(
+                        latestTransaction.getMerchantId(),
+                        latestTransaction.getPointOfSaleId()
+                );
+            }
+        }
 
 
-        VouchersStatusDTO.builder()
+        return VouchersStatusDTO.builder()
                 .name(wallet.getName())
                 .surname(wallet.getSurname())
                 .dateOfBirth(null)
@@ -49,23 +57,35 @@ public class AssistanceServiceImpl implements AssistanceService {
                 .expirationDate(wallet.getVoucherStartDate().atStartOfDay())
                 .maxDiscountAmount(wallet.getAmountCents())
                 .status(wallet.getStatus())
-                .dateOfUse(trx.getTrxDate())
+                .dateOfUse(latestTransaction != null ? latestTransaction.getTrxDate() : null)
                 .amountUsed(wallet.getAccruedCents())
-                .typeOfStore(pos.getType())
-                .merchant(pos.getFranchiseName())
-                .merchantAddress(pos.getAddress() + " , " + pos.getZipCode() +" "+pos.getCity()+" "+pos.getProvince())
-                .merchantCity(pos.getCity())
-                .phoneNumber(pos.getChannelPhone())
-                .goodAmount(null)
-                .goodDescription(trx.getAdditionalProperties().get("productName"))
+                .typeOfStore(pos != null ? pos.getType() : null)
+                .merchant(pos != null ? pos.getFranchiseName() : null)
+                .merchantAddress(pos != null ?
+                        pos.getAddress() + " , " + pos.getZipCode() + " " + pos.getCity() + " " + pos.getProvince() : null)
+                .merchantCity(pos != null ? pos.getCity() : null)
+                .phoneNumber(pos != null ? pos.getChannelPhone() : null)
+                .goodAmount(latestTransaction != null ? latestTransaction.getEffectiveAmountCents() : null)
+                .goodDescription(latestTransaction != null ?
+                        latestTransaction.getAdditionalProperties().get("productName") : null)
                 .build();
-
-        return null;
     }
+
 
     @Override
     public OnboardingStatusDTO onboardingStatus(String initiativeId, String userId) {
-        return null;
+        WalletDTO wallet = walletClient.walletDetail(initiativeId, userId);
+
+        return OnboardingStatusDTO.builder()
+                .name(wallet.getName())
+                .surname(wallet.getSurname())
+                .dateOfBirth(null)
+                .dateOfOnboardingRequest(null)
+                .iseeOptionSelected(null)
+                .channel(wallet.getChannel())
+                .email(wallet.getUserMail())
+                .status(wallet.getStatus())
+                .build();
     }
 
 }

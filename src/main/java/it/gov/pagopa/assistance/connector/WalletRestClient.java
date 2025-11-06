@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(
-        name = "${rest-client.wallet.serviceCode}",
-        url = "${rest-client.wallet.baseUrl}"
+        name = "${assistance.rest-client.wallet.serviceCode}",
+        url = "${assistance.rest-client.wallet.baseUrl}"
 )
 public interface WalletRestClient {
 
