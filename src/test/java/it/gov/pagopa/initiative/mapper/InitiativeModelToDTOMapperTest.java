@@ -788,7 +788,7 @@ class InitiativeModelToDTOMapperTest {
         selfCriteriaMultiConsent.setSubDescription("Sub_Desc_Multi_Consent");
         selfCriteriaMultiConsent.setThresholdCode("thresholdCode");
         List<SelfCriteriaMultiConsentValueDTO> selfCriteriaMultiConsentValueDTO = new ArrayList<>();
-        selfCriteriaMultiConsentValueDTO.add(new SelfCriteriaMultiConsentValueDTO("description", "subDescription"));
+        selfCriteriaMultiConsentValueDTO.add(new SelfCriteriaMultiConsentValueDTO("description", "subDescription", "1"));
         selfCriteriaMultiConsent.setValue(selfCriteriaMultiConsentValueDTO);
         SelfCriteriaText selfCriteriaText = new SelfCriteriaText();
         selfCriteriaText.set_type(TypeTextEnum.TEXT);
@@ -927,7 +927,7 @@ class InitiativeModelToDTOMapperTest {
         selfCriteriaMultiConsentDTO.setSubDescription("Sub_Desc_Multi_Consent");
         selfCriteriaMultiConsentDTO.setThresholdCode("thresholdCode");
         List<SelfCriteriaMultiConsentValueDTO> selfCriteriaMultiConsentValueDTO = new ArrayList<>();
-        selfCriteriaMultiConsentValueDTO.add(new SelfCriteriaMultiConsentValueDTO("description", "subDescription"));
+        selfCriteriaMultiConsentValueDTO.add(new SelfCriteriaMultiConsentValueDTO("description", "subDescription", "1"));
         selfCriteriaMultiConsentDTO.setValue(selfCriteriaMultiConsentValueDTO);
         SelfCriteriaTextDTO selfCriteriaTextDTO = new SelfCriteriaTextDTO();
         selfCriteriaTextDTO.setType(it.gov.pagopa.initiative.dto.TypeTextEnum.TEXT);
