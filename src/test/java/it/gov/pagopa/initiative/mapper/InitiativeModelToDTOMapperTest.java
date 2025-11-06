@@ -652,7 +652,7 @@ class InitiativeModelToDTOMapperTest {
                 .privacyLink("privacyLink")
                 .initiativeRewardType(InitiativeDTO.InitiativeRewardTypeEnum.REFUND)
                 .beneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF)
-                .logoURL("https://testassets/logo/organizationId1/Id1/logo.png")
+                .logoURL("https://testlogos/organizationId1/Id1/logo.png")
                 .build();
 
         assertEquals(List.of(expectedDTO), initiativeModelToDTOMapper.toInitiativeListMilDTO(localInitiativeList));
