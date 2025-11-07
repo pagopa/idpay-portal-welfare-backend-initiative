@@ -38,7 +38,7 @@ public class AssistanceServiceImpl implements AssistanceService {
         log.debug("wallet={}", wallet);
 
 
-        if(!wallet.getStatus().equals(AssistanceConstants.USED)){
+        if(!wallet.getVoucherStatus().equals(AssistanceConstants.USED)){
             log.debug("Voucher not used. initiativeId={} userId={}", initiativeId, userId);
             return buildVoucherStatus(wallet, null, null);
         }
