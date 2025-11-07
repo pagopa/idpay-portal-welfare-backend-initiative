@@ -1,7 +1,6 @@
 package it.gov.pagopa.assistance.dto.response;
 
 import it.gov.pagopa.assistance.enums.Channel;
-import it.gov.pagopa.assistance.enums.PointOfSaleTypeEnum;
 import lombok.Builder;
 
 import java.time.LocalDateTime;

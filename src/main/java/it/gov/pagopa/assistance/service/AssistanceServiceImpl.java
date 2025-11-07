@@ -1,9 +1,14 @@
 package it.gov.pagopa.assistance.service;
 
-import it.gov.pagopa.assistance.connector.*;
+
+import it.gov.pagopa.assistance.connector.PointOfSaleRestClientImpl;
+import it.gov.pagopa.assistance.costants.AssistanceConstants;
 import it.gov.pagopa.assistance.dto.request.*;
 import it.gov.pagopa.assistance.dto.response.OnboardingStatusDTO;
 import it.gov.pagopa.assistance.dto.response.VouchersStatusDTO;
+import it.gov.pagopa.assistance.connector.TimelineRestClientImpl;
+import it.gov.pagopa.assistance.connector.TransactionsRestClientImpl;
+import it.gov.pagopa.assistance.connector.WalletRestClientImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -13,8 +18,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static it.gov.pagopa.assistance.costants.AssistanceConstants.PRODUCT_NAME;
 
 @Service
 @Slf4j
@@ -72,7 +75,7 @@ public class AssistanceServiceImpl implements AssistanceService {
 
         String goodDescription = Optional.ofNullable(transaction)
                 .map(TransactionDTO::getAdditionalProperties)
-                .map(props -> props.get(PRODUCT_NAME))
+                .map(props -> props.get(AssistanceConstants.PRODUCT_NAME))
                 .map(Object::toString)
                 .orElse(null);
 
