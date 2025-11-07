@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(
     name = "${assistance.rest-client.onboarding.serviceCode}",
     url = "${assistance.rest-client.onboarding.uri}")
-public interface OnboardingRestClient {
+public interface OnboardingAssistanceRestClient {
 
   @GetMapping(
       value = "/idpay/onboarding/{initiativeId}/{userId}/assistance",

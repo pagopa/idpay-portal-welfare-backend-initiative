@@ -27,7 +27,7 @@ public class AssistanceServiceImpl implements AssistanceService {
     private final TimelineRestClientImpl timelineClient;
     private final TransactionsRestClientImpl transactionsClient;
     private final PointOfSaleRestClientImpl posClient;
-    private final OnboardingRestClientImpl onboardingRestClient;
+    private final OnboardingAssistanceRestClientImpl onboardingClient;
 
     @Override
     public VouchersStatusDTO vouchersStatus(String initiativeId, String userId) {
@@ -110,7 +110,7 @@ public class AssistanceServiceImpl implements AssistanceService {
     public OnboardingStatusDTO onboardingStatus(String initiativeId, String userId) {
         log.debug("Fetching onboarding status for initiativeId={} userId={}", initiativeId, userId);
 
-        OnboardingDTO onboarding = onboardingRestClient.getOnboardingStatus(initiativeId, userId);
+        OnboardingDTO onboarding = onboardingClient.getOnboardingStatus(initiativeId, userId);
 
         log.debug("onboarding={}", onboarding);
         return OnboardingStatusDTO.builder()

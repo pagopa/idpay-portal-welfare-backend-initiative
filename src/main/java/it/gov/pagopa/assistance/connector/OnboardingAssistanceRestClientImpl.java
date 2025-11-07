@@ -13,9 +13,9 @@ import org.springframework.web.client.RestClientException;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class OnboardingRestClientImpl {
+public class OnboardingAssistanceRestClientImpl {
 
-  private final OnboardingRestClient onboardingRestClient;
+  private final OnboardingAssistanceRestClient onboardingRestClient;
 
   public OnboardingDTO getOnboardingStatus(String initiativeId, String userId) {
     log.debug("Calling Onboarding MS for initiativeId={} userId={}", initiativeId, userId);
