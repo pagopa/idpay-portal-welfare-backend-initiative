@@ -225,5 +225,5 @@ assistance:
       serviceCode: idpay-transaction
       baseUrl: ${TRANSACTION_URI:}
     onboarding:
-      serviceCode: idpay-onboarding
+      serviceCode: idpay-onboarding-assistance
       uri: ${ONBOARDING_URI:}
