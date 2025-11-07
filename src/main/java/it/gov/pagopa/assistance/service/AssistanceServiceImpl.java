@@ -1,14 +1,11 @@
 package it.gov.pagopa.assistance.service;
 
 
-import it.gov.pagopa.assistance.connector.PointOfSaleRestClientImpl;
+import it.gov.pagopa.assistance.connector.*;
 import it.gov.pagopa.assistance.costants.AssistanceConstants;
 import it.gov.pagopa.assistance.dto.request.*;
 import it.gov.pagopa.assistance.dto.response.OnboardingStatusDTO;
 import it.gov.pagopa.assistance.dto.response.VouchersStatusDTO;
-import it.gov.pagopa.assistance.connector.TimelineRestClientImpl;
-import it.gov.pagopa.assistance.connector.TransactionsRestClientImpl;
-import it.gov.pagopa.assistance.connector.WalletRestClientImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,10 +22,12 @@ import java.util.stream.Stream;
 public class AssistanceServiceImpl implements AssistanceService {
 
 
+
     private final WalletRestClientImpl walletClient;
     private final TimelineRestClientImpl timelineClient;
     private final TransactionsRestClientImpl transactionsClient;
     private final PointOfSaleRestClientImpl posClient;
+    private final OnboardingRestClientImpl onboardingRestClient;
 
     @Override
     public VouchersStatusDTO vouchersStatus(String initiativeId, String userId) {
@@ -36,9 +35,16 @@ public class AssistanceServiceImpl implements AssistanceService {
 
 
         WalletDTO wallet = walletClient.getWallet(initiativeId, userId);
+        log.debug("wallet={}", wallet);
 
+
+        if(!wallet.getStatus().equals(AssistanceConstants.USED)){
+            log.debug("Voucher not used. initiativeId={} userId={}", initiativeId, userId);
+            return buildVoucherStatus(wallet, null, null);
+        }
 
         TimelineDTO timeline = timelineClient.getTimeline(initiativeId, userId);
+        log.debug("timeline={}", timeline);
 
 
         Optional<Operation> lastTransactionOp = timeline.getOperationList().stream()
@@ -52,6 +58,7 @@ public class AssistanceServiceImpl implements AssistanceService {
 
         Operation op = lastTransactionOp.get();
         TransactionDTO latestTransaction = transactionsClient.getTransaction(op.getEventId(), userId);
+        log.debug("transaction={}", latestTransaction);
         PointOfSaleDTO pos = null;
 
         if (latestTransaction != null &&
@@ -60,6 +67,7 @@ public class AssistanceServiceImpl implements AssistanceService {
             pos = posClient.getPointOfSale(latestTransaction.getMerchantId(), latestTransaction.getPointOfSaleId());
         }
 
+        log.debug("pos={}", pos);
         return buildVoucherStatus(wallet, latestTransaction, pos);
     }
 
@@ -82,11 +90,10 @@ public class AssistanceServiceImpl implements AssistanceService {
         return VouchersStatusDTO.builder()
                 .name(wallet.getName())
                 .surname(wallet.getSurname())
-                .dateOfBirth(null)
                 .issueDate(wallet.getVoucherStartDate() != null ? wallet.getVoucherStartDate().atStartOfDay() : null)
                 .expirationDate(wallet.getVoucherEndDate() != null ? wallet.getVoucherEndDate().atStartOfDay() : null)
-                .maxDiscountAmount(wallet.getAmountCents())
-                .status(wallet.getStatus())
+                .maxDiscountAmount(wallet.getAmountCents()+wallet.getAccruedCents()+(-1* wallet.getRefundedCents()))
+                .status(wallet.getVoucherStatus())
                 .dateOfUse(transaction != null ? transaction.getTrxDate() : null)
                 .amountUsed(wallet.getAccruedCents())
                 .typeOfStore(pos != null ? pos.getType() : null)
@@ -103,18 +110,18 @@ public class AssistanceServiceImpl implements AssistanceService {
     public OnboardingStatusDTO onboardingStatus(String initiativeId, String userId) {
         log.debug("Fetching onboarding status for initiativeId={} userId={}", initiativeId, userId);
 
-        WalletDTO wallet = walletClient.getWallet(initiativeId, userId);
+        OnboardingDTO onboarding = onboardingRestClient.getOnboardingStatus(initiativeId, userId);
 
-
+        log.debug("onboarding={}", onboarding);
         return OnboardingStatusDTO.builder()
-                .name(wallet.getName())
-                .surname(wallet.getSurname())
-                .dateOfBirth(null)
-                .dateOfOnboardingRequest(null)
-                .iseeOptionSelected(null)
-                .channel(wallet.getChannel())
-                .email(wallet.getUserMail())
-                .status(wallet.getStatus())
+                .name(onboarding.getName())
+                .surname(onboarding.getSurname())
+                .dateOfOnboardingRequest(onboarding.getCriteriaConsensusTimestamp())
+                .dateOfOnboardingOk(onboarding.getOnboardingOkDate())
+                .channel(onboarding.getChannel())
+                .email(onboarding.getUserMail())
+                .status(onboarding.getStatus())
+                .detailKO(onboarding.getDetailKO())
                 .build();
     }
 }

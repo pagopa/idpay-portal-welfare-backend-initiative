@@ -7,13 +7,13 @@ import java.time.LocalDateTime;
 @Builder
 public class OnboardingStatusDTO {
 
+
+    private LocalDateTime dateOfOnboardingRequest;
+    private LocalDateTime dateOfOnboardingOk;
+    private Channel channel;
+    private String status;
     private String name;
     private String surname;
-    private LocalDateTime dateOfBirth;
-    private LocalDateTime dateOfOnboardingRequest;
-    private String iseeOptionSelected;
-    private Channel channel;
     private String email;
-    private String status;
-
+    private String detailKO;
 }

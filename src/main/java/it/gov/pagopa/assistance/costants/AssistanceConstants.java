@@ -15,5 +15,6 @@ public class AssistanceConstants {
     }
 
     public static final String PRODUCT_NAME = "productName";
+    public static final String USED = "USED";
 }
 

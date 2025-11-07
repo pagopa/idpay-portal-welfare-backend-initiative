@@ -8,22 +8,20 @@ import java.time.LocalDateTime;
 @Builder
 public class VouchersStatusDTO {
 
-
+    private PointOfSaleTypeEnum typeOfStore;
     private String name;
     private String surname;
-    private LocalDateTime dateOfBirth;
-    private LocalDateTime issueDate;
-    private LocalDateTime expirationDate;
-    private Long maxDiscountAmount;
     private String status;
-    private LocalDateTime dateOfUse;
-    private Long amountUsed;
-    private PointOfSaleTypeEnum typeOfStore;
     private String merchant;
     private String merchantAddress;
     private String merchantCity;
     private String phoneNumber;
-    private Long goodAmount;
     private String goodDescription;
+    private Long goodAmount;
+    private Long amountUsed;
+    private Long maxDiscountAmount;
+    private LocalDateTime dateOfUse;
+    private LocalDateTime issueDate;
+    private LocalDateTime expirationDate;
 
 }
