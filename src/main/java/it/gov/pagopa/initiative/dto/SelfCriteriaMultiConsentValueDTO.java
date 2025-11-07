@@ -13,4 +13,6 @@ public class SelfCriteriaMultiConsentValueDTO {
 
   private String subDescription;
 
+  private String value;
+
 }
