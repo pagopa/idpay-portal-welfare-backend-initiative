@@ -485,8 +485,8 @@ class InitiativeDTOsToModelMapperTest {
         selfCriteriaMultiConsent.setDescription("Desc_Multi_Consent");
         selfCriteriaMultiConsent.setSubDescription("Sub_Desc_Multi_Consent");
         List<SelfCriteriaMultiConsentValueDTO> multiConsentValues = new ArrayList<>();
-        multiConsentValues.add(new SelfCriteriaMultiConsentValueDTO ("DESC_VAL_1", "SUBDEC_VAL_1"));
-        multiConsentValues.add(new SelfCriteriaMultiConsentValueDTO ("DESC_VAL_2", "SUBDEC_VAL_2"));
+        multiConsentValues.add(new SelfCriteriaMultiConsentValueDTO ("DESC_VAL_1", "SUBDEC_VAL_1", "1"));
+        multiConsentValues.add(new SelfCriteriaMultiConsentValueDTO ("DESC_VAL_2", "SUBDEC_VAL_2", "2"));
         selfCriteriaMultiConsent.setValue(multiConsentValues);
         List<ISelfDeclarationCriteria> iSelfDeclarationCriteriaList = new ArrayList<>();
         iSelfDeclarationCriteriaList.add(selfCriteriaBool);
@@ -631,8 +631,8 @@ class InitiativeDTOsToModelMapperTest {
         selfCriteriaMultiConsentDTO.setDescription("Desc_Multi_Consent");
         selfCriteriaMultiConsentDTO.setSubDescription("Sub_Desc_Multi_Consent");
         List<SelfCriteriaMultiConsentValueDTO> multiConsentValues = new ArrayList<>();
-        multiConsentValues.add(new SelfCriteriaMultiConsentValueDTO ("DESC_VAL_1", "SUBDEC_VAL_1"));
-        multiConsentValues.add(new SelfCriteriaMultiConsentValueDTO ("DESC_VAL_2", "SUBDEC_VAL_2"));
+        multiConsentValues.add(new SelfCriteriaMultiConsentValueDTO ("DESC_VAL_1", "SUBDEC_VAL_1", "1"));
+        multiConsentValues.add(new SelfCriteriaMultiConsentValueDTO ("DESC_VAL_2", "SUBDEC_VAL_2", "2"));
         selfCriteriaMultiConsentDTO.setValue(multiConsentValues);
         List<AnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems> anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems = new ArrayList<>();
         anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems.add(selfCriteriaBoolDTO);
