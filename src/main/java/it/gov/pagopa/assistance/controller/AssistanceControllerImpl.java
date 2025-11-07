@@ -17,7 +17,7 @@ public class AssistanceControllerImpl implements AssistanceController{
 
     @Override
     public ResponseEntity<OnboardingStatusDTO> onboardingStatus(String initiativeId, String userId) {
-        return null;
+        return ResponseEntity.ok().body(assistanceService.onboardingStatus(initiativeId,userId));
     }
 
     @Override
