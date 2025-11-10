@@ -1,5 +1,6 @@
 package it.gov.pagopa.initiative.config;
 
+import it.gov.pagopa.assistance.connector.*;
 import it.gov.pagopa.initiative.connector.decrypt.DecryptRest;
 import it.gov.pagopa.initiative.connector.encrypt.EncryptRest;
 import it.gov.pagopa.initiative.connector.onboarding.OnboardingRestClient;
@@ -12,7 +13,13 @@ import org.springframework.context.annotation.Configuration;
     EncryptRest.class,
     DecryptRest.class,
     OnboardingRestClient.class,
-    RankingRestClient.class
+    RankingRestClient.class,
+    PointOfSaleRestClient.class,
+    TimelineRestClient.class,
+    TransactionsRestClient.class,
+    WalletRestClient.class,
+    OnboardingAssistanceRestClient.class
+
 })
 public class RestConnectorConfig {
 

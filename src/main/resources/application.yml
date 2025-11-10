@@ -209,3 +209,21 @@ util:
         gcm:
           iv: ${UTIL_CRYPTO_AES_MODE_GCM_IV:}
           tLen: ${UTIL_CRYPTO_AES_MODE_GCM_TAG_LEN:16}
+
+assistance:
+  rest-client:
+    wallet:
+      serviceCode: idpay-wallet
+      baseUrl: ${WALLET_URI:}
+    merchant:
+      serviceCode: idpay-merchant
+      baseUrl: ${MERCHANT_URI:}
+    timeline:
+      serviceCode: idpay-timeline
+      baseUrl: ${TIMELINE_URI:}
+    transactions:
+      serviceCode: idpay-transaction
+      baseUrl: ${TRANSACTION_URI:}
+    onboarding:
+      serviceCode: idpay-onboarding-assistance
+      uri: ${ONBOARDING_URI:}
