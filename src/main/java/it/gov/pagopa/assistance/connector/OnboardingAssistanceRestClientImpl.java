@@ -1,14 +1,15 @@
 package it.gov.pagopa.assistance.connector;
 
+import feign.FeignException;
 import it.gov.pagopa.assistance.costants.AssistanceConstants;
 import it.gov.pagopa.assistance.dto.request.OnboardingDTO;
 import it.gov.pagopa.common.web.exception.ServiceException;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientException;
+
+import static it.gov.pagopa.assistance.utlis.Utils.extractMessageFromFeignException;
 
 @Slf4j
 @Service
@@ -23,19 +24,19 @@ public class OnboardingAssistanceRestClientImpl {
       ResponseEntity<OnboardingDTO> response = onboardingRestClient.onboardingStatus(initiativeId, userId);
 
       if (response == null || !response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
-        log.warn("Empty or invalid response from Onboarding MS for initiativeId={} userId={}", initiativeId, userId);
+        log.warn("[ASSISTANCE] Empty or invalid response from Onboarding MS for initiativeId={} userId={}", initiativeId, userId);
         throw new ServiceException(
-                AssistanceConstants.ConnectorError.ASSISTANCE_MERCHANT_ERROR,
-                "Empty or invalid response from Merchant MS"
+                AssistanceConstants.ConnectorError.ASSISTANCE_ONBOARDING_ERROR,
+                "Empty or invalid response from Onboarding MS"
         );
       }
 
       return response.getBody();
-    } catch (RestClientException e) {
-      log.error("Error while calling Onboarding MS for initiativeId={} userId={}", initiativeId, userId);
+    } catch (FeignException e) {
+      log.error("[ASSISTANCE] Error while calling Onboarding MS for initiativeId={} userId={}", initiativeId, userId);
       throw new ServiceException(
-              AssistanceConstants.ConnectorError.ASSISTANCE_MERCHANT_ERROR,
-              "Error while calling Merchant MS"
+              AssistanceConstants.ConnectorError.ASSISTANCE_ONBOARDING_ERROR,
+              extractMessageFromFeignException(e)
       );
     }
   }
