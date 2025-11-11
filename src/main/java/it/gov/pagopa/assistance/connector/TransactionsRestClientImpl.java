@@ -1,13 +1,15 @@
 package it.gov.pagopa.assistance.connector;
 
 
+import feign.FeignException;
 import it.gov.pagopa.assistance.costants.AssistanceConstants;
 import it.gov.pagopa.assistance.dto.request.TransactionDTO;
 import it.gov.pagopa.common.web.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientException;
+
+import static it.gov.pagopa.assistance.utlis.Utils.extractMessageFromFeignException;
 
 @Slf4j
 @Service
@@ -17,7 +19,7 @@ public class TransactionsRestClientImpl {
     private final TransactionsRestClient transactionsRestClient;
 
     public TransactionDTO getTransaction(String trxId, String userId) {
-        log.debug("Calling Transaction MS for trxId={} userId={}", trxId, userId);
+        log.debug("[ASSISTANCE]  Calling Transaction MS for trxId={} userId={}", trxId, userId);
         try {
             TransactionDTO transaction = transactionsRestClient.findByTrxIdAndUserId(trxId, userId);
 
@@ -30,11 +32,11 @@ public class TransactionsRestClientImpl {
             }
 
             return transaction;
-        } catch (RestClientException e) {
-            log.error("Error while calling Transaction MS for trxId={} userId={}", trxId, userId, e);
+        } catch (FeignException e) {
+            log.error("[ASSISTANCE]  Error while calling Transaction MS for trxId={} userId={}", trxId, userId, e);
             throw new ServiceException(
                     AssistanceConstants.ConnectorError.ASSISTANCE_TRANSACTION_ERROR,
-                    "Error while calling Transaction MS"
+                    extractMessageFromFeignException(e)
             );
         }
     }
