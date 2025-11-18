@@ -2,10 +2,12 @@ package it.gov.pagopa.assistance.dto.response;
 
 import it.gov.pagopa.assistance.enums.PointOfSaleTypeEnum;
 import lombok.Builder;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Builder
+@Data
 public class VouchersStatusDTO {
 
     private PointOfSaleTypeEnum typeOfStore;
