@@ -87,13 +87,21 @@ class AssistanceServiceImplTest {
         when(timelineClient.getTimeline(INITIATIVE_ID, USER_ID))
                 .thenReturn(timeline);
 
+        RewardCounters rewardCounters = RewardCounters.builder()
+                .initiativeBudgetCents(10000L)
+                .build();
+        Reward reward = Reward.builder()
+                .initiativeId("68dd003ccce8c534d1da22bc")
+                .counters(rewardCounters)
+                .build();
+
         TransactionDTO trx = new TransactionDTO();
         trx.setTrxDate(LocalDateTime.of(2024, 2, 1, 10, 0));
         trx.setMerchantId("MRC1");
         trx.setPointOfSaleId("POS100");
         trx.setEffectiveAmountCents(500L);
         trx.setAdditionalProperties(Map.of(AssistanceConstants.PRODUCT_NAME, "Pizza"));
-
+        trx.setRewards(Map.of("68dd003ccce8c534d1da22bc",reward));
         when(transactionsClient.getTransaction("EVT1", USER_ID))
                 .thenReturn(trx);
 
