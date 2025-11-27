@@ -92,7 +92,7 @@ public class AssistanceServiceImpl implements AssistanceService {
                 .surname(wallet.getSurname())
                 .issueDate(wallet.getVoucherStartDate() != null ? wallet.getVoucherStartDate().atStartOfDay() : null)
                 .expirationDate(wallet.getVoucherEndDate() != null ? wallet.getVoucherEndDate().atStartOfDay() : null)
-                .maxDiscountAmount(wallet.getVoucherStatus().equals("USED") ? Objects.requireNonNull(transaction).getRewards().get("68dd003ccce8c534d1da22bc").getCounters().getInitiativeBudgetCents() : wallet.getAmountCents())
+                .maxDiscountAmount(wallet.getVoucherStatus().equals("USED") ? null : wallet.getAmountCents())
                 .status(wallet.getVoucherStatus())
                 .dateOfUse(transaction != null ? transaction.getTrxDate() : null)
                 .amountUsed(wallet.getAccruedCents())
