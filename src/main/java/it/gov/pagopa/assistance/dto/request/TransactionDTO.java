@@ -62,4 +62,6 @@ public class TransactionDTO {
     private String channel;
     private Map<String, String> additionalProperties;
     private InvoiceFile invoiceFile;
+    private Boolean extendedAuthorization;
+    private Long voucherAmountCents;
 }
