@@ -1,9 +1,5 @@
 package it.gov.pagopa.assistance.connector;
 
-
-
-
-
 import feign.FeignException;
 import it.gov.pagopa.assistance.costants.AssistanceConstants;
 import it.gov.pagopa.assistance.dto.request.Operation;
@@ -49,9 +45,11 @@ class TimelineRestClientImplTest {
         TimelineDTO dto = new TimelineDTO();
         dto.setOperationList(List.of(operation));
         when(timelineRestClient.getTimeline(
-                INITIATIVE_ID, USER_ID,
+                INITIATIVE_ID,
+                USER_ID,
                 "TRANSACTION",
-                null, null, null, null
+                0, 20,
+                null, null
         )).thenReturn(ResponseEntity.ok(dto));
 
         TimelineDTO result = service.getTimeline(INITIATIVE_ID, USER_ID);
@@ -60,9 +58,11 @@ class TimelineRestClientImplTest {
         assertEquals(1, result.getOperationList().size());
 
         verify(timelineRestClient).getTimeline(
-                INITIATIVE_ID, USER_ID,
+                INITIATIVE_ID,
+                USER_ID,
                 "TRANSACTION",
-                null, null, null, null
+                0, 20,
+                null, null
         );
     }
 
@@ -74,15 +74,9 @@ class TimelineRestClientImplTest {
                 "TRANSACTION", null, null, null, null
         )).thenReturn(null);
 
-        ServiceException ex = assertThrows(
-                ServiceException.class,
-                () -> service.getTimeline(INITIATIVE_ID, USER_ID)
-        );
+        TimelineDTO response = service.getTimeline(INITIATIVE_ID, USER_ID);
+        assertNull(response);
 
-        assertEquals(
-                AssistanceConstants.ConnectorError.ASSISTANCE_TIMELINE_ERROR,
-                ex.getCode()
-        );
     }
 
 
@@ -93,15 +87,8 @@ class TimelineRestClientImplTest {
                 "TRANSACTION", null, null, null, null
         )).thenReturn(ResponseEntity.status(HttpStatus.BAD_GATEWAY).build());
 
-        ServiceException ex = assertThrows(
-                ServiceException.class,
-                () -> service.getTimeline(INITIATIVE_ID, USER_ID)
-        );
-
-        assertEquals(
-                AssistanceConstants.ConnectorError.ASSISTANCE_TIMELINE_ERROR,
-                ex.getCode()
-        );
+        TimelineDTO response = service.getTimeline(INITIATIVE_ID, USER_ID);
+        assertNull(response);
     }
 
     // =========================================================================
@@ -115,15 +102,8 @@ class TimelineRestClientImplTest {
                 "TRANSACTION", null, null, null, null
         )).thenReturn(ResponseEntity.ok(null));
 
-        ServiceException ex = assertThrows(
-                ServiceException.class,
-                () -> service.getTimeline(INITIATIVE_ID, USER_ID)
-        );
-
-        assertEquals(
-                AssistanceConstants.ConnectorError.ASSISTANCE_TIMELINE_ERROR,
-                ex.getCode()
-        );
+        TimelineDTO response = service.getTimeline(INITIATIVE_ID, USER_ID);
+        assertNull(response);
     }
 
 
@@ -133,8 +113,11 @@ class TimelineRestClientImplTest {
         FeignException fe = mock(FeignException.class);
 
         when(timelineRestClient.getTimeline(
-                INITIATIVE_ID, USER_ID,
-                "TRANSACTION", null, null, null, null
+                INITIATIVE_ID,
+                USER_ID,
+                "TRANSACTION",
+                0, 20,
+                null, null
         )).thenThrow(fe);
 
         ServiceException ex = assertThrows(
@@ -148,8 +131,11 @@ class TimelineRestClientImplTest {
         );
 
         verify(timelineRestClient).getTimeline(
-                INITIATIVE_ID, USER_ID,
-                "TRANSACTION", null, null, null, null
+                INITIATIVE_ID,
+                USER_ID,
+                "TRANSACTION",
+                0, 20,
+                null, null
         );
     }
 }

@@ -55,15 +55,8 @@ class TransactionsRestClientImplTest {
         when(transactionsRestClient.findByInitiativeIdAndUserId(TRX_ID, USER_ID))
                 .thenReturn(null);
 
-        ServiceException ex = assertThrows(
-                ServiceException.class,
-                () -> service.getTransactions(TRX_ID, USER_ID)
-        );
-
-        assertEquals(
-                AssistanceConstants.ConnectorError.ASSISTANCE_TRANSACTION_ERROR,
-                ex.getCode()
-        );
+        List<TransactionDTO> transactions = service.getTransactions(TRX_ID, USER_ID);
+        assertNull(transactions);
     }
 
 
