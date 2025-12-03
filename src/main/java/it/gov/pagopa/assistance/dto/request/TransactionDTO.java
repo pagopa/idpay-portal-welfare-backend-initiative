@@ -64,4 +64,5 @@ public class TransactionDTO {
     private InvoiceFile invoiceFile;
     private Boolean extendedAuthorization;
     private Long voucherAmountCents;
+
 }

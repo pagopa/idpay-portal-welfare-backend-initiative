@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -33,78 +34,69 @@ public class AssistanceServiceImpl implements AssistanceService {
     public VouchersStatusDTO vouchersStatus(String initiativeId, String userId) {
         log.debug("Fetching voucher status for initiativeId={} userId={}", initiativeId, userId);
 
-
         WalletDTO wallet = walletClient.getWallet(initiativeId, userId);
         log.debug("wallet={}", wallet);
-
-
-        if(!wallet.getVoucherStatus().equals(AssistanceConstants.USED)){
-            log.debug("Voucher not used. initiativeId={} userId={}", initiativeId, userId);
-            return buildVoucherStatus(wallet, null, null);
-        }
 
         TimelineDTO timeline = timelineClient.getTimeline(initiativeId, userId);
         log.debug("timeline={}", timeline);
 
-
-        Optional<Operation> lastTransactionOp = timeline.getOperationList().stream()
-                .filter(op -> op.getOperationDate() != null)
-                .max(Comparator.comparing(Operation::getOperationDate));
-
-        if (lastTransactionOp.isEmpty()) {
-            log.debug("No transaction operations found for initiativeId={} userId={}", initiativeId, userId);
-            return buildVoucherStatus(wallet, null, null);
-        }
-
-        Operation op = lastTransactionOp.get();
-        TransactionDTO latestTransaction = transactionsClient.getTransaction(op.getEventId(), userId);
-        log.debug("transaction={}", latestTransaction);
-        PointOfSaleDTO pos = null;
-
-        if (latestTransaction != null &&
-                latestTransaction.getMerchantId() != null &&
-                latestTransaction.getPointOfSaleId() != null) {
-            pos = posClient.getPointOfSale(latestTransaction.getMerchantId(), latestTransaction.getPointOfSaleId());
-        }
-
-        log.debug("pos={}", pos);
-        return buildVoucherStatus(wallet, latestTransaction, pos);
+        List<TransactionDTO> transactions = transactionsClient.getTransactions(initiativeId,userId);
+        log.debug("transactions={}", transactions);
+        return buildVoucherStatus(wallet, timeline.getOperationList(), transactions);
     }
 
 
-    private VouchersStatusDTO buildVoucherStatus(WalletDTO wallet, TransactionDTO transaction, PointOfSaleDTO pos) {
 
-        String merchantAddress = null;
-        if (pos != null) {
-            merchantAddress = Stream.of(pos.getAddress(), pos.getZipCode(), pos.getCity(), pos.getProvince())
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.joining(" "));
-        }
 
-        String goodDescription = Optional.ofNullable(transaction)
-                .map(TransactionDTO::getAdditionalProperties)
-                .map(props -> props.get(AssistanceConstants.PRODUCT_NAME))
-                .map(Object::toString)
-                .orElse(null);
+    private VouchersStatusDTO buildVoucherStatus(
+            WalletDTO wallet,
+            List<Operation> operations,
+            List<TransactionDTO> transactions
+    ) {
+
+        List<Operation> reducedOperations = operations != null
+                ? operations.stream()
+                .map(op -> {
+                    Operation o = new Operation();
+                    o.setEventId(op.getEventId());
+                    o.setOperationType(op.getOperationType());
+                    o.setAmountCents(op.getAmountCents());
+                    o.setOperationDate(op.getOperationDate());
+                    o.setBusinessName(op.getBusinessName());
+                    return o;
+                })
+                .toList()
+                : null;
+
+        List<TransactionDTO> reducedTransactions = transactions != null
+                ? transactions.stream()
+                .map(tx -> {
+                    TransactionDTO t = new TransactionDTO();
+                    t.setId(tx.getId());
+                    t.setTrxDate(tx.getTrxDate());
+                    t.setStatus(tx.getStatus());
+                    t.setAmountCents(tx.getAmountCents());
+                    t.setEffectiveAmountCents(tx.getEffectiveAmountCents());
+                    t.setMerchantId(tx.getMerchantId());
+                    t.setPointOfSaleId(tx.getPointOfSaleId());
+                    t.setAdditionalProperties(tx.getAdditionalProperties());
+                    return t;
+                })
+                .toList()
+                : null;
 
         return VouchersStatusDTO.builder()
                 .name(wallet.getName())
                 .surname(wallet.getSurname())
                 .issueDate(wallet.getVoucherStartDate() != null ? wallet.getVoucherStartDate().atStartOfDay() : null)
                 .expirationDate(wallet.getVoucherEndDate() != null ? wallet.getVoucherEndDate().atStartOfDay() : null)
-                .maxDiscountAmount(wallet.getVoucherStatus().equals("USED") ? Objects.requireNonNull(transaction).getVoucherAmountCents() : wallet.getAmountCents())
                 .status(wallet.getVoucherStatus())
-                .dateOfUse(transaction != null ? transaction.getTrxDate() : null)
-                .amountUsed(wallet.getAccruedCents())
-                .typeOfStore(pos != null ? pos.getType() : null)
-                .merchant(pos != null ? pos.getFranchiseName() : null)
-                .merchantAddress(merchantAddress)
-                .merchantCity(pos != null ? pos.getCity() : null)
-                .phoneNumber(pos != null ? pos.getChannelPhone() : null)
-                .goodAmount(transaction != null ? transaction.getEffectiveAmountCents() : null)
-                .goodDescription(goodDescription)
+                .operations(reducedOperations)
+                .transactions(reducedTransactions)
                 .build();
     }
+
+
 
     @Override
     public OnboardingStatusDTO onboardingStatus(String initiativeId, String userId) {
