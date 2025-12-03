@@ -25,16 +25,13 @@ public class TimelineRestClientImpl {
                     initiativeId,
                     userId,
                     "TRANSACTION",
-                    null, null,
+                    0, 20,
                     null, null
             );
 
             if (response == null || !response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
                 log.warn("[ASSISTANCE]  Empty or invalid response from Timeline MS for initiativeId={} userId={}", initiativeId, userId);
-                throw new ServiceException(
-                        AssistanceConstants.ConnectorError.ASSISTANCE_TIMELINE_ERROR,
-                        "Empty or invalid response from Timeline MS"
-                );
+                return null;
             }
 
             return response.getBody();

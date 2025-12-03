@@ -6,6 +6,8 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.List;
+
 @FeignClient(
         name = "${assistance.rest-client.transactions.serviceCode}",
         url = "${assistance.rest-client.transactions.baseUrl}"
@@ -13,11 +15,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface TransactionsRestClient {
 
     @GetMapping(
-            value = "/idpay/transactions/{trxId}/{userId}",
+            value = "/idpay/transactions/{initiativeId}/{userId}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    TransactionDTO findByTrxIdAndUserId(
-            @PathVariable(value = "trxId") String idTrxIssuer,
+    List<TransactionDTO> findByInitiativeIdAndUserId(
+            @PathVariable(value = "initiativeId") String initiativeId,
             @PathVariable(value = "userId") String userId
     );
 

@@ -13,6 +13,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -33,30 +35,29 @@ class TransactionsRestClientImplTest {
 
 
     @Test
-    void getTransaction_OK() {
+    void getTransactions_OK() {
         TransactionDTO dto = new TransactionDTO();
         dto.setId(TRX_ID);
 
-        when(transactionsRestClient.findByTrxIdAndUserId(TRX_ID, USER_ID))
-                .thenReturn(dto);
 
-        TransactionDTO result = service.getTransaction(TRX_ID, USER_ID);
+        when(transactionsRestClient.findByInitiativeIdAndUserId(TRX_ID, USER_ID))
+                .thenReturn( List.of(dto));
+
+        List<TransactionDTO> result = service.getTransactions(TRX_ID, USER_ID);
 
         assertNotNull(result);
-        assertEquals(TRX_ID, result.getId());
-
-        verify(transactionsRestClient).findByTrxIdAndUserId(TRX_ID, USER_ID);
+        verify(transactionsRestClient).findByInitiativeIdAndUserId(TRX_ID, USER_ID);
     }
 
 
     @Test
-    void getTransaction_nullResult_throwsServiceException() {
-        when(transactionsRestClient.findByTrxIdAndUserId(TRX_ID, USER_ID))
+    void getTransactions_nullResult_throwsServiceException() {
+        when(transactionsRestClient.findByInitiativeIdAndUserId(TRX_ID, USER_ID))
                 .thenReturn(null);
 
         ServiceException ex = assertThrows(
                 ServiceException.class,
-                () -> service.getTransaction(TRX_ID, USER_ID)
+                () -> service.getTransactions(TRX_ID, USER_ID)
         );
 
         assertEquals(
@@ -67,15 +68,15 @@ class TransactionsRestClientImplTest {
 
 
     @Test
-    void getTransaction_feignException_throwsServiceException() {
+    void getTransactions_feignException_throwsServiceException() {
         FeignException fe = mock(FeignException.class);
 
-        when(transactionsRestClient.findByTrxIdAndUserId(TRX_ID, USER_ID))
+        when(transactionsRestClient.findByInitiativeIdAndUserId(TRX_ID, USER_ID))
                 .thenThrow(fe);
 
         ServiceException ex = assertThrows(
                 ServiceException.class,
-                () -> service.getTransaction(TRX_ID, USER_ID)
+                () -> service.getTransactions(TRX_ID, USER_ID)
         );
 
         assertEquals(
@@ -83,6 +84,6 @@ class TransactionsRestClientImplTest {
                 ex.getCode()
         );
 
-        verify(transactionsRestClient).findByTrxIdAndUserId(TRX_ID, USER_ID);
+        verify(transactionsRestClient).findByInitiativeIdAndUserId(TRX_ID, USER_ID);
     }
 }
