@@ -25,7 +25,7 @@ public class TimelineRestClientImpl {
                     initiativeId,
                     userId,
                     "TRANSACTION",
-                    0, 20,
+                    0, 10,
                     null, null
             );
 

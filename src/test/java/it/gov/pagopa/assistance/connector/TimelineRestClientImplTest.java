@@ -48,7 +48,7 @@ class TimelineRestClientImplTest {
                 INITIATIVE_ID,
                 USER_ID,
                 "TRANSACTION",
-                0, 20,
+                0, 10,
                 null, null
         )).thenReturn(ResponseEntity.ok(dto));
 
@@ -61,7 +61,7 @@ class TimelineRestClientImplTest {
                 INITIATIVE_ID,
                 USER_ID,
                 "TRANSACTION",
-                0, 20,
+                0, 10,
                 null, null
         );
     }
@@ -71,7 +71,7 @@ class TimelineRestClientImplTest {
     void getTimeline_responseNull_throwsServiceException() {
         when(timelineRestClient.getTimeline(
                 INITIATIVE_ID, USER_ID,
-                "TRANSACTION", null, null, null, null
+                "TRANSACTION", 0, 10, null, null
         )).thenReturn(null);
 
         TimelineDTO response = service.getTimeline(INITIATIVE_ID, USER_ID);
@@ -84,7 +84,7 @@ class TimelineRestClientImplTest {
     void getTimeline_non2xx_throwsServiceException() {
         when(timelineRestClient.getTimeline(
                 INITIATIVE_ID, USER_ID,
-                "TRANSACTION", null, null, null, null
+                "TRANSACTION", 0, 10,null, null
         )).thenReturn(ResponseEntity.status(HttpStatus.BAD_GATEWAY).build());
 
         TimelineDTO response = service.getTimeline(INITIATIVE_ID, USER_ID);
@@ -99,7 +99,7 @@ class TimelineRestClientImplTest {
     void getTimeline_bodyNull_throwsServiceException() {
         when(timelineRestClient.getTimeline(
                 INITIATIVE_ID, USER_ID,
-                "TRANSACTION", null, null, null, null
+                "TRANSACTION", 0, 10, null, null
         )).thenReturn(ResponseEntity.ok(null));
 
         TimelineDTO response = service.getTimeline(INITIATIVE_ID, USER_ID);
@@ -116,7 +116,7 @@ class TimelineRestClientImplTest {
                 INITIATIVE_ID,
                 USER_ID,
                 "TRANSACTION",
-                0, 20,
+                0, 10,
                 null, null
         )).thenThrow(fe);
 
@@ -134,7 +134,7 @@ class TimelineRestClientImplTest {
                 INITIATIVE_ID,
                 USER_ID,
                 "TRANSACTION",
-                0, 20,
+                0, 10,
                 null, null
         );
     }
