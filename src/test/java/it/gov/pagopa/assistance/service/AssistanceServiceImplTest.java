@@ -61,7 +61,7 @@ class AssistanceServiceImplTest {
         timeline.setOperationList(List.of(op));
 
         when(timelineClient.getTimeline(INITIATIVE_ID, USER_ID))
-                .thenReturn(timeline);
+                .thenReturn(timeline.getOperationList());
 
         RewardCounters rewardCounters = RewardCounters.builder()
                 .initiativeBudgetCents(10000L)
