@@ -23,15 +23,6 @@ public class PointOfSaleRestClientImpl {
         log.debug("Calling Merchant MS for merchantId={} pointOfSaleId={}", merchantId, pointOfSaleId);
         try {
             ResponseEntity<PointOfSaleDTO> response = pointOfSaleRestClient.getPointOfSale(merchantId, pointOfSaleId);
-
-            if (response == null || !response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
-                log.warn("[ASSISTANCE]  Empty or invalid response from Merchant MS for merchantId={} posId={}", merchantId, pointOfSaleId);
-                throw new ServiceException(
-                        AssistanceConstants.ConnectorError.ASSISTANCE_MERCHANT_ERROR,
-                        "Empty or invalid response from Merchant MS"
-                );
-            }
-
             return response.getBody();
         } catch (FeignException e) {
             log.error("[ASSISTANCE]  Error while calling Merchant MS for merchantId={} posId={}", merchantId, pointOfSaleId, e);

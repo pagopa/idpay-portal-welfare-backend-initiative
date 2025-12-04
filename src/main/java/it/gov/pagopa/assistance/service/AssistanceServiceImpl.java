@@ -37,12 +37,12 @@ public class AssistanceServiceImpl implements AssistanceService {
         WalletDTO wallet = walletClient.getWallet(initiativeId, userId);
         log.debug("wallet={}", wallet);
 
-        TimelineDTO timeline = timelineClient.getTimeline(initiativeId, userId);
-        log.debug("timeline={}", timeline);
+        List<Operation> operations = timelineClient.getTimeline(initiativeId, userId);
+        log.debug("operations={}", operations);
 
         List<TransactionDTO> transactions = transactionsClient.getTransactions(initiativeId,userId);
         log.debug("transactions={}", transactions);
-        return buildVoucherStatus(wallet, timeline.getOperationList(), transactions);
+        return buildVoucherStatus(wallet, operations, transactions);
     }
 
 
