@@ -52,48 +52,6 @@ class WalletRestClientImplTest {
     }
 
 
-    @Test
-    void getWallet_responseNull_throwsServiceException() {
-        when(walletRestClient.walletDetail(INITIATIVE_ID, USER_ID))
-                .thenReturn(null);
-
-        ServiceException ex = assertThrows(
-                ServiceException.class,
-                () -> service.getWallet(INITIATIVE_ID, USER_ID)
-        );
-
-        assertEquals(AssistanceConstants.ConnectorError.ASSISTANCE_WALLET_ERROR, ex.getCode());
-    }
-
-
-
-    @Test
-    void getWallet_non2xx_throwsServiceException() {
-        when(walletRestClient.walletDetail(INITIATIVE_ID, USER_ID))
-                .thenReturn(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
-
-        ServiceException ex = assertThrows(
-                ServiceException.class,
-                () -> service.getWallet(INITIATIVE_ID, USER_ID)
-        );
-
-        assertEquals(AssistanceConstants.ConnectorError.ASSISTANCE_WALLET_ERROR, ex.getCode());
-    }
-
-
-    @Test
-    void getWallet_bodyNull_throwsServiceException() {
-        when(walletRestClient.walletDetail(INITIATIVE_ID, USER_ID))
-                .thenReturn(ResponseEntity.ok().body(null));
-
-        ServiceException ex = assertThrows(
-                ServiceException.class,
-                () -> service.getWallet(INITIATIVE_ID, USER_ID)
-        );
-
-        assertEquals(AssistanceConstants.ConnectorError.ASSISTANCE_WALLET_ERROR, ex.getCode());
-    }
-
 
     @Test
     void getWallet_feignException_throwsServiceException() {

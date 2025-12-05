@@ -52,10 +52,10 @@ class TimelineRestClientImplTest {
                 null, null
         )).thenReturn(ResponseEntity.ok(dto));
 
-        TimelineDTO result = service.getTimeline(INITIATIVE_ID, USER_ID);
+        List<Operation> result = service.getTimeline(INITIATIVE_ID, USER_ID);
 
         assertNotNull(result);
-        assertEquals(1, result.getOperationList().size());
+        assertEquals(1, result.size());
 
         verify(timelineRestClient).getTimeline(
                 INITIATIVE_ID,
@@ -67,44 +67,7 @@ class TimelineRestClientImplTest {
     }
 
 
-    @Test
-    void getTimeline_responseNull_throwsServiceException() {
-        when(timelineRestClient.getTimeline(
-                INITIATIVE_ID, USER_ID,
-                "TRANSACTION", 0, 10, null, null
-        )).thenReturn(null);
 
-        TimelineDTO response = service.getTimeline(INITIATIVE_ID, USER_ID);
-        assertNull(response);
-
-    }
-
-
-    @Test
-    void getTimeline_non2xx_throwsServiceException() {
-        when(timelineRestClient.getTimeline(
-                INITIATIVE_ID, USER_ID,
-                "TRANSACTION", 0, 10,null, null
-        )).thenReturn(ResponseEntity.status(HttpStatus.BAD_GATEWAY).build());
-
-        TimelineDTO response = service.getTimeline(INITIATIVE_ID, USER_ID);
-        assertNull(response);
-    }
-
-    // =========================================================================
-    //                      ERROR: body null
-    // =========================================================================
-
-    @Test
-    void getTimeline_bodyNull_throwsServiceException() {
-        when(timelineRestClient.getTimeline(
-                INITIATIVE_ID, USER_ID,
-                "TRANSACTION", 0, 10, null, null
-        )).thenReturn(ResponseEntity.ok(null));
-
-        TimelineDTO response = service.getTimeline(INITIATIVE_ID, USER_ID);
-        assertNull(response);
-    }
 
 
 

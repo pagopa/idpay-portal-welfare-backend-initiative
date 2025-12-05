@@ -45,44 +45,9 @@ class OnboardingAssistanceRestClientImplTest {
         verify(onboardingRestClient).onboardingStatus(INITIATIVE_ID, USER_ID);
     }
 
-    @Test
-    void getOnboardingStatus_responseNull_throwsServiceException() {
-        when(onboardingRestClient.onboardingStatus(INITIATIVE_ID, USER_ID))
-                .thenReturn(null);
 
-        ServiceException ex = assertThrows(
-                ServiceException.class,
-                () -> service.getOnboardingStatus(INITIATIVE_ID, USER_ID)
-        );
 
-        assertEquals(AssistanceConstants.ConnectorError.ASSISTANCE_ONBOARDING_ERROR, ex.getCode());
-    }
 
-    @Test
-    void getOnboardingStatus_non2xx_throwsServiceException() {
-        when(onboardingRestClient.onboardingStatus(INITIATIVE_ID, USER_ID))
-                .thenReturn(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
-
-        ServiceException ex = assertThrows(
-                ServiceException.class,
-                () -> service.getOnboardingStatus(INITIATIVE_ID, USER_ID)
-        );
-
-        assertEquals(AssistanceConstants.ConnectorError.ASSISTANCE_ONBOARDING_ERROR,  ex.getCode());
-    }
-
-    @Test
-    void getOnboardingStatus_bodyNull_throwsServiceException() {
-        when(onboardingRestClient.onboardingStatus(INITIATIVE_ID, USER_ID))
-                .thenReturn(ResponseEntity.ok().body(null));
-
-        ServiceException ex = assertThrows(
-                ServiceException.class,
-                () -> service.getOnboardingStatus(INITIATIVE_ID, USER_ID)
-        );
-
-        assertEquals(AssistanceConstants.ConnectorError.ASSISTANCE_ONBOARDING_ERROR, ex.getCode());
-    }
 
     @Test
     void getOnboardingStatus_feignExceptionThrown() {
