@@ -76,7 +76,6 @@ public class AssistanceServiceImpl implements AssistanceService {
                     t.setTrxDate(tx.getTrxDate());
                     t.setStatus(tx.getStatus());
                     t.setAmountCents(tx.getAmountCents());
-                    t.setEffectiveAmountCents(tx.getEffectiveAmountCents());
                     t.setMerchantId(tx.getMerchantId());
                     t.setPointOfSaleId(tx.getPointOfSaleId());
                     t.setAdditionalProperties(tx.getAdditionalProperties());
