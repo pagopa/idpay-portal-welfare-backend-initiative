@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 import static it.gov.pagopa.assistance.utlis.Utils.extractMessageFromFeignException;
 
 @Slf4j
@@ -18,22 +20,12 @@ public class TransactionsRestClientImpl {
 
     private final TransactionsRestClient transactionsRestClient;
 
-    public TransactionDTO getTransaction(String trxId, String userId) {
-        log.debug("[ASSISTANCE]  Calling Transaction MS for trxId={} userId={}", trxId, userId);
+    public List<TransactionDTO> getTransactions(String initiativeId, String userId) {
+        log.debug("[ASSISTANCE]  Calling Transaction MS for initiativeId={} userId={}", initiativeId, userId);
         try {
-            TransactionDTO transaction = transactionsRestClient.findByTrxIdAndUserId(trxId, userId);
-
-            if (transaction == null) {
-                log.warn("Transaction not found for trxId={} userId={}", trxId, userId);
-                throw new ServiceException(
-                        AssistanceConstants.ConnectorError.ASSISTANCE_TRANSACTION_ERROR,
-                        "Transaction not found in Transaction MS"
-                );
-            }
-
-            return transaction;
+            return transactionsRestClient.findByInitiativeIdAndUserId(initiativeId, userId);
         } catch (FeignException e) {
-            log.error("[ASSISTANCE]  Error while calling Transaction MS for trxId={} userId={}", trxId, userId, e);
+            log.error("[ASSISTANCE]  Error while calling Transaction MS for initiativeId={} userId={}", initiativeId, userId, e);
             throw new ServiceException(
                     AssistanceConstants.ConnectorError.ASSISTANCE_TRANSACTION_ERROR,
                     extractMessageFromFeignException(e)

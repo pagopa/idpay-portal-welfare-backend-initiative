@@ -2,12 +2,15 @@ package it.gov.pagopa.assistance.connector;
 
 import feign.FeignException;
 import it.gov.pagopa.assistance.costants.AssistanceConstants;
+import it.gov.pagopa.assistance.dto.request.Operation;
 import it.gov.pagopa.assistance.dto.request.TimelineDTO;
 import it.gov.pagopa.common.web.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 import static it.gov.pagopa.assistance.utlis.Utils.extractMessageFromFeignException;
 
@@ -18,27 +21,21 @@ public class TimelineRestClientImpl {
 
     private final TimelineRestClient timelineRestClient;
 
-    public TimelineDTO getTimeline(String initiativeId, String userId) {
+    public List<Operation> getTimeline(String initiativeId, String userId) {
         log.debug("Calling Timeline MS for initiativeId={} userId={}", initiativeId, userId);
         try {
             ResponseEntity<TimelineDTO> response = timelineRestClient.getTimeline(
                     initiativeId,
                     userId,
                     "TRANSACTION",
-                    null, null,
+                    0, 10,
                     null, null
             );
 
-            if (response == null || !response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
-                log.warn("[ASSISTANCE]  Empty or invalid response from Timeline MS for initiativeId={} userId={}", initiativeId, userId);
-                throw new ServiceException(
-                        AssistanceConstants.ConnectorError.ASSISTANCE_TIMELINE_ERROR,
-                        "Empty or invalid response from Timeline MS"
-                );
-            }
-
-            return response.getBody();
+            return response.getBody().getOperationList();
         } catch (FeignException e) {
+            if(e.status() == 404)
+                return List.of();
             log.error("[ASSISTANCE]  Error while calling Timeline MS for initiativeId={} userId={}", initiativeId, userId, e);
             throw new ServiceException(
                     AssistanceConstants.ConnectorError.ASSISTANCE_TIMELINE_ERROR,

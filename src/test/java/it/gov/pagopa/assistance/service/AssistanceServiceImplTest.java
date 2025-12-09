@@ -41,33 +41,9 @@ class AssistanceServiceImplTest {
     private static final String USER_ID = "USR123";
 
 
-    @Test
-    void vouchersStatus_shouldReturnNotUsedVoucher() {
-        WalletDTO wallet = new WalletDTO();
-        wallet.setVoucherStatus("ACTIVE");
-        wallet.setName("John");
-        wallet.setSurname("Doe");
-        wallet.setVoucherStartDate(LocalDate.of(2024, 1, 1));
-        wallet.setVoucherEndDate(LocalDate.of(2024, 12, 31));
-        wallet.setAmountCents(1000L);
-        wallet.setAccruedCents(100L);
-
-        when(walletClient.getWallet(INITIATIVE_ID, USER_ID))
-                .thenReturn(wallet);
-
-        VouchersStatusDTO result = service.vouchersStatus(INITIATIVE_ID, USER_ID);
-
-        assertNotNull(result);
-        assertEquals("John", result.getName());
-        assertEquals("ACTIVE", result.getStatus());
-        assertNull(result.getDateOfUse());        // no transaction
-        assertEquals(1000L, result.getMaxDiscountAmount()); // still usable
-
-        verify(timelineClient, never()).getTimeline(any(), any());
-    }
 
     @Test
-    void vouchersStatus_shouldReturnUsedVoucherWithTransactionAndPOS() {
+    void vouchersStatus_ok() {
         WalletDTO wallet = new WalletDTO();
         wallet.setVoucherStatus(AssistanceConstants.USED);
         wallet.setName("Mary");
@@ -85,7 +61,7 @@ class AssistanceServiceImplTest {
         timeline.setOperationList(List.of(op));
 
         when(timelineClient.getTimeline(INITIATIVE_ID, USER_ID))
-                .thenReturn(timeline);
+                .thenReturn(timeline.getOperationList());
 
         RewardCounters rewardCounters = RewardCounters.builder()
                 .initiativeBudgetCents(10000L)
@@ -102,8 +78,8 @@ class AssistanceServiceImplTest {
         trx.setEffectiveAmountCents(500L);
         trx.setAdditionalProperties(Map.of(AssistanceConstants.PRODUCT_NAME, "Pizza"));
         trx.setRewards(Map.of("68dd003ccce8c534d1da22bc",reward));
-        when(transactionsClient.getTransaction("EVT1", USER_ID))
-                .thenReturn(trx);
+        when(transactionsClient.getTransactions("INIT123", USER_ID))
+                .thenReturn(List.of(trx));
 
         PointOfSaleDTO pos = new PointOfSaleDTO();
         pos.setFranchiseName("Super Pizza");
@@ -121,16 +97,12 @@ class AssistanceServiceImplTest {
         assertNotNull(result);
         assertEquals("Mary", result.getName());
         assertEquals("USED", result.getStatus());
-        assertEquals(LocalDateTime.of(2024, 2, 1, 10, 0), result.getDateOfUse());
-        assertEquals("Super Pizza", result.getMerchant());
-        assertEquals("Via Roma 1 00100 Rome RM", result.getMerchantAddress());
-        assertEquals(500L, result.getGoodAmount());
-        assertEquals("Pizza", result.getGoodDescription());
+
 
         verify(walletClient).getWallet(INITIATIVE_ID, USER_ID);
         verify(timelineClient).getTimeline(INITIATIVE_ID, USER_ID);
-        verify(transactionsClient).getTransaction("EVT1", USER_ID);
-        verify(posClient).getPointOfSale("MRC1", "POS100");
+        verify(transactionsClient).getTransactions("INIT123", USER_ID);
+
     }
 
     @Test

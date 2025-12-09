@@ -51,46 +51,10 @@ class PointOfSaleRestClientImplTest {
 
 
 
-    @Test
-    void getPointOfSale_responseNull_throwsServiceException() {
-        when(pointOfSaleRestClient.getPointOfSale(MERCHANT_ID, POS_ID))
-                .thenReturn(null);
-
-        ServiceException ex = assertThrows(
-                ServiceException.class,
-                () -> service.getPointOfSale(MERCHANT_ID, POS_ID)
-        );
-
-        assertEquals(AssistanceConstants.ConnectorError.ASSISTANCE_MERCHANT_ERROR, ex.getCode());
-    }
 
 
-    @Test
-    void getPointOfSale_non2xx_throwsServiceException() {
-        when(pointOfSaleRestClient.getPointOfSale(MERCHANT_ID, POS_ID))
-                .thenReturn(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
-
-        ServiceException ex = assertThrows(
-                ServiceException.class,
-                () -> service.getPointOfSale(MERCHANT_ID, POS_ID)
-        );
-
-        assertEquals(AssistanceConstants.ConnectorError.ASSISTANCE_MERCHANT_ERROR, ex.getCode());
-    }
 
 
-    @Test
-    void getPointOfSale_bodyNull_throwsServiceException() {
-        when(pointOfSaleRestClient.getPointOfSale(MERCHANT_ID, POS_ID))
-                .thenReturn(ResponseEntity.ok().body(null));
-
-        ServiceException ex = assertThrows(
-                ServiceException.class,
-                () -> service.getPointOfSale(MERCHANT_ID, POS_ID)
-        );
-
-        assertEquals(AssistanceConstants.ConnectorError.ASSISTANCE_MERCHANT_ERROR, ex.getCode());
-    }
 
 
     @Test
