@@ -82,15 +82,11 @@ public class InitiativeGeneralDTO extends InitiativeOrganizationInfoDTO {
     @NotNull(groups = ValidationApiEnabledGroup.class)
     private Boolean beneficiaryKnown;
 
-    @JsonProperty("beneficiaryBudget")
+    @JsonProperty("beneficiaryBudgetFixed")
     @Min(value = 1, message = "Beneficiary budget should have an amount of at least 1", groups = ValidationApiEnabledGroup.class)
     @NotNull(groups = ValidationApiEnabledGroup.class)
-    private BigDecimal beneficiaryBudget;
+    private BigDecimal beneficiaryBudgetFixed;
 
-    @JsonProperty("beneficiaryBudgetMax")
-    @Min(value = 1, message = "Beneficiary budget max should have an amount of at least 1", groups = ValidationApiEnabledGroup.class)
-    @NotNull(groups = ValidationApiEnabledGroup.class)
-    private BigDecimal beneficiaryBudgetMax;
 
     /**
      * Start of period of spending funds in an initiative
@@ -127,4 +123,5 @@ public class InitiativeGeneralDTO extends InitiativeOrganizationInfoDTO {
     @Valid
     @NotEmpty(groups = ValidationApiEnabledGroup.class)
     private Map<String, String> descriptionMap;
+
 }

@@ -159,8 +159,7 @@ public class InitiativeModelToDTOMapper {
             return null;
         }
         return InitiativeGeneralDTO.builder()
-                .beneficiaryBudget(centsToEuro(general.getBeneficiaryBudgetCents()))
-                .beneficiaryBudgetMax(centsToEuro(general.getBeneficiaryBudgetMaxCents()))
+                .beneficiaryBudgetFixed(centsToEuro(general.getBeneficiaryBudgetFixedCents()))
                 .beneficiaryKnown(general.getBeneficiaryKnown())
                 .beneficiaryType(general.getBeneficiaryType()!=null?InitiativeGeneralDTO.BeneficiaryTypeEnum.valueOf(general.getBeneficiaryType().name()):null)
                 .familyUnitComposition(general.getFamilyUnitComposition()!=null?general.getFamilyUnitComposition():null)
@@ -259,7 +258,6 @@ public class InitiativeModelToDTOMapper {
                                 .code(selfCriteriaMultiConsent.getCode())
                                 .description(selfCriteriaMultiConsent.getDescription())
                                 .subDescription(selfCriteriaMultiConsent.getSubDescription())
-                                .thresholdCode(selfCriteriaMultiConsent.getThresholdCode())
                                 .value(selfCriteriaMultiConsent.getValue())
                                 .build();
                     }
