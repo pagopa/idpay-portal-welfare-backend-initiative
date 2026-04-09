@@ -41,6 +41,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -58,6 +59,7 @@ class InitiativeModelToDTOMapperTest {
     public static final String ITALIAN_LANGUAGE = "it";
     private static final String SERVICE_ID = "SERVICE_ID";
 
+    private static final ZoneId zone = ZoneId.of("Europe/Rome");
     @Autowired
     private InitiativeModelToDTOMapper initiativeModelToDTOMapper;
 
@@ -340,7 +342,7 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void toInitiativeDetailDTO_equals() {
         Locale acceptLanguage = Locale.ITALIAN;
-        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0));
+        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0).atZone(zone).toInstant());
         InitiativeDetailDTO initiativeDetailDTO = initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative,acceptLanguage, false);
 
         assertEquals(fullInitiativeDetailDTO, initiativeDetailDTO);
@@ -348,7 +350,7 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void toInitiativeDetailDTO_rewardNull() {
         Locale acceptLanguage = Locale.ITALIAN;
-        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0));
+        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0).atZone(zone).toInstant());
         fullInitiative.setRewardRule(null);
         fullInitiativeDetailDTO.setRewardRule(null);
 
@@ -359,7 +361,7 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void toInitiativeDetailDTO_withRewardGroups() {
         Locale acceptLanguage = Locale.ITALIAN;
-        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0));
+        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0).atZone(zone).toInstant());
         fullInitiative.setRewardRule(createInitiativeRewardRuleRewardGroup());
         InitiativeRewardRuleDTO rewardGroup = createInitiativeRewardRuleDTORewardGroupDTO();
         ((RewardGroupsDTO) rewardGroup).setType(null);
@@ -372,7 +374,7 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void toInitiativeDetailDTO_refundRule() {
         Locale acceptLanguage = Locale.ITALIAN;
-        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0));
+        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0).atZone(zone).toInstant());
         fullInitiative.setRefundRule(createRefundRuleValidWithTimeParameter());
         fullInitiativeDetailDTO.setRefundRule(createRefundRuleDTOValidWithTimeParameterAndAdditionalNull());
         InitiativeDetailDTO initiativeDetailDTO = initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative,acceptLanguage, false);
@@ -403,7 +405,7 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void toInitiativeDetailDTOWithGeneralInfo_Null() {
         Locale acceptLanguage = Locale.ITALIAN;
-        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0));
+        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0).atZone(zone).toInstant());
         fullInitiative.setGeneral(null);
         try {
             initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative,acceptLanguage, false);
@@ -414,7 +416,7 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void toInitiativeDetailDTOWithRuleDescription_Null() {
         Locale acceptLanguage = Locale.ITALIAN;
-        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0));
+        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0).atZone(zone).toInstant());
         fullInitiative.getGeneral().setDescriptionMap(null);
         fullInitiativeDetailDTO.setRuleDescription(StringUtils.EMPTY);
 
@@ -426,7 +428,7 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void toInitiativeDetailDTO_nullStartAndEndDate() {
         Locale acceptLanguage = Locale.ITALIAN;
-        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0));
+        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0).atZone(zone).toInstant());
         fullInitiative.getGeneral().setRankingStartDate(null);
         fullInitiative.getGeneral().setRankingEndDate(null);
 
@@ -1019,7 +1021,7 @@ class InitiativeModelToDTOMapperTest {
         List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<>();
         DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
-        dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
+        dayOfWeeks.add(DayOfWeek.MONDAY);
         dayOfWeeks.add(DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
         List<DayOfWeekDTO.Interval> intervals = new ArrayList<>();
@@ -1079,7 +1081,7 @@ class InitiativeModelToDTOMapperTest {
         List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<>();
         DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
-        dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
+        dayOfWeeks.add(DayOfWeek.MONDAY);
         dayOfWeeks.add(DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
         List<DayOfWeekDTO.Interval> intervals = new ArrayList<>();
@@ -1131,7 +1133,7 @@ class InitiativeModelToDTOMapperTest {
         List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<>();
         DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
-        dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
+        dayOfWeeks.add(DayOfWeek.MONDAY);
         dayOfWeeks.add(DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
         List<DayOfWeekDTO.Interval> intervals = new ArrayList<>();
@@ -1242,7 +1244,7 @@ class InitiativeModelToDTOMapperTest {
         List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<>();
         DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
-        dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
+        dayOfWeeks.add(DayOfWeek.MONDAY);
         dayOfWeeks.add(DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
         List<DayOfWeekDTO.Interval> intervals = new ArrayList<>();
@@ -1295,7 +1297,7 @@ class InitiativeModelToDTOMapperTest {
         List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<>();
         DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
-        dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
+        dayOfWeeks.add(DayOfWeek.MONDAY);
         dayOfWeeks.add(DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
         List<DayOfWeekDTO.Interval> intervals = new ArrayList<>();
@@ -1424,7 +1426,7 @@ class InitiativeModelToDTOMapperTest {
         List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig> dayConfigs = new ArrayList<>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig dayConfig1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig();
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
-        dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
+        dayOfWeeks.add(DayOfWeek.MONDAY);
         dayOfWeeks.add(DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
         List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval> intervals = new ArrayList<>();
@@ -1484,7 +1486,7 @@ class InitiativeModelToDTOMapperTest {
         List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig> dayConfigs = new ArrayList<>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig dayConfig1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig();
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
-        dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
+        dayOfWeeks.add(DayOfWeek.MONDAY);
         dayOfWeeks.add(DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
         List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval> intervals = new ArrayList<>();
@@ -1536,7 +1538,7 @@ class InitiativeModelToDTOMapperTest {
         List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig> dayConfigs = new ArrayList<>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig dayConfig1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig();
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
-        dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
+        dayOfWeeks.add(DayOfWeek.MONDAY);
         dayOfWeeks.add(DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
         List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval> intervals = new ArrayList<>();
@@ -1594,7 +1596,7 @@ class InitiativeModelToDTOMapperTest {
         List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig> dayConfigs = new ArrayList<>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig dayConfig1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig();
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
-        dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
+        dayOfWeeks.add(DayOfWeek.MONDAY);
         dayOfWeeks.add(DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
         List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval> intervals = new ArrayList<>();
@@ -1647,7 +1649,7 @@ class InitiativeModelToDTOMapperTest {
         List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig> dayConfigs = new ArrayList<>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig dayConfig1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig();
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
-        dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
+        dayOfWeeks.add(DayOfWeek.MONDAY);
         dayOfWeeks.add(DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
         List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval> intervals = new ArrayList<>();
@@ -1936,7 +1938,7 @@ class InitiativeModelToDTOMapperTest {
         initiativeDetailDTO.setPrivacyLink("privacyLink");
         initiativeDetailDTO.setTcLink("tcLink");
         initiativeDetailDTO.setLogoURL(null);
-        initiativeDetailDTO.setUpdateDate(LocalDateTime.of(2023,3,20,12,0));
+        initiativeDetailDTO.setUpdateDate(LocalDateTime.of(2023,3,20,12,0).atZone(zone).toInstant());
         initiativeDetailDTO.setServiceId(SERVICE_ID);
         return initiativeDetailDTO;
     }

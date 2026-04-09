@@ -10,7 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 @Data
@@ -34,7 +34,7 @@ public class WalletDTO {
     private Long amountCents;
     private Long accruedCents;
     private Long refundedCents;
-    private LocalDateTime lastCounterUpdate;
+    private Instant lastCounterUpdate;
     private String initiativeRewardType;
     private String logoURL;
     private String organizationName;

@@ -13,7 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.test.context.TestPropertySource;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -62,14 +63,14 @@ class InitiativeRepositoryExtendedImplTest {
     }
 
     private Initiative createInitiative(int bias) {
-        LocalDateTime now = LocalDateTime.now();
+        Instant now = Instant.now();
 
         return Initiative.builder()
                 .initiativeId("initiativeid_%d".formatted(bias))
                 .initiativeName("initiativeName_%d".formatted(bias))
                 .organizationId("organizationId_%d".formatted(bias))
                 .organizationName("organizationName_%d".formatted(bias))
-                .creationDate(now.minusWeeks(2))
+                .creationDate(now.minus(14, ChronoUnit.DAYS))
                 .updateDate(now)
                 .status(bias % 2 == 0
                         ? InitiativeConstants.Status.APPROVED

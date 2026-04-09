@@ -5,7 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public interface OnboardingRestConnector {
 
@@ -13,8 +13,8 @@ public interface OnboardingRestConnector {
       @PathVariable("initiativeId") String initiativeId,
       @RequestParam(required = false) Pageable pageable,
       @RequestParam(required = false) String userId,
-      @RequestParam(required = false) LocalDateTime startDate,
-      @RequestParam(required = false) LocalDateTime endDate,
+      @RequestParam(required = false) LocalDate startDate,
+      @RequestParam(required = false) LocalDate endDate,
       @RequestParam(required = false) String status);
 
 }

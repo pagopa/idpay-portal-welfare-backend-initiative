@@ -56,7 +56,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.time.LocalTime;
 import java.util.*;
 
@@ -98,8 +98,8 @@ class InitiativeServiceTest {
     private static final String CF = "CF";
     private static final String USER_ID = "USER_ID";
     private static final String STATUS = "ONBOARDING_OK";
-    private static final LocalDateTime STARTDATE = LocalDateTime.now();
-    private static final LocalDateTime ENDDATE = LocalDateTime.now();
+    private static final LocalDate STARTDATE = LocalDate.now();
+    private static final LocalDate ENDDATE = LocalDate.now();
     private static final String LOGO_EXTENSION = "png";
     private static final String LOGO_MIME_TYPE = "image/png";
     private static final String FILE_NAME = "logo.png";
@@ -1341,7 +1341,7 @@ class InitiativeServiceTest {
     @Test
     void getRankingList_ok() {
         Initiative initiative = this.createFullInitiative();
-        RankingRequestDTO rankingRequestDTO = new RankingRequestDTO(USER_ID,INITIATIVE_ID,ORGANIZATION_ID,LocalDateTime.now(),LocalDateTime.now(),1,1,"test", null, null);
+        RankingRequestDTO rankingRequestDTO = new RankingRequestDTO(USER_ID,INITIATIVE_ID,ORGANIZATION_ID,Instant.now(),Instant.now(),1,1,"test", null, null);
         RankingPageDTO rankingPageDTO =new RankingPageDTO();
         rankingPageDTO.setContent(List.of(rankingRequestDTO));
         DecryptCfDTO decryptCfDTO = new DecryptCfDTO(CF);
@@ -1384,7 +1384,7 @@ class InitiativeServiceTest {
     @Test
     void getRankingList_ko_decrypt() {
         Initiative initiative = this.createFullInitiative();
-        RankingRequestDTO rankingRequestDTO = new RankingRequestDTO(USER_ID,INITIATIVE_ID,ORGANIZATION_ID,LocalDateTime.now(),LocalDateTime.now(),1,1,"test", null, null);
+        RankingRequestDTO rankingRequestDTO = new RankingRequestDTO(USER_ID,INITIATIVE_ID,ORGANIZATION_ID,Instant.now(),Instant.now(),1,1,"test", null, null);
         RankingPageDTO rankingPageDTO =new RankingPageDTO();
         rankingPageDTO.setContent(List.of(rankingRequestDTO));
         EncryptedCfDTO encryptedCfDTO = new EncryptedCfDTO(USER_ID);
@@ -1447,7 +1447,7 @@ class InitiativeServiceTest {
         EncryptedCfDTO encryptedCfDTO = new EncryptedCfDTO(USER_ID);
         Mockito.when(encryptRestConnector.upsertToken(Mockito.any())).thenReturn(encryptedCfDTO);
 
-        RankingRequestDTO rankingRequestDTO = new RankingRequestDTO(USER_ID,INITIATIVE_ID,ORGANIZATION_ID,LocalDateTime.now(),LocalDateTime.now(),1,1,"test", "FAMILY_ID", Set.of(USER_ID, "USER_ID_2"));
+        RankingRequestDTO rankingRequestDTO = new RankingRequestDTO(USER_ID,INITIATIVE_ID,ORGANIZATION_ID,Instant.now(),Instant.now(),1,1,"test", "FAMILY_ID", Set.of(USER_ID, "USER_ID_2"));
         RankingPageDTO rankingPageDTO =new RankingPageDTO();
         rankingPageDTO.setContent(List.of(rankingRequestDTO));
         Mockito.when(rankingRestConnector.getRankingList(Mockito.anyString(),Mockito.anyString(),Mockito.any(),Mockito.anyString(),Mockito.anyString())).thenReturn(rankingPageDTO);
@@ -1466,7 +1466,7 @@ class InitiativeServiceTest {
     @Test
     void getOnboardingStatusList_ok() {
         Initiative initiative = this.createFullInitiative();
-        OnboardingStatusCitizenDTO onboardingStatusCitizenDTO = new OnboardingStatusCitizenDTO(USER_ID, STATUS, LocalDateTime.now().toString(), "familyId");
+        OnboardingStatusCitizenDTO onboardingStatusCitizenDTO = new OnboardingStatusCitizenDTO(USER_ID, STATUS, Instant.now().toString(), "familyId");
         List<OnboardingStatusCitizenDTO> onboardingStatusCitizenDTOS = new ArrayList<>();
         onboardingStatusCitizenDTOS.add(onboardingStatusCitizenDTO);
         ResponseOnboardingDTO onboardingDTO = new ResponseOnboardingDTO(onboardingStatusCitizenDTOS, 1, 1, 1, 1);
@@ -1474,7 +1474,7 @@ class InitiativeServiceTest {
         EncryptedCfDTO encryptedCfDTO = new EncryptedCfDTO(USER_ID);
         Mockito.when(encryptRestConnector.upsertToken(Mockito.any())).thenReturn(encryptedCfDTO);
         Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
-        Mockito.when(onboardingRestConnector.getOnboarding(INITIATIVE_ID, null, USER_ID, STARTDATE, ENDDATE, STATUS)).thenReturn(onboardingDTO);
+        Mockito.when(onboardingRestConnector.getOnboarding(INITIATIVE_ID, null, USER_ID,STARTDATE, ENDDATE, STATUS)).thenReturn(onboardingDTO);
         Mockito.when(decryptRestConnector.getPiiByToken(USER_ID)).thenReturn(decryptCfDTO);
         OnboardingDTO onboardingDTO1 = initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID, CF, STARTDATE, ENDDATE, STATUS, null);
         assertEquals(CF,onboardingDTO1.getContent().get(0).getBeneficiary());
@@ -1500,7 +1500,7 @@ class InitiativeServiceTest {
     @Test
     void getOnboardingStatusList_ko_decrypt() {
         Initiative initiative = this.createFullInitiative();
-        OnboardingStatusCitizenDTO onboardingStatusCitizenDTO = new OnboardingStatusCitizenDTO(USER_ID, STATUS, LocalDateTime.now().toString(), null);
+        OnboardingStatusCitizenDTO onboardingStatusCitizenDTO = new OnboardingStatusCitizenDTO(USER_ID, STATUS, Instant.now().toString(), null);
         List<OnboardingStatusCitizenDTO> onboardingStatusCitizenDTOS = new ArrayList<>();
         onboardingStatusCitizenDTOS.add(onboardingStatusCitizenDTO);
         ResponseOnboardingDTO onboardingDTO = new ResponseOnboardingDTO(onboardingStatusCitizenDTOS, 1, 1, 1, 1);
@@ -2077,7 +2077,7 @@ class InitiativeServiceTest {
         initiativeDetailDTO.setPrivacyLink("privacy.it");
         initiativeDetailDTO.setTcLink("tc.it");
         initiativeDetailDTO.setLogoURL("logo.png");
-        initiativeDetailDTO.setUpdateDate(LocalDateTime.now());
+        initiativeDetailDTO.setUpdateDate(Instant.now());
         initiativeDetailDTO.setServiceId("SERVICE_ID");
         return initiativeDetailDTO;
     }

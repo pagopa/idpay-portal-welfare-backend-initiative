@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 @NoArgsConstructor
@@ -23,8 +23,8 @@ public class OnboardingDTO {
     private Boolean tc;
     private Boolean pdndAccept;
     private Channel channel;
-    private LocalDateTime tcAcceptTimestamp;
-    private LocalDateTime criteriaConsensusTimestamp;
-    private LocalDateTime onboardingOkDate;
+    private Instant tcAcceptTimestamp;
+    private Instant criteriaConsensusTimestamp;
+    private Instant onboardingOkDate;
 }
 

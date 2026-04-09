@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 
@@ -56,7 +56,7 @@ public interface InitiativeService {
 
     Initiative getInitiativeIdFromServiceId(String serviceId);
 
-    OnboardingDTO getOnboardingStatusList(String organizationId, String initiativeId, String cf, LocalDateTime startDate, LocalDateTime endDate, String status, Pageable pageable);
+    OnboardingDTO getOnboardingStatusList(String organizationId, String initiativeId, String cf, LocalDate startDate, LocalDate endDate, String status, Pageable pageable);
     BeneficiaryRankingPageDTO getRankingList(String organizationId, String initiativeId,  Pageable pageable, String beneficiary, String state);
     void validate(String contentType, String fileName);
     InitiativeDetailDTO getInitiativeBeneficiaryDetail(String initiativeId, Locale acceptLanguage, boolean viewMinimalInfo);

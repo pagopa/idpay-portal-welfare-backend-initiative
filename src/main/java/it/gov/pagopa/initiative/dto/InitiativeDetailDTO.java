@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 @AllArgsConstructor
@@ -28,6 +28,6 @@ public class InitiativeDetailDTO {
     private String privacyLink;
     private String tcLink;
     private String logoURL;
-    private LocalDateTime updateDate;
+    private Instant updateDate;
     private String serviceId;
 }

@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 @Getter
@@ -15,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 public class TimelineDTO {
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  private LocalDateTime lastUpdate;
+  private Instant lastUpdate;
   private List<Operation> operationList;
   private int pageNo;
   private int pageSize;

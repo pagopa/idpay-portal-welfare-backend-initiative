@@ -4,7 +4,7 @@ import it.gov.pagopa.initiative.dto.ResponseOnboardingDTO;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Service
 public class OnboardingRestConnectorImpl implements OnboardingRestConnector {
@@ -18,7 +18,7 @@ public class OnboardingRestConnectorImpl implements OnboardingRestConnector {
 
   @Override
   public ResponseOnboardingDTO getOnboarding(String initiativeId, Pageable pageable, String userId,
-      LocalDateTime startDate, LocalDateTime endDate, String status) {
+      LocalDate startDate, LocalDate endDate, String status) {
     return onboardingRestClient.getOnboarding(initiativeId,pageable,userId,startDate,endDate,status);
   }
 }

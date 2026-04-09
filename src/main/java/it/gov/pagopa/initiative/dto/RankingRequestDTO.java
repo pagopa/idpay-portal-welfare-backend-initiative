@@ -1,6 +1,6 @@
 package it.gov.pagopa.initiative.dto;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Set;
 
 import jakarta.validation.constraints.NotEmpty;
@@ -23,8 +23,8 @@ public class RankingRequestDTO {
     @NotEmpty
     private String organizationId;
     @NotNull
-    private LocalDateTime admissibilityCheckDate;
-    private LocalDateTime criteriaConsensusTimestamp;
+    private Instant admissibilityCheckDate;
+    private Instant criteriaConsensusTimestamp;
     private long rankingValue;
     private long ranking;
     private String beneficiaryRankingStatus;

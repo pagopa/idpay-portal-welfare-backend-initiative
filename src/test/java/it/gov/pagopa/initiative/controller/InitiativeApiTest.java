@@ -86,10 +86,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -372,8 +369,8 @@ class InitiativeApiTest {
                 initiativeService,
                 organizationService,
                 initiativeModelToDTOMapperTest,
-                initiativeDTOsToModelMapperTest
-        );
+                initiativeDTOsToModelMapperTest,
+                Clock.fixed(Instant.parse("2026-04-03T10:00:00Z"), ZoneOffset.UTC));
         ResponseEntity<LogoDTO> actualAddLogoResult = initiativeApiController.addLogo("42", "42",
                 new MockMultipartFile("Name", new ByteArrayInputStream("AAAAAAAA".getBytes(StandardCharsets.UTF_8))));
         assertTrue(actualAddLogoResult.hasBody());
@@ -1736,7 +1733,7 @@ class InitiativeApiTest {
         initiativeDetailDTO.setPrivacyLink("privacy.it");
         initiativeDetailDTO.setTcLink("tc.it");
         initiativeDetailDTO.setLogoURL("logo.png");
-        initiativeDetailDTO.setUpdateDate(LocalDateTime.now());
+        initiativeDetailDTO.setUpdateDate(Instant.now());
         initiativeDetailDTO.setServiceId("SERVICE_ID");
         return initiativeDetailDTO;
     }
