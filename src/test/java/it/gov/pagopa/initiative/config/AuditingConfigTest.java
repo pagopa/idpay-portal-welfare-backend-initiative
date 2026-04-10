@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -21,12 +21,12 @@ class AuditingConfigTest {
     @Autowired
     private AuditingConfig auditingConfig;
 
-    @MockBean
+    @MockitoBean
     private HttpServletRequest httpServletRequestMock;
 
-    @MockBean(name = "mongoMappingContext")
+    @MockitoBean(name = "mongoMappingContext")
     private MongoMappingContext mongoMappingContextMock;
-    @MockBean
+    @MockitoBean
     private MappingMongoConverter mappingMongoConverterMock;
 
     @Test

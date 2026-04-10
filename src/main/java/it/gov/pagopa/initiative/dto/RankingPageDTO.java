@@ -16,14 +16,14 @@ public class RankingPageDTO {
     private List<RankingRequestDTO> content;
     private int pageNumber;
     private int pageSize;
-    private long totalElements;
-    private long totalPages;
+    private Long totalElements;
+    private Long totalPages;
     private String rankingStatus;
     private LocalDateTime rankingPublishedTimestamp;
     private LocalDateTime rankingGeneratedTimestamp;
-    private long totalEligibleOk;
-    private long totalEligibleKo;
-    private long totalOnboardingKo;
+    private Long totalEligibleOk;
+    private Long totalEligibleKo;
+    private Long totalOnboardingKo;
     private String rankingFilePath;
 
 }

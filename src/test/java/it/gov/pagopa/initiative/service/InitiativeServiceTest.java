@@ -47,8 +47,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.TestPropertySource;
 
@@ -112,51 +112,51 @@ class InitiativeServiceTest {
     @Autowired
     InitiativeService initiativeService;
 
-    @MockBean
+    @MockitoBean
     InitiativeRepository initiativeRepository;
 
-    @MockBean
+    @MockitoBean
     InitiativeProducer initiativeProducer;
 
-    @MockBean
+    @MockitoBean
     InitiativeModelToDTOMapper initiativeModelToDTOMapper;
 
-    @MockBean
+    @MockitoBean
     AuditUtilities auditUtilities;
 
-    @MockBean
+    @MockitoBean
     InitiativeAdditionalDTOsToIOServiceRequestDTOMapper initiativeAdditionalDTOsToIOServiceRequestDTOMapper;
-    @MockBean
+    @MockitoBean
     IOManageBackEndRestConnector ioManageBackEndRestConnector;
 
-    @MockBean
+    @MockitoBean
     GroupRestConnector groupRestConnector;
 
-    @MockBean
+    @MockitoBean
     InitiativeFileStorageConnector initiativeFileStorageConnector;
 
-    @MockBean
+    @MockitoBean
     OnboardingRestConnector onboardingRestConnector;
 
-    @MockBean
+    @MockitoBean
     EncryptRestConnector encryptRestConnector;
 
-    @MockBean
+    @MockitoBean
     DecryptRestConnector decryptRestConnector;
 
-    @MockBean
+    @MockitoBean
     RankingRestConnector rankingRestConnector;
 
-    @MockBean
+    @MockitoBean
     EmailNotificationService emailNotificationService;
 
-    @MockBean
+    @MockitoBean
     InitiativeValidationService initiativeValidationService;
 
-    @MockBean
+    @MockitoBean
     InitiativeUtils initiativeUtils;
 
-    @MockBean
+    @MockitoBean
     CommandsProducer commandsProducer;
 
 

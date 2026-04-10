@@ -4,7 +4,7 @@ import it.gov.pagopa.initiative.dto.RankingPageDTO;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -19,7 +19,7 @@ class RankingRestConnectorTest {
     public static final String INITIATIVE_ID = "initiativeId";
     private static final String USER_ID = "USER_ID";
 
-    @MockBean
+    @MockitoBean
     private RankingRestClient rankingRestClient;
 
     @Autowired

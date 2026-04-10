@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
@@ -26,7 +26,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ContextConfiguration(classes = {GroupRestConnectorImpl.class})
 @ExtendWith(SpringExtension.class)
 class GroupRestConnectorTest {
-    @MockBean
+    @MockitoBean
     private GroupFeignRestClient groupFeignRestClient;
 
     @Autowired

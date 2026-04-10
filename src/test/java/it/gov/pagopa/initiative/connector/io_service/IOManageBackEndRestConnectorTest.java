@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
@@ -50,7 +50,7 @@ class IOManageBackEndRestConnectorTest {
     @Autowired
     IOManageBackEndRestConnector ioManageBackEndRestConnector;
 
-    @MockBean
+    @MockitoBean
     IOManageBackEndFeignRestClient ioManageBackEndFeignRestClient;
 
     @Test

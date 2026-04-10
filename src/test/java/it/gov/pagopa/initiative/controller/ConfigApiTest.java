@@ -1,6 +1,5 @@
 package it.gov.pagopa.initiative.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import it.gov.pagopa.initiative.mapper.ConfigStaticModelToDTOMapper;
 import it.gov.pagopa.initiative.model.config.ConfigMcc;
 import it.gov.pagopa.initiative.model.config.ConfigTrxRule;
@@ -8,13 +7,16 @@ import it.gov.pagopa.initiative.service.ConfigService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.security.autoconfigure.SecurityAutoConfiguration;
+import org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.Arrays;
 import java.util.List;
@@ -25,14 +27,14 @@ import static org.hamcrest.Matchers.sameInstance;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
-@WebMvcTest(value = {
-        ConfigApi.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
+@WebMvcTest(value = {ConfigApi.class}, excludeAutoConfiguration = { UserDetailsServiceAutoConfiguration.class , SecurityAutoConfiguration.class})
+@AutoConfigureMockMvc(addFilters = false)
 class ConfigApiTest {
 
-    @MockBean
+    @MockitoBean
     ConfigService configService;
 
-    @MockBean
+    @MockitoBean
     ConfigStaticModelToDTOMapper configStaticModelToDTOMapper;
 
     @Autowired
@@ -82,8 +84,8 @@ class ConfigApiTest {
         assertThat("Reason of result", retrieveInitiativeSummary, is(sameInstance(mccConfigList)));
 
         mvc.perform(
-            MockMvcRequestBuilders.get(BASE_URL + GET_CONFIG_TRANSACTION_MCC_URL)
-                .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
+                        MockMvcRequestBuilders.get(BASE_URL + GET_CONFIG_TRANSACTION_MCC_URL)
+                                .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(print())
                 .andReturn();
@@ -104,8 +106,8 @@ class ConfigApiTest {
 
         //The MVC perform should perform the API by returning the response based on the Service previously mocked.
         mvc.perform(
-                MockMvcRequestBuilders.get(BASE_URL + GET_CONFIG_TRANSACTION_RULE_URL)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
+                        MockMvcRequestBuilders.get(BASE_URL + GET_CONFIG_TRANSACTION_RULE_URL)
+                                .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(print())
                 .andReturn();
