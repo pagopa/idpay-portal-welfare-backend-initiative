@@ -9,7 +9,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.Instant;
 import java.util.List;
 
@@ -26,9 +25,9 @@ public class WalletDTO {
     private String status;
     private String voucherStatus;
     private String iban;
-    private LocalDate initiativeEndDate;
-    private LocalDate voucherStartDate;
-    private LocalDate voucherEndDate;
+    private Instant initiativeEndDate;
+    private Instant voucherStartDate;
+    private Instant voucherEndDate;
     @JsonProperty("nInstr")
     private int nInstr;
     private Long amountCents;

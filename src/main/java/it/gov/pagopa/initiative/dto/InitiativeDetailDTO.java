@@ -7,7 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.time.Instant;
 import java.time.Instant;
 
 @Data
@@ -19,10 +19,10 @@ public class InitiativeDetailDTO {
     private String status;
     private String description;
     private String ruleDescription;
-    private LocalDate onboardingStartDate;
-    private LocalDate onboardingEndDate;
-    private LocalDate fruitionStartDate;
-    private LocalDate fruitionEndDate;
+    private Instant onboardingStartDate;
+    private Instant onboardingEndDate;
+    private Instant fruitionStartDate;
+    private Instant fruitionEndDate;
     private InitiativeRewardRuleDTO rewardRule;
     private InitiativeRefundRuleDTO refundRule;
     private String privacyLink;

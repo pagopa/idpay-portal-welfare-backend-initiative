@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
 
@@ -405,8 +405,8 @@ public interface InitiativeApi {
       @PathVariable("initiativeId") String initiativeId,
       @PageableDefault(size = 15) Pageable pageable,
       @RequestParam(required = false) String beneficiary,
-      @RequestParam(required = false) LocalDate dateFrom,
-      @RequestParam(required = false) LocalDate dateTo,
+      @RequestParam(required = false) Instant dateFrom,
+      @RequestParam(required = false) Instant dateTo,
       @RequestParam(required = false) String state);
 
   @Operation(summary = "Return ranking list for specified initiative", description = "", security = {

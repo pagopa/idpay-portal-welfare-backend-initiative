@@ -8,7 +8,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.*;
@@ -26,7 +28,7 @@ class OnboardingRestConnectorTest {
         ResponseOnboardingDTO responseOnboardingDTO = new ResponseOnboardingDTO();
         when(onboardingRestClient.getOnboarding(any(), any(), any(), any(),
                 any(), any())).thenReturn(responseOnboardingDTO);
-        LocalDate startDate = LocalDate.of(1, 1, 1);
+        Instant startDate = LocalDate.of(1, 1, 1).atStartOfDay().atZone(ZoneId.of("Europe/Rome")).toInstant();
         assertSame(responseOnboardingDTO, onboardingRestConnectorImpl.getOnboarding("42", null, "42", startDate, startDate,"Status"));
         verify(onboardingRestClient).getOnboarding(any(), any(), any(), any(),
                 any(), any());

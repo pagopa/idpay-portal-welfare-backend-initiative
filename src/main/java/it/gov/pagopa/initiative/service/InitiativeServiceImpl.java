@@ -40,7 +40,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.time.Instant;
 import java.util.*;
 
@@ -389,8 +389,8 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         }
 
         //validation end date
-        LocalDate initiativeEndDate = initiative.getGeneral().getEndDate();
-        if(LocalDate.now().isAfter(initiativeEndDate)){
+        Instant initiativeEndDate = initiative.getGeneral().getEndDate();
+        if(Instant.now().isAfter(initiativeEndDate)){
             throw new InitiativeDateInvalidException(
                     INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_NOT_VALID_END_DATE,
                     "Initiative [%s] unprocessable because the end date [%s] has passed".formatted(initiative.getInitiativeId(),initiativeEndDate)
@@ -509,7 +509,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
     @Override
     public OnboardingDTO getOnboardingStatusList(String organizationId, String initiativeId, String cf,
-                                                 LocalDate startDate, LocalDate endDate, String status, Pageable pageable) {
+                                                 Instant startDate, Instant endDate, String status, Pageable pageable) {
 
         log.info("start get status onboarding, initiative: " + initiativeId);
 

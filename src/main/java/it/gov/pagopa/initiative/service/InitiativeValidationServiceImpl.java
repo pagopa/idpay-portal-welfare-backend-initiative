@@ -24,7 +24,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.Clock;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.time.Year;
 import java.util.List;
 import java.util.Set;
@@ -200,7 +200,7 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
 
     @Override
     public void checkStartDateAndEndDate(Initiative initiative) {
-        if (initiative.getGeneral().getStartDate().isBefore(LocalDate.now(clock)) || initiative.getGeneral().getEndDate().isBefore(LocalDate.now())) {
+        if (initiative.getGeneral().getStartDate().isBefore(Instant.now(clock)) || initiative.getGeneral().getEndDate().isBefore(Instant.now())) {
             throw new InitiativeDateInvalidException(InitiativeConstants.Exception.BadRequest.INITIATIVE_START_DATE_AND_END_DATE_NOT_VALID,"In the initiative [%s] the startDate and endDate cannot be less than today".formatted(initiative.getInitiativeId()));
         }
     }

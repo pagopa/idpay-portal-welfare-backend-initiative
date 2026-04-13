@@ -13,7 +13,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 
-import java.time.LocalDate;
+import java.time.Instant;
 
 /**
  * InitiativeDTO
@@ -40,19 +40,19 @@ public class InitiativeMilDTO {
 
   @JsonProperty("onboardingStartDate")
   @FutureOrPresent(groups = ValidationApiEnabledGroup.class)
-  private LocalDate onboardingStartDate;
+  private Instant onboardingStartDate;
 
   @JsonProperty("onboardingEndDate")
   @Future(groups = ValidationApiEnabledGroup.class)
-  private LocalDate onboardingEndDate;
+  private Instant onboardingEndDate;
 
   @JsonProperty("fruitionStartDate")
   @NotNull(groups = ValidationApiEnabledGroup.class)
-  private LocalDate fruitionStartDate;
+  private Instant fruitionStartDate;
 
   @JsonProperty("fruitionEndDate")
   @NotNull(groups = ValidationApiEnabledGroup.class)
-  private LocalDate fruitionEndDate;
+  private Instant fruitionEndDate;
 
   @JsonProperty("initiativeRewardType")
   private InitiativeDTO.InitiativeRewardTypeEnum initiativeRewardType;

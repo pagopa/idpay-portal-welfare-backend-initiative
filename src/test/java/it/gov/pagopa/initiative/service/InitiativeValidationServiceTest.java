@@ -1,6 +1,7 @@
 package it.gov.pagopa.initiative.service;
 
 
+import it.gov.pagopa.common.config.TimeConfig;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
@@ -36,10 +37,8 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import java.math.BigDecimal;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.Year;
+import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -53,7 +52,7 @@ import static org.mockito.Mockito.*;
                 "app.initiative.ranking.gracePeriod=10"
         })
 @SpringJUnitConfig
-@ImportAutoConfiguration(classes = {InitiativeValidationServiceImpl.class, ValidationAutoConfiguration.class})
+@ImportAutoConfiguration(classes = {InitiativeValidationServiceImpl.class, ValidationAutoConfiguration.class, TimeConfig.class})
 class InitiativeValidationServiceTest {
 
     private static final String INITIATIVE_ID = "initiativeId";
@@ -361,10 +360,10 @@ class InitiativeValidationServiceTest {
     @Test
     void givenInitiativeOk_whenValidateAllWizardSteps_thenDoNothing() {
         InitiativeDTO step5InitiativeDTO = createStep5InitiativeDTO(true);
-        LocalDate startDate = step5InitiativeDTO.getGeneral().getStartDate();
-        startDate = startDate.plusDays(20);
-        LocalDate endDate = step5InitiativeDTO.getGeneral().getEndDate();
-        endDate = endDate.plusDays(20);
+        Instant startDate = step5InitiativeDTO.getGeneral().getStartDate();
+        startDate = startDate.plus(20, ChronoUnit.DAYS);
+        Instant endDate = step5InitiativeDTO.getGeneral().getEndDate();
+        endDate = endDate.plus(20, ChronoUnit.DAYS);
         step5InitiativeDTO.getGeneral().setStartDate(startDate);
         step5InitiativeDTO.getGeneral().setEndDate(endDate);
         Executable executable = () -> initiativeValidationService.validateAllWizardSteps(step5InitiativeDTO);
@@ -548,7 +547,7 @@ class InitiativeValidationServiceTest {
     }
     @ParameterizedTest
     @MethodSource("rangeDate")
-    void checkStartDateAndEndDate(LocalDate startDate, LocalDate endDate) {
+    void checkStartDateAndEndDate(Instant startDate, Instant endDate) {
         Initiative step2Initiative = createStep2Initiative(false);
         InitiativeGeneral initiativeGeneral = createInitiativeGeneral(false);
         initiativeGeneral.setStartDate(startDate);
@@ -666,10 +665,10 @@ class InitiativeValidationServiceTest {
         initiativeGeneral.setBeneficiaryKnown(false);
         initiativeGeneral.setBeneficiaryType(PF);
         initiativeGeneral.setBudgetCents(100000000000L);
-        LocalDate rankingStartDate = LocalDate.now();
-        LocalDate rankingEndDate = rankingStartDate.plusDays(1);
-        LocalDate startDate = rankingEndDate.plusDays(1);
-        LocalDate endDate = startDate.plusDays(1);
+        Instant rankingStartDate = Instant.now();
+        Instant rankingEndDate = rankingStartDate.plus(1, ChronoUnit.DAYS);;
+        Instant startDate = rankingEndDate.plus(1, ChronoUnit.DAYS);
+        Instant endDate = startDate.plus(1,ChronoUnit.DAYS);
         initiativeGeneral.setRankingStartDate(rankingStartDate);
         initiativeGeneral.setRankingEndDate(rankingEndDate);
         initiativeGeneral.setStartDate(startDate);
@@ -694,10 +693,11 @@ class InitiativeValidationServiceTest {
         initiativeGeneralDTO.setBeneficiaryKnown(false);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
-        LocalDate rankingStartDate = LocalDate.now();
-        LocalDate rankingEndDate = rankingStartDate.plusDays(1);
-        LocalDate startDate = rankingEndDate.plusDays(1);
-        LocalDate endDate = startDate.plusDays(1);
+        Instant base = Instant.now();
+        Instant rankingStartDate = base.plus(1, ChronoUnit.DAYS);
+        Instant rankingEndDate   = base.plus(2, ChronoUnit.DAYS);
+        Instant startDate        = base.plus(3, ChronoUnit.DAYS);
+        Instant endDate          = base.plus(4, ChronoUnit.DAYS);
         initiativeGeneralDTO.setRankingStartDate(rankingStartDate);
         initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
         initiativeGeneralDTO.setStartDate(startDate);
@@ -1036,19 +1036,19 @@ class InitiativeValidationServiceTest {
         initiativeGeneral.setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.NF);
         initiativeGeneral.setFamilyUnitComposition(InitiativeConstants.FamilyUnitCompositionConstant.INPS);
         initiativeGeneral.setBudgetCents(100000000000L);
-        initiativeGeneral.setEndDate(LocalDate.of(2022, 9, 8));
-        initiativeGeneral.setStartDate(LocalDate.of(2022, 8, 8));
-        initiativeGeneral.setRankingStartDate(LocalDate.of(2022, 9, 18));
-        initiativeGeneral.setRankingEndDate(LocalDate.of(2022, 8, 18));
+        initiativeGeneral.setEndDate(LocalDate.of(2022, 9, 8).atStartOfDay().atZone(ZoneId.of("Europe/Rome")).toInstant());
+        initiativeGeneral.setStartDate(LocalDate.of(2022, 8, 8).plusDays(1).atStartOfDay().minusNanos(1).atZone(ZoneId.of("Europe/Rome")).toInstant());
+        initiativeGeneral.setRankingStartDate(LocalDate.of(2022, 9, 18).atStartOfDay().atZone(ZoneId.of("Europe/Rome")).toInstant());
+        initiativeGeneral.setRankingEndDate(LocalDate.of(2022, 8, 18).plusDays(1).atStartOfDay().minusNanos(1).atZone(ZoneId.of("Europe/Rome")).toInstant());
         initiativeGeneral.setDescriptionMap(language);
         return initiativeGeneral;
     }
     private static Stream<Arguments> rangeDate() {
         return Stream.of(
-                Arguments.of(LocalDate.now().minusDays(5),LocalDate.now().minusDays(2)),
-                Arguments.of(LocalDate.now(), LocalDate.now().minusDays(2)),
-                Arguments.of(LocalDate.now().minusDays(2),LocalDate.now()),
-                Arguments.of(LocalDate.now(),LocalDate.now().plusDays(5)));
+                Arguments.of(Instant.now().minus(5, ChronoUnit.DAYS),Instant.now().minus(2, ChronoUnit.DAYS)),
+                Arguments.of(Instant.now(), Instant.now().minus(2, ChronoUnit.DAYS)),
+                Arguments.of(Instant.now().minus(2, ChronoUnit.DAYS),Instant.now()),
+                Arguments.of(Instant.now(),Instant.now().plus(5, ChronoUnit.DAYS)));
     }
 
     private static Stream<Arguments> fieldsAndDate() {

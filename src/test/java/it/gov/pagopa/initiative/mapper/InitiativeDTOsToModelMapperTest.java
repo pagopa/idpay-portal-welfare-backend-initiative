@@ -39,8 +39,11 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.time.LocalTime;
+import java.time.Clock;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import static com.mongodb.assertions.Assertions.assertNull;
@@ -121,7 +124,7 @@ class InitiativeDTOsToModelMapperTest {
     private Initiative initiativeTrxNullRewardAbsolute;
     private InitiativeGeneralDTO initiativeInfoOnlyInfoGeneralDTOFamilyUnitNotNull;
     private Initiative initiativeInfoOnlyInfoGeneralFamilyUnitNotNull;
-
+    private final Clock fixedClock = Clock.fixed(Instant.parse("2026-01-01T00:00:00Z"), ZoneOffset.UTC);
     @BeforeEach
     public void setUp() {
         initiativeOnlyInfoGeneral = createStep1InitiativeOnlyInfoGeneral();
@@ -429,10 +432,10 @@ class InitiativeDTOsToModelMapperTest {
         initiativeGeneral.setBeneficiaryKnown(true);
         initiativeGeneral.setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF);
         initiativeGeneral.setBudgetCents(100000000000L);
-        LocalDate rankingStartDate = LocalDate.now();
-        LocalDate rankingEndDate = rankingStartDate.plusDays(1);
-        LocalDate startDate = rankingEndDate.plusDays(1);
-        LocalDate endDate = startDate.plusDays(1);
+        Instant rankingStartDate = Instant.now(fixedClock);
+        Instant rankingEndDate = rankingStartDate.plus(1, ChronoUnit.DAYS);
+        Instant startDate = rankingEndDate.plus(1,ChronoUnit.DAYS);
+        Instant endDate = startDate.plus(1,ChronoUnit.DAYS);
         initiativeGeneral.setRankingStartDate(rankingStartDate);
         initiativeGeneral.setRankingEndDate(rankingEndDate);
         initiativeGeneral.setStartDate(startDate);
@@ -540,10 +543,10 @@ class InitiativeDTOsToModelMapperTest {
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
-        LocalDate rankingStartDate = LocalDate.now();
-        LocalDate rankingEndDate = rankingStartDate.plusDays(1);
-        LocalDate startDate = rankingEndDate.plusDays(1);
-        LocalDate endDate = startDate.plusDays(1);
+        Instant rankingStartDate = Instant.now(fixedClock);
+        Instant rankingEndDate = rankingStartDate.plus(1,ChronoUnit.DAYS);
+        Instant startDate = rankingEndDate.plus(1,ChronoUnit.DAYS);
+        Instant endDate = startDate.plus(1,ChronoUnit.DAYS);
         initiativeGeneralDTO.setRankingStartDate(rankingStartDate);
         initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
         initiativeGeneralDTO.setStartDate(startDate);
@@ -561,10 +564,10 @@ class InitiativeDTOsToModelMapperTest {
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.NF);
         initiativeGeneralDTO.setFamilyUnitComposition("INPS");
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
-        LocalDate rankingStartDate = LocalDate.now();
-        LocalDate rankingEndDate = rankingStartDate.plusDays(1);
-        LocalDate startDate = rankingEndDate.plusDays(1);
-        LocalDate endDate = startDate.plusDays(1);
+        Instant rankingStartDate = Instant.now(fixedClock);
+        Instant rankingEndDate = rankingStartDate.plus(1,ChronoUnit.DAYS);
+        Instant startDate = rankingEndDate.plus(1, ChronoUnit.DAYS);
+        Instant endDate = startDate.plus(1,ChronoUnit.DAYS);
         initiativeGeneralDTO.setRankingStartDate(rankingStartDate);
         initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
         initiativeGeneralDTO.setStartDate(startDate);

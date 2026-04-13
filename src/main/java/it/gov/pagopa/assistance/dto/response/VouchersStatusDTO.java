@@ -5,7 +5,7 @@ import it.gov.pagopa.assistance.dto.request.TransactionDTO;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.List;
 
 @Builder
@@ -14,8 +14,8 @@ public class VouchersStatusDTO {
 
     private String name;
     private String surname;
-    private LocalDate issueDate;
-    private LocalDate expirationDate;
+    private Instant issueDate;
+    private Instant expirationDate;
     private String status;
 
     private List<Operation> operations;

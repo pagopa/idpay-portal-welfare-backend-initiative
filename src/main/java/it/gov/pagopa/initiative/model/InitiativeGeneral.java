@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.*;
 
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.Map;
 
 @Data
@@ -24,19 +24,19 @@ public class InitiativeGeneral {
     /**
      * Start of period of spending funds in an initiative
      */
-    private LocalDate startDate;
+    private Instant startDate;
     /**
      * End of period of spending funds in an initiative
      */
-    private LocalDate endDate;
+    private Instant endDate;
     /**
      * Start of period of participation/adhesion in an initiative
      */
-    private LocalDate rankingStartDate;
+    private Instant rankingStartDate;
     /**
      * End of period of participation/adhesion in an initiative
      */
-    private LocalDate rankingEndDate;
+    private Instant rankingEndDate;
     private Boolean rankingEnabled;
     private Map<String, String> descriptionMap;
 

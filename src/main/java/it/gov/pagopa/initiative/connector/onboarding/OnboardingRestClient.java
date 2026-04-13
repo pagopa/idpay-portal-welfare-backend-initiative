@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.time.LocalDate;
+import java.time.Instant;
 
 @FeignClient(
     name = "${rest-client.onboarding.serviceCode}",
@@ -24,8 +24,8 @@ public interface OnboardingRestClient {
       @PathVariable("initiativeId") String initiativeId,
       Pageable pageable,
       @RequestParam(required = false) String userId,
-      @RequestParam(required = false) LocalDate startDate,
-      @RequestParam(required = false) LocalDate endDate,
+      @RequestParam(required = false) Instant startDate,
+      @RequestParam(required = false) Instant endDate,
       @RequestParam(required = false) String status);
 
 }

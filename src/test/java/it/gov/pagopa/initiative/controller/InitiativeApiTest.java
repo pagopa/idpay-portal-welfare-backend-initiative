@@ -26,6 +26,7 @@ import feign.FeignException;
 import feign.Request;
 import feign.RequestTemplate;
 import feign.Response;
+import it.gov.pagopa.common.config.TimeConfig;
 import it.gov.pagopa.common.web.dto.ErrorDTO;
 import it.gov.pagopa.common.web.exception.ClientExceptionWithBody;
 import it.gov.pagopa.initiative.config.ServiceExceptionConfig;
@@ -87,6 +88,7 @@ import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -97,6 +99,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.IntStream;
+
 import org.apache.kafka.common.KafkaException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -190,11 +193,20 @@ class InitiativeApiTest {
     @MockBean
     InitiativeGeneralDTO initiativeGeneralDTO;
 
+    @MockBean
+    Clock clock;
+
     @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
     protected MockMvc mvc;
+
+    @InjectMocks
+    InitiativeDTOsToModelMapper initiativeDTOsToModelMapperTest;
+
+    @InjectMocks
+    InitiativeModelToDTOMapper initiativeModelToDTOMapperTest;
 
     /* @Test
     void whenAdmin_getInitiativeSummary_statusOk() throws Exception {
@@ -245,7 +257,7 @@ class InitiativeApiTest {
 
         // When
         List<Initiative> retrieveInitiativeSummary = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, role);
-        when(initiativeModelToDTOMapper.toInitiativeSummaryDTOList(retrieveInitiativeSummary)).thenReturn(initiativeSummaryDTOs);
+        when(initiativeModelToDTOMapper.toInitiativeSummaryDTOList(retrieveInitiativeSummary,  clock)).thenReturn(initiativeSummaryDTOs);
         // Then
         // you are expecting service to return whatever returned by repo
         assertThat("Reason of result", retrieveInitiativeSummary, is(sameInstance(initiatives)));
@@ -349,12 +361,6 @@ class InitiativeApiTest {
                 .andReturn();
     }
 
-    @InjectMocks
-    InitiativeDTOsToModelMapper initiativeDTOsToModelMapperTest;
-
-    @InjectMocks
-    InitiativeModelToDTOMapper initiativeModelToDTOMapperTest;
-
     @Test
     void testAddLogo() throws IOException {
 
@@ -370,7 +376,7 @@ class InitiativeApiTest {
                 organizationService,
                 initiativeModelToDTOMapperTest,
                 initiativeDTOsToModelMapperTest,
-                Clock.fixed(Instant.parse("2026-04-03T10:00:00Z"), ZoneOffset.UTC));
+                clock);
         ResponseEntity<LogoDTO> actualAddLogoResult = initiativeApiController.addLogo("42", "42",
                 new MockMultipartFile("Name", new ByteArrayInputStream("AAAAAAAA".getBytes(StandardCharsets.UTF_8))));
         assertTrue(actualAddLogoResult.hasBody());
@@ -889,7 +895,7 @@ class InitiativeApiTest {
         InitiativeDTO initiativeDTO = createStep5InitiativeDTO();
 
         // Instruct the Service to insert a Dummy Initiative
-        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative, false)).thenReturn(initiativeDTO);
+        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative, false, clock)).thenReturn(initiativeDTO);
         // When
         // With this instruction, I instruct the service (via Mockito's when) to always return the DummyInitiative to me anytime I call the same service's function
         when(initiativeService.getInitiativeBeneficiaryView(anyString())).thenReturn(initiative);
@@ -1080,7 +1086,7 @@ class InitiativeApiTest {
         doNothing().when(initiativeService).isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED, ROLE);
 
         // Instruct the Service to insert a Dummy Initiative
-        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true)).thenReturn(step5InitiativeDTO);
+        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true,  clock)).thenReturn(step5InitiativeDTO);
 
         doNothing().when(initiativeService).updateInitiative(any(Initiative.class));
 
@@ -1118,7 +1124,7 @@ class InitiativeApiTest {
         doNothing().when(initiativeService).isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED, ROLE);
 
         // Instruct the Service to insert a Dummy Initiative
-        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true)).thenReturn(step5InitiativeDTO);
+        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true,  clock)).thenReturn(step5InitiativeDTO);
 
         doNothing().when(initiativeService).updateInitiative(any(Initiative.class));
 
@@ -1283,8 +1289,8 @@ class InitiativeApiTest {
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = new InitiativeTrxConditionsDTO();
         List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<>();
         DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
-        Set<DayOfWeek> dayOfWeeks = new HashSet<>();
-        dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
+        Set<java.time.DayOfWeek> dayOfWeeks = new HashSet<>();
+        dayOfWeeks.add(DayOfWeek.MONDAY);
         dayOfWeeks.add(DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
         List<DayOfWeekDTO.Interval> intervals = new ArrayList<>();
@@ -1442,10 +1448,10 @@ class InitiativeApiTest {
         initiativeGeneral.setBeneficiaryKnown(beneficiaryKnown);
         initiativeGeneral.setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF);
         initiativeGeneral.setBudgetCents(100000000000L);
-        LocalDate rankingStartDate = LocalDate.now();
-        LocalDate rankingEndDate = rankingStartDate.plusDays(1);
-        LocalDate startDate = rankingEndDate.plusDays(1);
-        LocalDate endDate = startDate.plusDays(1);
+        Instant rankingStartDate = Instant.now();
+        Instant rankingEndDate = rankingStartDate.plus(1, ChronoUnit.DAYS);
+        Instant startDate = rankingEndDate.plus(1, ChronoUnit.DAYS);
+        Instant endDate = startDate.plus(1, ChronoUnit.DAYS);
         initiativeGeneral.setRankingStartDate(rankingStartDate);
         initiativeGeneral.setRankingEndDate(rankingEndDate);
         initiativeGeneral.setStartDate(startDate);
@@ -1470,10 +1476,10 @@ class InitiativeApiTest {
         initiativeGeneralDTO.setBeneficiaryKnown(beneficiaryKnown);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
-        LocalDate rankingStartDate = LocalDate.now();
-        LocalDate rankingEndDate = rankingStartDate.plusDays(1);
-        LocalDate startDate = rankingEndDate.plusDays(1);
-        LocalDate endDate = startDate.plusDays(1);
+        Instant rankingStartDate = Instant.now().plus(1, ChronoUnit.MINUTES);
+        Instant rankingEndDate = rankingStartDate.plus(1, ChronoUnit.DAYS);
+        Instant startDate = rankingEndDate.plus(1, ChronoUnit.DAYS);
+        Instant endDate = startDate.plus(1, ChronoUnit.DAYS);
         initiativeGeneralDTO.setRankingStartDate(rankingStartDate);
         initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
         initiativeGeneralDTO.setStartDate(startDate);
@@ -1724,10 +1730,10 @@ class InitiativeApiTest {
         initiativeDetailDTO.setInitiativeName("TEST");
         initiativeDetailDTO.setStatus("APPROVED");
         initiativeDetailDTO.setDescription("test test");
-        initiativeDetailDTO.setOnboardingStartDate(LocalDate.now().minusDays(25));
-        initiativeDetailDTO.setOnboardingEndDate(LocalDate.now());
-        initiativeDetailDTO.setFruitionStartDate(LocalDate.now());
-        initiativeDetailDTO.setFruitionEndDate(LocalDate.now().plusDays(40));
+        initiativeDetailDTO.setOnboardingStartDate(Instant.now().minus(25, ChronoUnit.DAYS));
+        initiativeDetailDTO.setOnboardingEndDate(Instant.now());
+        initiativeDetailDTO.setFruitionStartDate(Instant.now());
+        initiativeDetailDTO.setFruitionEndDate(Instant.now().plus(40, ChronoUnit.DAYS));
         initiativeDetailDTO.setRewardRule(createRewardRuleDTO(false));
         initiativeDetailDTO.setRefundRule(null);
         initiativeDetailDTO.setPrivacyLink("privacy.it");

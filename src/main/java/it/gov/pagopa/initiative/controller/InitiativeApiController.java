@@ -23,7 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.Clock;
 import java.time.Instant;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
 
@@ -82,7 +82,7 @@ public class InitiativeApiController implements InitiativeApi {
     public ResponseEntity<List<InitiativeSummaryDTO>> getInitiativeSummary(String organizationId, String role) {
         log.info("[{}][GET_INITIATIVES] - InitiativeSummary: Start processing...", role);
         List<Initiative> initiatives = this.initiativeService.retrieveInitiativeSummary(organizationId, role);
-        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeSummaryDTOList(initiatives));
+        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeSummaryDTOList(initiatives,clock));
     }
 
     @Override
@@ -94,7 +94,7 @@ public class InitiativeApiController implements InitiativeApi {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<InitiativeDTO> getInitiativeDetail(String organizationId, String initiativeId, String role) {
         log.info("[{}][GET_INITIATIVE_DETAIL] - Initiative: {}. Start processing...", role, initiativeId);
-        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDTO(this.initiativeService.getInitiative(organizationId, initiativeId, role), true));
+        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDTO(this.initiativeService.getInitiative(organizationId, initiativeId, role), true,clock));
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -245,7 +245,7 @@ public class InitiativeApiController implements InitiativeApi {
     @Override
     public ResponseEntity<InitiativeDTO> getInitiativeBeneficiaryView(String initiativeId) {
         log.info("[GET_INITIATIVE_DETAIL_FOR_BENEFICIARY] - Initiative: {}. Start processing...", initiativeId);
-        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDTO(this.initiativeService.getInitiativeBeneficiaryView(initiativeId), false));
+        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDTO(this.initiativeService.getInitiativeBeneficiaryView(initiativeId), false,clock));
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -361,7 +361,7 @@ public class InitiativeApiController implements InitiativeApi {
 
     @Override
     public ResponseEntity<OnboardingDTO> getOnboardingStatus(String organizationId, String initiativeId, Pageable pageable,
-                                                             String beneficiary, LocalDate dateFrom, LocalDate dateTo, String state) {
+                                                             String beneficiary, Instant dateFrom, Instant dateTo, String state) {
         return ResponseEntity.ok(this.initiativeService.getOnboardingStatusList(organizationId,initiativeId,beneficiary,dateFrom,dateTo,state,pageable));
     }
 

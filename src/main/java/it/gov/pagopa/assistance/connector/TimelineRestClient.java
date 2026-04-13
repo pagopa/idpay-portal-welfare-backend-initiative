@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.time.LocalDate;
+import java.time.Instant;
 
 @FeignClient(
         name = "${assistance.rest-client.timeline.serviceCode}",
@@ -26,7 +26,7 @@ public interface TimelineRestClient {
             @RequestParam(required = false) String operationType,
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "3") Integer size,
-            @RequestParam(required = false) LocalDate dateFrom,
-            @RequestParam(required = false) LocalDate dateTo
+            @RequestParam(required = false) Instant dateFrom,
+            @RequestParam(required = false) Instant dateTo
     );
 }

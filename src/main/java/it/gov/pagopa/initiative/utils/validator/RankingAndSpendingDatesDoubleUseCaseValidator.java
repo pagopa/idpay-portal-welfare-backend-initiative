@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import java.time.LocalDate;
+import java.time.Instant;
 
 /**
  * Return true only in cases where:
@@ -19,10 +19,10 @@ public class RankingAndSpendingDatesDoubleUseCaseValidator implements Constraint
 
     @Override
     public boolean isValid(InitiativeGeneralDTO value, ConstraintValidatorContext context) {
-        LocalDate rankingStartDate = value.getRankingStartDate();
-        LocalDate rankingEndDate = value.getRankingEndDate();
-        LocalDate startDate = value.getStartDate();
-        LocalDate endDate = value.getEndDate();
+        Instant rankingStartDate = value.getRankingStartDate();
+        Instant rankingEndDate = value.getRankingEndDate();
+        Instant startDate = value.getStartDate();
+        Instant endDate = value.getEndDate();
 
         if (startDate != null && endDate != null){//if both start and end buy dates are not present, then Violation! return false.
             log.trace("[RankingAndSpendingDatesDoubleUseCaseValidator] startDate, endDate not null");
