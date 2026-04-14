@@ -16,8 +16,8 @@ import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.Internal
 import it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.NotFound;
 import it.gov.pagopa.initiative.constants.InitiativeConstants.Status;
 import it.gov.pagopa.initiative.dto.*;
-import it.gov.pagopa.initiative.dto.io.service.OrganizationDTO;
 import it.gov.pagopa.initiative.dto.io.service.*;
+import it.gov.pagopa.initiative.dto.io.service.OrganizationDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardGroupsDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.*;
@@ -26,9 +26,9 @@ import it.gov.pagopa.initiative.event.InitiativeProducer;
 import it.gov.pagopa.initiative.exception.custom.*;
 import it.gov.pagopa.initiative.mapper.InitiativeAdditionalDTOsToIOServiceRequestDTOMapper;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
+import it.gov.pagopa.initiative.model.*;
 import it.gov.pagopa.initiative.model.TypeBoolEnum;
 import it.gov.pagopa.initiative.model.TypeMultiEnum;
-import it.gov.pagopa.initiative.model.*;
 import it.gov.pagopa.initiative.model.rule.refund.AccumulatedAmount;
 import it.gov.pagopa.initiative.model.rule.refund.AdditionalInfo;
 import it.gov.pagopa.initiative.model.rule.refund.InitiativeRefundRule;
@@ -48,9 +48,9 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -1661,7 +1661,7 @@ class InitiativeServiceTest {
             when(ioManageBackEndRestConnector.getServiceKeys("test")).thenReturn(expectedKeysDTO);
             KeysDTO actualKeysDTO = initiativeService.getTokenKeys(INITIATIVE_ID);
             assertEquals(expectedKeysDTO, actualKeysDTO);
-        } catch (Exception e) {
+        } catch (Exception _) {
             Assertions.fail();
         }
     }

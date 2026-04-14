@@ -1,7 +1,5 @@
 package it.gov.pagopa.initiative.connector.io_service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
@@ -28,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.support.TestPropertySourceUtils;
+import tools.jackson.databind.ObjectMapper;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -108,7 +107,7 @@ class IOManageBackEndFeignRestClientTest {
     IOManageBackEndFeignRestClient ioManageBackEndFeignRestClient;
 
     @Test
-    void givenServiceFromInitiativePublished_whenPostCreateServiceCalled_thenReturnMatchingService_200() throws JsonProcessingException {
+    void givenServiceFromInitiativePublished_whenPostCreateServiceCalled_thenReturnMatchingService_200() {
         ServiceRequestDTO serviceRequestDTO = createServiceRequestDTO();
         ServiceResponseDTO serviceResponseDTOexpected = createServiceResponseDTO();
 
@@ -144,7 +143,7 @@ class IOManageBackEndFeignRestClientTest {
     }
 
     @Test
-    void givenServiceNotValid_FromInitiativePublished_whenPostCreateServiceCalled_thenReturnException_400() throws JsonProcessingException {
+    void givenServiceNotValid_FromInitiativePublished_whenPostCreateServiceCalled_thenReturnException_400(){
         ServiceRequestDTO serviceRequestDTO = createServiceRequestDTOnotValid();
         ServiceResponseErrorDTO serviceResponseErrorDTO = createServiceResponseErrorDTO(400);
 
@@ -175,7 +174,7 @@ class IOManageBackEndFeignRestClientTest {
     }
 
     @Test
-    void givenServiceNotValid_FromInitiativePublished_whenPostCreateServiceCalled_thenReturnException_500() throws JsonProcessingException {
+    void givenServiceNotValid_FromInitiativePublished_whenPostCreateServiceCalled_thenReturnException_500(){
         ServiceRequestDTO serviceRequestDTO = createServiceRequestDTOnotValid();
         ServiceResponseErrorDTO serviceResponseErrorDTO = createServiceResponseErrorDTO(500);
 
@@ -206,7 +205,7 @@ class IOManageBackEndFeignRestClientTest {
     }
 
     @Test
-    void givenServiceFromInitiativePublished_whenPutUpdateServiceCalled_thenReturnMatchingService_200() throws JsonProcessingException {
+    void givenServiceFromInitiativePublished_whenPutUpdateServiceCalled_thenReturnMatchingService_200(){
         ServiceRequestDTO serviceRequestDTO = createServiceRequestDTO();
         ServiceResponseDTO serviceResponseDTOexpected = createServiceResponseDTO();
 
@@ -252,7 +251,7 @@ class IOManageBackEndFeignRestClientTest {
     }
 
     @Test
-    void givenServiceNotValid_FromInitiativePublished_whenPutUpdateServiceCalled_thenReturnException_500() throws JsonProcessingException {
+    void givenServiceNotValid_FromInitiativePublished_whenPutUpdateServiceCalled_thenReturnException_500(){
         ServiceRequestDTO serviceRequestDTO = createServiceRequestDTOnotValid();
         ServiceResponseErrorDTO serviceResponseErrorDTO = createServiceResponseErrorDTO(500);
 
@@ -313,7 +312,7 @@ class IOManageBackEndFeignRestClientTest {
     }
 
     @Test
-    void givenServiceFromInitiativePublished_whenGetServiceToken_200() throws JsonProcessingException {
+    void givenServiceFromInitiativePublished_whenGetServiceToken_200(){
         KeysDTO responseKeysDTO = createServiceIOKeys();
         String responseKeysDTOjson = new ObjectMapper().writeValueAsString(responseKeysDTO);
 
