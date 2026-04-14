@@ -48,7 +48,7 @@ class ConfigApiTest {
     private List<ConfigTrxRule> trxConfigRulesList;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         mccConfigList = setUpMccConfig();
         trxConfigRulesList = setUpTransactionConfigRules();
     }

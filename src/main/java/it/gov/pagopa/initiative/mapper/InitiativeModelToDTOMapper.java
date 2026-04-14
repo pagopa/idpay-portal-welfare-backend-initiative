@@ -248,7 +248,7 @@ public class InitiativeModelToDTOMapper {
                                 .build();
                     } else if (x instanceof SelfCriteriaText selfCriteriaText) {
                         return SelfCriteriaTextDTO.builder()
-                                .type(TypeTextEnum.valueOf(selfCriteriaText.get_type().name()))
+                                .type(TypeTextEnum.valueOf(selfCriteriaText.getTypeTextEnum().name()))
                                 .code(selfCriteriaText.getCode())
                                 .description(selfCriteriaText.getDescription())
                                 .subDescription(selfCriteriaText.getSubDescription())

@@ -666,7 +666,7 @@ class InitiativeValidationServiceTest {
         initiativeGeneral.setBeneficiaryType(PF);
         initiativeGeneral.setBudgetCents(100000000000L);
         Instant rankingStartDate = Instant.now();
-        Instant rankingEndDate = rankingStartDate.plus(1, ChronoUnit.DAYS);;
+        Instant rankingEndDate = rankingStartDate.plus(1, ChronoUnit.DAYS);
         Instant startDate = rankingEndDate.plus(1, ChronoUnit.DAYS);
         Instant endDate = startDate.plus(1,ChronoUnit.DAYS);
         initiativeGeneral.setRankingStartDate(rankingStartDate);

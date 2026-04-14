@@ -230,7 +230,7 @@ class EmailNotificationServiceTest {
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
         Instant rankingStartDate = Instant.now();
         Instant rankingEndDate = rankingStartDate.plus(1, ChronoUnit.DAYS);
-        Instant startDate = rankingEndDate.plus(1, ChronoUnit.DAYS);;
+        Instant startDate = rankingEndDate.plus(1, ChronoUnit.DAYS);
         Instant endDate = startDate.plus(1, ChronoUnit.DAYS);
         initiativeGeneralDTO.setRankingStartDate(rankingStartDate);
         initiativeGeneralDTO.setRankingEndDate(rankingEndDate);

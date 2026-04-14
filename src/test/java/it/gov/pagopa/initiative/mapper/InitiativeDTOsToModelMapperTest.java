@@ -478,7 +478,7 @@ class InitiativeDTOsToModelMapperTest {
         values.add("valore2");
         selfCriteriaMulti.setValue(values);
         SelfCriteriaText selfCriteriaText = new SelfCriteriaText();
-        selfCriteriaText.set_type(TypeTextEnum.TEXT);
+        selfCriteriaText.setTypeTextEnum(TypeTextEnum.TEXT);
         selfCriteriaText.setCode("T001");
         selfCriteriaText.setDescription("Text");
         selfCriteriaText.setValue("valore libero");

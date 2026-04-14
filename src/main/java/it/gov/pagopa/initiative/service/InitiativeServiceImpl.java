@@ -41,7 +41,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.time.Instant;
-import java.time.Instant;
 import java.util.*;
 
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Email.*;

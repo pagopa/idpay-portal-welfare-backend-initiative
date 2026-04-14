@@ -220,8 +220,8 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
     }
 
     private InitiativeGeneralDTO createInitiativeGeneralDTO_ko() {
-        Map<String, String> language = new HashMap<>();
-        language.put(Locale.ITALIAN.getLanguage(), "it");
+        Map<String, String> lang = new HashMap<>();
+        lang.put(Locale.ITALIAN.getLanguage(), "it");
 
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
@@ -238,7 +238,7 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
         initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
         initiativeGeneralDTO.setStartDate(startDate);
         initiativeGeneralDTO.setEndDate(endDate);
-        initiativeGeneralDTO.setDescriptionMap(language);
+        initiativeGeneralDTO.setDescriptionMap(lang);
 
         return initiativeGeneralDTO;
     }

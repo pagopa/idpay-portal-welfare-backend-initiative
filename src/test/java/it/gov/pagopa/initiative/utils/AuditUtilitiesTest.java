@@ -16,7 +16,7 @@ class AuditUtilitiesTest {
     private final AuditUtilities auditUtilities = new AuditUtilities();
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger("AUDIT");
         memoryAppender = new MemoryAppender();
         memoryAppender.setContext((LoggerContext) LoggerFactory.getILoggerFactory());

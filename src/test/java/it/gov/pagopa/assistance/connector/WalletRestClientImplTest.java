@@ -2,14 +2,12 @@ package it.gov.pagopa.assistance.connector;
 
 
 import feign.FeignException;
+import it.gov.pagopa.assistance.costants.AssistanceConstants;
 import it.gov.pagopa.assistance.dto.request.WalletDTO;
 import it.gov.pagopa.common.web.exception.ServiceException;
-import it.gov.pagopa.assistance.costants.AssistanceConstants;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;

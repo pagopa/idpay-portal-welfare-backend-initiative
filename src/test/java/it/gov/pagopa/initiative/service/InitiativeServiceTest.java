@@ -1168,10 +1168,10 @@ class InitiativeServiceTest {
         Initiative initiative = createStep5Initiative();
         initiative.setStatus(InitiativeConstants.Status.APPROVED);
 
-        Instant InstantNow = Instant.now(clock);
+        Instant instantNow = Instant.now(clock);
         InitiativeGeneral initiativeGeneral = InitiativeGeneral.builder()
-                .startDate(InstantNow.minus(5, ChronoUnit.DAYS))
-                .endDate(InstantNow.minus(3, ChronoUnit.DAYS))
+                .startDate(instantNow.minus(5, ChronoUnit.DAYS))
+                .endDate(instantNow.minus(3, ChronoUnit.DAYS))
                 .build();
         initiative.setGeneral(initiativeGeneral);
 
