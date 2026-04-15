@@ -26,6 +26,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -61,7 +64,7 @@ public class InitiativeDTOsToModelMapper {
         if (generalDTO == null) {
             return null;
         }
-        
+        ZoneId zoneId = ZoneId.of("Europe/Rome");
         Instant normalizedStartDate = generalDTO.getStartDate()
                 .atZone(zoneId)
                 .toLocalDate()
