@@ -61,14 +61,28 @@ public class InitiativeDTOsToModelMapper {
         if (generalDTO == null) {
             return null;
         }
+        
+        Instant normalizedStartDate = generalDTO.getStartDate()
+                .atZone(zoneId)
+                .toLocalDate()
+                .atStartOfDay(zoneId)
+                .toInstant();
+        
+        Instant normalizedEndDate = generalDTO.getEndDate()
+                .atZone(zoneId)
+                .toLocalDate()
+                .atTime(LocalTime.MAX)
+                .atZone(zoneId)
+                .toInstant();
+
         return InitiativeGeneral.builder().beneficiaryBudgetCents(euroToCents(generalDTO.getBeneficiaryBudget()))
                 .beneficiaryBudgetMaxCents(euroToCents(generalDTO.getBeneficiaryBudgetMax()))
                 .beneficiaryKnown(generalDTO.getBeneficiaryKnown())
                 .beneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.valueOf(generalDTO.getBeneficiaryType().name()))
                 .familyUnitComposition(generalDTO.getFamilyUnitComposition()!=null?generalDTO.getFamilyUnitComposition():null)
                 .budgetCents(euroToCents(generalDTO.getBudget()))
-                .endDate(generalDTO.getEndDate())
-                .startDate(generalDTO.getStartDate())
+                .startDate(normalizedStartDate)
+                .endDate(normalizedEndDate)
                 .rankingEndDate(generalDTO.getRankingEndDate())
                 .rankingStartDate(generalDTO.getRankingStartDate())
                 .rankingEnabled(generalDTO.getRankingEnabled())
