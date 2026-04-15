@@ -75,6 +75,19 @@ public class InitiativeDTOsToModelMapper {
                 .atZone(zoneId)
                 .toInstant();
 
+        Instant rankingStartDate = generalDTO.getRankingStartDate()
+                .atZone(zoneId)
+                .toLocalDate()
+                .atStartOfDay(zoneId)
+                .toInstant();
+        
+        Instant rankingEndDate = generalDTO.getRankingEndDate()
+                .atZone(zoneId)
+                .toLocalDate()
+                .atTime(LocalTime.MAX)
+                .atZone(zoneId)
+                .toInstant();
+
         return InitiativeGeneral.builder().beneficiaryBudgetCents(euroToCents(generalDTO.getBeneficiaryBudget()))
                 .beneficiaryBudgetMaxCents(euroToCents(generalDTO.getBeneficiaryBudgetMax()))
                 .beneficiaryKnown(generalDTO.getBeneficiaryKnown())
@@ -83,8 +96,8 @@ public class InitiativeDTOsToModelMapper {
                 .budgetCents(euroToCents(generalDTO.getBudget()))
                 .startDate(normalizedStartDate)
                 .endDate(normalizedEndDate)
-                .rankingEndDate(generalDTO.getRankingEndDate())
-                .rankingStartDate(generalDTO.getRankingStartDate())
+                .rankingStartDate(rankingStartDate)
+                .rankingEndDate(rankingEndDate)
                 .rankingEnabled(generalDTO.getRankingEnabled())
                 .descriptionMap(generalDTO.getDescriptionMap()).build();
     }
