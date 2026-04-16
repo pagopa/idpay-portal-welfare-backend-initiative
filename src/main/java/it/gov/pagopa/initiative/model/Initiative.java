@@ -9,7 +9,7 @@ import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 @AllArgsConstructor
@@ -31,9 +31,9 @@ public class Initiative {
     @LastModifiedBy
     private String updatedBy;
     @CreatedDate
-    private LocalDateTime creationDate;
+    private Instant creationDate;
     @LastModifiedDate
-    private LocalDateTime updateDate;
+    private Instant updateDate;
     private String status;
     private InitiativeGeneral general;
     private InitiativeAdditional additionalInfo;

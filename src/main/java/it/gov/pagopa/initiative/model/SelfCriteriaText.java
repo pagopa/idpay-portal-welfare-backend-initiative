@@ -10,7 +10,7 @@ import lombok.*;
 @Builder
 public class SelfCriteriaText implements ISelfDeclarationCriteria {
 
-  private TypeTextEnum _type;
+  private TypeTextEnum typeTextEnum;
   private String description;
   private String subDescription;
   private String value;

@@ -14,7 +14,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -73,7 +73,7 @@ public class InitiativeAdditionalDTO extends InitiativeOrganizationInfoDTO {
   private String logoURL;
 
   @JsonProperty("logoUploadDate")
-  private LocalDateTime logoUploadDate;
+  private Instant logoUploadDate;
 
   @JsonProperty("thumbnailUrl")
   private String thumbnailUrl;

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * InitiativeSummaryDTO
@@ -30,10 +30,10 @@ public class InitiativeSummaryDTO   {
   private String status;
 
   @JsonProperty("creationDate")
-  private LocalDateTime creationDate;
+  private Instant creationDate;
 
   @JsonProperty("updateDate")
-  private LocalDateTime updateDate;
+  private Instant updateDate;
 
   @JsonProperty("rankingEnabled")
   private Boolean rankingEnabled;

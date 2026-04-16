@@ -10,10 +10,10 @@ import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardGroupsDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardValueDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.*;
-import it.gov.pagopa.initiative.model.*;
 import it.gov.pagopa.initiative.model.TypeBoolEnum;
 import it.gov.pagopa.initiative.model.TypeMultiEnum;
 import it.gov.pagopa.initiative.model.TypeTextEnum;
+import it.gov.pagopa.initiative.model.*;
 import it.gov.pagopa.initiative.model.rule.refund.AccumulatedAmount;
 import it.gov.pagopa.initiative.model.rule.refund.AdditionalInfo;
 import it.gov.pagopa.initiative.model.rule.refund.InitiativeRefundRule;
@@ -37,10 +37,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -58,6 +56,7 @@ class InitiativeModelToDTOMapperTest {
     public static final String ITALIAN_LANGUAGE = "it";
     private static final String SERVICE_ID = "SERVICE_ID";
 
+    private static final ZoneId zone = ZoneId.of("Europe/Rome");
     @Autowired
     private InitiativeModelToDTOMapper initiativeModelToDTOMapper;
 
@@ -97,6 +96,8 @@ class InitiativeModelToDTOMapperTest {
     private InitiativeDTO initiativeStep2DTOBeneficiaryTypeNull;
     private Initiative initiativeStep2FamilyUnitNotNull;
     private InitiativeDTO initiativeStep2DTOFamilyUnitNotNull;
+
+    private final Clock clock = Clock.fixed(Instant.parse("2026-04-03T10:00:00Z"), ZoneOffset.UTC);
 
     @BeforeEach
     public void setUp() {
@@ -242,56 +243,56 @@ class InitiativeModelToDTOMapperTest {
     }
     @Test
     void toInitiativeGeneralDTOBeneficiaryTypeNull() {
-        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(initiativeStep2BeneficiaryTypeNull, true);
+        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(initiativeStep2BeneficiaryTypeNull, true, clock);
         assertEquals(initiativeStep2DTOBeneficiaryTypeNull, initiativeDTO);
 
     }
     @Test
     void toInitiativeGeneralDTOFamilyUnitNotNull() {
-        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(initiativeStep2FamilyUnitNotNull, true);
+        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(initiativeStep2FamilyUnitNotNull, true, clock);
         assertEquals(initiativeStep2DTOFamilyUnitNotNull, initiativeDTO);
 
     }
 
     @Test
     void toInitiativeDTOStep4WithRewardAndTrxRulesThresholdNull_equals() {
-        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiativeStep4ThresholdNull, true);
+        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiativeStep4ThresholdNull, true, clock);
         assertEquals(fullInitiativeDTOStep4ThresholdNull, initiativeDTO);
     }
 
     @Test
     void toInitiativeDTOStep4WithRewardAndTrxRulesTrxCountNull_equals() {
-        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiativeStep4TrxCountNull, true);
+        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiativeStep4TrxCountNull, true, clock);
         assertEquals(fullInitiativeDTOStep4TrxCountNull, initiativeDTO);
     }
 
     @Test
     void toInitiativeDTOStep4WithRewardAndTrxRulesMccFilterNull_equals() {
-        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiativeStep4MccFilterNull, true);
+        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiativeStep4MccFilterNull, true, clock);
         assertEquals(fullInitiativeDTOStep4MccFilterNull, initiativeDTO);
     }
 
     @Test
     void toInitiativeDTOStep4WithRewardAndTrxRulesDayOfWeekNull_equals() {
-        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiativeStep4DayOfWeekNull, true);
+        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiativeStep4DayOfWeekNull, true, clock);
         assertEquals(fullInitiativeDTOStep4DayOfWeekNull, initiativeDTO);
     }
 
     @Test
     void toInitiativeDTOStep4WithRewardAndTrxRulesRewardLimitEmpty_equals() {
-        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiativeStep4RewardLimitEmpty, true);
+        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiativeStep4RewardLimitEmpty, true, clock);
         assertEquals(fullInitiativeDTOStep4RewardLimitEmpty, initiativeDTO);
     }
 
     @Test
     void toInitiativeDTOStep4WithRewardAndTrxRulesRewardGroup_equals() {
-        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiativeStep4RewardAndTrxRulesRewardGroup, true);
+        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiativeStep4RewardAndTrxRulesRewardGroup, true, clock);
         assertEquals(getFullInitiativeDTOStep4RewardGroup, initiativeDTO);
     }
 
     @Test
     void toInitiativeDTOStep4WithRewardAndTrxRules_equals() {
-        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiativeStep4RewardAndTrxRules, true);
+        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiativeStep4RewardAndTrxRules, true, clock);
         assertEquals(fullInitiativeDTOStep4, initiativeDTO);
     }
 
@@ -315,7 +316,7 @@ class InitiativeModelToDTOMapperTest {
 
     @Test
     void toInitiativeDTO_equals() {
-        InitiativeDTO initiativeDTOtoBeVerified = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiative, true);
+        InitiativeDTO initiativeDTOtoBeVerified = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiative, true, clock);
 
         //Check the equality of the results
         assertEquals(fullInitiativeDTO, initiativeDTOtoBeVerified);
@@ -332,7 +333,7 @@ class InitiativeModelToDTOMapperTest {
 
         Mockito.when(initiativeUtilsMock.createLogoUrl(anyString(),anyString())).thenReturn("test.it");
 
-        InitiativeDTO initiativeDTOExpected = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiative, true);
+        InitiativeDTO initiativeDTOExpected = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiative, true, clock);
 
         assertEquals(initiativeDTO,initiativeDTOExpected);
     }
@@ -340,7 +341,7 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void toInitiativeDetailDTO_equals() {
         Locale acceptLanguage = Locale.ITALIAN;
-        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0));
+        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0).atZone(zone).toInstant());
         InitiativeDetailDTO initiativeDetailDTO = initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative,acceptLanguage, false);
 
         assertEquals(fullInitiativeDetailDTO, initiativeDetailDTO);
@@ -348,7 +349,7 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void toInitiativeDetailDTO_rewardNull() {
         Locale acceptLanguage = Locale.ITALIAN;
-        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0));
+        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0).atZone(zone).toInstant());
         fullInitiative.setRewardRule(null);
         fullInitiativeDetailDTO.setRewardRule(null);
 
@@ -359,7 +360,7 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void toInitiativeDetailDTO_withRewardGroups() {
         Locale acceptLanguage = Locale.ITALIAN;
-        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0));
+        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0).atZone(zone).toInstant());
         fullInitiative.setRewardRule(createInitiativeRewardRuleRewardGroup());
         InitiativeRewardRuleDTO rewardGroup = createInitiativeRewardRuleDTORewardGroupDTO();
         ((RewardGroupsDTO) rewardGroup).setType(null);
@@ -372,7 +373,7 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void toInitiativeDetailDTO_refundRule() {
         Locale acceptLanguage = Locale.ITALIAN;
-        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0));
+        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0).atZone(zone).toInstant());
         fullInitiative.setRefundRule(createRefundRuleValidWithTimeParameter());
         fullInitiativeDetailDTO.setRefundRule(createRefundRuleDTOValidWithTimeParameterAndAdditionalNull());
         InitiativeDetailDTO initiativeDetailDTO = initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative,acceptLanguage, false);
@@ -403,7 +404,7 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void toInitiativeDetailDTOWithGeneralInfo_Null() {
         Locale acceptLanguage = Locale.ITALIAN;
-        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0));
+        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0).atZone(zone).toInstant());
         fullInitiative.setGeneral(null);
         try {
             initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative,acceptLanguage, false);
@@ -414,7 +415,7 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void toInitiativeDetailDTOWithRuleDescription_Null() {
         Locale acceptLanguage = Locale.ITALIAN;
-        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0));
+        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0).atZone(zone).toInstant());
         fullInitiative.getGeneral().setDescriptionMap(null);
         fullInitiativeDetailDTO.setRuleDescription(StringUtils.EMPTY);
 
@@ -426,7 +427,7 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void toInitiativeDetailDTO_nullStartAndEndDate() {
         Locale acceptLanguage = Locale.ITALIAN;
-        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0));
+        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0).atZone(zone).toInstant());
         fullInitiative.getGeneral().setRankingStartDate(null);
         fullInitiative.getGeneral().setRankingEndDate(null);
 
@@ -438,7 +439,7 @@ class InitiativeModelToDTOMapperTest {
 
     @Test
     void toInitiativeDTONull_equals() {
-        assertNull(initiativeModelToDTOMapper.toInitiativeDTO(null, true));
+        assertNull(initiativeModelToDTOMapper.toInitiativeDTO(null, true, clock));
     }
 
     @Test
@@ -463,7 +464,7 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void givenApiKeyClientIdNotPresent_toInitiativeDTO() {
         fullInitiative.getBeneficiaryRule().setApiKeyClientId(null);
-        InitiativeDTO initiativeDTOActual = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiative, true);
+        InitiativeDTO initiativeDTOActual = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiative, true, clock);
         //Check the equality of the results
         assertEquals(fullInitiative.getBeneficiaryRule().getApiKeyClientId(), initiativeDTOActual.getBeneficiaryRule().getApiKeyClientId());
     }
@@ -471,7 +472,7 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void givenApiKeyClientAssertionNotPresent_toInitiativeDTO() {
         fullInitiative.getBeneficiaryRule().setApiKeyClientAssertion(null);
-        InitiativeDTO initiativeDTOActual = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiative, true);
+        InitiativeDTO initiativeDTOActual = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiative, true, clock);
         //Check the equality of the results
         assertEquals(fullInitiative.getBeneficiaryRule().getApiKeyClientAssertion(), initiativeDTOActual.getBeneficiaryRule().getApiKeyClientAssertion());
     }
@@ -481,7 +482,7 @@ class InitiativeModelToDTOMapperTest {
         Initiative initiative = createStep1Initiative();
 
         initiative.setAdditionalInfo(null);
-        assertNull(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true).getAdditionalInfo());
+        assertNull(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true, clock).getAdditionalInfo());
     }
 
     @Test
@@ -494,7 +495,7 @@ class InitiativeModelToDTOMapperTest {
         additionalInfo.setServiceScope(InitiativeAdditional.ServiceScope.LOCAL);
         initiative.setAdditionalInfo(additionalInfo);
 
-        assertEquals(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true).getAdditionalInfo().getChannels(), channelDTO);
+        assertEquals(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true, clock).getAdditionalInfo().getChannels(), channelDTO);
     }
 
     @Test
@@ -534,17 +535,17 @@ class InitiativeModelToDTOMapperTest {
 
     @Test
     void testToInitiativeSummaryDTOList_isEmpty() {
-        assertTrue(initiativeModelToDTOMapper.toInitiativeSummaryDTOList(new ArrayList<>()).isEmpty());
+        assertTrue(initiativeModelToDTOMapper.toInitiativeSummaryDTOList(new ArrayList<>(), clock).isEmpty());
     }
 
     @Test
     void toInitiativeSummaryDTOList_statusCLOSED() {
         Initiative step2Initiative = createFullInitiative();
         step2Initiative.setStatus(InitiativeConstants.Status.PUBLISHED);
-        step2Initiative.getGeneral().setEndDate(LocalDate.now().minusDays(1));
+        step2Initiative.getGeneral().setEndDate(Instant.now(clock).minus(1,ChronoUnit.DAYS));
         List<Initiative> initiatives = List.of(step2Initiative);
 
-        List<InitiativeSummaryDTO> initiativeSummaryDTOS = initiativeModelToDTOMapper.toInitiativeSummaryDTOList(initiatives);
+        List<InitiativeSummaryDTO> initiativeSummaryDTOS = initiativeModelToDTOMapper.toInitiativeSummaryDTOList(initiatives, clock);
         initiativeSummaryDTOS.forEach(initiativeSummaryDTO ->
                 assertEquals(InitiativeConstants.Status.CLOSED, initiativeSummaryDTO.getStatus()));
     }
@@ -554,14 +555,14 @@ class InitiativeModelToDTOMapperTest {
         step2Initiative.setStatus(InitiativeConstants.Status.PUBLISHED);
         List<Initiative> initiatives = List.of(step2Initiative);
 
-        List<InitiativeSummaryDTO> initiativeSummaryDTOS = initiativeModelToDTOMapper.toInitiativeSummaryDTOList(initiatives);
+        List<InitiativeSummaryDTO> initiativeSummaryDTOS = initiativeModelToDTOMapper.toInitiativeSummaryDTOList(initiatives, clock);
         initiativeSummaryDTOS.forEach(initiativeSummaryDTO ->
                 assertEquals(InitiativeConstants.Status.PUBLISHED, initiativeSummaryDTO.getStatus()));
     }
 
     @Test
     void toInitiativeSummaryDTOList_equals() {
-        List<InitiativeSummaryDTO> initiativeSummaryDTOListActual = initiativeModelToDTOMapper.toInitiativeSummaryDTOList(initiativeList);
+        List<InitiativeSummaryDTO> initiativeSummaryDTOListActual = initiativeModelToDTOMapper.toInitiativeSummaryDTOList(initiativeList, clock);
         //Check the equality of the results
         assertEquals(initiativeSummaryDTOList, initiativeSummaryDTOListActual);
     }
@@ -613,10 +614,10 @@ class InitiativeModelToDTOMapperTest {
                 .initiativeId("Id1")
                 .initiativeName("initiativeName1")
                 .organizationId("organizationId1")
-                .fruitionStartDate(LocalDate.now().plusDays(2))
-                .fruitionEndDate(LocalDate.now().plusDays(3))
-                .onboardingStartDate(LocalDate.now())
-                .onboardingEndDate(LocalDate.now().plusDays(1))
+                .fruitionStartDate(Instant.now(clock).plus(2,ChronoUnit.DAYS))
+                .fruitionEndDate(Instant.now(clock).plus(3,ChronoUnit.DAYS))
+                .onboardingStartDate(Instant.now(clock))
+                .onboardingEndDate(Instant.now(clock).plus(1,ChronoUnit.DAYS))
                 .beneficiaryKnown(true)
                 .tcLink("tcLink")
                 .privacyLink("privacyLink")
@@ -643,10 +644,10 @@ class InitiativeModelToDTOMapperTest {
                 .initiativeId("Id1")
                 .initiativeName("initiativeName1")
                 .organizationId("organizationId1")
-                .fruitionStartDate(LocalDate.now().plusDays(2))
-                .fruitionEndDate(LocalDate.now().plusDays(3))
-                .onboardingStartDate(LocalDate.now())
-                .onboardingEndDate(LocalDate.now().plusDays(1))
+                .fruitionStartDate(Instant.now(clock).plus(2,ChronoUnit.DAYS))
+                .fruitionEndDate(Instant.now(clock).plus(3, ChronoUnit.DAYS))
+                .onboardingStartDate(Instant.now(clock))
+                .onboardingEndDate(Instant.now(clock).plus(1,ChronoUnit.DAYS))
                 .beneficiaryKnown(true)
                 .tcLink("tcLink")
                 .privacyLink("privacyLink")
@@ -681,15 +682,15 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void testToRewardRuleDTO() {
         Initiative initiative = createStep3Initiative();
-        Mockito.when(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true).getRewardRule()).thenReturn(null);
-        assertNull(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true).getRewardRule());
+        Mockito.when(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true, clock).getRewardRule()).thenReturn(null);
+        assertNull(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true, clock).getRewardRule());
     }
 
     @Test
     void testBeneficiaryView() {
             Initiative step2Initiative = createStep2Initiative();
 
-            InitiativeDTO initiative = initiativeModelToDTOMapper.toInitiativeDTO(step2Initiative, false);
+            InitiativeDTO initiative = initiativeModelToDTOMapper.toInitiativeDTO(step2Initiative, false, clock);
                     assertEquals(InitiativeConstants.Status.DRAFT, initiative.getStatus());
     }
 
@@ -736,10 +737,10 @@ class InitiativeModelToDTOMapperTest {
         initiativeGeneral.setBeneficiaryKnown(true);
         initiativeGeneral.setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF);
         initiativeGeneral.setBudgetCents(100000000000L);
-        LocalDate rankingStartDate = LocalDate.now();
-        LocalDate rankingEndDate = rankingStartDate.plusDays(1);
-        LocalDate startDate = rankingEndDate.plusDays(1);
-        LocalDate endDate = startDate.plusDays(1);
+        Instant rankingStartDate = Instant.now(clock);
+        Instant rankingEndDate = rankingStartDate.plus(1,ChronoUnit.DAYS);
+        Instant startDate = rankingEndDate.plus(1,ChronoUnit.DAYS);
+        Instant endDate = startDate.plus(1,ChronoUnit.DAYS);
         initiativeGeneral.setRankingStartDate(rankingStartDate);
         initiativeGeneral.setRankingEndDate(rankingEndDate);
         initiativeGeneral.setStartDate(startDate);
@@ -791,7 +792,7 @@ class InitiativeModelToDTOMapperTest {
         selfCriteriaMultiConsentValueDTO.add(new SelfCriteriaMultiConsentValueDTO("description", "subDescription", "1"));
         selfCriteriaMultiConsent.setValue(selfCriteriaMultiConsentValueDTO);
         SelfCriteriaText selfCriteriaText = new SelfCriteriaText();
-        selfCriteriaText.set_type(TypeTextEnum.TEXT);
+        selfCriteriaText.setTypeTextEnum(TypeTextEnum.TEXT);
         selfCriteriaText.setCode("T001");
         selfCriteriaText.setDescription("Text");
         selfCriteriaText.setValue("valore libero");
@@ -835,10 +836,10 @@ class InitiativeModelToDTOMapperTest {
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal("1000000000.00"));
-        LocalDate rankingStartDate = LocalDate.now();
-        LocalDate rankingEndDate = rankingStartDate.plusDays(1);
-        LocalDate startDate = rankingEndDate.plusDays(1);
-        LocalDate endDate = startDate.plusDays(1);
+        Instant rankingStartDate = Instant.now(clock);
+        Instant rankingEndDate = rankingStartDate.plus(1,ChronoUnit.DAYS);
+        Instant startDate = rankingEndDate.plus(1,ChronoUnit.DAYS);
+        Instant endDate = startDate.plus(1,ChronoUnit.DAYS);
         initiativeGeneralDTO.setRankingStartDate(rankingStartDate);
         initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
         initiativeGeneralDTO.setStartDate(startDate);
@@ -1018,9 +1019,9 @@ class InitiativeModelToDTOMapperTest {
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = new InitiativeTrxConditionsDTO();
         List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<>();
         DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
-        Set<DayOfWeek> dayOfWeeks = new HashSet<>();
+        Set<java.time.DayOfWeek> dayOfWeeks = new HashSet<>();
         dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
-        dayOfWeeks.add(DayOfWeek.THURSDAY);
+        dayOfWeeks.add(java.time.DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
         List<DayOfWeekDTO.Interval> intervals = new ArrayList<>();
         DayOfWeekDTO.Interval interval1 = new DayOfWeekDTO.Interval();
@@ -1078,9 +1079,9 @@ class InitiativeModelToDTOMapperTest {
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = new InitiativeTrxConditionsDTO();
         List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<>();
         DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
-        Set<DayOfWeek> dayOfWeeks = new HashSet<>();
+        Set<java.time.DayOfWeek> dayOfWeeks = new HashSet<>();
         dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
-        dayOfWeeks.add(DayOfWeek.THURSDAY);
+        dayOfWeeks.add(java.time.DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
         List<DayOfWeekDTO.Interval> intervals = new ArrayList<>();
         DayOfWeekDTO.Interval interval1 = new DayOfWeekDTO.Interval();
@@ -1130,9 +1131,9 @@ class InitiativeModelToDTOMapperTest {
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = new InitiativeTrxConditionsDTO();
         List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<>();
         DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
-        Set<DayOfWeek> dayOfWeeks = new HashSet<>();
+        Set<java.time.DayOfWeek> dayOfWeeks = new HashSet<>();
         dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
-        dayOfWeeks.add(DayOfWeek.THURSDAY);
+        dayOfWeeks.add(java.time.DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
         List<DayOfWeekDTO.Interval> intervals = new ArrayList<>();
         DayOfWeekDTO.Interval interval1 = new DayOfWeekDTO.Interval();
@@ -1188,9 +1189,9 @@ class InitiativeModelToDTOMapperTest {
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = new InitiativeTrxConditionsDTO();
         List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<>();
         DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
-        Set<DayOfWeek> dayOfWeeks = new HashSet<>();
+        Set<java.time.DayOfWeek> dayOfWeeks = new HashSet<>();
         dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
-        dayOfWeeks.add(DayOfWeek.THURSDAY);
+        dayOfWeeks.add(java.time.DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
         List<DayOfWeekDTO.Interval> intervals = new ArrayList<>();
         DayOfWeekDTO.Interval interval1 = new DayOfWeekDTO.Interval();
@@ -1241,9 +1242,9 @@ class InitiativeModelToDTOMapperTest {
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = new InitiativeTrxConditionsDTO();
         List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<>();
         DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
-        Set<DayOfWeek> dayOfWeeks = new HashSet<>();
+        Set<java.time.DayOfWeek> dayOfWeeks = new HashSet<>();
         dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
-        dayOfWeeks.add(DayOfWeek.THURSDAY);
+        dayOfWeeks.add(java.time.DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
         List<DayOfWeekDTO.Interval> intervals = new ArrayList<>();
         DayOfWeekDTO.Interval interval1 = new DayOfWeekDTO.Interval();
@@ -1294,9 +1295,9 @@ class InitiativeModelToDTOMapperTest {
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = new InitiativeTrxConditionsDTO();
         List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<>();
         DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
-        Set<DayOfWeek> dayOfWeeks = new HashSet<>();
+        Set<java.time.DayOfWeek> dayOfWeeks = new HashSet<>();
         dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
-        dayOfWeeks.add(DayOfWeek.THURSDAY);
+        dayOfWeeks.add(java.time.DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
         List<DayOfWeekDTO.Interval> intervals = new ArrayList<>();
         DayOfWeekDTO.Interval interval1 = new DayOfWeekDTO.Interval();
@@ -1423,9 +1424,9 @@ class InitiativeModelToDTOMapperTest {
         InitiativeTrxConditions initiativeTrxConditions = new InitiativeTrxConditions();
         List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig> dayConfigs = new ArrayList<>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig dayConfig1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig();
-        Set<DayOfWeek> dayOfWeeks = new HashSet<>();
+        Set<java.time.DayOfWeek> dayOfWeeks = new HashSet<>();
         dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
-        dayOfWeeks.add(DayOfWeek.THURSDAY);
+        dayOfWeeks.add(java.time.DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
         List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval> intervals = new ArrayList<>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval interval1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval();
@@ -1483,9 +1484,9 @@ class InitiativeModelToDTOMapperTest {
         InitiativeTrxConditions initiativeTrxConditions = new InitiativeTrxConditions();
         List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig> dayConfigs = new ArrayList<>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig dayConfig1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig();
-        Set<DayOfWeek> dayOfWeeks = new HashSet<>();
+        Set<java.time.DayOfWeek> dayOfWeeks = new HashSet<>();
         dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
-        dayOfWeeks.add(DayOfWeek.THURSDAY);
+        dayOfWeeks.add(java.time.DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
         List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval> intervals = new ArrayList<>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval interval1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval();
@@ -1535,9 +1536,9 @@ class InitiativeModelToDTOMapperTest {
         InitiativeTrxConditions initiativeTrxConditions = new InitiativeTrxConditions();
         List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig> dayConfigs = new ArrayList<>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig dayConfig1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig();
-        Set<DayOfWeek> dayOfWeeks = new HashSet<>();
+        Set<java.time.DayOfWeek> dayOfWeeks = new HashSet<>();
         dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
-        dayOfWeeks.add(DayOfWeek.THURSDAY);
+        dayOfWeeks.add(java.time.DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
         List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval> intervals = new ArrayList<>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval interval1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval();
@@ -1593,9 +1594,9 @@ class InitiativeModelToDTOMapperTest {
         InitiativeTrxConditions initiativeTrxConditions = new InitiativeTrxConditions();
         List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig> dayConfigs = new ArrayList<>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig dayConfig1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig();
-        Set<DayOfWeek> dayOfWeeks = new HashSet<>();
+        Set<java.time.DayOfWeek> dayOfWeeks = new HashSet<>();
         dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
-        dayOfWeeks.add(DayOfWeek.THURSDAY);
+        dayOfWeeks.add(java.time.DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
         List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval> intervals = new ArrayList<>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval interval1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval();
@@ -1646,9 +1647,9 @@ class InitiativeModelToDTOMapperTest {
         InitiativeTrxConditions initiativeTrxConditions = new InitiativeTrxConditions();
         List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig> dayConfigs = new ArrayList<>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig dayConfig1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig();
-        Set<DayOfWeek> dayOfWeeks = new HashSet<>();
+        Set<java.time.DayOfWeek> dayOfWeeks = new HashSet<>();
         dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
-        dayOfWeeks.add(DayOfWeek.THURSDAY);
+        dayOfWeeks.add(java.time.DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
         List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval> intervals = new ArrayList<>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval interval1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval();
@@ -1699,9 +1700,9 @@ class InitiativeModelToDTOMapperTest {
         InitiativeTrxConditions initiativeTrxConditions = new InitiativeTrxConditions();
         List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig> dayConfigs = new ArrayList<>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig dayConfig1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig();
-        Set<DayOfWeek> dayOfWeeks = new HashSet<>();
+        Set<java.time.DayOfWeek> dayOfWeeks = new HashSet<>();
         dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
-        dayOfWeeks.add(DayOfWeek.THURSDAY);
+        dayOfWeeks.add(java.time.DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
         List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval> intervals = new ArrayList<>();
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval interval1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval();
@@ -1922,10 +1923,10 @@ class InitiativeModelToDTOMapperTest {
         initiativeDetailDTO.setStatus("DRAFT");
         initiativeDetailDTO.setDescription("Description");
         initiativeDetailDTO.setRuleDescription(ITALIAN_LANGUAGE);
-        LocalDate rankingStartDate = LocalDate.now();
-        LocalDate rankingEndDate = rankingStartDate.plusDays(1);
-        LocalDate startDate = rankingEndDate.plusDays(1);
-        LocalDate endDate = startDate.plusDays(1);
+        Instant rankingStartDate = Instant.now(clock);
+        Instant rankingEndDate = rankingStartDate.plus(1,ChronoUnit.DAYS);
+        Instant startDate = rankingEndDate.plus(1,ChronoUnit.DAYS);
+        Instant endDate = startDate.plus(1,ChronoUnit.DAYS);
         initiativeDetailDTO.setOnboardingStartDate(rankingStartDate);
         initiativeDetailDTO.setOnboardingEndDate(rankingEndDate);
         initiativeDetailDTO.setFruitionStartDate(startDate);
@@ -1936,7 +1937,7 @@ class InitiativeModelToDTOMapperTest {
         initiativeDetailDTO.setPrivacyLink("privacyLink");
         initiativeDetailDTO.setTcLink("tcLink");
         initiativeDetailDTO.setLogoURL(null);
-        initiativeDetailDTO.setUpdateDate(LocalDateTime.of(2023,3,20,12,0));
+        initiativeDetailDTO.setUpdateDate(LocalDateTime.of(2023,3,20,12,0).atZone(zone).toInstant());
         initiativeDetailDTO.setServiceId(SERVICE_ID);
         return initiativeDetailDTO;
     }

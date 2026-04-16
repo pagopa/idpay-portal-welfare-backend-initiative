@@ -2,20 +2,17 @@ package it.gov.pagopa.assistance.service;
 
 
 import it.gov.pagopa.assistance.connector.*;
-import it.gov.pagopa.assistance.costants.AssistanceConstants;
-import it.gov.pagopa.assistance.dto.request.*;
+import it.gov.pagopa.assistance.dto.request.OnboardingDTO;
+import it.gov.pagopa.assistance.dto.request.Operation;
+import it.gov.pagopa.assistance.dto.request.TransactionDTO;
+import it.gov.pagopa.assistance.dto.request.WalletDTO;
 import it.gov.pagopa.assistance.dto.response.OnboardingStatusDTO;
 import it.gov.pagopa.assistance.dto.response.VouchersStatusDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -87,8 +84,8 @@ public class AssistanceServiceImpl implements AssistanceService {
         return VouchersStatusDTO.builder()
                 .name(wallet.getName())
                 .surname(wallet.getSurname())
-                .issueDate(wallet.getVoucherStartDate() != null ? wallet.getVoucherStartDate().atStartOfDay() : null)
-                .expirationDate(wallet.getVoucherEndDate() != null ? wallet.getVoucherEndDate().atStartOfDay() : null)
+                .issueDate(wallet.getVoucherStartDate() != null ? wallet.getVoucherStartDate() : null)
+                .expirationDate(wallet.getVoucherEndDate() != null ? wallet.getVoucherEndDate() : null)
                 .status(wallet.getVoucherStatus())
                 .operations(reducedOperations)
                 .transactions(reducedTransactions)

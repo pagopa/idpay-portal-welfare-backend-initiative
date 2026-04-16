@@ -1,6 +1,6 @@
 package it.gov.pagopa.initiative.dto;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,8 +19,8 @@ public class BeneficiaryRankingPageDTO {
     private long totalElements;
     private long totalPages;
     private String rankingStatus;
-    private LocalDateTime rankingPublishedTimestamp;
-    private LocalDateTime rankingGeneratedTimestamp;
+    private Instant rankingPublishedTimestamp;
+    private Instant rankingGeneratedTimestamp;
     private long totalEligibleOk;
     private long totalEligibleKo;
     private long totalOnboardingKo;

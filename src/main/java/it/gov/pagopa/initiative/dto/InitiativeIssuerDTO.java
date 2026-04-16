@@ -3,7 +3,7 @@ package it.gov.pagopa.initiative.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.Map;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Future;
@@ -45,22 +45,22 @@ public class InitiativeIssuerDTO {
 
   @JsonProperty("startDate")
   @NotNull(groups = ValidationApiEnabledGroup.class)
-  private LocalDate startDate;
+  private Instant startDate;
 
   @JsonProperty("endDate")
   @NotNull(groups = ValidationApiEnabledGroup.class)
-  private LocalDate endDate;
+  private Instant endDate;
 
   @JsonProperty("rankingEnabled")
   private Boolean rankingEnabled;
 
   @JsonProperty("rankingStartDate")
   @FutureOrPresent(groups = ValidationApiEnabledGroup.class)
-  private LocalDate rankingStartDate;
+  private Instant rankingStartDate;
 
   @JsonProperty("rankingEndDate")
   @Future(groups = ValidationApiEnabledGroup.class)
-  private LocalDate rankingEndDate;
+  private Instant rankingEndDate;
 
   @JsonProperty("beneficiaryKnown")
   private Boolean beneficiaryKnown;

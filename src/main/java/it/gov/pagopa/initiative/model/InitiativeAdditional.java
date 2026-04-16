@@ -3,7 +3,7 @@ package it.gov.pagopa.initiative.model;
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -31,7 +31,7 @@ public class InitiativeAdditional {
   private String tcLink;
   private List<Channel> channels;
   private String logoFileName;
-  private LocalDateTime logoUploadDate;
+  private Instant logoUploadDate;
   private String logoURL;
   private String thumbnailUrl;
 

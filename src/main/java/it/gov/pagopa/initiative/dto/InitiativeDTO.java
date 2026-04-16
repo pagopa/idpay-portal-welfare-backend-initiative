@@ -12,7 +12,7 @@ import lombok.*;
 import org.springframework.validation.annotation.Validated;
 
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * InitiativeDTO
@@ -70,10 +70,10 @@ public class InitiativeDTO   {
   private String status;
 
   @JsonProperty("creationDate")
-  private LocalDateTime creationDate;
+  private Instant creationDate;
 
   @JsonProperty("updateDate")
-  private LocalDateTime updateDate;
+  private Instant updateDate;
 
   @JsonProperty("autocertificationCheck")
   private Boolean autocertificationCheck;

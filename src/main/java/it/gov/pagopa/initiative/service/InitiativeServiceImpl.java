@@ -40,8 +40,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.*;
 
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Email.*;
@@ -389,8 +388,8 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         }
 
         //validation end date
-        LocalDate initiativeEndDate = initiative.getGeneral().getEndDate();
-        if(LocalDate.now().isAfter(initiativeEndDate)){
+        Instant initiativeEndDate = initiative.getGeneral().getEndDate();
+        if(Instant.now().isAfter(initiativeEndDate)){
             throw new InitiativeDateInvalidException(
                     INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_NOT_VALID_END_DATE,
                     "Initiative [%s] unprocessable because the end date [%s] has passed".formatted(initiative.getInitiativeId(),initiativeEndDate)
@@ -416,12 +415,12 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             this.validate(contentType, fileName);
             initiativeFileStorageConnector.uploadInitiativeLogo(logo, String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE, organizationId, initiativeId, InitiativeConstants.Logo.LOGO_NAME), contentType);
             initiative.getAdditionalInfo().setLogoFileName(fileName);
-            LocalDateTime localDateTime = LocalDateTime.now();
-            initiative.getAdditionalInfo().setLogoUploadDate(localDateTime);
-            initiative.setUpdateDate(localDateTime);
+            Instant instant = Instant.now();
+            initiative.getAdditionalInfo().setLogoUploadDate(instant);
+            initiative.setUpdateDate(instant);
             initiativeRepository.save(initiative);
             performanceLog(startTime, "STORE_INITIATIVE_LOGO");
-            return new LogoDTO(fileName, initiativeUtils.createLogoUrl(organizationId, initiativeId), localDateTime);
+            return new LogoDTO(fileName, initiativeUtils.createLogoUrl(organizationId, initiativeId), instant);
         } catch (Exception e) {
             performanceLog(startTime, "STORE_INITIATIVE_LOGO");
             throw new InitiativeLogoException("An error occurred during the uploading logo");
@@ -509,7 +508,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
     @Override
     public OnboardingDTO getOnboardingStatusList(String organizationId, String initiativeId, String cf,
-                                                 LocalDateTime startDate, LocalDateTime endDate, String status, Pageable pageable) {
+                                                 Instant startDate, Instant endDate, String status, Pageable pageable) {
 
         log.info("start get status onboarding, initiative: " + initiativeId);
 
@@ -632,7 +631,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         QueueCommandOperationDTO deleteInitiativeCommand = QueueCommandOperationDTO.builder()
                 .entityId(initiativeId)
                 .operationType(DELETE_INITIATIVE_OPERATION_TYPE)
-                .operationTime(LocalDateTime.now())
+                .operationTime(Instant.now())
                 .build();
         if(!commandsProducer.sendCommand(deleteInitiativeCommand)){
             log.error("[DELETE_INITIATIVE] - Initiative: {}. Something went wrong while sending the message on Commands Queue", initiativeId);
@@ -654,7 +653,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         QueueCommandOperationDTO createInitiativeStatistics = QueueCommandOperationDTO.builder()
                 .entityId(initiativeId.concat("_").concat(organizationId))
                 .operationType(CREATE_STATISTICS_OPERATION_TYPE)
-                .operationTime(LocalDateTime.now())
+                .operationTime(Instant.now())
                 .build();
         if(!commandsProducer.sendCommand(createInitiativeStatistics)){
             log.error("[CREATE_INITIATIVE_STATISTICS] - Initiative: {}. Something went wrong while sending the message on Commands Queue", initiativeId);

@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * InitiativeAdditionalDTO
@@ -23,5 +23,5 @@ public class LogoDTO {
   private String logoURL;
 
   @JsonProperty("logoUploadDate")
-  private LocalDateTime logoUploadDate;
+  private Instant logoUploadDate;
 }

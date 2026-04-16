@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 @Data
@@ -15,7 +15,7 @@ import java.util.List;
 public class BeneficiaryRankingDTO {
 
     private String beneficiary;
-    private LocalDateTime criteriaConsensusTimestamp;
+    private Instant criteriaConsensusTimestamp;
     private long rankingValue;
     private long ranking;
     private String beneficiaryRankingStatus;

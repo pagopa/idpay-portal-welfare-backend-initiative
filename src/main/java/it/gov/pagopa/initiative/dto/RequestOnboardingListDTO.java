@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 @Builder
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 
 public class RequestOnboardingListDTO {
   private String userId;
-  private LocalDateTime startDate;
-  private LocalDateTime endDate;
+  private Instant startDate;
+  private Instant endDate;
   private String status;
 }

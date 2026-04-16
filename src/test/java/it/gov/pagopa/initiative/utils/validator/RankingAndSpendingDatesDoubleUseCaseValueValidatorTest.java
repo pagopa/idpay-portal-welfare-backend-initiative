@@ -11,7 +11,8 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -205,10 +206,10 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
-        LocalDate rankingStartDate = LocalDate.now();
-        LocalDate rankingEndDate = rankingStartDate.plusDays(1);
-        LocalDate startDate = rankingEndDate.plusDays(11);
-        LocalDate endDate = startDate.plusDays(1);
+         Instant rankingStartDate = Instant.now().plus(1, ChronoUnit.MINUTES);
+        Instant rankingEndDate = rankingStartDate.plus(1, ChronoUnit.DAYS);
+        Instant startDate = rankingEndDate.plus(11, ChronoUnit.DAYS);
+        Instant endDate = startDate.plus(1, ChronoUnit.DAYS);
         initiativeGeneralDTO.setRankingEnabled(true);
         initiativeGeneralDTO.setRankingStartDate(rankingStartDate);
         initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
@@ -219,22 +220,26 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
     }
 
     private InitiativeGeneralDTO createInitiativeGeneralDTO_ko() {
+        Map<String, String> lang = new HashMap<>();
+        lang.put(Locale.ITALIAN.getLanguage(), "it");
+
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
-        language.put(Locale.ITALIAN.getLanguage(), "it");
         initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryBudgetMax(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
-        LocalDate rankingStartDate = LocalDate.now();
-        LocalDate startDate = rankingStartDate.plusDays(10);
-        LocalDate endDate = startDate.plusDays(1);
+        Instant rankingStartDate = Instant.now().plus(1, ChronoUnit.MINUTES);
+        Instant rankingEndDate = Instant.now().minus(1, ChronoUnit.DAYS);
+        Instant startDate = rankingEndDate.minus(5, ChronoUnit.DAYS);
+        Instant endDate = startDate.plus(1, ChronoUnit.DAYS);
         initiativeGeneralDTO.setRankingEnabled(true);
         initiativeGeneralDTO.setRankingStartDate(rankingStartDate);
-        initiativeGeneralDTO.setRankingEndDate(rankingStartDate);
+        initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
         initiativeGeneralDTO.setStartDate(startDate);
         initiativeGeneralDTO.setEndDate(endDate);
-        initiativeGeneralDTO.setDescriptionMap(language);
+        initiativeGeneralDTO.setDescriptionMap(lang);
+
         return initiativeGeneralDTO;
     }
 
@@ -246,9 +251,9 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
-        LocalDate rankingEndDate = LocalDate.now();
-        LocalDate startDate = rankingEndDate.plusDays(10);
-        LocalDate endDate = startDate.plusDays(1);
+        Instant rankingEndDate = Instant.now();
+        Instant startDate = rankingEndDate.plus(10, ChronoUnit.DAYS);
+        Instant endDate = startDate.plus(1, ChronoUnit.DAYS);
         initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
         initiativeGeneralDTO.setStartDate(startDate);
         initiativeGeneralDTO.setEndDate(endDate);
@@ -264,9 +269,9 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
-        LocalDate rankingStartDate = LocalDate.now();
-        LocalDate startDate = rankingStartDate.plusDays(1);
-        LocalDate endDate = startDate.plusDays(1);
+         Instant rankingStartDate = Instant.now().plus(1, ChronoUnit.MINUTES);
+        Instant startDate = rankingStartDate.plus(1, ChronoUnit.DAYS);
+        Instant endDate = startDate.plus(1, ChronoUnit.DAYS);
         initiativeGeneralDTO.setRankingEnabled(true);
         initiativeGeneralDTO.setRankingStartDate(rankingStartDate);
         initiativeGeneralDTO.setStartDate(startDate);
@@ -283,9 +288,9 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
-        LocalDate rankingStartDate = LocalDate.now();
-        LocalDate rankingEndDate = rankingStartDate.plusDays(1);
-        LocalDate endDate = rankingEndDate.plusDays(1);
+         Instant rankingStartDate = Instant.now().plus(1, ChronoUnit.MINUTES);
+        Instant rankingEndDate = rankingStartDate.plus(1, ChronoUnit.DAYS);
+        Instant endDate = rankingEndDate.plus(1, ChronoUnit.DAYS);
         initiativeGeneralDTO.setRankingEnabled(true);
         initiativeGeneralDTO.setRankingStartDate(rankingStartDate);
         initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
@@ -301,9 +306,9 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
-        LocalDate rankingStartDate = LocalDate.now();
-        LocalDate rankingEndDate = rankingStartDate.plusDays(1);
-        LocalDate startDate = rankingEndDate.plusDays(10);
+         Instant rankingStartDate = Instant.now().plus(1, ChronoUnit.MINUTES);
+        Instant rankingEndDate = rankingStartDate.plus(1, ChronoUnit.DAYS);
+        Instant startDate = rankingEndDate.plus(10, ChronoUnit.DAYS);
         initiativeGeneralDTO.setRankingEnabled(true);
         initiativeGeneralDTO.setRankingStartDate(rankingStartDate);
         initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
@@ -320,8 +325,8 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
-        LocalDate rankingStartDate = LocalDate.now();
-        LocalDate rankingEndDate = rankingStartDate.plusDays(1);
+         Instant rankingStartDate = Instant.now().plus(1, ChronoUnit.MINUTES);
+        Instant rankingEndDate = rankingStartDate.plus(1, ChronoUnit.DAYS);
         initiativeGeneralDTO.setRankingEnabled(true);
         initiativeGeneralDTO.setRankingStartDate(rankingStartDate);
         initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
@@ -336,8 +341,8 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
-        LocalDate startDate = LocalDate.now();
-        LocalDate endDate = startDate.minusDays(1);
+        Instant startDate = Instant.now();
+        Instant endDate = startDate.minus(1, ChronoUnit.DAYS);
         initiativeGeneralDTO.setStartDate(startDate);
         initiativeGeneralDTO.setEndDate(endDate);
         initiativeGeneralDTO.setDescriptionMap(language);
@@ -352,8 +357,8 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
-        LocalDate startDate = LocalDate.now();
-        LocalDate endDate = startDate.plusDays(1);
+        Instant startDate = Instant.now();
+        Instant endDate = startDate.plus(1, ChronoUnit.DAYS);
         initiativeGeneralDTO.setStartDate(startDate);
         initiativeGeneralDTO.setEndDate(endDate);
         initiativeGeneralDTO.setDescriptionMap(language);
@@ -367,10 +372,10 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
-        LocalDate rankingStartDate = LocalDate.now();
-        LocalDate rankingEndDate = rankingStartDate.plusDays(1);
-        LocalDate startDate = rankingEndDate.plusDays(2);
-        LocalDate endDate = rankingEndDate.plusDays(1);
+         Instant rankingStartDate = Instant.now().plus(1, ChronoUnit.MINUTES);
+        Instant rankingEndDate = rankingStartDate.plus(1, ChronoUnit.DAYS);
+        Instant startDate = rankingEndDate.plus(2, ChronoUnit.DAYS);
+        Instant endDate = rankingEndDate.plus(1, ChronoUnit.DAYS);
         initiativeGeneralDTO.setRankingEnabled(true);
         initiativeGeneralDTO.setRankingStartDate(rankingStartDate);
         initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
@@ -387,10 +392,10 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
-        LocalDate rankingStartDate = LocalDate.now();
-        LocalDate rankingEndDate = rankingStartDate.minusDays(1);
-        LocalDate startDate = rankingStartDate.plusDays(2);
-        LocalDate endDate = rankingStartDate.plusDays(1);
+         Instant rankingStartDate = Instant.now().plus(1, ChronoUnit.MINUTES);
+        Instant rankingEndDate = rankingStartDate.minus(1, ChronoUnit.DAYS);
+        Instant startDate = rankingStartDate.plus(2, ChronoUnit.DAYS);
+        Instant endDate = rankingStartDate.plus(1, ChronoUnit.DAYS);
         initiativeGeneralDTO.setRankingEnabled(true);
         initiativeGeneralDTO.setRankingStartDate(rankingStartDate);
         initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
@@ -407,10 +412,10 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
-        LocalDate rankingStartDate = LocalDate.now();
-        LocalDate rankingEndDate = rankingStartDate.plusDays(3);
-        LocalDate startDate = rankingStartDate.plusDays(1);
-        LocalDate endDate = startDate.plusDays(5);
+         Instant rankingStartDate = Instant.now().plus(1, ChronoUnit.MINUTES);
+        Instant rankingEndDate = rankingStartDate.plus(3, ChronoUnit.DAYS);
+        Instant startDate = rankingStartDate.plus(1, ChronoUnit.DAYS);
+        Instant endDate = startDate.plus(5, ChronoUnit.DAYS);
         initiativeGeneralDTO.setRankingEnabled(true);
         initiativeGeneralDTO.setRankingStartDate(rankingStartDate);
         initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
@@ -427,10 +432,10 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
-        LocalDate rankingStartDate = LocalDate.now();
-        LocalDate rankingEndDate = rankingStartDate.plusDays(1);
-        LocalDate startDate = rankingEndDate.plusDays(11);
-        LocalDate endDate = startDate.plusDays(5);
+         Instant rankingStartDate = Instant.now().plus(1, ChronoUnit.MINUTES);
+        Instant rankingEndDate = rankingStartDate.plus(1, ChronoUnit.DAYS);
+        Instant startDate = rankingEndDate.plus(11, ChronoUnit.DAYS);
+        Instant endDate = startDate.plus(5, ChronoUnit.DAYS);
         initiativeGeneralDTO.setRankingEnabled(true);
         initiativeGeneralDTO.setRankingStartDate(rankingStartDate);
         initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
@@ -447,10 +452,10 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
-        LocalDate startDate = LocalDate.now();
-        LocalDate rankingStartDate = startDate.plusDays(1);
-        LocalDate rankingEndDate = rankingStartDate.plusDays(1);
-        LocalDate endDate = rankingEndDate.plusDays(5);
+        Instant startDate = Instant.now();
+        Instant rankingStartDate = startDate.plus(1, ChronoUnit.DAYS);
+        Instant rankingEndDate = rankingStartDate.plus(1, ChronoUnit.DAYS);
+        Instant endDate = rankingEndDate.plus(5, ChronoUnit.DAYS);
         initiativeGeneralDTO.setRankingEnabled(true);
         initiativeGeneralDTO.setRankingStartDate(rankingStartDate);
         initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
@@ -468,10 +473,10 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
-        LocalDate rankingStartDate = LocalDate.now();
-        LocalDate rankingEndDate = rankingStartDate.plusDays(1);
-        LocalDate startDate = rankingEndDate.plusDays(11);
-        LocalDate endDate = startDate.plusDays(5);
+        Instant rankingStartDate = Instant.now().plus(1, ChronoUnit.MINUTES);
+        Instant rankingEndDate = rankingStartDate.plus(1, ChronoUnit.DAYS);
+        Instant startDate = rankingEndDate.plus(11, ChronoUnit.DAYS);
+        Instant endDate = startDate.plus(5, ChronoUnit.DAYS);
         initiativeGeneralDTO.setRankingEnabled(true);
         initiativeGeneralDTO.setRankingStartDate(rankingStartDate);
         initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
@@ -488,10 +493,10 @@ class RankingAndSpendingDatesDoubleUseCaseValueValidatorTest {
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
-        LocalDate rankingStartDate = LocalDate.now();
-        LocalDate rankingEndDate = rankingStartDate.plusDays(1);
-        LocalDate startDate = rankingEndDate.plusDays(10);
-        LocalDate endDate = startDate.plusDays(5);
+         Instant rankingStartDate = Instant.now().plus(1, ChronoUnit.MINUTES);
+        Instant rankingEndDate = rankingStartDate.plus(1, ChronoUnit.DAYS);
+        Instant startDate = rankingEndDate.plus(10, ChronoUnit.DAYS);
+        Instant endDate = startDate.plus(5, ChronoUnit.DAYS);
         initiativeGeneralDTO.setRankingEnabled(true);
         initiativeGeneralDTO.setRankingStartDate(rankingStartDate);
         initiativeGeneralDTO.setRankingEndDate(rankingEndDate);

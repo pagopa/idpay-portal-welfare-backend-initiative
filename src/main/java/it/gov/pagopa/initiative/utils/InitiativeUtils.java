@@ -5,7 +5,8 @@ import it.gov.pagopa.initiative.model.Initiative;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
+import java.time.Clock;
+import java.time.Instant;
 import java.util.Set;
 
 @Component
@@ -19,7 +20,6 @@ public class InitiativeUtils {
 
     @Value("${app.initiative.logo.allowed-extensions}")
     private Set<String> allowedInitiativeLogoExtensions;
-
 
     public String createLogoUrl(String organizationId, String initiativeId){
         return this.logoUrl+this.getPathLogo(organizationId,initiativeId);
@@ -37,9 +37,9 @@ public class InitiativeUtils {
         return allowedInitiativeLogoExtensions;
     }
 
-    public static String checkEndDateToSetStatus(Initiative initiative) {
+    public static String checkEndDateToSetStatus(Initiative initiative, Clock clock) {
         if (InitiativeConstants.Status.PUBLISHED.equals(initiative.getStatus()) &&
-                LocalDate.now().isAfter(initiative.getGeneral().getEndDate())) {
+                Instant.now(clock).isAfter(initiative.getGeneral().getEndDate())) {
             return InitiativeConstants.Status.CLOSED;
         }
         return initiative.getStatus();

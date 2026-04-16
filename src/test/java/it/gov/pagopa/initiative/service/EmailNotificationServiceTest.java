@@ -19,7 +19,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import static org.mockito.Mockito.*;
@@ -176,10 +179,10 @@ class EmailNotificationServiceTest {
         initiativeGeneral.setBeneficiaryKnown(true);
         initiativeGeneral.setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF);
         initiativeGeneral.setBudgetCents(100000000000L);
-        initiativeGeneral.setEndDate(LocalDate.of(2022, 9, 8));
-        initiativeGeneral.setStartDate(LocalDate.of(2022, 8, 8));
-        initiativeGeneral.setRankingStartDate(LocalDate.of(2022, 9, 18));
-        initiativeGeneral.setRankingEndDate(LocalDate.of(2022, 8, 18));
+        initiativeGeneral.setEndDate(LocalDate.of(2022, 9, 8).atStartOfDay().atZone(ZoneId.of("Europe/Rome")).toInstant());
+        initiativeGeneral.setStartDate(LocalDate.of(2022, 8, 8).plusDays(1).atStartOfDay().minusNanos(1).atZone(ZoneId.of("Europe/Rome")).toInstant());
+        initiativeGeneral.setRankingStartDate(LocalDate.of(2022, 9, 18).atStartOfDay().atZone(ZoneId.of("Europe/Rome")).toInstant());
+        initiativeGeneral.setRankingEndDate(LocalDate.of(2022, 8, 18).plusDays(1).atStartOfDay().minusNanos(1).atZone(ZoneId.of("Europe/Rome")).toInstant());
         initiativeGeneral.setDescriptionMap(language);
         return initiativeGeneral;
     }
@@ -225,10 +228,10 @@ class EmailNotificationServiceTest {
         initiativeGeneralDTO.setBeneficiaryKnown(beneficiaryKnown);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
-        LocalDate rankingStartDate = LocalDate.now();
-        LocalDate rankingEndDate = rankingStartDate.plusDays(1);
-        LocalDate startDate = rankingEndDate.plusDays(1);
-        LocalDate endDate = startDate.plusDays(1);
+        Instant rankingStartDate = Instant.now();
+        Instant rankingEndDate = rankingStartDate.plus(1, ChronoUnit.DAYS);
+        Instant startDate = rankingEndDate.plus(1, ChronoUnit.DAYS);
+        Instant endDate = startDate.plus(1, ChronoUnit.DAYS);
         initiativeGeneralDTO.setRankingStartDate(rankingStartDate);
         initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
         initiativeGeneralDTO.setStartDate(startDate);

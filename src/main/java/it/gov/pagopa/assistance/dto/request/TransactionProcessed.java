@@ -4,9 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Map;
 
 @Data
@@ -20,7 +19,7 @@ public class TransactionProcessed {
 
     private String acquirerCode;
 
-    private LocalDateTime trxDate;
+    private Instant trxDate;
 
     private String operationType;
 
@@ -35,11 +34,11 @@ public class TransactionProcessed {
     private Map<String, Reward> rewards;
 
     private Long effectiveAmountCents;
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private LocalDateTime trxChargeDate;
+
+    private Instant trxChargeDate;
     private String operationTypeTranscoded;
 
-    private LocalDateTime timestamp;
+    private Instant timestamp;
     private Map<String, String> additionalProperties;
     private InvoiceFile invoiceFile;
 }

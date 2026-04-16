@@ -8,7 +8,6 @@ import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
 import it.gov.pagopa.initiative.mapper.InitiativeDTOsToModelMapper;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.Initiative;
-import it.gov.pagopa.initiative.model.InitiativeGeneral;
 import it.gov.pagopa.initiative.service.InitiativeService;
 import it.gov.pagopa.initiative.service.OrganizationService;
 import lombok.extern.slf4j.Slf4j;
@@ -20,10 +19,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import reactor.core.publisher.Mono;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.time.Clock;
+import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
 
@@ -41,6 +40,8 @@ public class InitiativeApiController implements InitiativeApi {
     private final InitiativeModelToDTOMapper initiativeModelToDTOMapper;
     private final InitiativeDTOsToModelMapper initiativeDTOsToModelMapper;
 
+    private final Clock clock;
+
     public InitiativeApiController(
             @Value("${app.initiative.conditions.notifyRE}") boolean notifyRE,
             @Value("${app.initiative.conditions.notifyIO}") boolean notifyIO,
@@ -48,7 +49,7 @@ public class InitiativeApiController implements InitiativeApi {
             InitiativeService initiativeService,
             OrganizationService organizationService,
             InitiativeModelToDTOMapper initiativeModelToDTOMapper,
-            InitiativeDTOsToModelMapper initiativeDTOsToModelMapper) {
+            InitiativeDTOsToModelMapper initiativeDTOsToModelMapper, Clock clock) {
         this.notifyRE = notifyRE;
         this.notifyIO = notifyIO;
         this.notifyInternal = notifyInternal;
@@ -56,6 +57,7 @@ public class InitiativeApiController implements InitiativeApi {
         this.organizationService = organizationService;
         this.initiativeModelToDTOMapper = initiativeModelToDTOMapper;
         this.initiativeDTOsToModelMapper = initiativeDTOsToModelMapper;
+        this.clock = clock;
     }
     @Override
     public ResponseEntity<InitiativeDetailDTO> getInitiativeBeneficiaryDetail(String initiativeId, Locale acceptLanguage, boolean viewMinimalInfo) {
@@ -79,7 +81,7 @@ public class InitiativeApiController implements InitiativeApi {
     public ResponseEntity<List<InitiativeSummaryDTO>> getInitiativeSummary(String organizationId, String role) {
         log.info("[{}][GET_INITIATIVES] - InitiativeSummary: Start processing...", role);
         List<Initiative> initiatives = this.initiativeService.retrieveInitiativeSummary(organizationId, role);
-        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeSummaryDTOList(initiatives));
+        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeSummaryDTOList(initiatives,clock));
     }
 
     @Override
@@ -91,7 +93,7 @@ public class InitiativeApiController implements InitiativeApi {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<InitiativeDTO> getInitiativeDetail(String organizationId, String initiativeId, String role) {
         log.info("[{}][GET_INITIATIVE_DETAIL] - Initiative: {}. Start processing...", role, initiativeId);
-        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDTO(this.initiativeService.getInitiative(organizationId, initiativeId, role), true));
+        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDTO(this.initiativeService.getInitiative(organizationId, initiativeId, role), true,clock));
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -242,7 +244,7 @@ public class InitiativeApiController implements InitiativeApi {
     @Override
     public ResponseEntity<InitiativeDTO> getInitiativeBeneficiaryView(String initiativeId) {
         log.info("[GET_INITIATIVE_DETAIL_FOR_BENEFICIARY] - Initiative: {}. Start processing...", initiativeId);
-        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDTO(this.initiativeService.getInitiativeBeneficiaryView(initiativeId), false));
+        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDTO(this.initiativeService.getInitiativeBeneficiaryView(initiativeId), false,clock));
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -262,10 +264,10 @@ public class InitiativeApiController implements InitiativeApi {
 
         log.debug("Retrieve current state and save it as TEMP");
         String statusTemp = initiative.getStatus();
-        LocalDateTime updateDateTemp = initiative.getUpdateDate();
+        Instant updateDateTemp = initiative.getUpdateDate();
 
         initiative.setStatus(InitiativeConstants.Status.PUBLISHED);
-        initiative.setUpdateDate(LocalDateTime.now());
+        initiative.setUpdateDate(Instant.now());
         initiativeService.updateInitiative(initiative);
         log.debug("Initiative saved in status PUBLISHED");
 
@@ -303,7 +305,7 @@ public class InitiativeApiController implements InitiativeApi {
 
         log.debug("Initiative saved in status PUBLISHED");
         initiative.setStatus(InitiativeConstants.Status.PUBLISHED);
-        initiative.setUpdateDate(LocalDateTime.now());
+        initiative.setUpdateDate(Instant.now(clock));
         initiativeService.updateInitiative(initiative);
 
         try {
@@ -357,8 +359,8 @@ public class InitiativeApiController implements InitiativeApi {
     }
 
     @Override
-    public ResponseEntity<OnboardingDTO> getOnboardingStatus(String organizationId,String initiativeId, Pageable pageable,
-        String beneficiary, LocalDateTime dateFrom, LocalDateTime dateTo, String state) {
+    public ResponseEntity<OnboardingDTO> getOnboardingStatus(String organizationId, String initiativeId, Pageable pageable,
+                                                             String beneficiary, Instant dateFrom, Instant dateTo, String state) {
         return ResponseEntity.ok(this.initiativeService.getOnboardingStatusList(organizationId,initiativeId,beneficiary,dateFrom,dateTo,state,pageable));
     }
 

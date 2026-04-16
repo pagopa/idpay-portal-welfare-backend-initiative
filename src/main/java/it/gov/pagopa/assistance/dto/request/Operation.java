@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 @Builder
@@ -37,7 +37,7 @@ public class Operation {
 
   private String status;
 
-  private LocalDateTime operationDate;
+  private Instant operationDate;
 
   private Long amountCents;
 

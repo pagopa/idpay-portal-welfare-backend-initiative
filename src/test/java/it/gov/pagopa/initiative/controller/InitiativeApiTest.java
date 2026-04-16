@@ -1,25 +1,5 @@
 package it.gov.pagopa.initiative.controller;
 
-import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest.INITIATIVE_INVALID_LOCALE_FORMAT;
-import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.ErrorDtoDefaultMsg.ACCUMULATED_AMOUNT_TYPE;
-import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.ErrorDtoDefaultMsg.SOMETHING_WRONG_WITH_THE_REFUND_TYPE;
-import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.ADMIN;
-import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.PAGOPA_ADMIN;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import feign.FeignException;
@@ -30,22 +10,7 @@ import it.gov.pagopa.common.web.dto.ErrorDTO;
 import it.gov.pagopa.common.web.exception.ClientExceptionWithBody;
 import it.gov.pagopa.initiative.config.ServiceExceptionConfig;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
-import it.gov.pagopa.initiative.dto.AnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems;
-import it.gov.pagopa.initiative.dto.AutomatedCriteriaDTO;
-import it.gov.pagopa.initiative.dto.ChannelDTO;
-import it.gov.pagopa.initiative.dto.FilterOperatorEnum;
-import it.gov.pagopa.initiative.dto.InitiativeAdditionalDTO;
-import it.gov.pagopa.initiative.dto.InitiativeBeneficiaryRuleDTO;
-import it.gov.pagopa.initiative.dto.InitiativeDTO;
-import it.gov.pagopa.initiative.dto.InitiativeDetailDTO;
-import it.gov.pagopa.initiative.dto.InitiativeGeneralDTO;
-import it.gov.pagopa.initiative.dto.InitiativeOrganizationInfoDTO;
-import it.gov.pagopa.initiative.dto.InitiativeRewardAndTrxRulesDTO;
-import it.gov.pagopa.initiative.dto.InitiativeSummaryDTO;
-import it.gov.pagopa.initiative.dto.LogoDTO;
-import it.gov.pagopa.initiative.dto.OrganizationDTO;
-import it.gov.pagopa.initiative.dto.SelfCriteriaBoolDTO;
-import it.gov.pagopa.initiative.dto.SelfCriteriaMultiDTO;
+import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.rule.refund.AccumulatedAmountDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.RefundAdditionalInfoDTO;
@@ -53,53 +18,20 @@ import it.gov.pagopa.initiative.dto.rule.refund.TimeParameterDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardGroupsDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardValueDTO;
-import it.gov.pagopa.initiative.dto.rule.trx.DayOfWeekDTO;
-import it.gov.pagopa.initiative.dto.rule.trx.InitiativeTrxConditionsDTO;
-import it.gov.pagopa.initiative.dto.rule.trx.MccFilterDTO;
-import it.gov.pagopa.initiative.dto.rule.trx.RewardLimitsDTO;
-import it.gov.pagopa.initiative.dto.rule.trx.ThresholdDTO;
-import it.gov.pagopa.initiative.dto.rule.trx.TrxCountDTO;
+import it.gov.pagopa.initiative.dto.rule.trx.*;
 import it.gov.pagopa.initiative.exception.custom.InitiativeStatusNotValidException;
 import it.gov.pagopa.initiative.exception.custom.OrgPermissionException;
 import it.gov.pagopa.initiative.mapper.InitiativeDTOsToModelMapper;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
-import it.gov.pagopa.initiative.model.AutomatedCriteria;
-import it.gov.pagopa.initiative.model.Channel;
-import it.gov.pagopa.initiative.model.FilterOperatorEnumModel;
-import it.gov.pagopa.initiative.model.ISelfDeclarationCriteria;
-import it.gov.pagopa.initiative.model.Initiative;
-import it.gov.pagopa.initiative.model.InitiativeAdditional;
-import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
-import it.gov.pagopa.initiative.model.InitiativeGeneral;
-import it.gov.pagopa.initiative.model.SelfCriteriaBool;
-import it.gov.pagopa.initiative.model.SelfCriteriaMulti;
 import it.gov.pagopa.initiative.model.TypeBoolEnum;
 import it.gov.pagopa.initiative.model.TypeMultiEnum;
+import it.gov.pagopa.initiative.model.*;
 import it.gov.pagopa.initiative.model.rule.refund.AccumulatedAmount;
 import it.gov.pagopa.initiative.model.rule.refund.AdditionalInfo;
 import it.gov.pagopa.initiative.model.rule.refund.InitiativeRefundRule;
 import it.gov.pagopa.initiative.model.rule.refund.TimeParameter;
 import it.gov.pagopa.initiative.service.InitiativeService;
 import it.gov.pagopa.initiative.service.OrganizationService;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.IntStream;
 import org.apache.kafka.common.KafkaException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -118,6 +50,33 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.time.Clock;
+import java.time.DayOfWeek;
+import java.time.Instant;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.stream.IntStream;
+
+import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest.INITIATIVE_INVALID_LOCALE_FORMAT;
+import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.ErrorDtoDefaultMsg.ACCUMULATED_AMOUNT_TYPE;
+import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.ErrorDtoDefaultMsg.SOMETHING_WRONG_WITH_THE_REFUND_TYPE;
+import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.ADMIN;
+import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.PAGOPA_ADMIN;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 @TestPropertySource(
         locations = "classpath:application.yml",
@@ -193,11 +152,20 @@ class InitiativeApiTest {
     @MockBean
     InitiativeGeneralDTO initiativeGeneralDTO;
 
+    @MockBean
+    Clock clock;
+
     @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
     protected MockMvc mvc;
+
+    @InjectMocks
+    InitiativeDTOsToModelMapper initiativeDTOsToModelMapperTest;
+
+    @InjectMocks
+    InitiativeModelToDTOMapper initiativeModelToDTOMapperTest;
 
     /* @Test
     void whenAdmin_getInitiativeSummary_statusOk() throws Exception {
@@ -248,7 +216,7 @@ class InitiativeApiTest {
 
         // When
         List<Initiative> retrieveInitiativeSummary = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, role);
-        when(initiativeModelToDTOMapper.toInitiativeSummaryDTOList(retrieveInitiativeSummary)).thenReturn(initiativeSummaryDTOs);
+        when(initiativeModelToDTOMapper.toInitiativeSummaryDTOList(retrieveInitiativeSummary,  clock)).thenReturn(initiativeSummaryDTOs);
         // Then
         // you are expecting service to return whatever returned by repo
         assertThat("Reason of result", retrieveInitiativeSummary, is(sameInstance(initiatives)));
@@ -352,12 +320,6 @@ class InitiativeApiTest {
                 .andReturn();
     }
 
-    @InjectMocks
-    InitiativeDTOsToModelMapper initiativeDTOsToModelMapperTest;
-
-    @InjectMocks
-    InitiativeModelToDTOMapper initiativeModelToDTOMapperTest;
-
     @Test
     void testAddLogo() throws IOException {
 
@@ -372,8 +334,8 @@ class InitiativeApiTest {
                 initiativeService,
                 organizationService,
                 initiativeModelToDTOMapperTest,
-                initiativeDTOsToModelMapperTest
-        );
+                initiativeDTOsToModelMapperTest,
+                clock);
         ResponseEntity<LogoDTO> actualAddLogoResult = initiativeApiController.addLogo("42", "42",
                 new MockMultipartFile("Name", new ByteArrayInputStream("AAAAAAAA".getBytes(StandardCharsets.UTF_8))));
         assertTrue(actualAddLogoResult.hasBody());
@@ -892,7 +854,7 @@ class InitiativeApiTest {
         InitiativeDTO initiativeDTO = createStep5InitiativeDTO();
 
         // Instruct the Service to insert a Dummy Initiative
-        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative, false)).thenReturn(initiativeDTO);
+        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative, false, clock)).thenReturn(initiativeDTO);
         // When
         // With this instruction, I instruct the service (via Mockito's when) to always return the DummyInitiative to me anytime I call the same service's function
         when(initiativeService.getInitiativeBeneficiaryView(anyString())).thenReturn(initiative);
@@ -1083,7 +1045,7 @@ class InitiativeApiTest {
         doNothing().when(initiativeService).isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED, ROLE);
 
         // Instruct the Service to insert a Dummy Initiative
-        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true)).thenReturn(step5InitiativeDTO);
+        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true,  clock)).thenReturn(step5InitiativeDTO);
 
         doNothing().when(initiativeService).updateInitiative(any(Initiative.class));
 
@@ -1121,7 +1083,7 @@ class InitiativeApiTest {
         doNothing().when(initiativeService).isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED, ROLE);
 
         // Instruct the Service to insert a Dummy Initiative
-        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true)).thenReturn(step5InitiativeDTO);
+        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true,  clock)).thenReturn(step5InitiativeDTO);
 
         doNothing().when(initiativeService).updateInitiative(any(Initiative.class));
 
@@ -1286,8 +1248,8 @@ class InitiativeApiTest {
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = new InitiativeTrxConditionsDTO();
         List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<>();
         DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
-        Set<DayOfWeek> dayOfWeeks = new HashSet<>();
-        dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
+        Set<java.time.DayOfWeek> dayOfWeeks = new HashSet<>();
+        dayOfWeeks.add(DayOfWeek.MONDAY);
         dayOfWeeks.add(DayOfWeek.THURSDAY);
         dayConfig1.setDaysOfWeek(dayOfWeeks);
         List<DayOfWeekDTO.Interval> intervals = new ArrayList<>();
@@ -1445,10 +1407,10 @@ class InitiativeApiTest {
         initiativeGeneral.setBeneficiaryKnown(beneficiaryKnown);
         initiativeGeneral.setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF);
         initiativeGeneral.setBudgetCents(100000000000L);
-        LocalDate rankingStartDate = LocalDate.now();
-        LocalDate rankingEndDate = rankingStartDate.plusDays(1);
-        LocalDate startDate = rankingEndDate.plusDays(1);
-        LocalDate endDate = startDate.plusDays(1);
+        Instant rankingStartDate = Instant.now();
+        Instant rankingEndDate = rankingStartDate.plus(1, ChronoUnit.DAYS);
+        Instant startDate = rankingEndDate.plus(1, ChronoUnit.DAYS);
+        Instant endDate = startDate.plus(1, ChronoUnit.DAYS);
         initiativeGeneral.setRankingStartDate(rankingStartDate);
         initiativeGeneral.setRankingEndDate(rankingEndDate);
         initiativeGeneral.setStartDate(startDate);
@@ -1473,10 +1435,10 @@ class InitiativeApiTest {
         initiativeGeneralDTO.setBeneficiaryKnown(beneficiaryKnown);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
-        LocalDate rankingStartDate = LocalDate.now();
-        LocalDate rankingEndDate = rankingStartDate.plusDays(1);
-        LocalDate startDate = rankingEndDate.plusDays(1);
-        LocalDate endDate = startDate.plusDays(1);
+        Instant rankingStartDate = Instant.now().plus(1, ChronoUnit.MINUTES);
+        Instant rankingEndDate = rankingStartDate.plus(1, ChronoUnit.DAYS);
+        Instant startDate = rankingEndDate.plus(1, ChronoUnit.DAYS);
+        Instant endDate = startDate.plus(1, ChronoUnit.DAYS);
         initiativeGeneralDTO.setRankingStartDate(rankingStartDate);
         initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
         initiativeGeneralDTO.setStartDate(startDate);
@@ -1727,16 +1689,16 @@ class InitiativeApiTest {
         initiativeDetailDTO.setInitiativeName("TEST");
         initiativeDetailDTO.setStatus("APPROVED");
         initiativeDetailDTO.setDescription("test test");
-        initiativeDetailDTO.setOnboardingStartDate(LocalDate.now().minusDays(25));
-        initiativeDetailDTO.setOnboardingEndDate(LocalDate.now());
-        initiativeDetailDTO.setFruitionStartDate(LocalDate.now());
-        initiativeDetailDTO.setFruitionEndDate(LocalDate.now().plusDays(40));
+        initiativeDetailDTO.setOnboardingStartDate(Instant.now().minus(25, ChronoUnit.DAYS));
+        initiativeDetailDTO.setOnboardingEndDate(Instant.now());
+        initiativeDetailDTO.setFruitionStartDate(Instant.now());
+        initiativeDetailDTO.setFruitionEndDate(Instant.now().plus(40, ChronoUnit.DAYS));
         initiativeDetailDTO.setRewardRule(createRewardRuleDTO(false));
         initiativeDetailDTO.setRefundRule(null);
         initiativeDetailDTO.setPrivacyLink("privacy.it");
         initiativeDetailDTO.setTcLink("tc.it");
         initiativeDetailDTO.setLogoURL("logo.png");
-        initiativeDetailDTO.setUpdateDate(LocalDateTime.now());
+        initiativeDetailDTO.setUpdateDate(Instant.now());
         initiativeDetailDTO.setServiceId("SERVICE_ID");
         return initiativeDetailDTO;
     }

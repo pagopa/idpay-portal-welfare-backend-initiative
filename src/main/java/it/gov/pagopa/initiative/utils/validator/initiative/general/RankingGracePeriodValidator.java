@@ -6,7 +6,8 @@ import org.springframework.beans.factory.annotation.Value;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import java.time.LocalDate;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 public class RankingGracePeriodValidator implements ConstraintValidator<RankingGracePeriodConstraint, InitiativeGeneralDTO> {
 
@@ -17,10 +18,10 @@ public class RankingGracePeriodValidator implements ConstraintValidator<RankingG
     public boolean isValid(InitiativeGeneralDTO value, ConstraintValidatorContext context) {
         Boolean rankingEnabled = value.getRankingEnabled();
         if(rankingEnabled != null && rankingEnabled){
-            LocalDate rankingEndDate = value.getRankingEndDate();
-            LocalDate startDate = value.getStartDate();
+            Instant rankingEndDate = value.getRankingEndDate();
+            Instant startDate = value.getStartDate();
             if (startDate != null && rankingEndDate != null) {
-                return rankingEndDate.plusDays(gracePeriod).isBefore(startDate);
+                return rankingEndDate.plus(gracePeriod, ChronoUnit.DAYS).isBefore(startDate);
             }
         }
         return true;

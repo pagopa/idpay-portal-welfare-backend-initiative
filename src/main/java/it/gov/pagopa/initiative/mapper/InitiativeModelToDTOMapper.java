@@ -27,6 +27,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Clock;
 import java.util.*;
 
 
@@ -113,13 +114,13 @@ public class InitiativeModelToDTOMapper {
                 .build();
     }
 
-    public InitiativeDTO toInitiativeDTO(Initiative initiative, boolean checkEndDate) {
+    public InitiativeDTO toInitiativeDTO(Initiative initiative, boolean checkEndDate, Clock clock) {
         if (initiative == null) {
             return null;
         }
         InitiativeDTO initiativeDto = this.toDtoOnlyId(initiative);
         initiativeDto.setInitiativeName(initiative.getInitiativeName());
-        initiativeDto.setStatus(checkEndDate ? InitiativeUtils.checkEndDateToSetStatus(initiative) : initiative.getStatus());
+        initiativeDto.setStatus(checkEndDate ? InitiativeUtils.checkEndDateToSetStatus(initiative,clock) : initiative.getStatus());
         initiativeDto.setOrganizationId(initiative.getOrganizationId());
         initiativeDto.setOrganizationName(initiative.getOrganizationName());
         initiativeDto.setCreationDate(initiative.getCreationDate());
@@ -247,7 +248,7 @@ public class InitiativeModelToDTOMapper {
                                 .build();
                     } else if (x instanceof SelfCriteriaText selfCriteriaText) {
                         return SelfCriteriaTextDTO.builder()
-                                .type(TypeTextEnum.valueOf(selfCriteriaText.get_type().name()))
+                                .type(TypeTextEnum.valueOf(selfCriteriaText.getTypeTextEnum().name()))
                                 .code(selfCriteriaText.getCode())
                                 .description(selfCriteriaText.getDescription())
                                 .subDescription(selfCriteriaText.getSubDescription())
@@ -272,7 +273,7 @@ public class InitiativeModelToDTOMapper {
         return beneficiaryRuleDto;
     }
 
-    public List<InitiativeSummaryDTO> toInitiativeSummaryDTOList(List<Initiative> initiatives) {
+    public List<InitiativeSummaryDTO> toInitiativeSummaryDTOList(List<Initiative> initiatives, Clock clock) {
         if (CollectionUtils.isEmpty(initiatives)) {
             return Collections.emptyList();
         }
@@ -286,7 +287,7 @@ public class InitiativeModelToDTOMapper {
                             )
                             .initiativeRewardType(initiativeModel.getInitiativeRewardType() != null ?
                                     initiativeModel.getInitiativeRewardType().name() : null)
-                            .status(InitiativeUtils.checkEndDateToSetStatus(initiativeModel))
+                            .status(InitiativeUtils.checkEndDateToSetStatus(initiativeModel,clock))
                             .creationDate(initiativeModel.getCreationDate())
                             .updateDate(initiativeModel.getUpdateDate())
                             .rankingEnabled(initiativeModel.getGeneral() != null ? initiativeModel.getGeneral().getRankingEnabled() : null)

@@ -26,6 +26,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -61,16 +64,43 @@ public class InitiativeDTOsToModelMapper {
         if (generalDTO == null) {
             return null;
         }
+        ZoneId zoneId = ZoneId.of("Europe/Rome");
+        Instant normalizedStartDate = generalDTO.getStartDate()
+                .atZone(zoneId)
+                .toLocalDate()
+                .atStartOfDay(zoneId)
+                .toInstant();
+        
+        Instant normalizedEndDate = generalDTO.getEndDate()
+                .atZone(zoneId)
+                .toLocalDate()
+                .atTime(LocalTime.MAX)
+                .atZone(zoneId)
+                .toInstant();
+
+        Instant rankingStartDate = generalDTO.getRankingStartDate()
+                .atZone(zoneId)
+                .toLocalDate()
+                .atStartOfDay(zoneId)
+                .toInstant();
+        
+        Instant rankingEndDate = generalDTO.getRankingEndDate()
+                .atZone(zoneId)
+                .toLocalDate()
+                .atTime(LocalTime.MAX)
+                .atZone(zoneId)
+                .toInstant();
+
         return InitiativeGeneral.builder().beneficiaryBudgetCents(euroToCents(generalDTO.getBeneficiaryBudget()))
                 .beneficiaryBudgetMaxCents(euroToCents(generalDTO.getBeneficiaryBudgetMax()))
                 .beneficiaryKnown(generalDTO.getBeneficiaryKnown())
                 .beneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.valueOf(generalDTO.getBeneficiaryType().name()))
                 .familyUnitComposition(generalDTO.getFamilyUnitComposition()!=null?generalDTO.getFamilyUnitComposition():null)
                 .budgetCents(euroToCents(generalDTO.getBudget()))
-                .endDate(generalDTO.getEndDate())
-                .startDate(generalDTO.getStartDate())
-                .rankingEndDate(generalDTO.getRankingEndDate())
-                .rankingStartDate(generalDTO.getRankingStartDate())
+                .startDate(normalizedStartDate)
+                .endDate(normalizedEndDate)
+                .rankingStartDate(rankingStartDate)
+                .rankingEndDate(rankingEndDate)
                 .rankingEnabled(generalDTO.getRankingEnabled())
                 .descriptionMap(generalDTO.getDescriptionMap()).build();
     }
@@ -146,7 +176,7 @@ public class InitiativeDTOsToModelMapper {
                                 .build();
                     } else if (dto instanceof SelfCriteriaTextDTO selfCriteriaTextDTO) {
                         return SelfCriteriaText.builder()
-                                ._type(TypeTextEnum.valueOf(selfCriteriaTextDTO.getType().name()))
+                                .typeTextEnum(TypeTextEnum.valueOf(selfCriteriaTextDTO.getType().name()))
                                 .code(selfCriteriaTextDTO.getCode())
                                 .description(selfCriteriaTextDTO.getDescription())
                                 .value(selfCriteriaTextDTO.getValue())

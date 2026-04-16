@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.Map;
 
 /**
@@ -97,28 +97,28 @@ public class InitiativeGeneralDTO extends InitiativeOrganizationInfoDTO {
      */
     @JsonProperty("startDate")
     @NotNull(groups = ValidationApiEnabledGroup.class)
-    private LocalDate startDate;
+    private Instant startDate;
 
     /**
      * End of period of spending funds in an initiative
      */
     @JsonProperty("endDate")
     @NotNull(groups = ValidationApiEnabledGroup.class)
-    private LocalDate endDate;
+    private Instant endDate;
 
     /**
      * Start of period of participation/adhesion in an initiative
      */
     @JsonProperty("rankingStartDate")
     @FutureOrPresent(groups = ValidationApiEnabledGroup.class)
-    private LocalDate rankingStartDate;
+    private Instant rankingStartDate;
 
     /**
      * End of period of participation/adhesion in an initiative
      */
     @JsonProperty("rankingEndDate")
     @Future(groups = ValidationApiEnabledGroup.class)
-    private LocalDate rankingEndDate;
+    private Instant rankingEndDate;
 
     @JsonProperty("rankingEnabled")
     private Boolean rankingEnabled;

@@ -1,13 +1,11 @@
 package it.gov.pagopa.assistance.dto.response;
 
 import it.gov.pagopa.assistance.dto.request.Operation;
-import it.gov.pagopa.assistance.dto.request.TimelineDTO;
 import it.gov.pagopa.assistance.dto.request.TransactionDTO;
-import it.gov.pagopa.assistance.enums.PointOfSaleTypeEnum;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 @Builder
@@ -16,8 +14,8 @@ public class VouchersStatusDTO {
 
     private String name;
     private String surname;
-    private LocalDateTime issueDate;
-    private LocalDateTime expirationDate;
+    private Instant issueDate;
+    private Instant expirationDate;
     private String status;
 
     private List<Operation> operations;

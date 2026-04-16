@@ -16,12 +16,14 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
         AssistanceServiceImpl.class,
@@ -40,7 +42,7 @@ class AssistanceServiceImplTest {
     private static final String INITIATIVE_ID = "INIT123";
     private static final String USER_ID = "USR123";
 
-
+    private static final ZoneId zone = ZoneId.of("Europe/Rome");
 
     @Test
     void vouchersStatus_ok() {
@@ -55,8 +57,10 @@ class AssistanceServiceImplTest {
 
         Operation op = new Operation();
         op.setEventId("EVT1");
-        op.setOperationDate(LocalDateTime.of(2024, 2, 1, 10, 0));
-
+        op.setOperationDate(LocalDate.of(2024, 2, 1)
+                .atTime(10, 0)
+                .atZone(zone)
+                .toInstant());
         TimelineDTO timeline = new TimelineDTO();
         timeline.setOperationList(List.of(op));
 
@@ -72,7 +76,10 @@ class AssistanceServiceImplTest {
                 .build();
 
         TransactionDTO trx = new TransactionDTO();
-        trx.setTrxDate(LocalDateTime.of(2024, 2, 1, 10, 0));
+        trx.setTrxDate(LocalDate.of(2024, 2, 1)
+                .atTime(10, 0)
+                .atZone(zone)
+                .toInstant());
         trx.setMerchantId("MRC1");
         trx.setPointOfSaleId("POS100");
         trx.setEffectiveAmountCents(500L);
@@ -113,7 +120,10 @@ class AssistanceServiceImplTest {
         onboarding.setStatus("OK");
         onboarding.setUserMail("alice@mail.com");
         onboarding.setChannel(Channel.IO);
-        onboarding.setCriteriaConsensusTimestamp(LocalDateTime.of(2024, 1, 10, 10, 0));
+        onboarding.setCriteriaConsensusTimestamp(LocalDate.of(2024, 2, 1)
+                .atTime(10, 0)
+                .atZone(zone)
+                .toInstant());
 
         when(onboardingClient.getOnboardingStatus(INITIATIVE_ID, USER_ID))
                 .thenReturn(onboarding);

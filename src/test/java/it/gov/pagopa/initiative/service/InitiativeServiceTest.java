@@ -36,6 +36,7 @@ import it.gov.pagopa.initiative.model.rule.refund.TimeParameter;
 import it.gov.pagopa.initiative.model.rule.reward.InitiativeRewardRule;
 import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
 import it.gov.pagopa.initiative.model.rule.trx.*;
+import it.gov.pagopa.initiative.model.rule.trx.DayOfWeek;
 import it.gov.pagopa.initiative.repository.InitiativeRepository;
 import it.gov.pagopa.initiative.utils.AuditUtilities;
 import it.gov.pagopa.initiative.utils.InitiativeUtils;
@@ -55,9 +56,9 @@ import org.springframework.test.context.TestPropertySource;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_NOT_VALID_END_DATE;
@@ -77,6 +78,7 @@ import static org.mockito.Mockito.*;
         InitiativeService.class})
 class InitiativeServiceTest {
 
+    private static final Clock clock = Clock.fixed(Instant.now(), ZoneOffset.UTC);
     private static final String ANY_NOT_INITIATIVE_STATE = "ANY_NOT_INITIATIVE_STATE";
     public static final String INITIATIVE_NAME = "initiativeName1";
     public static final String ORGANIZATION_ID = "organizationId1";
@@ -98,8 +100,8 @@ class InitiativeServiceTest {
     private static final String CF = "CF";
     private static final String USER_ID = "USER_ID";
     private static final String STATUS = "ONBOARDING_OK";
-    private static final LocalDateTime STARTDATE = LocalDateTime.now();
-    private static final LocalDateTime ENDDATE = LocalDateTime.now();
+    private static final Instant STARTDATE = Instant.now(clock);
+    private static final Instant ENDDATE = Instant.now(clock);
     private static final String LOGO_EXTENSION = "png";
     private static final String LOGO_MIME_TYPE = "image/png";
     private static final String FILE_NAME = "logo.png";
@@ -1148,13 +1150,12 @@ class InitiativeServiceTest {
         Initiative initiative = createStep5Initiative();
         initiative.setStatus(InitiativeConstants.Status.APPROVED);
 
-        LocalDate localDateNow = LocalDate.now();
+        Instant now = Instant.now(clock);
         InitiativeGeneral initiativeGeneral = InitiativeGeneral.builder()
-                .startDate(localDateNow.minusDays(5))
-                .endDate(localDateNow)
+                .startDate(now.minus(5, ChronoUnit.DAYS))
+                .endDate(now.plus(1, ChronoUnit.DAYS))
                 .build();
         initiative.setGeneral(initiativeGeneral);
-
         //Try to call the Real Service
         //Prepare Executable with invocation of the method on your system under test
         Executable executable = () -> initiativeService.isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED, ROLE);
@@ -1167,10 +1168,10 @@ class InitiativeServiceTest {
         Initiative initiative = createStep5Initiative();
         initiative.setStatus(InitiativeConstants.Status.APPROVED);
 
-        LocalDate localDateNow = LocalDate.now();
+        Instant instantNow = Instant.now(clock);
         InitiativeGeneral initiativeGeneral = InitiativeGeneral.builder()
-                .startDate(localDateNow.minusDays(5))
-                .endDate(localDateNow.minusDays(3))
+                .startDate(instantNow.minus(5, ChronoUnit.DAYS))
+                .endDate(instantNow.minus(3, ChronoUnit.DAYS))
                 .build();
         initiative.setGeneral(initiativeGeneral);
 
@@ -1341,7 +1342,7 @@ class InitiativeServiceTest {
     @Test
     void getRankingList_ok() {
         Initiative initiative = this.createFullInitiative();
-        RankingRequestDTO rankingRequestDTO = new RankingRequestDTO(USER_ID,INITIATIVE_ID,ORGANIZATION_ID,LocalDateTime.now(),LocalDateTime.now(),1,1,"test", null, null);
+        RankingRequestDTO rankingRequestDTO = new RankingRequestDTO(USER_ID,INITIATIVE_ID,ORGANIZATION_ID,Instant.now(clock),Instant.now(clock),1,1,"test", null, null);
         RankingPageDTO rankingPageDTO =new RankingPageDTO();
         rankingPageDTO.setContent(List.of(rankingRequestDTO));
         DecryptCfDTO decryptCfDTO = new DecryptCfDTO(CF);
@@ -1384,7 +1385,7 @@ class InitiativeServiceTest {
     @Test
     void getRankingList_ko_decrypt() {
         Initiative initiative = this.createFullInitiative();
-        RankingRequestDTO rankingRequestDTO = new RankingRequestDTO(USER_ID,INITIATIVE_ID,ORGANIZATION_ID,LocalDateTime.now(),LocalDateTime.now(),1,1,"test", null, null);
+        RankingRequestDTO rankingRequestDTO = new RankingRequestDTO(USER_ID,INITIATIVE_ID,ORGANIZATION_ID,Instant.now(clock),Instant.now(clock),1,1,"test", null, null);
         RankingPageDTO rankingPageDTO =new RankingPageDTO();
         rankingPageDTO.setContent(List.of(rankingRequestDTO));
         EncryptedCfDTO encryptedCfDTO = new EncryptedCfDTO(USER_ID);
@@ -1447,7 +1448,7 @@ class InitiativeServiceTest {
         EncryptedCfDTO encryptedCfDTO = new EncryptedCfDTO(USER_ID);
         Mockito.when(encryptRestConnector.upsertToken(Mockito.any())).thenReturn(encryptedCfDTO);
 
-        RankingRequestDTO rankingRequestDTO = new RankingRequestDTO(USER_ID,INITIATIVE_ID,ORGANIZATION_ID,LocalDateTime.now(),LocalDateTime.now(),1,1,"test", "FAMILY_ID", Set.of(USER_ID, "USER_ID_2"));
+        RankingRequestDTO rankingRequestDTO = new RankingRequestDTO(USER_ID,INITIATIVE_ID,ORGANIZATION_ID,Instant.now(clock),Instant.now(clock),1,1,"test", "FAMILY_ID", Set.of(USER_ID, "USER_ID_2"));
         RankingPageDTO rankingPageDTO =new RankingPageDTO();
         rankingPageDTO.setContent(List.of(rankingRequestDTO));
         Mockito.when(rankingRestConnector.getRankingList(Mockito.anyString(),Mockito.anyString(),Mockito.any(),Mockito.anyString(),Mockito.anyString())).thenReturn(rankingPageDTO);
@@ -1466,7 +1467,7 @@ class InitiativeServiceTest {
     @Test
     void getOnboardingStatusList_ok() {
         Initiative initiative = this.createFullInitiative();
-        OnboardingStatusCitizenDTO onboardingStatusCitizenDTO = new OnboardingStatusCitizenDTO(USER_ID, STATUS, LocalDateTime.now().toString(), "familyId");
+        OnboardingStatusCitizenDTO onboardingStatusCitizenDTO = new OnboardingStatusCitizenDTO(USER_ID, STATUS, Instant.now(clock).toString(), "familyId");
         List<OnboardingStatusCitizenDTO> onboardingStatusCitizenDTOS = new ArrayList<>();
         onboardingStatusCitizenDTOS.add(onboardingStatusCitizenDTO);
         ResponseOnboardingDTO onboardingDTO = new ResponseOnboardingDTO(onboardingStatusCitizenDTOS, 1, 1, 1, 1);
@@ -1474,7 +1475,7 @@ class InitiativeServiceTest {
         EncryptedCfDTO encryptedCfDTO = new EncryptedCfDTO(USER_ID);
         Mockito.when(encryptRestConnector.upsertToken(Mockito.any())).thenReturn(encryptedCfDTO);
         Mockito.when(initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(ORGANIZATION_ID, INITIATIVE_ID, true)).thenReturn(Optional.of(initiative));
-        Mockito.when(onboardingRestConnector.getOnboarding(INITIATIVE_ID, null, USER_ID, STARTDATE, ENDDATE, STATUS)).thenReturn(onboardingDTO);
+        Mockito.when(onboardingRestConnector.getOnboarding(INITIATIVE_ID, null, USER_ID,STARTDATE, ENDDATE, STATUS)).thenReturn(onboardingDTO);
         Mockito.when(decryptRestConnector.getPiiByToken(USER_ID)).thenReturn(decryptCfDTO);
         OnboardingDTO onboardingDTO1 = initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID, CF, STARTDATE, ENDDATE, STATUS, null);
         assertEquals(CF,onboardingDTO1.getContent().get(0).getBeneficiary());
@@ -1500,7 +1501,7 @@ class InitiativeServiceTest {
     @Test
     void getOnboardingStatusList_ko_decrypt() {
         Initiative initiative = this.createFullInitiative();
-        OnboardingStatusCitizenDTO onboardingStatusCitizenDTO = new OnboardingStatusCitizenDTO(USER_ID, STATUS, LocalDateTime.now().toString(), null);
+        OnboardingStatusCitizenDTO onboardingStatusCitizenDTO = new OnboardingStatusCitizenDTO(USER_ID, STATUS, Instant.now(clock).toString(), null);
         List<OnboardingStatusCitizenDTO> onboardingStatusCitizenDTOS = new ArrayList<>();
         onboardingStatusCitizenDTOS.add(onboardingStatusCitizenDTO);
         ResponseOnboardingDTO onboardingDTO = new ResponseOnboardingDTO(onboardingStatusCitizenDTOS, 1, 1, 1, 1);
@@ -1795,10 +1796,10 @@ class InitiativeServiceTest {
         initiativeGeneral.setBeneficiaryKnown(beneficiaryKnown);
         initiativeGeneral.setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF);
         initiativeGeneral.setBudgetCents(100000000000L);
-        initiativeGeneral.setEndDate(LocalDate.of(2022, 9, 8));
-        initiativeGeneral.setStartDate(LocalDate.of(2022, 8, 8));
-        initiativeGeneral.setRankingStartDate(LocalDate.of(2022, 9, 18));
-        initiativeGeneral.setRankingEndDate(LocalDate.of(2022, 8, 18));
+        initiativeGeneral.setEndDate(LocalDate.of(2022, 9, 8).atStartOfDay().atZone(ZoneId.of("Europe/Rome")).toInstant());
+        initiativeGeneral.setStartDate(LocalDate.of(2022, 8, 8).plusDays(1).atStartOfDay().minusNanos(1).atZone(ZoneId.of("Europe/Rome")).toInstant());
+        initiativeGeneral.setRankingStartDate(LocalDate.of(2022, 9, 18).atStartOfDay().atZone(ZoneId.of("Europe/Rome")).toInstant());
+        initiativeGeneral.setRankingEndDate(LocalDate.of(2022, 8, 18).plusDays(1).atStartOfDay().minusNanos(1).atZone(ZoneId.of("Europe/Rome")).toInstant());
         initiativeGeneral.setDescriptionMap(language);
         return initiativeGeneral;
     }
@@ -1811,10 +1812,10 @@ class InitiativeServiceTest {
         initiativeGeneral.setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.NF);
         initiativeGeneral.setFamilyUnitComposition(InitiativeConstants.FamilyUnitCompositionConstant.INPS);
         initiativeGeneral.setBudgetCents(100000000000L);
-        initiativeGeneral.setEndDate(LocalDate.of(2022, 9, 8));
-        initiativeGeneral.setStartDate(LocalDate.of(2022, 8, 8));
-        initiativeGeneral.setRankingStartDate(LocalDate.of(2022, 9, 18));
-        initiativeGeneral.setRankingEndDate(LocalDate.of(2022, 8, 18));
+        initiativeGeneral.setEndDate(LocalDate.of(2022, 9, 8).atStartOfDay().atZone(ZoneId.of("Europe/Rome")).toInstant());
+        initiativeGeneral.setStartDate(LocalDate.of(2022, 8, 8).plusDays(1).atStartOfDay().minusNanos(1).atZone(ZoneId.of("Europe/Rome")).toInstant());
+        initiativeGeneral.setRankingStartDate(LocalDate.of(2022, 9, 18).atStartOfDay().atZone(ZoneId.of("Europe/Rome")).toInstant());
+        initiativeGeneral.setRankingEndDate(LocalDate.of(2022, 8, 18).plusDays(1).atStartOfDay().minusNanos(1).atZone(ZoneId.of("Europe/Rome")).toInstant());
         initiativeGeneral.setDescriptionMap(language);
         return initiativeGeneral;
     }
@@ -1854,10 +1855,10 @@ class InitiativeServiceTest {
         initiativeGeneralDTO.setBeneficiaryKnown(beneficiaryKnown);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
-        LocalDate rankingStartDate = LocalDate.now();
-        LocalDate rankingEndDate = rankingStartDate.plusDays(1);
-        LocalDate startDate = rankingEndDate.plusDays(1);
-        LocalDate endDate = startDate.plusDays(1);
+        Instant rankingStartDate = Instant.now(clock);
+        Instant rankingEndDate = rankingStartDate.plus(1,ChronoUnit.DAYS);
+        Instant startDate = rankingEndDate.plus(1, ChronoUnit.DAYS);
+        Instant endDate = startDate.plus(1, ChronoUnit.DAYS);
         initiativeGeneralDTO.setRankingStartDate(rankingStartDate);
         initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
         initiativeGeneralDTO.setStartDate(startDate);
@@ -2068,16 +2069,16 @@ class InitiativeServiceTest {
         initiativeDetailDTO.setInitiativeName("TEST");
         initiativeDetailDTO.setStatus("APPROVED");
         initiativeDetailDTO.setDescription("test test");
-        initiativeDetailDTO.setOnboardingStartDate(LocalDate.now().minusDays(25));
-        initiativeDetailDTO.setOnboardingEndDate(LocalDate.now());
-        initiativeDetailDTO.setFruitionStartDate(LocalDate.now());
-        initiativeDetailDTO.setFruitionEndDate(LocalDate.now().plusDays(40));
+        initiativeDetailDTO.setOnboardingStartDate(Instant.now(clock).minus(25, ChronoUnit.DAYS));
+        initiativeDetailDTO.setOnboardingEndDate(Instant.now(clock));
+        initiativeDetailDTO.setFruitionStartDate(Instant.now(clock));
+        initiativeDetailDTO.setFruitionEndDate(Instant.now(clock).plus(40, ChronoUnit.DAYS));
         initiativeDetailDTO.setRewardRule(createRewardRuleDTO(false));
         initiativeDetailDTO.setRefundRule(null);
         initiativeDetailDTO.setPrivacyLink("privacy.it");
         initiativeDetailDTO.setTcLink("tc.it");
         initiativeDetailDTO.setLogoURL("logo.png");
-        initiativeDetailDTO.setUpdateDate(LocalDateTime.now());
+        initiativeDetailDTO.setUpdateDate(Instant.now(clock));
         initiativeDetailDTO.setServiceId("SERVICE_ID");
         return initiativeDetailDTO;
     }
