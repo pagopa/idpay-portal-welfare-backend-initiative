@@ -43,6 +43,7 @@ import java.time.Instant;
 import java.time.LocalTime;
 import java.time.Clock;
 import java.time.ZoneOffset;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
@@ -426,23 +427,55 @@ class InitiativeDTOsToModelMapperTest {
     private InitiativeGeneral createInitiativeGeneral() {
         Map<String, String> language = new HashMap<>();
         language.put(Locale.ITALIAN.getLanguage(), "it");
+
         InitiativeGeneral initiativeGeneral = new InitiativeGeneral();
         initiativeGeneral.setBeneficiaryBudgetCents(1000L);
         initiativeGeneral.setBeneficiaryBudgetMaxCents(1000L);
         initiativeGeneral.setBeneficiaryKnown(true);
         initiativeGeneral.setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF);
         initiativeGeneral.setBudgetCents(100000000000L);
+
         Instant rankingStartDate = Instant.now(fixedClock);
         Instant rankingEndDate = rankingStartDate.plus(1, ChronoUnit.DAYS);
-        Instant startDate = rankingEndDate.plus(1,ChronoUnit.DAYS);
-        Instant endDate = startDate.plus(1,ChronoUnit.DAYS);
-        initiativeGeneral.setRankingStartDate(rankingStartDate);
-        initiativeGeneral.setRankingEndDate(rankingEndDate);
-        initiativeGeneral.setStartDate(startDate);
-        initiativeGeneral.setEndDate(endDate);
+        Instant startDate = rankingEndDate.plus(1, ChronoUnit.DAYS);
+        Instant endDate = startDate.plus(1, ChronoUnit.DAYS);
+
+        ZoneId zoneId = ZoneId.of("Europe/Rome");
+
+        initiativeGeneral.setRankingStartDate(
+                rankingStartDate.atZone(zoneId)
+                        .toLocalDate()
+                        .atStartOfDay(zoneId)
+                        .toInstant()
+        );
+
+        initiativeGeneral.setRankingEndDate(
+                rankingEndDate.atZone(zoneId)
+                        .toLocalDate()
+                        .atTime(LocalTime.MAX)
+                        .atZone(zoneId)
+                        .toInstant()
+        );
+
+        initiativeGeneral.setStartDate(
+                startDate.atZone(zoneId)
+                        .toLocalDate()
+                        .atStartOfDay(zoneId)
+                        .toInstant()
+        );
+
+        initiativeGeneral.setEndDate(
+                endDate.atZone(zoneId)
+                        .toLocalDate()
+                        .atTime(LocalTime.MAX)
+                        .atZone(zoneId)
+                        .toInstant()
+        );
+
         initiativeGeneral.setDescriptionMap(language);
         return initiativeGeneral;
     }
+
 
     private InitiativeAdditional createInitiativeAdditional() {
         InitiativeAdditional initiativeAdditional = new InitiativeAdditional();
