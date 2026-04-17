@@ -1791,7 +1791,6 @@ class InitiativeServiceTest {
         Map<String, String> language = new HashMap<>();
         language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneral initiativeGeneral = new InitiativeGeneral();
-        initiativeGeneral.setBeneficiaryBudgetCents(1000L);
         initiativeGeneral.setBeneficiaryKnown(beneficiaryKnown);
         initiativeGeneral.setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF);
         initiativeGeneral.setBudgetCents(100000000000L);
@@ -1806,7 +1805,6 @@ class InitiativeServiceTest {
         Map<String, String> language = new HashMap<>();
         language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneral initiativeGeneral = new InitiativeGeneral();
-        initiativeGeneral.setBeneficiaryBudgetCents(1000L);
         initiativeGeneral.setBeneficiaryKnown(true);
         initiativeGeneral.setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.NF);
         initiativeGeneral.setFamilyUnitComposition(InitiativeConstants.FamilyUnitCompositionConstant.INPS);
@@ -1850,7 +1848,6 @@ class InitiativeServiceTest {
         Map<String, String> language = new HashMap<>();
         language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
-        initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(beneficiaryKnown);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
