@@ -1,6 +1,5 @@
 package it.gov.pagopa.initiative.controller;
 
-<<<<<<< UPBE-682-design-review-verifica-gestione-isee_analisi
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest.INITIATIVE_INVALID_LOCALE_FORMAT;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest.INITIATIVE_ROLLBACK_TO_PREVIOUS_STATUS;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_VALID;
@@ -26,10 +25,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-=======
->>>>>>> develop
 import feign.FeignException;
 import feign.Request;
 import feign.RequestTemplate;
@@ -38,7 +33,6 @@ import it.gov.pagopa.common.web.dto.ErrorDTO;
 import it.gov.pagopa.common.web.exception.ClientExceptionWithBody;
 import it.gov.pagopa.initiative.config.ServiceExceptionConfig;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
-<<<<<<< UPBE-682-design-review-verifica-gestione-isee_analisi
 import it.gov.pagopa.initiative.dto.AnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems;
 import it.gov.pagopa.initiative.dto.AutomatedCriteriaDTO;
 import it.gov.pagopa.initiative.dto.BeneficiaryRankingPageDTO;
@@ -58,9 +52,6 @@ import it.gov.pagopa.initiative.dto.OnboardingDTO;
 import it.gov.pagopa.initiative.dto.OrganizationDTO;
 import it.gov.pagopa.initiative.dto.SelfCriteriaBoolDTO;
 import it.gov.pagopa.initiative.dto.SelfCriteriaMultiDTO;
-=======
-import it.gov.pagopa.initiative.dto.*;
->>>>>>> develop
 import it.gov.pagopa.initiative.dto.rule.refund.AccumulatedAmountDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.RefundAdditionalInfoDTO;
@@ -68,12 +59,26 @@ import it.gov.pagopa.initiative.dto.rule.refund.TimeParameterDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardGroupsDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardValueDTO;
-import it.gov.pagopa.initiative.dto.rule.trx.*;
+import it.gov.pagopa.initiative.dto.rule.trx.DayOfWeekDTO;
+import it.gov.pagopa.initiative.dto.rule.trx.InitiativeTrxConditionsDTO;
+import it.gov.pagopa.initiative.dto.rule.trx.MccFilterDTO;
+import it.gov.pagopa.initiative.dto.rule.trx.RewardLimitsDTO;
+import it.gov.pagopa.initiative.dto.rule.trx.ThresholdDTO;
+import it.gov.pagopa.initiative.dto.rule.trx.TrxCountDTO;
 import it.gov.pagopa.initiative.exception.custom.InitiativeStatusNotValidException;
 import it.gov.pagopa.initiative.exception.custom.OrgPermissionException;
 import it.gov.pagopa.initiative.mapper.InitiativeDTOsToModelMapper;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
-import it.gov.pagopa.initiative.model.*;
+import it.gov.pagopa.initiative.model.AutomatedCriteria;
+import it.gov.pagopa.initiative.model.Channel;
+import it.gov.pagopa.initiative.model.FilterOperatorEnumModel;
+import it.gov.pagopa.initiative.model.ISelfDeclarationCriteria;
+import it.gov.pagopa.initiative.model.Initiative;
+import it.gov.pagopa.initiative.model.InitiativeAdditional;
+import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
+import it.gov.pagopa.initiative.model.InitiativeGeneral;
+import it.gov.pagopa.initiative.model.SelfCriteriaBool;
+import it.gov.pagopa.initiative.model.SelfCriteriaMulti;
 import it.gov.pagopa.initiative.model.TypeBoolEnum;
 import it.gov.pagopa.initiative.model.TypeMultiEnum;
 import it.gov.pagopa.initiative.model.rule.refund.AccumulatedAmount;
@@ -82,7 +87,6 @@ import it.gov.pagopa.initiative.model.rule.refund.InitiativeRefundRule;
 import it.gov.pagopa.initiative.model.rule.refund.TimeParameter;
 import it.gov.pagopa.initiative.service.InitiativeService;
 import it.gov.pagopa.initiative.service.OrganizationService;
-<<<<<<< UPBE-682-design-review-verifica-gestione-isee_analisi
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -101,23 +105,16 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.IntStream;
-=======
->>>>>>> develop
 import org.apache.kafka.common.KafkaException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-<<<<<<< UPBE-682-design-review-verifica-gestione-isee_analisi
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-=======
 import org.springframework.boot.security.autoconfigure.SecurityAutoConfiguration;
 import org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
->>>>>>> develop
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -126,38 +123,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-<<<<<<< UPBE-682-design-review-verifica-gestione-isee_analisi
-=======
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import tools.jackson.databind.ObjectMapper;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.*;
-import java.util.stream.IntStream;
-
-import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest.INITIATIVE_INVALID_LOCALE_FORMAT;
-import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.ErrorDtoDefaultMsg.ACCUMULATED_AMOUNT_TYPE;
-import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.ErrorDtoDefaultMsg.SOMETHING_WRONG_WITH_THE_REFUND_TYPE;
-import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.ADMIN;
-import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.PAGOPA_ADMIN;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
->>>>>>> develop
 
 @TestPropertySource(
         locations = "classpath:application.yml",
@@ -167,15 +133,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
                 "app.initiative.conditions.notifyInternal=true",
                 "app.initiative.ranking.gracePeriod=10"
         })
-<<<<<<< UPBE-682-design-review-verifica-gestione-isee_analisi
 @WebMvcTest(
         value = {InitiativeApi.class, ServiceExceptionConfig.class},
-        excludeAutoConfiguration = SecurityAutoConfiguration.class)
-=======
-@WebMvcTest(value = {
-        InitiativeApi.class, ServiceExceptionConfig.class}, excludeAutoConfiguration = { UserDetailsServiceAutoConfiguration .class , SecurityAutoConfiguration.class})
+        excludeAutoConfiguration = {
+                SecurityAutoConfiguration.class,
+                UserDetailsServiceAutoConfiguration.class
+        })
 @AutoConfigureMockMvc(addFilters = false)
->>>>>>> develop
 class InitiativeApiTest {
 
     private static final String INITIATIVE_ID = "Id1";
@@ -189,7 +153,6 @@ class InitiativeApiTest {
     private static final String API_KEY_CLIENT_ID = "apiKeyClientId";
     private static final String API_KEY_CLIENT_ASSERTION = "apiKeyClientAssertion";
 
-<<<<<<< UPBE-682-design-review-verifica-gestione-isee_analisi
     private static final String GET_INITIATIVES_SUMMARY_URL = "/organization/%s/initiative/summary";
     private static final String GET_INITIATIVES_ISSUER = "/initiatives";
     private static final String GET_INITIATIVES_MIL = "/mil/initiatives";
@@ -225,24 +188,6 @@ class InitiativeApiTest {
 
     @Autowired
     private InitiativeApiController initiativeApiController;
-=======
-    @MockitoBean
-    InitiativeService initiativeService;
-    @MockitoBean
-    OrganizationService organizationService;
-
-    @Autowired
-    InitiativeApiController initiativeApiController;
-
-    @MockitoBean
-    InitiativeModelToDTOMapper initiativeModelToDTOMapper;
-
-    @MockitoBean
-    InitiativeDTOsToModelMapper initiativeDTOsToModelMapper;
-
-    @MockitoBean
-    InitiativeGeneralDTO initiativeGeneralDTO;
->>>>>>> develop
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -250,10 +195,6 @@ class InitiativeApiTest {
     @Autowired
     private MockMvc mvc;
 
-    @BeforeEach
-    void setUp() {
-        objectMapper.registerModule(new JavaTimeModule());
-    }
 
     @ParameterizedTest
     @ValueSource(strings = {PAGOPA_ADMIN, ADMIN})
@@ -264,7 +205,6 @@ class InitiativeApiTest {
         when(initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, role)).thenReturn(initiatives);
         when(initiativeModelToDTOMapper.toInitiativeSummaryDTOList(initiatives)).thenReturn(summaryDTOs);
 
-<<<<<<< UPBE-682-design-review-verifica-gestione-isee_analisi
         mvc.perform(
                         get(BASE_URL + String.format(GET_INITIATIVES_SUMMARY_URL, ORGANIZATION_ID))
                                 .queryParam("role", role)
@@ -273,31 +213,6 @@ class InitiativeApiTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(summaryDTOs)))
                 .andDo(print());
-=======
-        // When
-        List<Initiative> retrieveInitiativeSummary = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, role);
-        when(initiativeModelToDTOMapper.toInitiativeSummaryDTOList(retrieveInitiativeSummary)).thenReturn(initiativeSummaryDTOs);
-        // Then
-        // you are expecting service to return whatever returned by repo
-        assertThat("Reason of result", retrieveInitiativeSummary, is(sameInstance(initiatives)));
-
-        mvc.perform(
-                        MockMvcRequestBuilders.get(BASE_URL + String.format(GET_INITIATIVES_SUMMARY_URL, ORGANIZATION_ID))
-                                .queryParam("role",role)
-                                .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().json("[{\"initiativeId\":\"initiativeId\",\"initiativeName\":\"initiativeName\",\"status\":\"PUBLISHED\"},{\"initiativeId\":\"initiativeId\",\"initiativeName\":\"initiativeName\",\"status\":\"PUBLISHED\"}]"))
-                .andDo(print())
-                .andReturn();
-    }
-
-    private InitiativeSummaryDTO createStep1InitiativeSummaryDTO() {
-        return InitiativeSummaryDTO.builder()
-                .initiativeId("initiativeId")
-                .initiativeName("initiativeName")
-                .status(InitiativeConstants.Status.PUBLISHED)
-                .build();
->>>>>>> develop
     }
 
     @Test
@@ -405,21 +320,9 @@ class InitiativeApiTest {
 
     @Test
     void saveInitiativeServiceInfo_statusCreated() throws Exception {
-<<<<<<< UPBE-682-design-review-verifica-gestione-isee_analisi
         Initiative initiative = createStep1Initiative();
         InitiativeAdditionalDTO request = createStep1InitiativeAdditionalDTO();
         InitiativeDTO responseDto = createStep1InitiativeDTO();
-=======
-        //objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
-        //create Dummy Initiative
-        Initiative step1Initiative = createStep1Initiative();
-
-        InitiativeAdditionalDTO initiativeAdditionalDTO = createStep1InitiativeAdditionalDTO();
-
-        // Instruct the Service to insert a Dummy Initiative
-        when(initiativeService.insertInitiative(step1Initiative, ORGANIZATION_ID, ORGANIZATION_NAME, ROLE)).thenReturn(step1Initiative);
->>>>>>> develop
 
         when(initiativeDTOsToModelMapper.toInitiative(request)).thenReturn(initiative);
         when(initiativeService.insertInitiative(initiative, ORGANIZATION_ID, ORGANIZATION_NAME, ROLE)).thenReturn(initiative);
@@ -436,20 +339,9 @@ class InitiativeApiTest {
 
     @Test
     void saveInitiativeServiceInfo_WebUrlContactValid() throws Exception {
-<<<<<<< UPBE-682-design-review-verifica-gestione-isee_analisi
         Initiative initiative = createStep1Initiative();
         initiative.getAdditionalInfo().getChannels().get(0).setType(Channel.TypeEnum.WEB);
         initiative.getAdditionalInfo().getChannels().get(0).setContact("https://www.google.it");
-=======
-
-        Initiative step1Initiative = createStep1Initiative();
-        step1Initiative.getAdditionalInfo().getChannels().get(0).setType(Channel.TypeEnum.WEB);
-        step1Initiative.getAdditionalInfo().getChannels().get(0).setContact("https://www.google.it");
-
-        InitiativeAdditionalDTO initiativeAdditionalDTO = createStep1InitiativeAdditionalDTO();
-        initiativeAdditionalDTO.getChannels().get(0).setType(ChannelDTO.TypeEnum.WEB);
-        initiativeAdditionalDTO.getChannels().get(0).setContact("https://www.google.it");
->>>>>>> develop
 
         InitiativeAdditionalDTO request = createStep1InitiativeAdditionalDTO();
         request.getChannels().get(0).setType(ChannelDTO.TypeEnum.WEB);
@@ -470,17 +362,9 @@ class InitiativeApiTest {
 
     @Test
     void saveInitiativeServiceInfo_WebUrlContactNotValid() throws Exception {
-<<<<<<< UPBE-682-design-review-verifica-gestione-isee_analisi
         InitiativeAdditionalDTO request = createStep1InitiativeAdditionalDTO();
         request.getChannels().get(0).setType(ChannelDTO.TypeEnum.WEB);
         request.getChannels().get(0).setContact("http://www.google.it");
-=======
-
-
-        InitiativeAdditionalDTO initiativeAdditionalDTO = createStep1InitiativeAdditionalDTO();
-        initiativeAdditionalDTO.getChannels().get(0).setType(ChannelDTO.TypeEnum.WEB);
-        initiativeAdditionalDTO.getChannels().get(0).setContact("http://www.google.it");
->>>>>>> develop
 
         mvc.perform(
                         post(BASE_URL + String.format(POST_INITIATIVE_ADDITIONAL_INFO_URL, ORGANIZATION_ID))
@@ -493,20 +377,8 @@ class InitiativeApiTest {
 
     @Test
     void updateInitiativeGeneralInfo_statusNoContent() throws Exception {
-<<<<<<< UPBE-682-design-review-verifica-gestione-isee_analisi
         Initiative initiative = createStep2Initiative(false);
         InitiativeGeneralDTO request = createInitiativeGeneralDTO(false);
-=======
-
-
-        Boolean beneficiaryKnown = false;
-        //create Dummy Initiative
-        Initiative step2Initiative = createStep2Initiative(beneficiaryKnown);
-        InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralDTO(beneficiaryKnown);
-
-        // Instruct the Service to update a Dummy Initiative
-        when(initiativeDTOsToModelMapper.toInitiative(initiativeGeneralDTO)).thenReturn(step2Initiative);
->>>>>>> develop
 
         when(initiativeDTOsToModelMapper.toInitiative(any(InitiativeGeneralDTO.class))).thenReturn(initiative);
         doNothing().when(initiativeService).updateInitiativeGeneralInfo(ORGANIZATION_ID, INITIATIVE_ID, initiative, ROLE, false);
@@ -522,19 +394,8 @@ class InitiativeApiTest {
 
     @Test
     void updateInitiativeAdditionalInfo_statusNoContent() throws Exception {
-<<<<<<< UPBE-682-design-review-verifica-gestione-isee_analisi
         Initiative initiative = createStep1Initiative();
         InitiativeAdditionalDTO request = createInitiativeAdditionalDTO();
-=======
-
-
-        //create Dummy Initiative
-        Initiative step1Initiative = createStep1Initiative();
-        InitiativeAdditionalDTO initiativeAdditionalDTO = createInitiativeAdditionalDTO();
-
-        // Instruct the Service to update a Dummy Initiative
-        when(initiativeDTOsToModelMapper.toInitiative(initiativeAdditionalDTO)).thenReturn(step1Initiative);
->>>>>>> develop
 
         when(initiativeDTOsToModelMapper.toInitiative(request)).thenReturn(initiative);
         doNothing().when(initiativeService).updateInitiativeAdditionalInfo(ORGANIZATION_ID, INITIATIVE_ID, initiative, ROLE);
@@ -550,19 +411,8 @@ class InitiativeApiTest {
 
     @Test
     void updateInitiativeGeneralInfoDraft_statusNoContent() throws Exception {
-<<<<<<< UPBE-682-design-review-verifica-gestione-isee_analisi
         Initiative initiative = createStep2Initiative(false);
         InitiativeGeneralDTO request = createInitiativeGeneralDTO(false);
-=======
-
-
-        //create Dummy Initiative
-        Initiative step1Initiative = createStep1Initiative();
-        InitiativeAdditionalDTO initiativeAdditionalDTO = createInitiativeAdditionalDTO();
-
-        // Instruct the Service to update a Dummy Initiative
-        when(initiativeDTOsToModelMapper.toInitiative(initiativeAdditionalDTO)).thenReturn(step1Initiative);
->>>>>>> develop
 
         when(initiativeDTOsToModelMapper.toInitiative(request)).thenReturn(initiative);
         doNothing().when(initiativeService).updateInitiativeGeneralInfo(ORGANIZATION_ID, INITIATIVE_ID, initiative, ROLE, true);
@@ -578,7 +428,6 @@ class InitiativeApiTest {
 
     @Test
     void updateInitiativeBeneficiary_statusNoContent() throws Exception {
-<<<<<<< UPBE-682-design-review-verifica-gestione-isee_analisi
         Initiative initiative = createStep2Initiative(false);
         InitiativeBeneficiaryRule rule = createInitiativeBeneficiaryRule();
         InitiativeBeneficiaryRuleDTO request = createInitiativeBeneficiaryRuleDTO();
@@ -586,40 +435,6 @@ class InitiativeApiTest {
         when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(initiative);
         when(initiativeDTOsToModelMapper.toBeneficiaryRule(any(InitiativeBeneficiaryRuleDTO.class))).thenReturn(rule);
         doNothing().when(initiativeService).updateStep3InitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, rule, ROLE, false);
-=======
-
-
-        InitiativeBeneficiaryRule initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
-        Boolean beneficiaryKnown = false;
-        //create Dummy Initiative
-        Initiative step2Initiative = createStep2Initiative(beneficiaryKnown);
-        InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
-        initiativeBeneficiaryRuleDTO.setOrganizationName(ORGANIZATION_NAME);
-        initiativeBeneficiaryRuleDTO.setOrganizationUserRole(ROLE);
-
-        // Instruct the Service to insert a Dummy Initiative
-        when(initiativeDTOsToModelMapper.toBeneficiaryRule(initiativeBeneficiaryRuleDTO)).thenReturn(initiativeBeneficiaryRule);
-
-        // Instruct the Service to get a Dummy Initiative
-        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step2Initiative);
-
-        //doNothing only for Void method
-        doNothing().when(initiativeService).updateStep3InitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule, ROLE, false);
-
-        // Base test
-        mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_BENEFICIARY_RULES_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(initiativeBeneficiaryRuleDTO))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNoContent())
-                .andDo(print())
-                .andReturn();
-    }
-
-    //@Test
-    void updateInitiativeBeneficiaryISEEandNumber_statusNoContent() throws Exception {
-
->>>>>>> develop
 
         mvc.perform(
                         put(BASE_URL + String.format(PUT_INITIATIVE_BENEFICIARY_RULES_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
@@ -631,25 +446,9 @@ class InitiativeApiTest {
     }
 
     @Test
-<<<<<<< UPBE-682-design-review-verifica-gestione-isee_analisi
     void updateInitiativeBeneficiary_statusBadRequest_whenBeneficiaryKnown() throws Exception {
         Initiative initiative = createStep2Initiative(true);
         InitiativeBeneficiaryRuleDTO request = createInitiativeBeneficiaryRuleDTO();
-=======
-    void updateInitiativeBeneficiary_statusBadRequest() throws Exception {
-
-
-        InitiativeBeneficiaryRule initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
-        Boolean beneficiaryKnown = true;
-        //create Dummy Initiative
-        Initiative step2Initiative = createStep2Initiative(beneficiaryKnown);
-        InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
-        initiativeBeneficiaryRuleDTO.setOrganizationName(ORGANIZATION_NAME);
-        initiativeBeneficiaryRuleDTO.setOrganizationUserRole(ROLE);
-
-        // Instruct the Service to insert a Dummy Initiative
-        when(initiativeDTOsToModelMapper.toBeneficiaryRule(initiativeBeneficiaryRuleDTO)).thenReturn(initiativeBeneficiaryRule);
->>>>>>> develop
 
         when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(initiative);
 
@@ -664,13 +463,9 @@ class InitiativeApiTest {
 
     @Test
     void updateInitiativeBeneficiary_statusBadRequest_notValidCodeWithISEEInput() throws Exception {
-<<<<<<< UPBE-682-design-review-verifica-gestione-isee_analisi
         Initiative initiative = createStep2Initiative(false);
         InitiativeBeneficiaryRuleDTO request = createInitiativeBeneficiaryRuleDTO();
         request.getAutomatedCriteria().get(0).setCode("ISEE");
-=======
-
->>>>>>> develop
 
         when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(initiative);
 
@@ -685,19 +480,8 @@ class InitiativeApiTest {
 
     @Test
     void updateTrxAndRewardRules_statusNoContent() throws Exception {
-<<<<<<< UPBE-682-design-review-verifica-gestione-isee_analisi
         Initiative initiative = createStep1Initiative();
         InitiativeRewardAndTrxRulesDTO request = createInitiativeRewardAndTrxRulesDTO();
-=======
-
-
-        //create Dummy Initiative
-        Initiative step1Initiative = createStep1Initiative();
-        InitiativeRewardAndTrxRulesDTO rewardAndTrxRulesDTO = createInitiativeRewardAndTrxRulesDTO();
-
-        // Instruct the Service to update a Dummy Initiative
-        when(initiativeDTOsToModelMapper.toInitiative(rewardAndTrxRulesDTO)).thenReturn(step1Initiative);
->>>>>>> develop
 
         when(initiativeDTOsToModelMapper.toInitiative(request)).thenReturn(initiative);
         doNothing().when(initiativeService).updateTrxAndRewardRules(ORGANIZATION_ID, INITIATIVE_ID, initiative, ROLE, false);
@@ -713,19 +497,8 @@ class InitiativeApiTest {
 
     @Test
     void updateTrxAndRewardRulesDraft_statusNoContent() throws Exception {
-<<<<<<< UPBE-682-design-review-verifica-gestione-isee_analisi
         Initiative initiative = createStep1Initiative();
         InitiativeRewardAndTrxRulesDTO request = createInitiativeRewardAndTrxRulesDTO();
-=======
-
-
-        //create Dummy Initiative
-        Initiative step1Initiative = createStep1Initiative();
-        InitiativeRewardAndTrxRulesDTO rewardAndTrxRulesDTO = createInitiativeRewardAndTrxRulesDTO();
-
-        // Instruct the Service to update a Dummy Initiative
-        when(initiativeDTOsToModelMapper.toInitiative(rewardAndTrxRulesDTO)).thenReturn(step1Initiative);
->>>>>>> develop
 
         when(initiativeDTOsToModelMapper.toInitiative(request)).thenReturn(initiative);
         doNothing().when(initiativeService).updateTrxAndRewardRules(ORGANIZATION_ID, INITIATIVE_ID, initiative, ROLE, true);
@@ -741,14 +514,7 @@ class InitiativeApiTest {
 
     @Test
     void updateInitiativeRefundRule_statusNoContent() throws Exception {
-<<<<<<< UPBE-682-design-review-verifica-gestione-isee_analisi
         InitiativeRefundRuleDTO request = createRefundRuleDTOValidWithAccumulatedAmount();
-=======
-
-
-        InitiativeRefundRuleDTO refundRuleDTO = createRefundRuleDTOValidWithAccumulatedAmount();
-
->>>>>>> develop
         Initiative initiative = createInitiativeOnlyRefundRule();
 
         when(initiativeDTOsToModelMapper.toInitiative(request)).thenReturn(initiative);
@@ -765,14 +531,7 @@ class InitiativeApiTest {
 
     @Test
     void updateRefundRule_PUT_whenInitiativeUnprocessableForStatusNotValid_then400isRaisedForInitiativeException() throws Exception {
-<<<<<<< UPBE-682-design-review-verifica-gestione-isee_analisi
         InitiativeRefundRuleDTO request = createRefundRuleDTOValidWithAccumulatedAmount();
-=======
-
-
-        InitiativeRefundRuleDTO refundRuleDTO = createRefundRuleDTOValidWithAccumulatedAmount();
-
->>>>>>> develop
         Initiative initiative = createInitiativeOnlyRefundRule();
 
         when(initiativeDTOsToModelMapper.toInitiative(request)).thenReturn(initiative);
@@ -793,14 +552,7 @@ class InitiativeApiTest {
 
     @Test
     void updateInitiativeRefundRuleDraft_statusNoContent() throws Exception {
-<<<<<<< UPBE-682-design-review-verifica-gestione-isee_analisi
         InitiativeRefundRuleDTO request = createRefundRuleDTOValidWithAccumulatedAmount();
-=======
-
-
-        InitiativeRefundRuleDTO refundRuleDTO = createRefundRuleDTOValidWithAccumulatedAmount();
-
->>>>>>> develop
         Initiative initiative = createInitiativeOnlyRefundRule();
 
         when(initiativeDTOsToModelMapper.toInitiative(request)).thenReturn(initiative);
@@ -817,21 +569,8 @@ class InitiativeApiTest {
 
     @Test
     void updateInitiativeBeneficiaryDraft_statusNoContent() throws Exception {
-<<<<<<< UPBE-682-design-review-verifica-gestione-isee_analisi
         InitiativeBeneficiaryRuleDTO request = createInitiativeBeneficiaryRuleDTO();
         InitiativeBeneficiaryRule rule = createInitiativeBeneficiaryRule();
-=======
-
-
-        InitiativeBeneficiaryRule initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
-        Boolean beneficiaryKnown = false;
-        //create Dummy Initiative
-        createStep2Initiative(beneficiaryKnown);
-        InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
-
-        // Instruct the Service to insert a Dummy Initiative
-        when(initiativeDTOsToModelMapper.toBeneficiaryRule(initiativeBeneficiaryRuleDTO)).thenReturn(initiativeBeneficiaryRule);
->>>>>>> develop
 
         when(initiativeDTOsToModelMapper.toBeneficiaryRule(request)).thenReturn(rule);
         doNothing().when(initiativeService).updateStep3InitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, rule, ROLE, true);
