@@ -1,6 +1,5 @@
 package it.gov.pagopa.initiative.repository;
 
-import it.gov.pagopa.common.mongo.singleinstance.AutoConfigureSingleInstanceMongodb;
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.OrganizationDTO;
 import it.gov.pagopa.initiative.model.Initiative;
@@ -10,8 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.boot.data.mongodb.test.autoconfigure.DataMongoTest;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -20,11 +18,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.IntStream;
 
-@DataMongoTest
-@TestPropertySource(properties = {
-        "de.flapdoodle.mongodb.embedded.version=4.2.24",
+@DataMongoTest(properties = {
+        "spring.data.mongodb.database=test",
+        "spring.data.mongodb.port=0",
+        "de.flapdoodle.mongodb.embedded.version=4.2.24"
 })
-@AutoConfigureSingleInstanceMongodb
 class InitiativeRepositoryExtendedImplTest {
 
     private static final int DATA_LIST_SIZE = 4;
