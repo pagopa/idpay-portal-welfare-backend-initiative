@@ -5,7 +5,7 @@ import org.bson.UuidRepresentation;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
@@ -23,7 +23,7 @@ class MongoDBConfigTest {
     @Autowired
     private MongoDBConfig mongoDBConfig;
 
-    @MockBean
+    @MockitoBean
     private MongoDatabaseFactory mongoDatabaseFactory;
 
     @Test
