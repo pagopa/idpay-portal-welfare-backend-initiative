@@ -139,21 +139,21 @@ public class InitiativeDTOsToModelMapper {
                                 .build();
                     } else if (dto instanceof SelfCriteriaMultiDTO selfCriteriaMultiDTO) {
                         return SelfCriteriaMulti.builder()
-                                .type(TypeMultiEnum.valueOf(selfCriteriaMultiDTO.getType().name()))
+                                ._type(TypeMultiEnum.valueOf(selfCriteriaMultiDTO.getType().name()))
                                 .code(selfCriteriaMultiDTO.getCode())
                                 .description(selfCriteriaMultiDTO.getDescription())
                                 .value(selfCriteriaMultiDTO.getValue())
                                 .build();
                     } else if (dto instanceof SelfCriteriaTextDTO selfCriteriaTextDTO) {
                         return SelfCriteriaText.builder()
-                                .type(TypeTextEnum.valueOf(selfCriteriaTextDTO.getType().name()))
+                                ._type(TypeTextEnum.valueOf(selfCriteriaTextDTO.getType().name()))
                                 .code(selfCriteriaTextDTO.getCode())
                                 .description(selfCriteriaTextDTO.getDescription())
                                 .value(selfCriteriaTextDTO.getValue())
                                 .build();
                     }else if (dto instanceof SelfCriteriaMultiConsentDTO selfCriteriaMultiConsentDTO) {
                         return SelfCriteriaMultiConsent.builder()
-                                .type(TypeMultiConsentEnum.valueOf(selfCriteriaMultiConsentDTO.getType().name()))
+                                ._type(TypeMultiConsentEnum.valueOf(selfCriteriaMultiConsentDTO.getType().name()))
                                 .code(selfCriteriaMultiConsentDTO.getCode())
                                 .description(selfCriteriaMultiConsentDTO.getDescription())
                                 .subDescription(selfCriteriaMultiConsentDTO.getSubDescription())

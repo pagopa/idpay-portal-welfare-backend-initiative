@@ -16,7 +16,7 @@ import java.util.List;
 public class SelfCriteriaMultiConsent implements ISelfDeclarationCriteria {
 
   @JsonProperty("_type")
-  private TypeMultiConsentEnum type;
+  private TypeMultiConsentEnum _type;
   private String description;
   private String subDescription;
   private List<SelfCriteriaMultiConsentValueDTO> value;
