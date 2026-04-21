@@ -1,5 +1,6 @@
 package it.gov.pagopa.initiative.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 
@@ -10,7 +11,8 @@ import lombok.*;
 @Builder
 public class SelfCriteriaText implements ISelfDeclarationCriteria {
 
-  private TypeTextEnum _type;
+  @JsonProperty("_type")
+  private TypeTextEnum type;
   private String description;
   private String subDescription;
   private String value;
