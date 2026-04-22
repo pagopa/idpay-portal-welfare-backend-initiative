@@ -1,5 +1,5 @@
-#spring.data.mongodb.database=${MONGODB_DBNAME}
-#spring.data.mongodb.uri=${MONGODB_URI}
+#spring.mongodb.database=${MONGODB_DBNAME}
+#spring.mongodb.uri=${MONGODB_URI}
 spring:
   mongodb:
     embedded:
