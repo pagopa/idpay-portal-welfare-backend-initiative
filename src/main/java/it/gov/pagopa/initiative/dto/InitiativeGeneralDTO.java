@@ -84,7 +84,6 @@ public class InitiativeGeneralDTO extends InitiativeOrganizationInfoDTO {
 
     @JsonProperty("beneficiaryBudgetFixed")
     @Min(value = 1, message = "Beneficiary budget should have an amount of at least 1", groups = ValidationApiEnabledGroup.class)
-    @NotNull(groups = ValidationApiEnabledGroup.class)
     private BigDecimal beneficiaryBudgetFixed;
 
 
