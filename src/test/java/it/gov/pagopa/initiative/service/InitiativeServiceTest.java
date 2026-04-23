@@ -976,7 +976,7 @@ class InitiativeServiceTest {
         //You are expecting FeignException to be caught otherwise the test fail
         try {
             initiativeService.updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID, PAGOPA_ADMIN);
-        } catch (FeignException e) {
+        } catch (FeignException _) {
             Assertions.fail();
         }
     }
@@ -1044,7 +1044,7 @@ class InitiativeServiceTest {
                         Mockito.anyString());
         try {
             initiativeService.logicallyDeleteInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
-        } catch (FeignException e) {
+        } catch (FeignException _) {
             Assertions.fail();}
     }
 
@@ -1122,7 +1122,7 @@ class InitiativeServiceTest {
         //You are expecting FeignException to be caught otherwise the test fail
         try {
             initiativeService.updateInitiativeToCheckStatus(ORGANIZATION_ID, INITIATIVE_ID, PAGOPA_ADMIN);
-        } catch (FeignException e) {
+        } catch (FeignException _) {
             Assertions.fail();}
     }
 
@@ -1661,7 +1661,7 @@ class InitiativeServiceTest {
             when(ioManageBackEndRestConnector.getServiceKeys("test")).thenReturn(expectedKeysDTO);
             KeysDTO actualKeysDTO = initiativeService.getTokenKeys(INITIATIVE_ID);
             assertEquals(expectedKeysDTO, actualKeysDTO);
-        } catch (Exception e) {
+        } catch (Exception _) {
             Assertions.fail();
         }
     }

@@ -87,9 +87,16 @@ public class InitiativeServiceRoot {
     private void validateRange(SelfCriteriaMultiConsentValueDTO value, String initiativeId) {
         Long min = value.getBeneficiaryBudgetCentsMin();
         Long max = value.getBeneficiaryBudgetCentsMax();
+        boolean blockingVerify = value.isBlockingVerify();
 
         if (min == null || max == null) {
             throwSelfDeclarationCriteriaException(initiativeId, "both min and max budgets must be present for all choices in the MultiConsent criteria.");
+        }
+        if (!blockingVerify && min == 0) {
+            throwSelfDeclarationCriteriaException(initiativeId, "if blockingVerify is false, beneficiaryBudgetCentsMin cannot be 0.");
+        }
+        if (blockingVerify && min != 0) {
+            throwSelfDeclarationCriteriaException(initiativeId, "if blockingVerify is true, beneficiaryBudgetCentsMin must be 0.");
         }
         if (max < min) {
             throwSelfDeclarationCriteriaException(initiativeId, "beneficiaryBudgetCentsMax must be greater than beneficiaryBudgetCentsMin.");
