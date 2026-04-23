@@ -145,7 +145,8 @@ public class InitiativeApiController implements InitiativeApi {
                     "Initiative properties are not valid for this initiative [%s] with beneficiary known".formatted(initiativeId)
             );
         }
-        if(initiative.getOrganizationName().equalsIgnoreCase("comune di guidonia montecelio") &&
+        if(initiative.getOrganizationName() != null && initiative.getInitiativeName() != null &&
+                initiative.getOrganizationName().equalsIgnoreCase("comune di guidonia montecelio") &&
                 initiative.getInitiativeName().toLowerCase().contains("bonus")) {
             beneficiaryRuleDto.getAutomatedCriteria().add(
                     AutomatedCriteriaDTO.builder()

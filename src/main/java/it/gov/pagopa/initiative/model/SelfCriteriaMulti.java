@@ -1,5 +1,6 @@
 package it.gov.pagopa.initiative.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
 @Builder
 public class SelfCriteriaMulti implements ISelfDeclarationCriteria {
 
+  @JsonProperty("_type")
   private TypeMultiEnum _type;
   private String description;
   private String subDescription;

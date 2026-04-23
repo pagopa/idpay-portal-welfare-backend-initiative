@@ -21,9 +21,9 @@ import it.gov.pagopa.initiative.exception.custom.InitiativeStatusNotValidExcepti
 import it.gov.pagopa.initiative.exception.custom.OrgPermissionException;
 import it.gov.pagopa.initiative.mapper.InitiativeDTOsToModelMapper;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
-import it.gov.pagopa.initiative.model.*;
 import it.gov.pagopa.initiative.model.TypeBoolEnum;
 import it.gov.pagopa.initiative.model.TypeMultiEnum;
+import it.gov.pagopa.initiative.model.*;
 import it.gov.pagopa.initiative.model.rule.refund.AccumulatedAmount;
 import it.gov.pagopa.initiative.model.rule.refund.AdditionalInfo;
 import it.gov.pagopa.initiative.model.rule.refund.InitiativeRefundRule;
@@ -34,7 +34,6 @@ import org.apache.kafka.common.KafkaException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.security.autoconfigure.SecurityAutoConfiguration;
 import org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration;
@@ -48,8 +47,6 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.ByteArrayInputStream;
@@ -64,19 +61,19 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.IntStream;
 
-import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest.INITIATIVE_INVALID_LOCALE_FORMAT;
+import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest.*;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.ErrorDtoDefaultMsg.ACCUMULATED_AMOUNT_TYPE;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.ErrorDtoDefaultMsg.SOMETHING_WRONG_WITH_THE_REFUND_TYPE;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.ADMIN;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.PAGOPA_ADMIN;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @TestPropertySource(
         locations = "classpath:application.yml",
@@ -86,275 +83,177 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
                 "app.initiative.conditions.notifyInternal=true",
                 "app.initiative.ranking.gracePeriod=10"
         })
-@WebMvcTest(value = {
-        InitiativeApi.class, ServiceExceptionConfig.class}, excludeAutoConfiguration = { UserDetailsServiceAutoConfiguration .class , SecurityAutoConfiguration.class})
+@WebMvcTest(
+        value = {InitiativeApi.class, ServiceExceptionConfig.class},
+        excludeAutoConfiguration = {
+                SecurityAutoConfiguration.class,
+                UserDetailsServiceAutoConfiguration.class
+        })
 @AutoConfigureMockMvc(addFilters = false)
 class InitiativeApiTest {
 
-    public static final String INITIATIVE_ID = "Id1";
-    public static final String ORGANIZATION_ID = "O1";
-    public static final String SERVICE_ID = "service1";
-
-    private static final String ORGANIZATION_ID_PLACEHOLDER = "%s";
-    private static final String INITIATIVE_ID_PLACEHOLDER = "%s";
-    private static final String SERVICE_ID_PLACEHOLDER = "%s";
-
-    private static final String ROLE_PLACEHOLDER = "%s";
-
-    private static final String ROLE = "admin";
-
-    private static final String ROLE_QUERY_PARAMETER_PLACEHOLDER = "?role=";
+    private static final String INITIATIVE_ID = "Id1";
+    private static final String ORGANIZATION_ID = "O1";
+    private static final String SERVICE_ID = "service1";
 
     private static final String BASE_URL = "http://localhost:8080/idpay";
-    private static final String GET_INITIATIVES_SUMMARY_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/summary";
-    private static final String GET_INITIATIVES_ISSUER = "/initiatives";
-    private static final String GET_INITIATIVES_MIL = "/mil/initiatives";
-    private static final String GET_INITIATIVE_ACTIVE_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER;
-    private static final String GET_INITIATIVE_ID_FROM_SERVICE_ID = "/initiative?serviceId=" + SERVICE_ID_PLACEHOLDER;
-    private static final String GET_INITIATIVE_BENEFICIARY_VIEW_URL = "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/beneficiary/view";
-    private static final String POST_INITIATIVE_ADDITIONAL_INFO_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/info";
-    private static final String GET_RANKING_LIST = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/ranking/exports";
-
-    private static final String PUT_INITIATIVE_ADDITIONAL_INFO_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/info";
-    private static final String PUT_INITIATIVE_GENERAL_INFO_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/general";
-    private static final String PUT_LOGO_URL =
-            "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/logo";
-    private static final String PUT_TRX_REWARD_RULE_URL =
-            "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/reward";
-    private static final String PUT_INITIATIVE_REFUND_RULES_INFO_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/refund";
-    private static final String PUT_INITIATIVE_BENEFICIARY_RULES_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/beneficiary" + ROLE_QUERY_PARAMETER_PLACEHOLDER + ROLE_PLACEHOLDER;
-    private static final String PUT_INITIATIVE_BENEFICIARY_RULES_DRAFT_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/beneficiary";
-    private static final String PUT_INITIATIVE_STATUS_APPROVED_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/approved";
-    private static final String PUT_INITIATIVE_TO_CHECK_STATUS_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/rejected";
-    private static final String PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/published" + ROLE_QUERY_PARAMETER_PLACEHOLDER + ROLE_PLACEHOLDER;
-    private static final String LOGICALLY_DELETE_INITIATIVE_URL = "/organization/" + ORGANIZATION_ID_PLACEHOLDER + "/initiative/" + INITIATIVE_ID_PLACEHOLDER;
-    //    private static final String ROLE = "TEST_ROLE";
-    private static final String GET_INITIATIVE_BENEFICIARY_DETAIL_URL = "/initiative/" + INITIATIVE_ID_PLACEHOLDER + "/detail";
-    private static final String DELETE_INITIATIVE_URL = "/initiative/" + INITIATIVE_ID_PLACEHOLDER;
+    private static final String ROLE = "admin";
     private static final String ORGANIZATION_NAME = "organizationName";
     private static final String ORGANIZATION_VAT = "organizationVat";
-    public static final String API_KEY_CLIENT_ID = "apiKeyClientId";
-    public static final String API_KEY_CLIENT_ASSERTION = "apiKeyClientAssertion";
+    private static final String API_KEY_CLIENT_ID = "apiKeyClientId";
+    private static final String API_KEY_CLIENT_ASSERTION = "apiKeyClientAssertion";
+
+    private static final String GET_INITIATIVES_SUMMARY_URL = "/organization/%s/initiative/summary";
+    private static final String GET_INITIATIVES_ISSUER = "/initiatives";
+    private static final String GET_INITIATIVES_MIL = "/mil/initiatives";
+    private static final String GET_INITIATIVE_ACTIVE_URL = "/organization/%s/initiative/%s";
+    private static final String GET_INITIATIVE_ID_FROM_SERVICE_ID = "/initiative?serviceId=%s";
+    private static final String GET_INITIATIVE_BENEFICIARY_VIEW_URL = "/initiative/%s/beneficiary/view";
+    private static final String POST_INITIATIVE_ADDITIONAL_INFO_URL = "/organization/%s/initiative/info";
+    private static final String GET_RANKING_LIST = "/organization/%s/initiative/%s/ranking/exports";
+    private static final String PUT_INITIATIVE_ADDITIONAL_INFO_URL = "/organization/%s/initiative/%s/info";
+    private static final String PUT_INITIATIVE_GENERAL_INFO_URL = "/organization/%s/initiative/%s/general";
+    private static final String PUT_TRX_REWARD_RULE_URL = "/organization/%s/initiative/%s/reward";
+    private static final String PUT_INITIATIVE_REFUND_RULES_INFO_URL = "/organization/%s/initiative/%s/refund";
+    private static final String PUT_INITIATIVE_BENEFICIARY_RULES_URL = "/organization/%s/initiative/%s/beneficiary?role=%s";
+    private static final String PUT_INITIATIVE_BENEFICIARY_RULES_DRAFT_URL = "/organization/%s/initiative/%s/beneficiary/draft";
+    private static final String PUT_INITIATIVE_STATUS_APPROVED_URL = "/organization/%s/initiative/%s/approved";
+    private static final String PUT_INITIATIVE_TO_CHECK_STATUS_URL = "/organization/%s/initiative/%s/rejected";
+    private static final String PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL = "/organization/%s/initiative/%s/published?role=%s";
+    private static final String LOGICALLY_DELETE_INITIATIVE_URL = "/organization/%s/initiative/%s";
+    private static final String GET_INITIATIVE_BENEFICIARY_DETAIL_URL = "/initiative/%s/detail";
+    private static final String DELETE_INITIATIVE_URL = "/initiative/%s";
 
     @MockitoBean
-    InitiativeService initiativeService;
+    private InitiativeService initiativeService;
+
     @MockitoBean
-    OrganizationService organizationService;
+    private OrganizationService organizationService;
+
+    @MockitoBean
+    private InitiativeModelToDTOMapper initiativeModelToDTOMapper;
+
+    @MockitoBean
+    private InitiativeDTOsToModelMapper initiativeDTOsToModelMapper;
 
     @Autowired
-    InitiativeApiController initiativeApiController;
-
-    @MockitoBean
-    InitiativeModelToDTOMapper initiativeModelToDTOMapper;
-
-    @MockitoBean
-    InitiativeDTOsToModelMapper initiativeDTOsToModelMapper;
-
-    @MockitoBean
-    InitiativeGeneralDTO initiativeGeneralDTO;
+    private InitiativeApiController initiativeApiController;
 
     @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
-    protected MockMvc mvc;
+    private MockMvc mvc;
 
-    /* @Test
-    void whenAdmin_getInitiativeSummary_statusOk() throws Exception {
 
-        Boolean beneficiaryKnown = false;
-        //create Dummy Initiative
-        Initiative step2Initiative = createStep2Initiative(beneficiaryKnown);
-        Initiative step2Initiative2 = createStep2Initiative(beneficiaryKnown);
-        List<Initiative> initiatives = Arrays.asList(step2Initiative, step2Initiative2);
-
-        // Returning something from Repo by using ServiceMock
-        when(initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, ADMIN)).thenReturn(initiatives);
-
-        // When
-        List<Initiative> retrieveInitiativeSummary = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, ADMIN);
-
-        // Then
-        // you are expecting service to return whatever returned by repo
-        assertThat("Reason of result", retrieveInitiativeSummary, is(sameInstance(initiatives)));
-
-        mvc.perform(
-                        MockMvcRequestBuilders.get(BASE_URL + String.format(GET_INITIATIVES_SUMMARY_URL, ORGANIZATION_ID))
-                                .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andDo(print())
-                .andReturn();
-    }
-     */
-
-    //@Test
     @ParameterizedTest
     @ValueSource(strings = {PAGOPA_ADMIN, ADMIN})
-
-    void whenPagoPaAdmin_getInitiativeSummary_statusOk(String role) throws Exception {
-
-        Boolean beneficiaryKnown = false;
-
-        Initiative step1Initiative = createStep1Initiative();
-        Initiative step1Initiative2 = createStep1Initiative();
-        List<Initiative> initiatives = Arrays.asList(step1Initiative, step1Initiative2);
-
-        InitiativeSummaryDTO step1InitiativeSummaryDTO = createStep1InitiativeSummaryDTO();
-        InitiativeSummaryDTO step1InitiativeSummary2DTO = createStep1InitiativeSummaryDTO();
-        List<InitiativeSummaryDTO> initiativeSummaryDTOs = Arrays.asList(step1InitiativeSummaryDTO, step1InitiativeSummary2DTO);
-
+    void whenGetInitiativeSummary_thenStatusOk(String role) throws Exception {
+        List<Initiative> initiatives = List.of(createStep1Initiative(), createStep1Initiative());
+        List<InitiativeSummaryDTO> summaryDTOs = List.of(createStep1InitiativeSummaryDTO(), createStep1InitiativeSummaryDTO());
 
         when(initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, role)).thenReturn(initiatives);
-
-        // When
-        List<Initiative> retrieveInitiativeSummary = initiativeService.retrieveInitiativeSummary(ORGANIZATION_ID, role);
-        when(initiativeModelToDTOMapper.toInitiativeSummaryDTOList(retrieveInitiativeSummary)).thenReturn(initiativeSummaryDTOs);
-        // Then
-        // you are expecting service to return whatever returned by repo
-        assertThat("Reason of result", retrieveInitiativeSummary, is(sameInstance(initiatives)));
+        when(initiativeModelToDTOMapper.toInitiativeSummaryDTOList(initiatives)).thenReturn(summaryDTOs);
 
         mvc.perform(
-                        MockMvcRequestBuilders.get(BASE_URL + String.format(GET_INITIATIVES_SUMMARY_URL, ORGANIZATION_ID))
-                                .queryParam("role",role)
-                                .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().json("[{\"initiativeId\":\"initiativeId\",\"initiativeName\":\"initiativeName\",\"status\":\"PUBLISHED\"},{\"initiativeId\":\"initiativeId\",\"initiativeName\":\"initiativeName\",\"status\":\"PUBLISHED\"}]"))
-                .andDo(print())
-                .andReturn();
-    }
-
-    private InitiativeSummaryDTO createStep1InitiativeSummaryDTO() {
-        return InitiativeSummaryDTO.builder()
-                .initiativeId("initiativeId")
-                .initiativeName("initiativeName")
-                .status(InitiativeConstants.Status.PUBLISHED)
-                .build();
+                        get(BASE_URL + String.format(GET_INITIATIVES_SUMMARY_URL, ORGANIZATION_ID))
+                                .queryParam("role", role)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(summaryDTOs)))
+                .andDo(print());
     }
 
     @Test
     void getInitiativesIssuer_Ok() throws Exception {
-
-        Boolean beneficiaryKnown = false;
-        //create Dummy Initiative
-        Initiative step2Initiative = createStep2Initiative(beneficiaryKnown);
-        Initiative step2Initiative2 = createStep2Initiative(beneficiaryKnown);
-        List<Initiative> initiatives = Arrays.asList(step2Initiative, step2Initiative2);
-
-        // Returning something from Repo by using ServiceMock
+        List<Initiative> initiatives = List.of(createStep2Initiative(false), createStep2Initiative(false));
         when(initiativeService.getPublishedInitiativesList()).thenReturn(initiatives);
+        when(initiativeModelToDTOMapper.toInitiativeIssuerDTOList(initiatives)).thenReturn(List.of());
 
-        // When
-        List<Initiative> initiativesIssuer = initiativeService.getPublishedInitiativesList();
-
-        // Then
-        // you are expecting service to return whatever returned by repo
-        assertThat("Reason of result", initiativesIssuer, is(sameInstance(initiatives)));
         mvc.perform(
-                        MockMvcRequestBuilders.get(BASE_URL + GET_INITIATIVES_ISSUER)
-                                .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andDo(print())
-                .andReturn();
+                        get(BASE_URL + GET_INITIATIVES_ISSUER)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print());
     }
 
     @Test
     void getInitiativesMIL_Ok() throws Exception {
-
-        Boolean beneficiaryKnown = false;
-        //create Dummy Initiative
-        Initiative step2Initiative = createStep2Initiative(beneficiaryKnown);
-        Initiative step2Initiative2 = createStep2Initiative(beneficiaryKnown);
-        List<Initiative> initiatives = Arrays.asList(step2Initiative, step2Initiative2);
-
-        // Returning something from Repo by using ServiceMock
+        List<Initiative> initiatives = List.of(createStep2Initiative(false), createStep2Initiative(false));
         when(initiativeService.getPublishedInitiativesList()).thenReturn(initiatives);
-
-        // When
-        List<Initiative> initiativesMIL = initiativeService.getPublishedInitiativesList();
-
-        // Then
-        // you are expecting service to return whatever returned by repo
-        assertThat("Reason of result", initiativesMIL, is(sameInstance(initiatives)));
+        when(initiativeModelToDTOMapper.toInitiativeListMilDTO(initiatives)).thenReturn(List.of());
 
         mvc.perform(
-                        MockMvcRequestBuilders.get(BASE_URL + GET_INITIATIVES_MIL)
-                                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("x-user-id", "USER_ID_TEST"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andDo(print())
-                .andReturn();
+                        get(BASE_URL + GET_INITIATIVES_MIL)
+                                .header("x-user-id", "USER_ID_TEST")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print());
     }
 
     @Test
     void getInitiativeDetail_statusOk() throws Exception {
+        Initiative initiative = createStep2Initiative(false);
+        InitiativeDTO initiativeDTO = createStep2InitiativeDTO();
 
-        Boolean beneficiaryKnown = false;
-        //create Dummy Initiative
-        Initiative step2Initiative = createStep2Initiative(beneficiaryKnown);
+        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, null)).thenReturn(initiative);
+        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true)).thenReturn(initiativeDTO);
 
-        // When
-        // With this instruction, I instruct the service (via Mockito's when) to always return the DummyInitiative to me anytime I call the same service's function
-        when(initiativeService.getInitiative(anyString(), anyString(), anyString())).thenReturn(step2Initiative);
-
-        Initiative initiative = initiativeService.getInitiative(anyString(), anyString(), anyString());
-
-        // Then
-        // you are expecting service to return whatever returned by repo
-        assertThat("Reason of result", initiative, is(sameInstance(step2Initiative)));
-
-        //The MVC perform should perform the API by returning the response based on the Service previously mocked.
         mvc.perform(
-                        MockMvcRequestBuilders.get(BASE_URL + String.format(GET_INITIATIVE_ACTIVE_URL, ORGANIZATION_ID, INITIATIVE_ID))
-                                .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andDo(print())
-                .andReturn();
+                        get(BASE_URL + String.format(GET_INITIATIVE_ACTIVE_URL, ORGANIZATION_ID, INITIATIVE_ID))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print());
     }
-
-    @InjectMocks
-    InitiativeDTOsToModelMapper initiativeDTOsToModelMapperTest;
-
-    @InjectMocks
-    InitiativeModelToDTOMapper initiativeModelToDTOMapperTest;
 
     @Test
     void testAddLogo() throws IOException {
+        InitiativeService localInitiativeService = mock(InitiativeService.class);
+        OrganizationService localOrganizationService = mock(OrganizationService.class);
+        InitiativeModelToDTOMapper localModelMapper = mock(InitiativeModelToDTOMapper.class);
+        InitiativeDTOsToModelMapper localDtoMapper = mock(InitiativeDTOsToModelMapper.class);
 
-        InitiativeService initiativeService = mock(InitiativeService.class);
-        when(initiativeService.storeInitiativeLogo(any(), any(), any(), any(),
-                any())).thenReturn(new LogoDTO());
-        OrganizationService organizationService = mock(OrganizationService.class);
-        InitiativeApiController initiativeApiController = new InitiativeApiController(
+        when(localInitiativeService.storeInitiativeLogo(any(), any(), any(), any(), any())).thenReturn(new LogoDTO());
+
+        InitiativeApiController controller = new InitiativeApiController(
                 true,
                 true,
                 true,
-                initiativeService,
-                organizationService,
-                initiativeModelToDTOMapperTest,
-                initiativeDTOsToModelMapperTest
-        );
-        ResponseEntity<LogoDTO> actualAddLogoResult = initiativeApiController.addLogo("42", "42",
+                localInitiativeService,
+                localOrganizationService,
+                localModelMapper,
+                localDtoMapper);
+
+        ResponseEntity<LogoDTO> response = controller.addLogo(
+                "42",
+                "42",
                 new MockMultipartFile("Name", new ByteArrayInputStream("AAAAAAAA".getBytes(StandardCharsets.UTF_8))));
-        assertTrue(actualAddLogoResult.hasBody());
-        assertTrue(actualAddLogoResult.getHeaders().isEmpty());
-        assertEquals(HttpStatus.OK, actualAddLogoResult.getStatusCode());
-        verify(initiativeService).storeInitiativeLogo(any(), any(), any(), any(),
-                any());
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertTrue(response.hasBody());
+        verify(localInitiativeService).storeInitiativeLogo(any(), any(), any(), any(), any());
     }
 
     @Test
     void getInitiativeIdFromServiceId_statusOk() throws Exception {
-        Initiative step1Initiative = createStep1Initiative();
-        when(initiativeService.getInitiativeIdFromServiceId(SERVICE_ID)).thenReturn(step1Initiative);
-        Initiative initiative = initiativeService.getInitiativeIdFromServiceId(SERVICE_ID);
-        assertThat("Reason of result", initiative, is(sameInstance(step1Initiative)));
+        Initiative initiative = createStep1Initiative();
+        InitiativeDataDTO dto = new InitiativeDataDTO();
+        dto.setInitiativeId(INITIATIVE_ID);
+
+        when(initiativeService.getInitiativeIdFromServiceId(SERVICE_ID)).thenReturn(initiative);
+        when(initiativeModelToDTOMapper.toInitiativeDataDTO(any(Initiative.class), any(Locale.class))).thenReturn(dto);
+
         mvc.perform(
-                        MockMvcRequestBuilders.get(BASE_URL + String.format(GET_INITIATIVE_ID_FROM_SERVICE_ID, ORGANIZATION_ID, SERVICE_ID))
-                                .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andDo(print())
-                .andReturn();
+                        get(BASE_URL + String.format(GET_INITIATIVE_ID_FROM_SERVICE_ID, SERVICE_ID))
+                                .header("Accept-Language", "it")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print());
     }
 
     @Test
@@ -363,519 +262,401 @@ class InitiativeApiTest {
             initiativeApiController.getInitiativeIdFromServiceId(Locale.forLanguageTag("xxxx"), SERVICE_ID);
         } catch (ClientExceptionWithBody e) {
             assertEquals(INITIATIVE_INVALID_LOCALE_FORMAT, e.getCode());
-            assertEquals(String.format("The initiative could not be found for the current serviceId [%s], due to invalid locale format", SERVICE_ID), e.getMessage());
+            assertEquals(
+                    String.format("The initiative could not be found for the current serviceId [%s], due to invalid locale format", SERVICE_ID),
+                    e.getMessage());
         }
     }
 
     @Test
     void saveInitiativeServiceInfo_statusCreated() throws Exception {
-        //objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        Initiative initiative = createStep1Initiative();
+        InitiativeAdditionalDTO request = createStep1InitiativeAdditionalDTO();
+        InitiativeDTO responseDto = createStep1InitiativeDTO();
 
-        //create Dummy Initiative
-        Initiative step1Initiative = createStep1Initiative();
+        when(initiativeDTOsToModelMapper.toInitiative(request)).thenReturn(initiative);
+        when(initiativeService.insertInitiative(initiative, ORGANIZATION_ID, ORGANIZATION_NAME, ROLE)).thenReturn(initiative);
+        when(initiativeModelToDTOMapper.toDtoOnlyId(initiative)).thenReturn(responseDto);
 
-        InitiativeAdditionalDTO initiativeAdditionalDTO = createStep1InitiativeAdditionalDTO();
-
-        // Instruct the Service to insert a Dummy Initiative
-        when(initiativeService.insertInitiative(step1Initiative, ORGANIZATION_ID, ORGANIZATION_NAME, ROLE)).thenReturn(step1Initiative);
-
-        when(initiativeDTOsToModelMapper.toInitiative(initiativeAdditionalDTO)).thenReturn(step1Initiative);
-
-        mvc.perform(MockMvcRequestBuilders.post(BASE_URL + String.format(POST_INITIATIVE_ADDITIONAL_INFO_URL, ORGANIZATION_ID))
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(initiativeAdditionalDTO))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andDo(print())
-                .andReturn();
+        mvc.perform(
+                        post(BASE_URL + String.format(POST_INITIATIVE_ADDITIONAL_INFO_URL, ORGANIZATION_ID))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andDo(print());
     }
 
     @Test
     void saveInitiativeServiceInfo_WebUrlContactValid() throws Exception {
+        Initiative initiative = createStep1Initiative();
+        initiative.getAdditionalInfo().getChannels().get(0).setType(Channel.TypeEnum.WEB);
+        initiative.getAdditionalInfo().getChannels().get(0).setContact("https://www.google.it");
 
-        Initiative step1Initiative = createStep1Initiative();
-        step1Initiative.getAdditionalInfo().getChannels().get(0).setType(Channel.TypeEnum.WEB);
-        step1Initiative.getAdditionalInfo().getChannels().get(0).setContact("https://www.google.it");
+        InitiativeAdditionalDTO request = createStep1InitiativeAdditionalDTO();
+        request.getChannels().get(0).setType(ChannelDTO.TypeEnum.WEB);
+        request.getChannels().get(0).setContact("https://www.google.it");
 
-        InitiativeAdditionalDTO initiativeAdditionalDTO = createStep1InitiativeAdditionalDTO();
-        initiativeAdditionalDTO.getChannels().get(0).setType(ChannelDTO.TypeEnum.WEB);
-        initiativeAdditionalDTO.getChannels().get(0).setContact("https://www.google.it");
+        when(initiativeDTOsToModelMapper.toInitiative(request)).thenReturn(initiative);
+        when(initiativeService.insertInitiative(initiative, ORGANIZATION_ID, ORGANIZATION_NAME, ROLE)).thenReturn(initiative);
+        when(initiativeModelToDTOMapper.toDtoOnlyId(initiative)).thenReturn(createStep1InitiativeDTO());
 
-        when(initiativeService.insertInitiative(step1Initiative, ORGANIZATION_ID, ORGANIZATION_NAME, ROLE)).thenReturn(step1Initiative);
-
-        when(initiativeDTOsToModelMapper.toInitiative(initiativeAdditionalDTO)).thenReturn(step1Initiative);
-
-        mvc.perform(MockMvcRequestBuilders.post(BASE_URL + String.format(POST_INITIATIVE_ADDITIONAL_INFO_URL, ORGANIZATION_ID))
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(initiativeAdditionalDTO))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andDo(print())
-                .andReturn();
+        mvc.perform(
+                        post(BASE_URL + String.format(POST_INITIATIVE_ADDITIONAL_INFO_URL, ORGANIZATION_ID))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andDo(print());
     }
 
     @Test
     void saveInitiativeServiceInfo_WebUrlContactNotValid() throws Exception {
+        InitiativeAdditionalDTO request = createStep1InitiativeAdditionalDTO();
+        request.getChannels().get(0).setType(ChannelDTO.TypeEnum.WEB);
+        request.getChannels().get(0).setContact("http://www.google.it");
 
-
-        InitiativeAdditionalDTO initiativeAdditionalDTO = createStep1InitiativeAdditionalDTO();
-        initiativeAdditionalDTO.getChannels().get(0).setType(ChannelDTO.TypeEnum.WEB);
-        initiativeAdditionalDTO.getChannels().get(0).setContact("http://www.google.it");
-
-        mvc.perform(MockMvcRequestBuilders.post(BASE_URL + String.format(POST_INITIATIVE_ADDITIONAL_INFO_URL, ORGANIZATION_ID))
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(initiativeAdditionalDTO))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andDo(print())
-                .andReturn();
+        mvc.perform(
+                        post(BASE_URL + String.format(POST_INITIATIVE_ADDITIONAL_INFO_URL, ORGANIZATION_ID))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
     }
 
     @Test
     void updateInitiativeGeneralInfo_statusNoContent() throws Exception {
+        Initiative initiative = createStep2Initiative(false);
+        InitiativeGeneralDTO request = createInitiativeGeneralDTO(false);
 
+        when(initiativeDTOsToModelMapper.toInitiative(any(InitiativeGeneralDTO.class))).thenReturn(initiative);
+        doNothing().when(initiativeService).updateInitiativeGeneralInfo(ORGANIZATION_ID, INITIATIVE_ID, initiative, ROLE, false);
 
-        Boolean beneficiaryKnown = false;
-        //create Dummy Initiative
-        Initiative step2Initiative = createStep2Initiative(beneficiaryKnown);
-        InitiativeGeneralDTO initiativeGeneralDTO = createInitiativeGeneralDTO(beneficiaryKnown);
-
-        // Instruct the Service to update a Dummy Initiative
-        when(initiativeDTOsToModelMapper.toInitiative(initiativeGeneralDTO)).thenReturn(step2Initiative);
-
-        //doNothing only for Void method
-        doNothing().when(initiativeService).updateInitiativeGeneralInfo(ORGANIZATION_ID, INITIATIVE_ID, step2Initiative, ROLE, true);
-
-        mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_GENERAL_INFO_URL, ORGANIZATION_ID, INITIATIVE_ID))
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(initiativeGeneralDTO))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNoContent())
-                .andDo(print())
-                .andReturn();
+        mvc.perform(
+                        put(BASE_URL + String.format(PUT_INITIATIVE_GENERAL_INFO_URL, ORGANIZATION_ID, INITIATIVE_ID))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andDo(print());
     }
 
     @Test
     void updateInitiativeAdditionalInfo_statusNoContent() throws Exception {
+        Initiative initiative = createStep1Initiative();
+        InitiativeAdditionalDTO request = createInitiativeAdditionalDTO();
 
+        when(initiativeDTOsToModelMapper.toInitiative(request)).thenReturn(initiative);
+        doNothing().when(initiativeService).updateInitiativeAdditionalInfo(ORGANIZATION_ID, INITIATIVE_ID, initiative, ROLE);
 
-        //create Dummy Initiative
-        Initiative step1Initiative = createStep1Initiative();
-        InitiativeAdditionalDTO initiativeAdditionalDTO = createInitiativeAdditionalDTO();
-
-        // Instruct the Service to update a Dummy Initiative
-        when(initiativeDTOsToModelMapper.toInitiative(initiativeAdditionalDTO)).thenReturn(step1Initiative);
-
-        //doNothing only for Void method
-        doNothing().when(initiativeService).updateInitiativeAdditionalInfo(ORGANIZATION_ID, INITIATIVE_ID, step1Initiative, ROLE);
-
-        mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_ADDITIONAL_INFO_URL, ORGANIZATION_ID, INITIATIVE_ID))
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(initiativeAdditionalDTO))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNoContent())
-                .andDo(print())
-                .andReturn();
+        mvc.perform(
+                        put(BASE_URL + String.format(PUT_INITIATIVE_ADDITIONAL_INFO_URL, ORGANIZATION_ID, INITIATIVE_ID))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andDo(print());
     }
 
     @Test
     void updateInitiativeGeneralInfoDraft_statusNoContent() throws Exception {
+        Initiative initiative = createStep2Initiative(false);
+        InitiativeGeneralDTO request = createInitiativeGeneralDTO(false);
 
+        when(initiativeDTOsToModelMapper.toInitiative(request)).thenReturn(initiative);
+        doNothing().when(initiativeService).updateInitiativeGeneralInfo(ORGANIZATION_ID, INITIATIVE_ID, initiative, ROLE, true);
 
-        //create Dummy Initiative
-        Initiative step1Initiative = createStep1Initiative();
-        InitiativeAdditionalDTO initiativeAdditionalDTO = createInitiativeAdditionalDTO();
-
-        // Instruct the Service to update a Dummy Initiative
-        when(initiativeDTOsToModelMapper.toInitiative(initiativeAdditionalDTO)).thenReturn(step1Initiative);
-
-        //doNothing only for Void method
-        doNothing().when(initiativeService).updateInitiativeAdditionalInfo(ORGANIZATION_ID, INITIATIVE_ID, step1Initiative, ROLE);
-
-        mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_GENERAL_INFO_URL + "/draft",
-                                ORGANIZATION_ID, INITIATIVE_ID))
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(initiativeAdditionalDTO))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNoContent())
-                .andDo(print())
-                .andReturn();
-    }
-
-    void updateInitiativeBeneficiary_statusNoContent() throws Exception {
-
-
-        InitiativeBeneficiaryRule initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
-        Boolean beneficiaryKnown = false;
-        //create Dummy Initiative
-        Initiative step2Initiative = createStep2Initiative(beneficiaryKnown);
-        InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
-        initiativeBeneficiaryRuleDTO.setOrganizationName(ORGANIZATION_NAME);
-        initiativeBeneficiaryRuleDTO.setOrganizationUserRole(ROLE);
-
-        // Instruct the Service to insert a Dummy Initiative
-        when(initiativeDTOsToModelMapper.toBeneficiaryRule(initiativeBeneficiaryRuleDTO)).thenReturn(initiativeBeneficiaryRule);
-
-        // Instruct the Service to get a Dummy Initiative
-        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step2Initiative);
-
-        //doNothing only for Void method
-        doNothing().when(initiativeService).updateStep3InitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule, ROLE, false);
-
-        // Base test
-        mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_BENEFICIARY_RULES_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(initiativeBeneficiaryRuleDTO))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNoContent())
-                .andDo(print())
-                .andReturn();
-    }
-
-    //@Test
-    void updateInitiativeBeneficiaryISEEandNumber_statusNoContent() throws Exception {
-
-
-        InitiativeBeneficiaryRule initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
-        Boolean beneficiaryKnown = false;
-        //create Dummy Initiative
-        Initiative step2Initiative = createStep2Initiative(beneficiaryKnown);
-        InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
-        initiativeBeneficiaryRuleDTO.setOrganizationName(ORGANIZATION_NAME);
-        initiativeBeneficiaryRuleDTO.setOrganizationUserRole(ROLE);
-
-        // Instruct the Service to insert a Dummy Initiative
-        when(initiativeDTOsToModelMapper.toBeneficiaryRule(initiativeBeneficiaryRuleDTO)).thenReturn(initiativeBeneficiaryRule);
-
-        // Instruct the Service to get a Dummy Initiative
-        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step2Initiative);
-
-        //doNothing only for Void method
-        doNothing().when(initiativeService).updateStep3InitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule, ROLE, false);
-
-        // ISEE with decimal and field null
-        initiativeBeneficiaryRuleDTO.getAutomatedCriteria().get(0).setCode("ISEE");
-        initiativeBeneficiaryRuleDTO.getAutomatedCriteria().get(0).setValue("2.5");
-        initiativeBeneficiaryRuleDTO.getAutomatedCriteria().get(0).setField(null);
-        mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_BENEFICIARY_RULES_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(initiativeBeneficiaryRuleDTO))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNoContent())
-                .andDo(print())
-                .andReturn();
+        mvc.perform(
+                        put(BASE_URL + String.format(PUT_INITIATIVE_GENERAL_INFO_URL, ORGANIZATION_ID, INITIATIVE_ID) + "/draft")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andDo(print());
     }
 
     @Test
-    void updateInitiativeBeneficiary_statusBadRequest() throws Exception {
+    void updateInitiativeBeneficiary_shouldAddAutomatedCriteria_whenGuidoniaAndBonus() throws Exception {
+        Initiative initiative = createStep2Initiative(false);
+        initiative.setOrganizationName("comune di guidonia montecelio");
+        initiative.setInitiativeName("Bonus Sociale 2024");
 
+        InitiativeBeneficiaryRuleDTO request = createInitiativeBeneficiaryRuleDTO();
+        if (request.getAutomatedCriteria() == null) {
+            request.setAutomatedCriteria(new ArrayList<>());
+        }
 
-        InitiativeBeneficiaryRule initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
-        Boolean beneficiaryKnown = true;
-        //create Dummy Initiative
-        Initiative step2Initiative = createStep2Initiative(beneficiaryKnown);
-        InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
-        initiativeBeneficiaryRuleDTO.setOrganizationName(ORGANIZATION_NAME);
-        initiativeBeneficiaryRuleDTO.setOrganizationUserRole(ROLE);
+        InitiativeBeneficiaryRule rule = createInitiativeBeneficiaryRule();
 
-        // Instruct the Service to insert a Dummy Initiative
-        when(initiativeDTOsToModelMapper.toBeneficiaryRule(initiativeBeneficiaryRuleDTO)).thenReturn(initiativeBeneficiaryRule);
+        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(initiative);
+        when(initiativeDTOsToModelMapper.toBeneficiaryRule(any(InitiativeBeneficiaryRuleDTO.class))).thenReturn(rule);
 
-        // Instruct the Service to get a Dummy Initiative
-        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step2Initiative);
+        mvc.perform(
+                        put(BASE_URL + String.format(PUT_INITIATIVE_BENEFICIARY_RULES_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
 
-        //doNothing only for Void method
-        doNothing().when(initiativeService).updateStep3InitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule, ROLE, false);
+        verify(initiativeService).updateStep3InitiativeBeneficiary(
+                eq(ORGANIZATION_ID),
+                eq(INITIATIVE_ID),
+                any(InitiativeBeneficiaryRule.class),
+                eq(ROLE),
+                eq(false)
+        );
+    }
 
-        mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_BENEFICIARY_RULES_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(initiativeBeneficiaryRuleDTO))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andDo(print())
-                .andReturn();
+    @Test
+    void updateInitiativeBeneficiary_statusNoContent() throws Exception {
+        Initiative initiative = createStep2Initiative(false);
+        InitiativeBeneficiaryRule rule = createInitiativeBeneficiaryRule();
+        InitiativeBeneficiaryRuleDTO request = createInitiativeBeneficiaryRuleDTO();
+
+        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(initiative);
+        when(initiativeDTOsToModelMapper.toBeneficiaryRule(any(InitiativeBeneficiaryRuleDTO.class))).thenReturn(rule);
+        doNothing().when(initiativeService).updateStep3InitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, rule, ROLE, false);
+
+        mvc.perform(
+                        put(BASE_URL + String.format(PUT_INITIATIVE_BENEFICIARY_RULES_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andDo(print());
+    }
+
+    @Test
+    void updateInitiativeBeneficiary_statusBadRequest_whenBeneficiaryKnown() throws Exception {
+        Initiative initiative = createStep2Initiative(true);
+        InitiativeBeneficiaryRuleDTO request = createInitiativeBeneficiaryRuleDTO();
+
+        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(initiative);
+
+        mvc.perform(
+                        put(BASE_URL + String.format(PUT_INITIATIVE_BENEFICIARY_RULES_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
     }
 
     @Test
     void updateInitiativeBeneficiary_statusBadRequest_notValidCodeWithISEEInput() throws Exception {
+        Initiative initiative = createStep2Initiative(false);
+        InitiativeBeneficiaryRuleDTO request = createInitiativeBeneficiaryRuleDTO();
+        request.getAutomatedCriteria().get(0).setCode("ISEE");
 
+        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(initiative);
 
-        InitiativeBeneficiaryRule initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
-        Boolean beneficiaryKnown = false;
-        //create Dummy Initiative
-        Initiative step2Initiative = createStep2Initiative(beneficiaryKnown);
-        InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
-        initiativeBeneficiaryRuleDTO.setOrganizationName(ORGANIZATION_NAME);
-        initiativeBeneficiaryRuleDTO.setOrganizationUserRole(ROLE);
-        initiativeBeneficiaryRuleDTO.getAutomatedCriteria().get(0).setCode("ISEE");
-
-        // Instruct the Service to insert a Dummy Initiative
-        when(initiativeDTOsToModelMapper.toBeneficiaryRule(initiativeBeneficiaryRuleDTO)).thenReturn(initiativeBeneficiaryRule);
-
-        // Instruct the Service to get a Dummy Initiative
-        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step2Initiative);
-
-        //doNothing only for Void method
-        doNothing().when(initiativeService).updateStep3InitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule, ROLE, false);
-
-        mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_BENEFICIARY_RULES_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(initiativeBeneficiaryRuleDTO))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andDo(print())
-                .andReturn();
+        mvc.perform(
+                        put(BASE_URL + String.format(PUT_INITIATIVE_BENEFICIARY_RULES_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
     }
 
     @Test
     void updateTrxAndRewardRules_statusNoContent() throws Exception {
+        Initiative initiative = createStep1Initiative();
+        InitiativeRewardAndTrxRulesDTO request = createInitiativeRewardAndTrxRulesDTO();
 
+        when(initiativeDTOsToModelMapper.toInitiative(request)).thenReturn(initiative);
+        doNothing().when(initiativeService).updateTrxAndRewardRules(ORGANIZATION_ID, INITIATIVE_ID, initiative, ROLE, false);
 
-        //create Dummy Initiative
-        Initiative step1Initiative = createStep1Initiative();
-        InitiativeRewardAndTrxRulesDTO rewardAndTrxRulesDTO = createInitiativeRewardAndTrxRulesDTO();
-
-        // Instruct the Service to update a Dummy Initiative
-        when(initiativeDTOsToModelMapper.toInitiative(rewardAndTrxRulesDTO)).thenReturn(step1Initiative);
-
-        //doNothing only for Void method
-        doNothing().when(initiativeService).updateTrxAndRewardRules(ORGANIZATION_ID, INITIATIVE_ID, step1Initiative, ROLE, false);
-
-        mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_TRX_REWARD_RULE_URL,
-                                ORGANIZATION_ID, INITIATIVE_ID))
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(rewardAndTrxRulesDTO))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNoContent())
-                .andDo(print())
-                .andReturn();
+        mvc.perform(
+                        put(BASE_URL + String.format(PUT_TRX_REWARD_RULE_URL, ORGANIZATION_ID, INITIATIVE_ID))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andDo(print());
     }
 
     @Test
     void updateTrxAndRewardRulesDraft_statusNoContent() throws Exception {
+        Initiative initiative = createStep1Initiative();
+        InitiativeRewardAndTrxRulesDTO request = createInitiativeRewardAndTrxRulesDTO();
 
+        when(initiativeDTOsToModelMapper.toInitiative(request)).thenReturn(initiative);
+        doNothing().when(initiativeService).updateTrxAndRewardRules(ORGANIZATION_ID, INITIATIVE_ID, initiative, ROLE, true);
 
-        //create Dummy Initiative
-        Initiative step1Initiative = createStep1Initiative();
-        InitiativeRewardAndTrxRulesDTO rewardAndTrxRulesDTO = createInitiativeRewardAndTrxRulesDTO();
-
-        // Instruct the Service to update a Dummy Initiative
-        when(initiativeDTOsToModelMapper.toInitiative(rewardAndTrxRulesDTO)).thenReturn(step1Initiative);
-
-        //doNothing only for Void method
-        doNothing().when(initiativeService).updateTrxAndRewardRules(ORGANIZATION_ID, INITIATIVE_ID, step1Initiative, ROLE, true);
-
-        mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_TRX_REWARD_RULE_URL + "/draft",
-                                ORGANIZATION_ID, INITIATIVE_ID))
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(rewardAndTrxRulesDTO))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNoContent())
-                .andDo(print())
-                .andReturn();
+        mvc.perform(
+                        put(BASE_URL + String.format(PUT_TRX_REWARD_RULE_URL, ORGANIZATION_ID, INITIATIVE_ID) + "/draft")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andDo(print());
     }
 
     @Test
     void updateInitiativeRefundRule_statusNoContent() throws Exception {
-
-
-        InitiativeRefundRuleDTO refundRuleDTO = createRefundRuleDTOValidWithAccumulatedAmount();
-
+        InitiativeRefundRuleDTO request = createRefundRuleDTOValidWithAccumulatedAmount();
         Initiative initiative = createInitiativeOnlyRefundRule();
 
-        when(initiativeDTOsToModelMapper.toInitiative(refundRuleDTO)).thenReturn(initiative);
-
+        when(initiativeDTOsToModelMapper.toInitiative(request)).thenReturn(initiative);
         doNothing().when(initiativeService).updateInitiativeRefundRules(ORGANIZATION_ID, INITIATIVE_ID, ROLE, initiative, true);
 
-        mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_REFUND_RULES_INFO_URL, ORGANIZATION_ID, INITIATIVE_ID))
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(refundRuleDTO))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNoContent())
-                .andDo(print())
-                .andReturn();
+        mvc.perform(
+                        put(BASE_URL + String.format(PUT_INITIATIVE_REFUND_RULES_INFO_URL, ORGANIZATION_ID, INITIATIVE_ID))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andDo(print());
     }
 
     @Test
     void updateRefundRule_PUT_whenInitiativeUnprocessableForStatusNotValid_then400isRaisedForInitiativeException() throws Exception {
-
-
-        InitiativeRefundRuleDTO refundRuleDTO = createRefundRuleDTOValidWithAccumulatedAmount();
-
+        InitiativeRefundRuleDTO request = createRefundRuleDTOValidWithAccumulatedAmount();
         Initiative initiative = createInitiativeOnlyRefundRule();
 
-        // Instruct the Service to update a Dummy Initiative
-        when(initiativeDTOsToModelMapper.toInitiative(refundRuleDTO)).thenReturn(initiative);
+        when(initiativeDTOsToModelMapper.toInitiative(request)).thenReturn(initiative);
+        doThrow(new InitiativeStatusNotValidException(
+                "Initiative [%s] with status [%s] is unprocessable for status not valid"
+                        .formatted(initiative.getInitiativeId(), initiative.getStatus())))
+                .when(initiativeService)
+                .updateInitiativeRefundRules(ORGANIZATION_ID, INITIATIVE_ID, ROLE, initiative, true);
 
-        //doThrow InitiativeException for Void method
-        doThrow(new InitiativeStatusNotValidException("Initiative [%s] with status [%s] is unprocessable for status not valid".formatted(initiative.getInitiativeId(),initiative.getStatus())))
-                .when(initiativeService).updateInitiativeRefundRules(ORGANIZATION_ID, INITIATIVE_ID, ROLE, initiative, true);
-
-        mvc.perform(MockMvcRequestBuilders.put(BASE_URL +"/organization/" +  ORGANIZATION_ID + "/initiative/"+ INITIATIVE_ID + "/refund")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(refundRuleDTO))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andDo(print())
-                .andReturn();
+        mvc.perform(
+                        put(BASE_URL + String.format(PUT_INITIATIVE_REFUND_RULES_INFO_URL, ORGANIZATION_ID, INITIATIVE_ID))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
     }
 
     @Test
     void updateInitiativeRefundRuleDraft_statusNoContent() throws Exception {
-
-
-        InitiativeRefundRuleDTO refundRuleDTO = createRefundRuleDTOValidWithAccumulatedAmount();
-
+        InitiativeRefundRuleDTO request = createRefundRuleDTOValidWithAccumulatedAmount();
         Initiative initiative = createInitiativeOnlyRefundRule();
 
-        when(initiativeDTOsToModelMapper.toInitiative(refundRuleDTO)).thenReturn(initiative);
-
+        when(initiativeDTOsToModelMapper.toInitiative(request)).thenReturn(initiative);
         doNothing().when(initiativeService).updateInitiativeRefundRules(ORGANIZATION_ID, INITIATIVE_ID, ROLE, initiative, false);
 
-        mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_REFUND_RULES_INFO_URL + "/draft", ORGANIZATION_ID, INITIATIVE_ID))
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(refundRuleDTO))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNoContent())
-                .andDo(print())
-                .andReturn();
+        mvc.perform(
+                        put(BASE_URL + String.format(PUT_INITIATIVE_REFUND_RULES_INFO_URL, ORGANIZATION_ID, INITIATIVE_ID) + "/draft")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andDo(print());
     }
 
     @Test
     void updateInitiativeBeneficiaryDraft_statusNoContent() throws Exception {
+        InitiativeBeneficiaryRuleDTO request = createInitiativeBeneficiaryRuleDTO();
+        InitiativeBeneficiaryRule rule = createInitiativeBeneficiaryRule();
 
+        when(initiativeDTOsToModelMapper.toBeneficiaryRule(request)).thenReturn(rule);
+        doNothing().when(initiativeService).updateStep3InitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, rule, ROLE, true);
 
-        InitiativeBeneficiaryRule initiativeBeneficiaryRule = createInitiativeBeneficiaryRule();
-        Boolean beneficiaryKnown = false;
-        //create Dummy Initiative
-        createStep2Initiative(beneficiaryKnown);
-        InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
-
-        // Instruct the Service to insert a Dummy Initiative
-        when(initiativeDTOsToModelMapper.toBeneficiaryRule(initiativeBeneficiaryRuleDTO)).thenReturn(initiativeBeneficiaryRule);
-
-        //doNothing only for Void method
-        InitiativeBeneficiaryRule initiativeBeneficiaryRule2 = initiativeDTOsToModelMapper.toBeneficiaryRule(initiativeBeneficiaryRuleDTO);
-        doNothing().when(initiativeService).updateStep3InitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, initiativeBeneficiaryRule2, ROLE, true);
-
-        mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_BENEFICIARY_RULES_DRAFT_URL + "/draft", ORGANIZATION_ID, INITIATIVE_ID))
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(initiativeBeneficiaryRuleDTO))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNoContent())
-                .andDo(print())
-                .andReturn();
+        mvc.perform(
+                        put(BASE_URL + String.format(PUT_INITIATIVE_BENEFICIARY_RULES_DRAFT_URL, ORGANIZATION_ID, INITIATIVE_ID))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andDo(print());
     }
 
     @Test
     void updateInitiativeStatusApproved_statusNoContent() throws Exception {
-        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = new InitiativeOrganizationInfoDTO();
-        initiativeOrganizationInfoDTO.setOrganizationName(ORGANIZATION_NAME);
-        initiativeOrganizationInfoDTO.setOrganizationUserRole(ROLE);
-
-        //doNothing only for Void method
+        InitiativeOrganizationInfoDTO request = createInitiativeOrganizationInfoDTO();
         doNothing().when(initiativeService).updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
 
-        mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_STATUS_APPROVED_URL, ORGANIZATION_ID, INITIATIVE_ID))
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(initiativeOrganizationInfoDTO))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNoContent())
-                .andDo(print())
-                .andReturn();
+        mvc.perform(
+                        put(BASE_URL + String.format(PUT_INITIATIVE_STATUS_APPROVED_URL, ORGANIZATION_ID, INITIATIVE_ID))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andDo(print());
     }
 
     @Test
     void updateInitiativeStatusApproved_roleException() throws Exception {
-        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = new InitiativeOrganizationInfoDTO();
-        initiativeOrganizationInfoDTO.setOrganizationName(ORGANIZATION_NAME);
-        initiativeOrganizationInfoDTO.setOrganizationUserRole(ROLE);
+        InitiativeOrganizationInfoDTO request = createInitiativeOrganizationInfoDTO();
 
         doThrow(new OrgPermissionException("Message"))
                 .when(initiativeService)
                 .updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
 
-        mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_STATUS_APPROVED_URL, ORGANIZATION_ID, INITIATIVE_ID))
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(initiativeOrganizationInfoDTO))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andDo(print())
-                .andReturn();
-
-
+        mvc.perform(
+                        put(BASE_URL + String.format(PUT_INITIATIVE_STATUS_APPROVED_URL, ORGANIZATION_ID, INITIATIVE_ID))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andDo(print());
     }
 
     @Test
     void updateInitiativeStatusToCheck_roleException() throws Exception {
-        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = new InitiativeOrganizationInfoDTO();
-        initiativeOrganizationInfoDTO.setOrganizationName(ORGANIZATION_NAME);
-        initiativeOrganizationInfoDTO.setOrganizationUserRole(ROLE);
+        InitiativeOrganizationInfoDTO request = createInitiativeOrganizationInfoDTO();
 
         doThrow(new OrgPermissionException("Message"))
                 .when(initiativeService)
                 .updateInitiativeToCheckStatus(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
 
-        mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_CHECK_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID))
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(initiativeOrganizationInfoDTO))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andDo(print())
-                .andReturn();
+        mvc.perform(
+                        put(BASE_URL + String.format(PUT_INITIATIVE_TO_CHECK_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andDo(print());
     }
 
     @Test
     void updateInitiativeToCheckStatus_statusNoContent() throws Exception {
-        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = new InitiativeOrganizationInfoDTO();
-        initiativeOrganizationInfoDTO.setOrganizationName(ORGANIZATION_NAME);
-        initiativeOrganizationInfoDTO.setOrganizationUserRole(ROLE);
+        InitiativeOrganizationInfoDTO request = createInitiativeOrganizationInfoDTO();
 
         doNothing().when(initiativeService).updateInitiativeToCheckStatus(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
 
-        mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_CHECK_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID))
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(initiativeOrganizationInfoDTO))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNoContent())
-                .andDo(print())
-                .andReturn();
+        mvc.perform(
+                        put(BASE_URL + String.format(PUT_INITIATIVE_TO_CHECK_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andDo(print());
     }
 
     @Test
     void getInitiativeBeneficiaryView_statusOk() throws Exception {
-
-        //create Dummy Initiative
         Initiative initiative = createStep5Initiative();
         InitiativeDTO initiativeDTO = createStep5InitiativeDTO();
 
-        // Instruct the Service to insert a Dummy Initiative
+        when(initiativeService.getInitiativeBeneficiaryView(INITIATIVE_ID)).thenReturn(initiative);
         when(initiativeModelToDTOMapper.toInitiativeDTO(initiative, false)).thenReturn(initiativeDTO);
-        // When
-        // With this instruction, I instruct the service (via Mockito's when) to always return the DummyInitiative to me anytime I call the same service's function
-        when(initiativeService.getInitiativeBeneficiaryView(anyString())).thenReturn(initiative);
 
-        //The MVC perform should perform the API by returning the response based on the Service previously mocked.
         mvc.perform(
-                        MockMvcRequestBuilders.get(BASE_URL + String.format(GET_INITIATIVE_BENEFICIARY_VIEW_URL, INITIATIVE_ID))
-                                .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andDo(print())
-                .andReturn();
+                        get(BASE_URL + String.format(GET_INITIATIVE_BENEFICIARY_VIEW_URL, INITIATIVE_ID))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print());
     }
 
     @Test
     void anyUpdate_PUT_whenBodyRequestIsNotValid_then400BadRequest_MethodArgumentNotValidException() throws Exception {
-        InitiativeRefundRuleDTO refundRuleDTO = createRefundRuleWithAccumulatedAmountDTO_NotValid_ko();
+        InitiativeRefundRuleDTO request = createRefundRuleWithAccumulatedAmountDTO_NotValid_ko();
 
-        MvcResult res =
-                mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_REFUND_RULES_INFO_URL, ORGANIZATION_ID, INITIATIVE_ID))
-                                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                .content(objectMapper.writeValueAsString(refundRuleDTO))
+        MvcResult res = mvc.perform(
+                        put(BASE_URL + String.format(PUT_INITIATIVE_REFUND_RULES_INFO_URL, ORGANIZATION_ID, INITIATIVE_ID))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
                                 .accept(MediaType.APPLICATION_JSON))
-                        .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                        .andDo(print())
-                        .andReturn();
+                .andExpect(status().isBadRequest())
+                .andDo(print())
+                .andReturn();
 
         ErrorDTO error = objectMapper.readValue(res.getResponse().getContentAsString(), ErrorDTO.class);
         assertEquals(HttpStatus.BAD_REQUEST.value(), res.getResponse().getStatus());
@@ -885,60 +666,54 @@ class InitiativeApiTest {
 
     @Test
     void PUT_updateInitiativeStatusToCheck_whenStatusIsNotInRevision() throws Exception {
-        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = new InitiativeOrganizationInfoDTO();
-        initiativeOrganizationInfoDTO.setOrganizationName(ORGANIZATION_NAME);
-        initiativeOrganizationInfoDTO.setOrganizationUserRole(ROLE);
+        InitiativeOrganizationInfoDTO request = createInitiativeOrganizationInfoDTO();
 
-        doThrow(
-                new InitiativeStatusNotValidException("The status of initiative [%s] is not IN_REVISION".formatted(INITIATIVE_ID))
-        ).when(initiativeService).updateInitiativeToCheckStatus(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
+        doThrow(new InitiativeStatusNotValidException(
+                "The status of initiative [%s] is not IN_REVISION".formatted(INITIATIVE_ID)))
+                .when(initiativeService)
+                .updateInitiativeToCheckStatus(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
 
-        MvcResult res =
-                mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_CHECK_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID))
-                                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                .content(objectMapper.writeValueAsString(initiativeOrganizationInfoDTO))
+        MvcResult res = mvc.perform(
+                        put(BASE_URL + String.format(PUT_INITIATIVE_TO_CHECK_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
                                 .accept(MediaType.APPLICATION_JSON))
-                        .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                        .andDo(print())
-                        .andReturn();
+                .andExpect(status().isBadRequest())
+                .andDo(print())
+                .andReturn();
 
         ErrorDTO error = objectMapper.readValue(res.getResponse().getContentAsString(), ErrorDTO.class);
         assertEquals(HttpStatus.BAD_REQUEST.value(), res.getResponse().getStatus());
-        assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_STATUS_NOT_VALID, error.getCode());
-        assertEquals("The status of initiative [%s] is not IN_REVISION".formatted(INITIATIVE_ID),error.getMessage());
+        assertEquals(INITIATIVE_STATUS_NOT_VALID, error.getCode());
+        assertEquals("The status of initiative [%s] is not IN_REVISION".formatted(INITIATIVE_ID), error.getMessage());
     }
 
     @Test
-    void DEL_logicallyDeleteInitiative_whenCurrentDeletedIsFalse_thenBecomeTrue() throws Exception {
-        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = new InitiativeOrganizationInfoDTO();
-        initiativeOrganizationInfoDTO.setOrganizationName(ORGANIZATION_NAME);
-        initiativeOrganizationInfoDTO.setOrganizationUserRole(ROLE);
+    void DEL_logicallyDeleteInitiative_whenCurrentDeletedIsFalse_thenNoContent() throws Exception {
+        InitiativeOrganizationInfoDTO request = createInitiativeOrganizationInfoDTO();
+        doNothing().when(initiativeService).logicallyDeleteInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
 
-        Initiative initiative = createStep5Initiative();
-        initiative.setEnabled(true);
-
-        mvc.perform(MockMvcRequestBuilders.delete(BASE_URL + String.format(LOGICALLY_DELETE_INITIATIVE_URL, initiative.getOrganizationId(), initiative.getInitiativeId()))
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(initiativeOrganizationInfoDTO))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNoContent())
-                .andDo(print())
-                .andReturn();
-//        assertEquals(true, initiative.getDeleted());
+        mvc.perform(
+                        delete(BASE_URL + String.format(LOGICALLY_DELETE_INITIATIVE_URL, ORGANIZATION_ID, INITIATIVE_ID))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andDo(print());
     }
 
     @Test
     void anyUpdate_PUT_whenBodyRequestIsNotValid_then400BadRequest_MethodArgumentNotValidExceptionElseCase() throws Exception {
-        InitiativeRefundRuleDTO refundRuleDTO = createRefundRuleWithAccumulatedAmountAndTimeParameter_NotValid();
+        InitiativeRefundRuleDTO request = createRefundRuleWithAccumulatedAmountAndTimeParameter_NotValid();
 
-        MvcResult res =
-                mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_REFUND_RULES_INFO_URL, ORGANIZATION_ID, INITIATIVE_ID))
-                                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                .content(objectMapper.writeValueAsString(refundRuleDTO))
+        MvcResult res = mvc.perform(
+                        put(BASE_URL + String.format(PUT_INITIATIVE_REFUND_RULES_INFO_URL, ORGANIZATION_ID, INITIATIVE_ID))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
                                 .accept(MediaType.APPLICATION_JSON))
-                        .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                        .andDo(print())
-                        .andReturn();
+                .andExpect(status().isBadRequest())
+                .andDo(print())
+                .andReturn();
 
         ErrorDTO error = objectMapper.readValue(res.getResponse().getContentAsString(), ErrorDTO.class);
         assertEquals(HttpStatus.BAD_REQUEST.value(), res.getResponse().getStatus());
@@ -948,193 +723,135 @@ class InitiativeApiTest {
 
     @Test
     void when_PUT_updateInitiativePublishedStatus_ToIO_then204() throws Exception {
-        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = InitiativeOrganizationInfoDTO.builder()
-                .organizationName(ORGANIZATION_NAME)
-                .organizationVat(ORGANIZATION_VAT)
-                .organizationUserRole(ROLE)
-                .build();
+        InitiativeOrganizationInfoDTO request = createInitiativeOrganizationInfoDTO();
+        Initiative initiative = createStep5Initiative();
 
-        //create Dummy Initiative
-        Initiative step5Initiative = createStep5Initiative();
-        createStep5InitiativeDTO();
-
-        // When
-        // With this instruction, I instruct the service (via Mockito's when) to always return the DummyInitiative to me anytime I call the same service's function
-        when(initiativeService.getInitiative(anyString(), anyString(), anyString())).thenReturn(step5Initiative);
-        Initiative initiative = initiativeService.getInitiative(anyString(), anyString(), anyString());
-        // Expecting same instance
-        assertThat("Reason of result", initiative, is(sameInstance(step5Initiative)));
-
+        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(initiative);
         doNothing().when(initiativeService).isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED, ROLE);
-
         doNothing().when(initiativeService).updateInitiative(any(Initiative.class));
-
         doNothing().when(initiativeService).sendInitiativeInfoToRuleEngine(any(Initiative.class));
+        when(initiativeService.sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(any(Initiative.class), any(InitiativeOrganizationInfoDTO.class)))
+                .thenReturn(initiative);
+        doNothing().when(initiativeService).sendEmailToPagoPA(any(), anyString(), anyString());
+        doNothing().when(initiativeService).sendEmailToCurrentOrg(any(), anyString(), anyString());
+        doNothing().when(initiativeService).initializeStatistics(INITIATIVE_ID, ORGANIZATION_ID);
 
-        when(initiativeService.sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(step5Initiative, initiativeOrganizationInfoDTO)).thenReturn(step5Initiative);
-
-
-        mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(initiativeOrganizationInfoDTO))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNoContent())
-                .andDo(print())
-                .andReturn();
+        mvc.perform(
+                        put(BASE_URL + String.format(PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andDo(print());
     }
 
     @Test
     void when_PUT_updateInitiativePublishedStatus_NotToIO_then204() throws Exception {
-        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = InitiativeOrganizationInfoDTO.builder()
-                .organizationName(ORGANIZATION_NAME)
-                .organizationVat(ORGANIZATION_VAT)
-                .organizationUserRole(ROLE)
-                .build();
+        InitiativeOrganizationInfoDTO request = createInitiativeOrganizationInfoDTO();
+        Initiative initiative = createStep5Initiative();
+        initiative.getAdditionalInfo().setServiceIO(false);
 
-        //create Dummy Initiative
-        Initiative step5Initiative = createStep5Initiative();
-        InitiativeAdditional additionalInfo = step5Initiative.getAdditionalInfo();
-        additionalInfo.setServiceIO(false);
-        step5Initiative.setAdditionalInfo(additionalInfo);
-
-        // When
-        // With this instruction, I instruct the service (via Mockito's when) to always return the DummyInitiative to me anytime I call the same service's function
-        when(initiativeService.getInitiative(anyString(), anyString(), anyString())).thenReturn(step5Initiative);
-        Initiative initiative = initiativeService.getInitiative(anyString(), anyString(), anyString());
-        // Expecting same instance
-        assertThat("Reason of result", initiative, is(sameInstance(step5Initiative)));
-
+        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(initiative);
         doNothing().when(initiativeService).isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED, ROLE);
-
         doNothing().when(initiativeService).updateInitiative(any(Initiative.class));
-
         doNothing().when(initiativeService).sendInitiativeInfoToRuleEngine(any(Initiative.class));
+        doNothing().when(initiativeService).sendEmailToPagoPA(any(), anyString(), anyString());
+        doNothing().when(initiativeService).sendEmailToCurrentOrg(any(), anyString(), anyString());
+        doNothing().when(initiativeService).initializeStatistics(INITIATIVE_ID, ORGANIZATION_ID);
 
-        mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(initiativeOrganizationInfoDTO))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNoContent())
-                .andDo(print())
-                .andReturn();
+        mvc.perform(
+                        put(BASE_URL + String.format(PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andDo(print());
     }
 
     @Test
     void givenRuleEngineError_when_PUT_updateInitiativePublishedStatus_thenThrowException() throws Exception {
-        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = InitiativeOrganizationInfoDTO.builder()
-                .organizationName(ORGANIZATION_NAME)
-                .organizationVat(ORGANIZATION_VAT)
-                .organizationUserRole(ROLE)
-                .build();
+        InitiativeOrganizationInfoDTO request = createInitiativeOrganizationInfoDTO();
+        Initiative initiative = createStep5Initiative();
 
-        //create Dummy Initiative
-        Initiative step5Initiative = createStep5Initiative();
-        InitiativeDTO step5InitiativeDTO = createStep5InitiativeDTO();
-
-        // When
-        // With this instruction, I instruct the service (via Mockito's when) to always return the DummyInitiative to me anytime I call the same service's function
-        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step5Initiative);
-        Initiative initiative = initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
-        // Expecting same instance
-        assertThat("Reason of result", initiative, is(sameInstance(step5Initiative)));
-
+        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(initiative);
         doNothing().when(initiativeService).isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED, ROLE);
-
-        // Instruct the Service to insert a Dummy Initiative
-        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true)).thenReturn(step5InitiativeDTO);
-
         doNothing().when(initiativeService).updateInitiative(any(Initiative.class));
+        doThrow(new KafkaException()).when(initiativeService).sendInitiativeInfoToRuleEngine(any(Initiative.class));
 
-        doThrow(
-                new KafkaException()
-        ).when(initiativeService).sendInitiativeInfoToRuleEngine(any(Initiative.class));
-
-        MvcResult res =
-                mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
-                                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                .content(objectMapper.writeValueAsString(initiativeOrganizationInfoDTO))
+        MvcResult res = mvc.perform(
+                        put(BASE_URL + String.format(PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
                                 .accept(MediaType.APPLICATION_JSON))
-                        .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                        .andDo(print())
-                        .andReturn();
+                .andExpect(status().isBadRequest())
+                .andDo(print())
+                .andReturn();
 
+        ErrorDTO error = objectMapper.readValue(res.getResponse().getContentAsString(), ErrorDTO.class);
         assertEquals(HttpStatus.BAD_REQUEST.value(), res.getResponse().getStatus());
+        assertEquals(INITIATIVE_ROLLBACK_TO_PREVIOUS_STATUS, error.getCode());
     }
 
     @Test
     void givenIOBackEndError_when_PUT_updateInitiativePublishedStatus_thenThrowException() throws Exception {
-        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = createInitiativeOrganizationInfoDTO();
+        InitiativeOrganizationInfoDTO request = createInitiativeOrganizationInfoDTO();
+        Initiative initiative = createStep5Initiative();
 
-        //create Dummy Initiative
-        Initiative step5Initiative = createStep5Initiative();
-        InitiativeDTO step5InitiativeDTO = createStep5InitiativeDTO();
-
-        // When
-        // With this instruction, I instruct the service (via Mockito's when) to always return the DummyInitiative to me anytime I call the same service's function
-        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step5Initiative);
-        Initiative initiative = initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
-        // Expecting same instance
-        assertThat("Reason of result", initiative, is(sameInstance(step5Initiative)));
-
+        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(initiative);
         doNothing().when(initiativeService).isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED, ROLE);
-
-        // Instruct the Service to insert a Dummy Initiative
-        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true)).thenReturn(step5InitiativeDTO);
-
         doNothing().when(initiativeService).updateInitiative(any(Initiative.class));
-
         doNothing().when(initiativeService).sendInitiativeInfoToRuleEngine(any(Initiative.class));
+        doThrow(FeignException.errorStatus("Bad Request", responseStub()))
+                .when(initiativeService)
+                .sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(any(Initiative.class), any(InitiativeOrganizationInfoDTO.class));
 
-        doThrow(
-                FeignException.errorStatus("Bad Request", responseStub())
-        ).when(initiativeService).sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(step5Initiative, initiativeOrganizationInfoDTO);
-
-        MvcResult res =
-                mvc.perform(MockMvcRequestBuilders.put(BASE_URL + String.format(PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
-                                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                .content(objectMapper.writeValueAsString(initiativeOrganizationInfoDTO))
+        MvcResult res = mvc.perform(
+                        put(BASE_URL + String.format(PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
                                 .accept(MediaType.APPLICATION_JSON))
-                        .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                        .andDo(print())
-                        .andReturn();
+                .andExpect(status().isBadRequest())
+                .andDo(print())
+                .andReturn();
 
         ErrorDTO error = objectMapper.readValue(res.getResponse().getContentAsString(), ErrorDTO.class);
         assertEquals(HttpStatus.BAD_REQUEST.value(), res.getResponse().getStatus());
-        assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_ROLLBACK_TO_PREVIOUS_STATUS, error.getCode());
+        assertEquals(INITIATIVE_ROLLBACK_TO_PREVIOUS_STATUS, error.getCode());
         assertEquals("Something gone wrong while notify Initiative [%s] for publishing".formatted(initiative.getInitiativeId()), error.getMessage());
     }
 
     @Test
     void getListOfOrganization() throws Exception {
-        List<OrganizationDTO> organizationDTOList = createOrganizationDTOList();
-        when(organizationService.getOrganizationList(ADMIN)).thenReturn(organizationDTOList);
-        when(organizationService.getOrganizationList(PAGOPA_ADMIN)).thenReturn(organizationDTOList);
+        List<OrganizationDTO> organizations = createOrganizationDTOList();
+
+        when(organizationService.getOrganizationList(ADMIN)).thenReturn(organizations);
+        when(organizationService.getOrganizationList(PAGOPA_ADMIN)).thenReturn(organizations);
         when(organizationService.getOrganizationList("default")).thenReturn(null);
 
-        MvcResult resultAdmin = mvc.perform(MockMvcRequestBuilders
-                        .get(BASE_URL + "/organizations")
-                        .param("role", ADMIN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
+        MvcResult resultAdmin = mvc.perform(
+                        get(BASE_URL + "/organizations")
+                                .param("role", ADMIN)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
                 .andReturn();
 
-        MvcResult resultPagoPaAdmin = mvc.perform(MockMvcRequestBuilders
-                        .get(BASE_URL + "/organizations")
-                        .param("role", PAGOPA_ADMIN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
+        MvcResult resultPagoPaAdmin = mvc.perform(
+                        get(BASE_URL + "/organizations")
+                                .param("role", PAGOPA_ADMIN)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
                 .andReturn();
 
-        MvcResult resultDefault = mvc.perform(MockMvcRequestBuilders
-                        .get(BASE_URL + "/organizations")
-                        .param("role", "default")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
+        MvcResult resultDefault = mvc.perform(
+                        get(BASE_URL + "/organizations")
+                                .param("role", "default")
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
                 .andReturn();
 
-        String expectedResultContent = "[{\"organizationId\":\"organizationId_0\",\"organizationName\":\"organizationName_0\"},{\"organizationId\":\"organizationId_1\",\"organizationName\":\"organizationName_1\"},{\"organizationId\":\"organizationId_2\",\"organizationName\":\"organizationName_2\"},{\"organizationId\":\"organizationId_3\",\"organizationName\":\"organizationName_3\"}]";
-        assertEquals(expectedResultContent, resultAdmin.getResponse().getContentAsString());
-        assertEquals(expectedResultContent, resultPagoPaAdmin.getResponse().getContentAsString());
+        String expected = objectMapper.writeValueAsString(organizations);
+        assertEquals(expected, resultAdmin.getResponse().getContentAsString());
+        assertEquals(expected, resultPagoPaAdmin.getResponse().getContentAsString());
         assertEquals("", resultDefault.getResponse().getContentAsString());
     }
 
@@ -1143,74 +860,75 @@ class InitiativeApiTest {
         OrganizationDTO organization = createOrganizationDTO(1);
         when(organizationService.getOrganization(organization.getOrganizationId())).thenReturn(organization);
 
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
-                        .get(BASE_URL + "/organizations/{organizationId}", organization.getOrganizationId())
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
+        MvcResult result = mvc.perform(
+                        get(BASE_URL + "/organizations/{organizationId}", organization.getOrganizationId())
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
                 .andDo(print())
                 .andReturn();
 
-        String expectedResultContent = "{\"organizationId\":\"organizationId_1\",\"organizationName\":\"organizationName_1\"}";
-        assertEquals(expectedResultContent, result.getResponse().getContentAsString());
+        assertEquals(objectMapper.writeValueAsString(organization), result.getResponse().getContentAsString());
     }
 
     @Test
     void testGetRankingList() throws Exception {
+        when(initiativeService.getRankingList(anyString(), anyString(), any(), any(), any()))
+                .thenReturn(new BeneficiaryRankingPageDTO());
+
         mvc.perform(
-                        MockMvcRequestBuilders.get(BASE_URL + String.format(GET_RANKING_LIST,
-                                        ORGANIZATION_ID, INITIATIVE_ID))
-                                .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andDo(print())
-                .andReturn();
+                        get(BASE_URL + String.format(GET_RANKING_LIST, ORGANIZATION_ID, INITIATIVE_ID))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print());
     }
 
     @Test
     void getOnboardingList() throws Exception {
+        when(initiativeService.getOnboardingStatusList(anyString(), anyString(), any(), any(), any(), any(), any()))
+                .thenReturn(new OnboardingDTO());
+
         mvc.perform(
-                        MockMvcRequestBuilders.get(BASE_URL + String.format(GET_INITIATIVE_ACTIVE_URL, ORGANIZATION_ID, INITIATIVE_ID + "/onboardings"))
-                                .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andDo(print())
-                .andReturn();
+                        get(BASE_URL + String.format(GET_INITIATIVE_ACTIVE_URL, ORGANIZATION_ID, INITIATIVE_ID + "/onboardings"))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print());
     }
 
     @Test
     void getInitiativeBeneficiaryDetail_statusOk() throws Exception {
+        InitiativeDetailDTO detailDTO = createInitiativeDetailDTO();
 
-        //create Dummy Initiative
-        Initiative initiative = createStep5Initiative();
-        InitiativeDetailDTO initiativeDetailDTO = createInitiativeDetailDTO();
-        Locale acceptLanguage = Locale.ITALIAN;
+        when(initiativeService.getInitiativeBeneficiaryDetail(anyString(), any(), anyBoolean())).thenReturn(detailDTO);
 
-        // Instruct the Service to insert a Dummy Initiative
-        when(initiativeModelToDTOMapper.toInitiativeDetailDTO(initiative,acceptLanguage, false)).thenReturn(initiativeDetailDTO);
-        // When
-        // With this instruction, I instruct the service (via Mockito's when) to always return the DummyInitiative to me anytime I call the same service's function
-        when(initiativeService.getInitiativeBeneficiaryDetail(anyString(),any(), anyBoolean())).thenReturn(initiativeDetailDTO);
-
-        //The MVC perform should perform the API by returning the response based on the Service previously mocked.
         mvc.perform(
-                        MockMvcRequestBuilders.get(BASE_URL + String.format(GET_INITIATIVE_BENEFICIARY_DETAIL_URL, INITIATIVE_ID))
-                                .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andDo(print())
-                .andReturn();
+                        get(BASE_URL + String.format(GET_INITIATIVE_BENEFICIARY_DETAIL_URL, INITIATIVE_ID))
+                                .header("Accept-Language", "it")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print());
     }
 
     @Test
     void deleteInitiative() throws Exception {
-        // When
-        // With this instruction, I instruct the service (via Mockito's when) to always return the DummyInitiative to me anytime I call the same service's function
-        doNothing().when(initiativeService).deleteInitiative(any());
+        doNothing().when(initiativeService).deleteInitiative(INITIATIVE_ID);
 
-        //The MVC perform should perform the API by returning the response based on the Service previously mocked.
         mvc.perform(
-                        MockMvcRequestBuilders.delete(BASE_URL + String.format(DELETE_INITIATIVE_URL, INITIATIVE_ID))
-                                .contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNoContent())
-                .andDo(print())
-                .andReturn();
+                        delete(BASE_URL + String.format(DELETE_INITIATIVE_URL, INITIATIVE_ID))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andDo(print());
+    }
+
+    private InitiativeSummaryDTO createStep1InitiativeSummaryDTO() {
+        return InitiativeSummaryDTO.builder()
+                .initiativeId("initiativeId")
+                .initiativeName("initiativeName")
+                .status(InitiativeConstants.Status.PUBLISHED)
+                .build();
     }
 
     private List<OrganizationDTO> createOrganizationDTOList() {
@@ -1225,11 +943,11 @@ class InitiativeApiTest {
     }
 
     private InitiativeOrganizationInfoDTO createInitiativeOrganizationInfoDTO() {
-        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = new InitiativeOrganizationInfoDTO();
-        initiativeOrganizationInfoDTO.setOrganizationName(ORGANIZATION_NAME);
-        initiativeOrganizationInfoDTO.setOrganizationVat(ORGANIZATION_VAT);
-        initiativeOrganizationInfoDTO.setOrganizationUserRole(ROLE);
-        return initiativeOrganizationInfoDTO;
+        InitiativeOrganizationInfoDTO dto = new InitiativeOrganizationInfoDTO();
+        dto.setOrganizationName(ORGANIZATION_NAME);
+        dto.setOrganizationVat(ORGANIZATION_VAT);
+        dto.setOrganizationUserRole(ROLE);
+        return dto;
     }
 
     private InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardValueDTO() {
@@ -1241,118 +959,110 @@ class InitiativeApiTest {
     }
 
     private InitiativeTrxConditionsDTO createInitiativeTrxConditionsDTOValid() {
-        InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = new InitiativeTrxConditionsDTO();
+        InitiativeTrxConditionsDTO dto = new InitiativeTrxConditionsDTO();
+
         List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<>();
-        DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
-        Set<DayOfWeek> dayOfWeeks = new HashSet<>();
-        dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
-        dayOfWeeks.add(DayOfWeek.THURSDAY);
-        dayConfig1.setDaysOfWeek(dayOfWeeks);
+        DayOfWeekDTO.DayConfig dayConfig = new DayOfWeekDTO.DayConfig();
+
+        Set<DayOfWeek> daysOfWeek = new HashSet<>();
+        daysOfWeek.add(DayOfWeek.MONDAY);
+        daysOfWeek.add(DayOfWeek.THURSDAY);
+        dayConfig.setDaysOfWeek(daysOfWeek);
+
         List<DayOfWeekDTO.Interval> intervals = new ArrayList<>();
-        DayOfWeekDTO.Interval interval1 = new DayOfWeekDTO.Interval();
-        LocalTime t1 = LocalTime.of(6, 0, 0);
-        LocalTime t2 = LocalTime.of(12, 0, 0);
-        interval1.setStartTime(t1);
-        interval1.setEndTime(t2);
-        intervals.add(interval1);
-        dayConfig1.setIntervals(intervals);
-        dayConfigs.add(dayConfig1);
+        DayOfWeekDTO.Interval interval = new DayOfWeekDTO.Interval();
+        interval.setStartTime(LocalTime.of(6, 0, 0));
+        interval.setEndTime(LocalTime.of(12, 0, 0));
+        intervals.add(interval);
+        dayConfig.setIntervals(intervals);
+        dayConfigs.add(dayConfig);
 
-        DayOfWeekDTO dayOfWeekDTO = new DayOfWeekDTO(dayConfigs);
+        dto.setDaysOfWeek(new DayOfWeekDTO(dayConfigs));
 
-        ThresholdDTO thresholdDTO = new ThresholdDTO();
+        ThresholdDTO threshold = new ThresholdDTO();
+        threshold.setFrom(BigDecimal.valueOf(10));
+        threshold.setFromIncluded(true);
+        threshold.setTo(BigDecimal.valueOf(30));
+        threshold.setToIncluded(true);
+        dto.setThreshold(threshold);
 
-        thresholdDTO.setFrom(BigDecimal.valueOf(10));
-        thresholdDTO.setFromIncluded(true);
-        thresholdDTO.setTo(BigDecimal.valueOf(30));
-        thresholdDTO.setToIncluded(true);
+        TrxCountDTO trxCount = new TrxCountDTO();
+        trxCount.setFrom(10L);
+        trxCount.setFromIncluded(true);
+        trxCount.setTo(30L);
+        trxCount.setToIncluded(true);
+        dto.setTrxCount(trxCount);
 
-        TrxCountDTO trxCountDTO = new TrxCountDTO();
+        MccFilterDTO mccFilter = new MccFilterDTO();
+        mccFilter.setAllowedList(true);
+        mccFilter.setValues(Set.of("123", "456"));
+        dto.setMccFilter(mccFilter);
 
-        trxCountDTO.setFrom(10L);
-        trxCountDTO.setFromIncluded(true);
-        trxCountDTO.setTo(30L);
-        trxCountDTO.setToIncluded(true);
+        RewardLimitsDTO daily = new RewardLimitsDTO();
+        daily.setFrequency(RewardLimitsDTO.RewardLimitFrequency.DAILY);
+        daily.setRewardLimit(BigDecimal.valueOf(100));
 
-        MccFilterDTO mccFilterDTO = new MccFilterDTO();
-        mccFilterDTO.setAllowedList(true);
-        Set<String> values = new HashSet<>();
-        values.add("123");
-        values.add("456");
-        mccFilterDTO.setValues(values);
+        RewardLimitsDTO monthly = new RewardLimitsDTO();
+        monthly.setFrequency(RewardLimitsDTO.RewardLimitFrequency.MONTHLY);
+        monthly.setRewardLimit(BigDecimal.valueOf(3000));
 
-        List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<>();
-        RewardLimitsDTO rewardLimitsDTO1 = new RewardLimitsDTO();
-        rewardLimitsDTO1.setFrequency(RewardLimitsDTO.RewardLimitFrequency.DAILY);
-        rewardLimitsDTO1.setRewardLimit(BigDecimal.valueOf(100));
-        RewardLimitsDTO rewardLimitsDTO2 = new RewardLimitsDTO();
-        rewardLimitsDTO2.setFrequency(RewardLimitsDTO.RewardLimitFrequency.MONTHLY);
-        rewardLimitsDTO2.setRewardLimit(BigDecimal.valueOf(3000));
-        rewardLimitsDTOList.add(rewardLimitsDTO1);
-        rewardLimitsDTOList.add(rewardLimitsDTO2);
-
-        initiativeTrxConditionsDTO.setDaysOfWeek(dayOfWeekDTO);
-        initiativeTrxConditionsDTO.setThreshold(thresholdDTO);
-        initiativeTrxConditionsDTO.setTrxCount(trxCountDTO);
-        initiativeTrxConditionsDTO.setMccFilter(mccFilterDTO);
-        initiativeTrxConditionsDTO.setRewardLimits(rewardLimitsDTOList);
-
-        return initiativeTrxConditionsDTO;
+        dto.setRewardLimits(List.of(daily, monthly));
+        return dto;
     }
 
     private InitiativeRewardAndTrxRulesDTO createInitiativeRewardAndTrxRulesDTO() {
-        InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = new InitiativeRewardAndTrxRulesDTO();
-        initiativeRewardAndTrxRulesDTO.setInitiativeRewardType(InitiativeRewardAndTrxRulesDTO.InitiativeRewardTypeEnum.REFUND);
-        InitiativeRewardRuleDTO initiativeRewardRuleDTO = createInitiativeRewardRuleDTORewardValueDTO();
-        initiativeRewardAndTrxRulesDTO.setRewardRule(initiativeRewardRuleDTO);
-        InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = createInitiativeTrxConditionsDTOValid();
-        initiativeRewardAndTrxRulesDTO.setTrxRule(initiativeTrxConditionsDTO);
-        return initiativeRewardAndTrxRulesDTO;
+        InitiativeRewardAndTrxRulesDTO dto = new InitiativeRewardAndTrxRulesDTO();
+        dto.setInitiativeRewardType(InitiativeRewardAndTrxRulesDTO.InitiativeRewardTypeEnum.REFUND);
+        dto.setRewardRule(createInitiativeRewardRuleDTORewardValueDTO());
+        dto.setTrxRule(createInitiativeTrxConditionsDTOValid());
+        dto.setOrganizationUserRole(ROLE);
+        return dto;
     }
 
     private Response responseStub() {
         return Response.builder()
-                .request(
-                        Request.create(Request.HttpMethod.POST, "url", Collections.emptyMap(), new byte[0], Charset.defaultCharset(), new RequestTemplate()))
+                .request(Request.create(
+                        Request.HttpMethod.POST,
+                        "url",
+                        Collections.emptyMap(),
+                        new byte[0],
+                        Charset.defaultCharset(),
+                        new RequestTemplate()))
                 .status(400)
                 .reason("Bad Request")
-//                .headers(Collections.emptyMap()
                 .build();
     }
-
-    /*
-     * ############### Step 1 ###############
-     */
 
     private Initiative createStep1Initiative() {
         Initiative initiative = new Initiative();
         initiative.setInitiativeId(INITIATIVE_ID);
         initiative.setInitiativeName("initiativeName1");
         initiative.setOrganizationId(ORGANIZATION_ID);
+        initiative.setOrganizationName(ORGANIZATION_NAME);
         initiative.setStatus("DRAFT");
         initiative.setAdditionalInfo(createInitiativeAdditional());
         return initiative;
     }
 
     private InitiativeAdditional createInitiativeAdditional() {
-        InitiativeAdditional initiativeAdditional = new InitiativeAdditional();
-        initiativeAdditional.setServiceIO(true);
-        initiativeAdditional.setServiceId(SERVICE_ID);
-        initiativeAdditional.setServiceName("serviceName");
-        initiativeAdditional.setServiceScope(InitiativeAdditional.ServiceScope.LOCAL);
-        initiativeAdditional.setDescription("Description");
-        initiativeAdditional.setPrivacyLink("https://www.google.it");
-        initiativeAdditional.setTcLink("https://www.google.it");
+        InitiativeAdditional additional = new InitiativeAdditional();
+        additional.setServiceIO(true);
+        additional.setServiceId(SERVICE_ID);
+        additional.setServiceName("serviceName");
+        additional.setServiceScope(InitiativeAdditional.ServiceScope.LOCAL);
+        additional.setDescription("Description");
+        additional.setPrivacyLink("https://www.google.it");
+        additional.setTcLink("https://www.google.it");
+
         Channel channel = new Channel();
         channel.setType(Channel.TypeEnum.EMAIL);
         channel.setContact("contact");
-        List<Channel> channels = new ArrayList<>();
-        channels.add(channel);
-        initiativeAdditional.setChannels(channels);
-        return initiativeAdditional;
+        additional.setChannels(new ArrayList<>(List.of(channel)));
+
+        return additional;
     }
 
-    InitiativeDTO createStep1InitiativeDTO() {
+    private InitiativeDTO createStep1InitiativeDTO() {
         return InitiativeDTO.builder()
                 .initiativeId(INITIATIVE_ID)
                 .initiativeName("initiativeName1")
@@ -1360,34 +1070,33 @@ class InitiativeApiTest {
                 .status("DRAFT")
                 .autocertificationCheck(true)
                 .beneficiaryRanking(true)
-                .additionalInfo(createInitiativeAdditionalDTO()).build();
+                .additionalInfo(createInitiativeAdditionalDTO())
+                .build();
     }
 
-    InitiativeAdditionalDTO createStep1InitiativeAdditionalDTO() {
+    private InitiativeAdditionalDTO createStep1InitiativeAdditionalDTO() {
         return createInitiativeAdditionalDTO();
     }
 
     private InitiativeAdditionalDTO createInitiativeAdditionalDTO() {
-        InitiativeAdditionalDTO initiativeAdditionalDTO = new InitiativeAdditionalDTO();
-        initiativeAdditionalDTO.setServiceIO(true);
-        initiativeAdditionalDTO.setServiceId("serviceId");
-        initiativeAdditionalDTO.setServiceName("serviceName");
-        initiativeAdditionalDTO.setServiceScope(InitiativeAdditionalDTO.ServiceScope.LOCAL);
-        initiativeAdditionalDTO.setDescription("Description");
-        initiativeAdditionalDTO.setPrivacyLink("https://www.google.it");
-        initiativeAdditionalDTO.setTcLink("https://www.google.it");
+        InitiativeAdditionalDTO dto = new InitiativeAdditionalDTO();
+        dto.setOrganizationName(ORGANIZATION_NAME);
+        dto.setOrganizationUserRole(ROLE);
+        dto.setServiceIO(true);
+        dto.setServiceId("serviceId");
+        dto.setServiceName("serviceName");
+        dto.setServiceScope(InitiativeAdditionalDTO.ServiceScope.LOCAL);
+        dto.setDescription("Description");
+        dto.setPrivacyLink("https://www.google.it");
+        dto.setTcLink("https://www.google.it");
+
         ChannelDTO channelDTO = new ChannelDTO();
         channelDTO.setType(ChannelDTO.TypeEnum.EMAIL);
         channelDTO.setContact("contact");
-        List<ChannelDTO> channelDTOS = new ArrayList<>();
-        channelDTOS.add(channelDTO);
-        initiativeAdditionalDTO.setChannels(channelDTOS);
-        return initiativeAdditionalDTO;
-    }
+        dto.setChannels(new ArrayList<>(List.of(channelDTO)));
 
-    /*
-     * ############### Step 2 ###############
-     */
+        return dto;
+    }
 
     private Initiative createStep2Initiative(Boolean beneficiaryKnown) {
         Initiative initiative = createStep1Initiative();
@@ -1398,55 +1107,59 @@ class InitiativeApiTest {
     private InitiativeGeneral createInitiativeGeneral(Boolean beneficiaryKnown) {
         Map<String, String> language = new HashMap<>();
         language.put(Locale.ITALIAN.getLanguage(), "it");
-        InitiativeGeneral initiativeGeneral = new InitiativeGeneral();
-        initiativeGeneral.setBeneficiaryBudgetCents(1000L);
-        initiativeGeneral.setBeneficiaryKnown(beneficiaryKnown);
-        initiativeGeneral.setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF);
-        initiativeGeneral.setBudgetCents(100000000000L);
+
+        InitiativeGeneral general = new InitiativeGeneral();
+        general.setBeneficiaryKnown(beneficiaryKnown);
+        general.setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF);
+        general.setBudgetCents(100000000000L);
+
         LocalDate rankingStartDate = LocalDate.now();
         LocalDate rankingEndDate = rankingStartDate.plusDays(1);
         LocalDate startDate = rankingEndDate.plusDays(1);
         LocalDate endDate = startDate.plusDays(1);
-        initiativeGeneral.setRankingStartDate(rankingStartDate);
-        initiativeGeneral.setRankingEndDate(rankingEndDate);
-        initiativeGeneral.setStartDate(startDate);
-        initiativeGeneral.setEndDate(endDate);
-        initiativeGeneral.setRankingEnabled(false);
-        initiativeGeneral.setDescriptionMap(language);
-        return initiativeGeneral;
+
+        general.setRankingStartDate(rankingStartDate);
+        general.setRankingEndDate(rankingEndDate);
+        general.setStartDate(startDate);
+        general.setEndDate(endDate);
+        general.setRankingEnabled(false);
+        general.setDescriptionMap(language);
+        return general;
     }
 
     private InitiativeDTO createStep2InitiativeDTO() {
-        InitiativeDTO initiativeDTO = createStep1InitiativeDTO();
-        initiativeDTO.setGeneral(createInitiativeGeneralDTO(false));
-        return initiativeDTO;
+        InitiativeDTO dto = createStep1InitiativeDTO();
+        dto.setGeneral(createInitiativeGeneralDTO(false));
+        return dto;
     }
 
     private InitiativeGeneralDTO createInitiativeGeneralDTO(Boolean beneficiaryKnown) {
         Map<String, String> language = new HashMap<>();
         language.put(Locale.ITALIAN.getLanguage(), "it");
-        InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
-        initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
-        initiativeGeneralDTO.setBeneficiaryBudgetMax(new BigDecimal(10));
-        initiativeGeneralDTO.setBeneficiaryKnown(beneficiaryKnown);
-        initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
-        initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
+
+        InitiativeGeneralDTO dto = new InitiativeGeneralDTO();
+        dto.setOrganizationUserRole(ROLE);
+        dto.setBeneficiaryKnown(beneficiaryKnown);
+        dto.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
+
+        dto.setBudget(BigDecimal.valueOf(1000000000L));
+
+        dto.setBeneficiaryBudgetFixed(new BigDecimal(1000));
+
         LocalDate rankingStartDate = LocalDate.now();
         LocalDate rankingEndDate = rankingStartDate.plusDays(1);
         LocalDate startDate = rankingEndDate.plusDays(1);
         LocalDate endDate = startDate.plusDays(1);
-        initiativeGeneralDTO.setRankingStartDate(rankingStartDate);
-        initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
-        initiativeGeneralDTO.setStartDate(startDate);
-        initiativeGeneralDTO.setEndDate(endDate);
-        initiativeGeneralDTO.setRankingEnabled(false);
-        initiativeGeneralDTO.setDescriptionMap(language);
-        return initiativeGeneralDTO;
-    }
 
-    /*
-     * ############### Step 3 ###############
-     */
+        dto.setRankingStartDate(rankingStartDate);
+        dto.setRankingEndDate(rankingEndDate);
+        dto.setStartDate(startDate);
+        dto.setEndDate(endDate);
+        dto.setRankingEnabled(false);
+        dto.setDescriptionMap(language);
+
+        return dto;
+    }
 
     private Initiative createStep3Initiative() {
         Initiative initiative = createStep2Initiative(false);
@@ -1455,91 +1168,86 @@ class InitiativeApiTest {
     }
 
     private InitiativeBeneficiaryRule createInitiativeBeneficiaryRule() {
-        InitiativeBeneficiaryRule initiativeBeneficiaryRule = new InitiativeBeneficiaryRule();
+        InitiativeBeneficiaryRule rule = new InitiativeBeneficiaryRule();
+
         SelfCriteriaBool selfCriteriaBool = new SelfCriteriaBool();
         selfCriteriaBool.set_type(TypeBoolEnum.BOOLEAN);
         selfCriteriaBool.setCode("B001");
         selfCriteriaBool.setDescription("Desc_bool");
         selfCriteriaBool.setValue(true);
+
         SelfCriteriaMulti selfCriteriaMulti = new SelfCriteriaMulti();
         selfCriteriaMulti.set_type(TypeMultiEnum.MULTI);
         selfCriteriaMulti.setCode("B001");
         selfCriteriaMulti.setDescription("Desc_Multi");
-        List<String> values = new ArrayList<>();
-        values.add("valore1");
-        values.add("valore2");
-        selfCriteriaMulti.setValue(values);
-        List<ISelfDeclarationCriteria> iSelfDeclarationCriteriaList = new ArrayList<>();
-        iSelfDeclarationCriteriaList.add(selfCriteriaBool);
-        iSelfDeclarationCriteriaList.add(selfCriteriaMulti);
-        initiativeBeneficiaryRule.setSelfDeclarationCriteria(iSelfDeclarationCriteriaList);
+        selfCriteriaMulti.setValue(List.of("valore1", "valore2"));
+
+        List<ISelfDeclarationCriteria> selfDeclarationCriteria = new ArrayList<>();
+        selfDeclarationCriteria.add(selfCriteriaBool);
+        selfDeclarationCriteria.add(selfCriteriaMulti);
+        rule.setSelfDeclarationCriteria(selfDeclarationCriteria);
+
         AutomatedCriteria automatedCriteria = new AutomatedCriteria();
         automatedCriteria.setAuthority("Authority_ISEE");
         automatedCriteria.setCode("Code_ISEE");
         automatedCriteria.setField("true");
         automatedCriteria.setOperator(FilterOperatorEnumModel.EQ);
         automatedCriteria.setValue("value");
-        List<AutomatedCriteria> automatedCriteriaList = new ArrayList<>();
-        automatedCriteriaList.add(automatedCriteria);
-        initiativeBeneficiaryRule.setAutomatedCriteria(automatedCriteriaList);
-        initiativeBeneficiaryRule.setApiKeyClientId(API_KEY_CLIENT_ID);
-        initiativeBeneficiaryRule.setApiKeyClientAssertion(API_KEY_CLIENT_ASSERTION);
-        return initiativeBeneficiaryRule;
+
+        rule.setAutomatedCriteria(new ArrayList<>(List.of(automatedCriteria)));
+        rule.setApiKeyClientId(API_KEY_CLIENT_ID);
+        rule.setApiKeyClientAssertion(API_KEY_CLIENT_ASSERTION);
+
+        return rule;
     }
 
     private InitiativeDTO createStep3InitiativeDTO() {
-        InitiativeDTO initiativeDTO = createStep2InitiativeDTO();
-        initiativeDTO.setBeneficiaryRule(createInitiativeBeneficiaryRuleDTO());
-        return initiativeDTO;
+        InitiativeDTO dto = createStep2InitiativeDTO();
+        dto.setBeneficiaryRule(createInitiativeBeneficiaryRuleDTO());
+        return dto;
     }
 
     private InitiativeBeneficiaryRuleDTO createInitiativeBeneficiaryRuleDTO() {
-        InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTO = new InitiativeBeneficiaryRuleDTO();
-
-        initiativeBeneficiaryRuleDTO.setSelfDeclarationCriteria(createAnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems());
-        initiativeBeneficiaryRuleDTO.setAutomatedCriteria(createAutomatedCriteriaDTO());
-
-        initiativeBeneficiaryRuleDTO.setApiKeyClientId(API_KEY_CLIENT_ID);
-        initiativeBeneficiaryRuleDTO.setApiKeyClientAssertion(API_KEY_CLIENT_ASSERTION);
-        return initiativeBeneficiaryRuleDTO;
+        InitiativeBeneficiaryRuleDTO dto = new InitiativeBeneficiaryRuleDTO();
+        dto.setOrganizationName(ORGANIZATION_NAME);
+        dto.setOrganizationUserRole(ROLE);
+        dto.setSelfDeclarationCriteria(createAnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems());
+        dto.setAutomatedCriteria(createAutomatedCriteriaDTO());
+        dto.setApiKeyClientId(API_KEY_CLIENT_ID);
+        dto.setApiKeyClientAssertion(API_KEY_CLIENT_ASSERTION);
+        return dto;
     }
 
-
-    private List<AutomatedCriteriaDTO> createAutomatedCriteriaDTO(){
+    private List<AutomatedCriteriaDTO> createAutomatedCriteriaDTO() {
         AutomatedCriteriaDTO automatedCriteriaDTO = new AutomatedCriteriaDTO();
         automatedCriteriaDTO.setAuthority("Authority_ISEE");
         automatedCriteriaDTO.setCode("Code_ISEE");
         automatedCriteriaDTO.setField("true");
         automatedCriteriaDTO.setOperator(FilterOperatorEnum.EQ);
         automatedCriteriaDTO.setValue("value");
-        List<AutomatedCriteriaDTO> automatedCriteriaList = new ArrayList<>();
-        automatedCriteriaList.add(automatedCriteriaDTO);
-        return automatedCriteriaList;
+        return new ArrayList<>(List.of(automatedCriteriaDTO));
     }
 
-    private List<AnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems> createAnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems(){
+    private List<AnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems> createAnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems() {
         SelfCriteriaBoolDTO selfCriteriaBoolDTO = new SelfCriteriaBoolDTO();
         selfCriteriaBoolDTO.setType(it.gov.pagopa.initiative.dto.TypeBoolEnum.BOOLEAN);
         selfCriteriaBoolDTO.setCode("B001");
         selfCriteriaBoolDTO.setDescription("Desc_bool");
+        selfCriteriaBoolDTO.setSubDescription("SubDesc_bool");
         selfCriteriaBoolDTO.setValue(true);
+
         SelfCriteriaMultiDTO selfCriteriaMultiDTO = new SelfCriteriaMultiDTO();
         selfCriteriaMultiDTO.setType(it.gov.pagopa.initiative.dto.TypeMultiEnum.MULTI);
         selfCriteriaMultiDTO.setCode("B001");
         selfCriteriaMultiDTO.setDescription("Desc_Multi");
-        List<String> values = new ArrayList<>();
-        values.add("valore1");
-        values.add("valore2");
-        selfCriteriaMultiDTO.setValue(values);
-        List<AnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems> anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems = new ArrayList<>();
-        anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems.add(selfCriteriaBoolDTO);
-        anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems.add(selfCriteriaMultiDTO);
-        return anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems;
-    }
+        selfCriteriaMultiDTO.setSubDescription("SubDesc_multi");
+        selfCriteriaMultiDTO.setValue(List.of("valore1", "valore2"));
 
-    /*
-     * ############### Step 4 ###############
-     */
+        List<AnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems> list = new ArrayList<>();
+        list.add(selfCriteriaBoolDTO);
+        list.add(selfCriteriaMultiDTO);
+        return list;
+    }
 
     private Initiative createStep4Initiative() {
         return createStep3Initiative();
@@ -1549,64 +1257,56 @@ class InitiativeApiTest {
         return createStep3InitiativeDTO();
     }
 
-
-    /*
-     * ############### Step 5 ###############
-     */
-
     private Initiative createStep5Initiative() {
         Initiative initiative = createStep4Initiative();
         initiative.setRefundRule(createRefundRuleValidWithTimeParameter());
+        initiative.setUpdateDate(LocalDateTime.now());
         return initiative;
     }
 
     private InitiativeDTO createStep5InitiativeDTO() {
-        InitiativeDTO initiativeDTO = createStep4InitiativeDTO();
-        initiativeDTO.setRefundRule(createRefundRuleDTOValidWithTimeParameter());
-        return initiativeDTO;
+        InitiativeDTO dto = createStep4InitiativeDTO();
+        dto.setRefundRule(createRefundRuleDTOValidWithTimeParameter());
+        return dto;
     }
 
     private AccumulatedAmountDTO createAccumulatedAmountDTOValid() {
-        AccumulatedAmountDTO amountDTO = new AccumulatedAmountDTO();
-        amountDTO.setAccumulatedType(AccumulatedAmountDTO.AccumulatedTypeEnum.THRESHOLD_REACHED);
-        amountDTO.setRefundThreshold(BigDecimal.valueOf(100000));
-        return amountDTO;
+        AccumulatedAmountDTO dto = new AccumulatedAmountDTO();
+        dto.setAccumulatedType(AccumulatedAmountDTO.AccumulatedTypeEnum.THRESHOLD_REACHED);
+        dto.setRefundThreshold(BigDecimal.valueOf(100000));
+        return dto;
     }
 
     private TimeParameterDTO createTimeParameterDTO_Valid() {
-        TimeParameterDTO timeParameterDTO = new TimeParameterDTO();
-        timeParameterDTO.setTimeType(TimeParameterDTO.TimeTypeEnum.CLOSED);
-        return timeParameterDTO;
+        TimeParameterDTO dto = new TimeParameterDTO();
+        dto.setTimeType(TimeParameterDTO.TimeTypeEnum.CLOSED);
+        return dto;
     }
 
     private RefundAdditionalInfoDTO createAdditionalInfoDTOValid() {
-        RefundAdditionalInfoDTO refundAdditionalInfoDTO = new RefundAdditionalInfoDTO();
-        refundAdditionalInfoDTO.setIdentificationCode("B002");
-        return refundAdditionalInfoDTO;
+        RefundAdditionalInfoDTO dto = new RefundAdditionalInfoDTO();
+        dto.setIdentificationCode("B002");
+        return dto;
     }
 
     private InitiativeRefundRuleDTO createRefundRuleDTOValidWithTimeParameter() {
-        InitiativeRefundRuleDTO refundRuleDTO = new InitiativeRefundRuleDTO();
-
-        refundRuleDTO.setOrganizationName(ORGANIZATION_NAME);
-        refundRuleDTO.setOrganizationUserRole(ROLE);
-
-        refundRuleDTO.setAccumulatedAmount(null);
-        refundRuleDTO.setTimeParameter(createTimeParameterDTO_Valid());
-        refundRuleDTO.setAdditionalInfo(createAdditionalInfoDTOValid());
-        return refundRuleDTO;
+        InitiativeRefundRuleDTO dto = new InitiativeRefundRuleDTO();
+        dto.setOrganizationName(ORGANIZATION_NAME);
+        dto.setOrganizationUserRole(ROLE);
+        dto.setAccumulatedAmount(null);
+        dto.setTimeParameter(createTimeParameterDTO_Valid());
+        dto.setAdditionalInfo(createAdditionalInfoDTOValid());
+        return dto;
     }
 
     private InitiativeRefundRuleDTO createRefundRuleDTOValidWithAccumulatedAmount() {
-        InitiativeRefundRuleDTO refundRuleDTO = new InitiativeRefundRuleDTO();
-
-        refundRuleDTO.setOrganizationName(ORGANIZATION_NAME);
-        refundRuleDTO.setOrganizationUserRole(ROLE);
-
-        refundRuleDTO.setAccumulatedAmount(createAccumulatedAmountDTOValid());
-        refundRuleDTO.setTimeParameter(null);
-        refundRuleDTO.setAdditionalInfo(createAdditionalInfoDTOValid());
-        return refundRuleDTO;
+        InitiativeRefundRuleDTO dto = new InitiativeRefundRuleDTO();
+        dto.setOrganizationName(ORGANIZATION_NAME);
+        dto.setOrganizationUserRole(ROLE);
+        dto.setAccumulatedAmount(createAccumulatedAmountDTOValid());
+        dto.setTimeParameter(null);
+        dto.setAdditionalInfo(createAdditionalInfoDTOValid());
+        return dto;
     }
 
     private AccumulatedAmount createAccumulatedAmount_Valid() {
@@ -1623,37 +1323,30 @@ class InitiativeApiTest {
     }
 
     private AdditionalInfo createAdditionalInfo_Valid() {
-        AdditionalInfo additionalInfo = new AdditionalInfo();
-        additionalInfo.setIdentificationCode("B002");
-        return additionalInfo;
-    }
-
-    private InitiativeRefundRuleDTO createRefundWithBothRefundNullNotValid_ko() {
-        InitiativeRefundRuleDTO refundRuleDTO = new InitiativeRefundRuleDTO();
-        refundRuleDTO.setAccumulatedAmount(null);
-        refundRuleDTO.setTimeParameter(null);
-        return refundRuleDTO;
+        AdditionalInfo info = new AdditionalInfo();
+        info.setIdentificationCode("B002");
+        return info;
     }
 
     private InitiativeRefundRuleDTO createRefundRuleWithAccumulatedAmountDTO_NotValid_ko() {
-        InitiativeRefundRuleDTO refundRuleDTO = new InitiativeRefundRuleDTO();
-        refundRuleDTO.setAccumulatedAmount(createAccumulatedAmountDTO_NotValid_ko());
-        refundRuleDTO.setTimeParameter(null);
-        return refundRuleDTO;
+        InitiativeRefundRuleDTO dto = new InitiativeRefundRuleDTO();
+        dto.setAccumulatedAmount(createAccumulatedAmountDTO_NotValid_ko());
+        dto.setTimeParameter(null);
+        return dto;
     }
 
     private InitiativeRefundRuleDTO createRefundRuleWithAccumulatedAmountAndTimeParameter_NotValid() {
-        InitiativeRefundRuleDTO refundRuleDTO = new InitiativeRefundRuleDTO();
-        refundRuleDTO.setAccumulatedAmount(createAccumulatedAmountDTO_NotValid_ko());
-        refundRuleDTO.setTimeParameter(createTimeParameterDTO_Valid());
-        return refundRuleDTO;
+        InitiativeRefundRuleDTO dto = new InitiativeRefundRuleDTO();
+        dto.setAccumulatedAmount(createAccumulatedAmountDTO_NotValid_ko());
+        dto.setTimeParameter(createTimeParameterDTO_Valid());
+        return dto;
     }
 
     private AccumulatedAmountDTO createAccumulatedAmountDTO_NotValid_ko() {
-        AccumulatedAmountDTO amountDTO = new AccumulatedAmountDTO();
-        amountDTO.setAccumulatedType(AccumulatedAmountDTO.AccumulatedTypeEnum.BUDGET_EXHAUSTED);
-        amountDTO.setRefundThreshold(BigDecimal.valueOf(100000));
-        return amountDTO;
+        AccumulatedAmountDTO dto = new AccumulatedAmountDTO();
+        dto.setAccumulatedType(AccumulatedAmountDTO.AccumulatedTypeEnum.BUDGET_EXHAUSTED);
+        dto.setRefundThreshold(BigDecimal.valueOf(100000));
+        return dto;
     }
 
     private InitiativeRefundRule createRefundRuleValidWithAccumulatedAmount() {
@@ -1676,43 +1369,42 @@ class InitiativeApiTest {
         Initiative initiative = new Initiative();
         initiative.setInitiativeId(INITIATIVE_ID);
         initiative.setOrganizationId(ORGANIZATION_ID);
+        initiative.setOrganizationName(ORGANIZATION_NAME);
+        initiative.setStatus("DRAFT");
         initiative.setRefundRule(createRefundRuleValidWithAccumulatedAmount());
         return initiative;
     }
 
     private InitiativeDetailDTO createInitiativeDetailDTO() {
-        InitiativeDetailDTO initiativeDetailDTO = new InitiativeDetailDTO();
-        initiativeDetailDTO.setInitiativeName("TEST");
-        initiativeDetailDTO.setStatus("APPROVED");
-        initiativeDetailDTO.setDescription("test test");
-        initiativeDetailDTO.setOnboardingStartDate(LocalDate.now().minusDays(25));
-        initiativeDetailDTO.setOnboardingEndDate(LocalDate.now());
-        initiativeDetailDTO.setFruitionStartDate(LocalDate.now());
-        initiativeDetailDTO.setFruitionEndDate(LocalDate.now().plusDays(40));
-        initiativeDetailDTO.setRewardRule(createRewardRuleDTO(false));
-        initiativeDetailDTO.setRefundRule(null);
-        initiativeDetailDTO.setPrivacyLink("privacy.it");
-        initiativeDetailDTO.setTcLink("tc.it");
-        initiativeDetailDTO.setLogoURL("logo.png");
-        initiativeDetailDTO.setUpdateDate(LocalDateTime.now());
-        initiativeDetailDTO.setServiceId("SERVICE_ID");
-        return initiativeDetailDTO;
+        InitiativeDetailDTO dto = new InitiativeDetailDTO();
+        dto.setInitiativeName("TEST");
+        dto.setStatus("APPROVED");
+        dto.setDescription("test test");
+        dto.setOnboardingStartDate(LocalDate.now().minusDays(25));
+        dto.setOnboardingEndDate(LocalDate.now());
+        dto.setFruitionStartDate(LocalDate.now());
+        dto.setFruitionEndDate(LocalDate.now().plusDays(40));
+        dto.setRewardRule(createRewardRuleDTO(false));
+        dto.setRefundRule(null);
+        dto.setPrivacyLink("privacy.it");
+        dto.setTcLink("tc.it");
+        dto.setLogoURL("logo.png");
+        dto.setUpdateDate(LocalDateTime.now());
+        dto.setServiceId("SERVICE_ID");
+        return dto;
     }
 
     private InitiativeRewardRuleDTO createRewardRuleDTO(boolean isRewardFixedValue) {
         if (isRewardFixedValue) {
-            //TODO Aggiungere RewardValue
             return null;
-        } else {
-            RewardGroupsDTO rewardGroupsDTO = new RewardGroupsDTO();
-            RewardGroupsDTO.RewardGroupDTO rewardGroupDTO1 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(10), BigDecimal.valueOf(20), BigDecimal.valueOf(30));
-            RewardGroupsDTO.RewardGroupDTO rewardGroupDTO2 = new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(10), BigDecimal.valueOf(30), BigDecimal.valueOf(40));
-            List<RewardGroupsDTO.RewardGroupDTO> rewardGroupDTOList = new ArrayList<>();
-            rewardGroupDTOList.add(rewardGroupDTO1);
-            rewardGroupDTOList.add(rewardGroupDTO2);
-            rewardGroupsDTO.setRewardGroups(rewardGroupDTOList);
-            return rewardGroupsDTO;
         }
-    }
 
+        RewardGroupsDTO rewardGroupsDTO = new RewardGroupsDTO();
+        RewardGroupsDTO.RewardGroupDTO rewardGroupDTO1 =
+                new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(10), BigDecimal.valueOf(20), BigDecimal.valueOf(30));
+        RewardGroupsDTO.RewardGroupDTO rewardGroupDTO2 =
+                new RewardGroupsDTO.RewardGroupDTO(BigDecimal.valueOf(10), BigDecimal.valueOf(30), BigDecimal.valueOf(40));
+        rewardGroupsDTO.setRewardGroups(List.of(rewardGroupDTO1, rewardGroupDTO2));
+        return rewardGroupsDTO;
+    }
 }

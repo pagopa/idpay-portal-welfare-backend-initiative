@@ -55,9 +55,8 @@ class RankingEnabledNotNullForBeneficiaryKnownFalseValidatorTest {
     private InitiativeGeneralDTO createInitiativeGeneralDTO_ok() {
         language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
-        initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
-        initiativeGeneralDTO.setBeneficiaryBudgetMax(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(false);
+        initiativeGeneralDTO.setBeneficiaryBudgetFixed(new BigDecimal(100000));
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
         LocalDate rankingStartDate = LocalDate.now();
@@ -76,15 +75,15 @@ class RankingEnabledNotNullForBeneficiaryKnownFalseValidatorTest {
     private InitiativeGeneralDTO createInitiativeGeneralDTO_ko() {
         language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
-        initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
-        initiativeGeneralDTO.setBeneficiaryBudgetMax(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(false);
+        initiativeGeneralDTO.setBeneficiaryBudgetFixed(new BigDecimal(100000));
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
         LocalDate rankingStartDate = LocalDate.now();
         LocalDate rankingEndDate = rankingStartDate.plusDays(1);
-        LocalDate startDate = rankingEndDate.plusDays(10);
+        LocalDate startDate = rankingEndDate.plusDays(11);
         LocalDate endDate = startDate.plusDays(1);
+        initiativeGeneralDTO.setRankingEnabled(null);
         initiativeGeneralDTO.setRankingStartDate(rankingStartDate);
         initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
         initiativeGeneralDTO.setStartDate(startDate);

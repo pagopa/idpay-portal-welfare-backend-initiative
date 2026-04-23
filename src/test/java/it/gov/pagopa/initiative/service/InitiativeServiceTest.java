@@ -785,6 +785,196 @@ class InitiativeServiceTest {
         assertEquals(NotFound.INITIATIVE_NOT_FOUND_MESSAGE.formatted(INITIATIVE_ID), exception.getMessage());
     }
     @Test
+    void updateInitiativeBeneficiary_throwException_whenMultipleMultiConsentWithBudget() {
+        Initiative initiative = createStep2Initiative();
+        if (initiative.getGeneral() == null) initiative.setGeneral(new InitiativeGeneral());
+        initiative.getGeneral().setBeneficiaryBudgetFixedCents(null);
+
+        SelfCriteriaMultiConsent multi1 = new SelfCriteriaMultiConsent();
+        multi1.setValue(List.of(
+                SelfCriteriaMultiConsentValueDTO.builder().beneficiaryBudgetCentsMin(0L).beneficiaryBudgetCentsMax(100L).blockingVerify(true).build()
+        ));
+
+        SelfCriteriaMultiConsent multi2 = new SelfCriteriaMultiConsent();
+        multi2.setValue(List.of(
+                SelfCriteriaMultiConsentValueDTO.builder().beneficiaryBudgetCentsMin(0L).beneficiaryBudgetCentsMax(200L).blockingVerify(true).build()
+        ));
+
+        InitiativeBeneficiaryRule rule = createInitiativeBeneficiaryRule();
+        rule.setSelfDeclarationCriteria(List.of(multi1, multi2));
+
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(initiative);
+
+        SelfCriteriaNotValidException exception = assertThrows(SelfCriteriaNotValidException.class, () ->
+                initiativeService.updateStep3InitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, rule, ROLE, false)
+        );
+        assertTrue(exception.getMessage().contains("only one MultiConsent criteria can have budget values defined"));
+    }
+
+    @Test
+    void updateInitiativeBeneficiary_throwException_whenInconsistentBudgetsInSameCriteria() {
+        Initiative initiative = createStep2Initiative();
+        if (initiative.getGeneral() == null) initiative.setGeneral(new InitiativeGeneral());
+        initiative.getGeneral().setBeneficiaryBudgetFixedCents(null);
+
+        SelfCriteriaMultiConsent multi = new SelfCriteriaMultiConsent();
+        multi.setValue(List.of(
+                SelfCriteriaMultiConsentValueDTO.builder().beneficiaryBudgetCentsMin(0L).beneficiaryBudgetCentsMax(100L).blockingVerify(true).build(),
+                SelfCriteriaMultiConsentValueDTO.builder().beneficiaryBudgetCentsMin(null).build()
+        ));
+
+        InitiativeBeneficiaryRule rule = createInitiativeBeneficiaryRule();
+        rule.setSelfDeclarationCriteria(List.of(multi));
+
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(initiative);
+
+        SelfCriteriaNotValidException exception = assertThrows(SelfCriteriaNotValidException.class, () ->
+                initiativeService.updateStep3InitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, rule, ROLE, false)
+        );
+        assertTrue(exception.getMessage().contains("all other choices in the same criteria must also have min/max values defined"));
+    }
+
+    @Test
+    void updateInitiativeBeneficiary_throwException_whenMinOrMaxMissing() {
+        Initiative initiative = createStep2Initiative();
+        if (initiative.getGeneral() == null) initiative.setGeneral(new InitiativeGeneral());
+        initiative.getGeneral().setBeneficiaryBudgetFixedCents(null);
+
+        SelfCriteriaMultiConsent multi = new SelfCriteriaMultiConsent();
+        multi.setValue(List.of(
+                SelfCriteriaMultiConsentValueDTO.builder().beneficiaryBudgetCentsMin(10L).beneficiaryBudgetCentsMax(null).build()
+        ));
+
+        InitiativeBeneficiaryRule rule = createInitiativeBeneficiaryRule();
+        rule.setSelfDeclarationCriteria(List.of(multi));
+
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(initiative);
+
+        SelfCriteriaNotValidException exception = assertThrows(SelfCriteriaNotValidException.class, () ->
+                initiativeService.updateStep3InitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, rule, ROLE, false)
+        );
+        assertTrue(exception.getMessage().contains("both min and max budgets must be present"));
+    }
+
+    @Test
+    void updateInitiativeBeneficiary_throwException_whenBlockingVerifyFalseAndMinIsZero() {
+        Initiative initiative = createStep2Initiative();
+        if (initiative.getGeneral() == null) initiative.setGeneral(new InitiativeGeneral());
+        initiative.getGeneral().setBeneficiaryBudgetFixedCents(null);
+
+        SelfCriteriaMultiConsent multi = new SelfCriteriaMultiConsent();
+        multi.setValue(List.of(
+                SelfCriteriaMultiConsentValueDTO.builder()
+                        .beneficiaryBudgetCentsMin(0L)
+                        .beneficiaryBudgetCentsMax(100L)
+                        .blockingVerify(false).build()
+        ));
+
+        InitiativeBeneficiaryRule rule = createInitiativeBeneficiaryRule();
+        rule.setSelfDeclarationCriteria(List.of(multi));
+
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(initiative);
+
+        SelfCriteriaNotValidException exception = assertThrows(SelfCriteriaNotValidException.class, () ->
+                initiativeService.updateStep3InitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, rule, ROLE, false)
+        );
+        assertTrue(exception.getMessage().contains("if blockingVerify is false, beneficiaryBudgetCentsMin cannot be 0"));
+    }
+
+    @Test
+    void updateInitiativeBeneficiary_throwException_whenBlockingVerifyTrueAndMinNotZero() {
+        Initiative initiative = createStep2Initiative();
+        if (initiative.getGeneral() == null) initiative.setGeneral(new InitiativeGeneral());
+        initiative.getGeneral().setBeneficiaryBudgetFixedCents(null);
+
+        SelfCriteriaMultiConsent multi = new SelfCriteriaMultiConsent();
+        multi.setValue(List.of(
+                SelfCriteriaMultiConsentValueDTO.builder()
+                        .beneficiaryBudgetCentsMin(10L)
+                        .beneficiaryBudgetCentsMax(100L)
+                        .blockingVerify(true).build()
+        ));
+
+        InitiativeBeneficiaryRule rule = createInitiativeBeneficiaryRule();
+        rule.setSelfDeclarationCriteria(List.of(multi));
+
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(initiative);
+
+        SelfCriteriaNotValidException exception = assertThrows(SelfCriteriaNotValidException.class, () ->
+                initiativeService.updateStep3InitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, rule, ROLE, false)
+        );
+        assertTrue(exception.getMessage().contains("if blockingVerify is true, beneficiaryBudgetCentsMin must be 0"));
+    }
+
+    @Test
+    void updateInitiativeBeneficiary_throwException_whenMaxLowerThanMin() {
+        Initiative initiative = createStep2Initiative();
+        if (initiative.getGeneral() == null) initiative.setGeneral(new InitiativeGeneral());
+        initiative.getGeneral().setBeneficiaryBudgetFixedCents(null);
+
+        SelfCriteriaMultiConsent multi = new SelfCriteriaMultiConsent();
+        multi.setValue(List.of(
+                SelfCriteriaMultiConsentValueDTO.builder()
+                        .beneficiaryBudgetCentsMin(100L)
+                        .beneficiaryBudgetCentsMax(50L)
+                        .blockingVerify(false).build()
+        ));
+
+        InitiativeBeneficiaryRule rule = createInitiativeBeneficiaryRule();
+        rule.setSelfDeclarationCriteria(List.of(multi));
+
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(initiative);
+
+        SelfCriteriaNotValidException exception = assertThrows(SelfCriteriaNotValidException.class, () ->
+                initiativeService.updateStep3InitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, rule, ROLE, false)
+        );
+        assertTrue(exception.getMessage().contains("beneficiaryBudgetCentsMax must be greater than beneficiaryBudgetCentsMin"));
+    }
+
+    @Test
+    void updateInitiativeBeneficiary_throwException_whenFixedBudgetAndMultiConsentBudgetConflict() {
+        Initiative initiative = createStep2Initiative();
+        if (initiative.getGeneral() == null) initiative.setGeneral(new InitiativeGeneral());
+        initiative.getGeneral().setBeneficiaryBudgetFixedCents(1000L);
+
+        SelfCriteriaMultiConsent multi = new SelfCriteriaMultiConsent();
+        multi.setValue(List.of(
+                SelfCriteriaMultiConsentValueDTO.builder().beneficiaryBudgetCentsMin(0L).beneficiaryBudgetCentsMax(100L).blockingVerify(true).build()
+        ));
+
+        InitiativeBeneficiaryRule rule = createInitiativeBeneficiaryRule();
+        rule.setSelfDeclarationCriteria(List.of(multi));
+
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(initiative);
+
+        SelfCriteriaNotValidException exception = assertThrows(SelfCriteriaNotValidException.class, () ->
+                initiativeService.updateStep3InitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, rule, ROLE, false)
+        );
+        assertTrue(exception.getMessage().contains("when beneficiaryBudgetFixedCents is provided, all MultiConsent min/max budgets must be null"));
+    }
+
+    @Test
+    void updateInitiativeBeneficiary_throwException_whenNoBudgetsAtAll() {
+        Initiative initiative = createStep2Initiative();
+        if (initiative.getGeneral() == null) initiative.setGeneral(new InitiativeGeneral());
+        initiative.getGeneral().setBeneficiaryBudgetFixedCents(null);
+
+        SelfCriteriaMultiConsent multi = new SelfCriteriaMultiConsent();
+        multi.setValue(List.of(
+                SelfCriteriaMultiConsentValueDTO.builder().beneficiaryBudgetCentsMin(null).build()
+        ));
+
+        InitiativeBeneficiaryRule rule = createInitiativeBeneficiaryRule();
+        rule.setSelfDeclarationCriteria(List.of(multi));
+
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(initiative);
+
+        SelfCriteriaNotValidException exception = assertThrows(SelfCriteriaNotValidException.class, () ->
+                initiativeService.updateStep3InitiativeBeneficiary(ORGANIZATION_ID, INITIATIVE_ID, rule, ROLE, false)
+        );
+        assertTrue(exception.getMessage().contains("beneficiaryBudgetFixedCents is null, so at least one MultiConsent range must be provided"));
+    }
+    @Test
     void updateGeneralInfoWhenBeneficiaryTypeIsPFAndISeeIsMissing_ko() {
         Initiative fullInitiative = createFullInitiative();
         InitiativeGeneral generalInfoInitiative = createInitiativeGeneralFamilyUnitComposition();
@@ -976,7 +1166,7 @@ class InitiativeServiceTest {
         //You are expecting FeignException to be caught otherwise the test fail
         try {
             initiativeService.updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID, PAGOPA_ADMIN);
-        } catch (FeignException _) {
+        } catch (FeignException e) {
             Assertions.fail();
         }
     }
@@ -1044,7 +1234,7 @@ class InitiativeServiceTest {
                         Mockito.anyString());
         try {
             initiativeService.logicallyDeleteInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
-        } catch (FeignException _) {
+        } catch (FeignException e) {
             Assertions.fail();}
     }
 
@@ -1122,7 +1312,7 @@ class InitiativeServiceTest {
         //You are expecting FeignException to be caught otherwise the test fail
         try {
             initiativeService.updateInitiativeToCheckStatus(ORGANIZATION_ID, INITIATIVE_ID, PAGOPA_ADMIN);
-        } catch (FeignException _) {
+        } catch (FeignException e) {
             Assertions.fail();}
     }
 
@@ -1661,7 +1851,7 @@ class InitiativeServiceTest {
             when(ioManageBackEndRestConnector.getServiceKeys("test")).thenReturn(expectedKeysDTO);
             KeysDTO actualKeysDTO = initiativeService.getTokenKeys(INITIATIVE_ID);
             assertEquals(expectedKeysDTO, actualKeysDTO);
-        } catch (Exception _) {
+        } catch (Exception e) {
             Assertions.fail();
         }
     }
@@ -1791,7 +1981,6 @@ class InitiativeServiceTest {
         Map<String, String> language = new HashMap<>();
         language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneral initiativeGeneral = new InitiativeGeneral();
-        initiativeGeneral.setBeneficiaryBudgetCents(1000L);
         initiativeGeneral.setBeneficiaryKnown(beneficiaryKnown);
         initiativeGeneral.setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF);
         initiativeGeneral.setBudgetCents(100000000000L);
@@ -1806,7 +1995,6 @@ class InitiativeServiceTest {
         Map<String, String> language = new HashMap<>();
         language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneral initiativeGeneral = new InitiativeGeneral();
-        initiativeGeneral.setBeneficiaryBudgetCents(1000L);
         initiativeGeneral.setBeneficiaryKnown(true);
         initiativeGeneral.setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.NF);
         initiativeGeneral.setFamilyUnitComposition(InitiativeConstants.FamilyUnitCompositionConstant.INPS);
@@ -1850,7 +2038,6 @@ class InitiativeServiceTest {
         Map<String, String> language = new HashMap<>();
         language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
-        initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(beneficiaryKnown);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
@@ -1902,17 +2089,34 @@ class InitiativeServiceTest {
         selfCriteriaBool.setCode("B001");
         selfCriteriaBool.setDescription("Desc_bool");
         selfCriteriaBool.setValue(true);
-        SelfCriteriaMulti selfCriteriaMulti = new SelfCriteriaMulti();
-        selfCriteriaMulti.set_type(TypeMultiEnum.MULTI);
-        selfCriteriaMulti.setCode("B001");
-        selfCriteriaMulti.setDescription("Desc_Multi");
-        List<String> values = new ArrayList<>();
-        values.add("valore1");
-        values.add("valore2");
-        selfCriteriaMulti.setValue(values);
+        SelfCriteriaMultiConsent selfCriteriaMultiConsent = new SelfCriteriaMultiConsent();
+        selfCriteriaMultiConsent.set_type(TypeMultiConsentEnum.MULTI_CONSENT);
+        selfCriteriaMultiConsent.setCode("B001");
+        selfCriteriaMultiConsent.setDescription("Desc_Multi");
+        List<SelfCriteriaMultiConsentValueDTO> values = new ArrayList<>();
+        SelfCriteriaMultiConsentValueDTO value1 = new SelfCriteriaMultiConsentValueDTO();
+        value1.setDescription("desc1");
+        value1.setSubDescription("sub1");
+        value1.setValue("1");
+        value1.setVerify(true);
+        value1.setBlockingVerify(false);
+        value1.setBeneficiaryBudgetCentsMax(20000L);
+        value1.setBeneficiaryBudgetCentsMin(10000L);
+        value1.setThresholdCode("belet25");
+        SelfCriteriaMultiConsentValueDTO value2 = new SelfCriteriaMultiConsentValueDTO();
+        value2.setDescription("desc2");
+        value2.setSubDescription("sub2");
+        value2.setValue("2");
+        value2.setVerify(false);
+        value2.setBlockingVerify(false);
+        value2.setBeneficiaryBudgetCentsMax(10000L);
+        value2.setBeneficiaryBudgetCentsMin(10000L);
+        values.add(value1);
+        values.add(value2);
+        selfCriteriaMultiConsent.setValue(values);
         List<ISelfDeclarationCriteria> iSelfDeclarationCriteriaList = new ArrayList<>();
         iSelfDeclarationCriteriaList.add(selfCriteriaBool);
-        iSelfDeclarationCriteriaList.add(selfCriteriaMulti);
+        iSelfDeclarationCriteriaList.add(selfCriteriaMultiConsent);
         initiativeBeneficiaryRule.setSelfDeclarationCriteria(iSelfDeclarationCriteriaList);
         AutomatedCriteria automatedCriteria = new AutomatedCriteria();
         automatedCriteria.setAuthority("Authority_ISEE");
