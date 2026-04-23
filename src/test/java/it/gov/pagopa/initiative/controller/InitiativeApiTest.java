@@ -377,6 +377,38 @@ class InitiativeApiTest {
     }
 
     @Test
+    void updateInitiativeBeneficiary_shouldAddAutomatedCriteria_whenGuidoniaAndBonus() throws Exception {
+        Initiative initiative = createStep2Initiative(false);
+        initiative.setOrganizationName("comune di guidonia montecelio");
+        initiative.setInitiativeName("Bonus Sociale 2024");
+
+        InitiativeBeneficiaryRuleDTO request = createInitiativeBeneficiaryRuleDTO();
+        if (request.getAutomatedCriteria() == null) {
+            request.setAutomatedCriteria(new ArrayList<>());
+        }
+
+        InitiativeBeneficiaryRule rule = createInitiativeBeneficiaryRule();
+
+        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(initiative);
+        when(initiativeDTOsToModelMapper.toBeneficiaryRule(any(InitiativeBeneficiaryRuleDTO.class))).thenReturn(rule);
+
+        mvc.perform(
+                        put(BASE_URL + String.format(PUT_INITIATIVE_BENEFICIARY_RULES_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+
+        verify(initiativeService).updateStep3InitiativeBeneficiary(
+                eq(ORGANIZATION_ID),
+                eq(INITIATIVE_ID),
+                any(InitiativeBeneficiaryRule.class),
+                eq(ROLE),
+                eq(false)
+        );
+    }
+
+    @Test
     void updateInitiativeBeneficiary_statusNoContent() throws Exception {
         Initiative initiative = createStep2Initiative(false);
         InitiativeBeneficiaryRule rule = createInitiativeBeneficiaryRule();
