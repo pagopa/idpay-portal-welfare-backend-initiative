@@ -91,7 +91,7 @@ public class InitiativeServiceRoot {
         if (min == null || max == null) {
             throwSelfDeclarationCriteriaException(initiativeId, "both min and max budgets must be present for all choices in the MultiConsent criteria.");
         }
-        if (max <= min) {
+        if (max < min) {
             throwSelfDeclarationCriteriaException(initiativeId, "beneficiaryBudgetCentsMax must be greater than beneficiaryBudgetCentsMin.");
         }
     }

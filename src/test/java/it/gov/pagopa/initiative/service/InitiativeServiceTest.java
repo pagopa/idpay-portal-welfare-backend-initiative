@@ -976,7 +976,7 @@ class InitiativeServiceTest {
         //You are expecting FeignException to be caught otherwise the test fail
         try {
             initiativeService.updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID, PAGOPA_ADMIN);
-        } catch (FeignException _) {
+        } catch (FeignException e) {
             Assertions.fail();
         }
     }
@@ -1044,7 +1044,7 @@ class InitiativeServiceTest {
                         Mockito.anyString());
         try {
             initiativeService.logicallyDeleteInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
-        } catch (FeignException _) {
+        } catch (FeignException e) {
             Assertions.fail();}
     }
 
@@ -1122,7 +1122,7 @@ class InitiativeServiceTest {
         //You are expecting FeignException to be caught otherwise the test fail
         try {
             initiativeService.updateInitiativeToCheckStatus(ORGANIZATION_ID, INITIATIVE_ID, PAGOPA_ADMIN);
-        } catch (FeignException _) {
+        } catch (FeignException e) {
             Assertions.fail();}
     }
 
@@ -1661,7 +1661,7 @@ class InitiativeServiceTest {
             when(ioManageBackEndRestConnector.getServiceKeys("test")).thenReturn(expectedKeysDTO);
             KeysDTO actualKeysDTO = initiativeService.getTokenKeys(INITIATIVE_ID);
             assertEquals(expectedKeysDTO, actualKeysDTO);
-        } catch (Exception _) {
+        } catch (Exception e) {
             Assertions.fail();
         }
     }
@@ -1899,17 +1899,34 @@ class InitiativeServiceTest {
         selfCriteriaBool.setCode("B001");
         selfCriteriaBool.setDescription("Desc_bool");
         selfCriteriaBool.setValue(true);
-        SelfCriteriaMulti selfCriteriaMulti = new SelfCriteriaMulti();
-        selfCriteriaMulti.set_type(TypeMultiEnum.MULTI);
-        selfCriteriaMulti.setCode("B001");
-        selfCriteriaMulti.setDescription("Desc_Multi");
-        List<String> values = new ArrayList<>();
-        values.add("valore1");
-        values.add("valore2");
-        selfCriteriaMulti.setValue(values);
+        SelfCriteriaMultiConsent selfCriteriaMultiConsent = new SelfCriteriaMultiConsent();
+        selfCriteriaMultiConsent.set_type(TypeMultiConsentEnum.MULTI_CONSENT);
+        selfCriteriaMultiConsent.setCode("B001");
+        selfCriteriaMultiConsent.setDescription("Desc_Multi");
+        List<SelfCriteriaMultiConsentValueDTO> values = new ArrayList<>();
+        SelfCriteriaMultiConsentValueDTO value1 = new SelfCriteriaMultiConsentValueDTO();
+        value1.setDescription("desc1");
+        value1.setSubDescription("sub1");
+        value1.setValue("1");
+        value1.setVerify(true);
+        value1.setBlockingVerify(false);
+        value1.setBeneficiaryBudgetCentsMax(20000L);
+        value1.setBeneficiaryBudgetCentsMin(10000L);
+        value1.setThresholdCode("belet25");
+        SelfCriteriaMultiConsentValueDTO value2 = new SelfCriteriaMultiConsentValueDTO();
+        value2.setDescription("desc2");
+        value2.setSubDescription("sub2");
+        value2.setValue("2");
+        value2.setVerify(false);
+        value2.setBlockingVerify(false);
+        value2.setBeneficiaryBudgetCentsMax(10000L);
+        value2.setBeneficiaryBudgetCentsMin(10000L);
+        values.add(value1);
+        values.add(value2);
+        selfCriteriaMultiConsent.setValue(values);
         List<ISelfDeclarationCriteria> iSelfDeclarationCriteriaList = new ArrayList<>();
         iSelfDeclarationCriteriaList.add(selfCriteriaBool);
-        iSelfDeclarationCriteriaList.add(selfCriteriaMulti);
+        iSelfDeclarationCriteriaList.add(selfCriteriaMultiConsent);
         initiativeBeneficiaryRule.setSelfDeclarationCriteria(iSelfDeclarationCriteriaList);
         AutomatedCriteria automatedCriteria = new AutomatedCriteria();
         automatedCriteria.setAuthority("Authority_ISEE");
