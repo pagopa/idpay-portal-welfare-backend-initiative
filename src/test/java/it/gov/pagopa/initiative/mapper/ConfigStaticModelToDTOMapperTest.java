@@ -6,7 +6,7 @@ import it.gov.pagopa.initiative.model.config.ConfigMcc;
 import it.gov.pagopa.initiative.model.config.ConfigTrxRule;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 
 import java.util.Arrays;
 import java.util.Collections;

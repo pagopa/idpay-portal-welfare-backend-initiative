@@ -6,6 +6,8 @@ import static org.mockito.Mockito.mock;
 
 import it.gov.pagopa.common.web.dto.ErrorDTO;
 import java.io.DataInputStream;
+import java.nio.charset.StandardCharsets;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +20,7 @@ class RestResponseExceptionHandlerTest {
     void testHandleHttpMessageNotReadableException() {
         RestResponseExceptionHandler restResponseExceptionHandler = new RestResponseExceptionHandler();
         ResponseEntity<ErrorDTO> actualHandleHttpMessageNotReadableExceptionResult = restResponseExceptionHandler
-                .handleHttpMessageNotReadableException(new HttpMessageNotReadableException("https://example.org/example"));
+                .handleHttpMessageNotReadableException(new HttpMessageNotReadableException("https://example.org/example", new MockHttpInputMessage("".getBytes(StandardCharsets.UTF_8))));
         assertTrue(actualHandleHttpMessageNotReadableExceptionResult.hasBody());
         assertTrue(actualHandleHttpMessageNotReadableExceptionResult.getHeaders().isEmpty());
         assertEquals(HttpStatus.BAD_REQUEST, actualHandleHttpMessageNotReadableExceptionResult.getStatusCode());

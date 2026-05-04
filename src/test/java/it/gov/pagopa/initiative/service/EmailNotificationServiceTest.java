@@ -14,7 +14,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -41,13 +41,13 @@ class EmailNotificationServiceTest {
     public static final String API_KEY_CLIENT_ID = "apiKeyClientId";
     public static final String API_KEY_CLIENT_ASSERTION = "apiKeyClientAssertion";
 
-    @MockBean
+    @MockitoBean
     private EmailNotificationRestConnector emailNotificationRestConnector;
 
     @Autowired
     private EmailNotificationServiceImpl emailNotificationServiceImpl;
 
-    @MockBean
+    @MockitoBean
     private SelcRestConnector selcRestConnector;
 
     @Test

@@ -16,8 +16,8 @@ public class BeneficiaryRankingDTO {
 
     private String beneficiary;
     private LocalDateTime criteriaConsensusTimestamp;
-    private long rankingValue;
-    private long ranking;
+    private Long rankingValue;
+    private Long ranking;
     private String beneficiaryRankingStatus;
     private String familyId;
     private List<String> memberIds;
