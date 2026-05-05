@@ -960,6 +960,7 @@ class InitiativeModelToDTOMapperTest {
         InitiativeSummaryDTO initiativeSummaryDTO = new InitiativeSummaryDTO();
         initiativeSummaryDTO.setInitiativeId("Id1");
         initiativeSummaryDTO.setInitiativeName("initiativeName1");
+        initiativeSummaryDTO.setServiceId("SERVICE_ID");
         initiativeSummaryDTO.setStatus("DRAFT");
         initiativeSummaryDTO.setInitiativeRewardType("REFUND");
         initiativeSummaryDTO.setStartDate(LocalDate.now().plusDays(2));
@@ -970,6 +971,7 @@ class InitiativeModelToDTOMapperTest {
         InitiativeSummaryDTO initiativeSummaryDTO2 = new InitiativeSummaryDTO();
         initiativeSummaryDTO2.setInitiativeId("Id1");
         initiativeSummaryDTO2.setInitiativeName("initiativeName1");
+        initiativeSummaryDTO2.setServiceId("SERVICE_ID");
         initiativeSummaryDTO2.setStatus("DRAFT");
         initiativeSummaryDTO2.setRankingEnabled(Boolean.FALSE);
         initiativeSummaryDTO2.setInitiativeRewardType("REFUND");
