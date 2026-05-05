@@ -287,6 +287,8 @@ public class InitiativeModelToDTOMapper {
                             .initiativeRewardType(initiativeModel.getInitiativeRewardType() != null ?
                                     initiativeModel.getInitiativeRewardType().name() : null)
                             .status(InitiativeUtils.checkEndDateToSetStatus(initiativeModel))
+                            .startDate(initiativeModel.getGeneral().getStartDate())
+                            .endDate(initiativeModel.getGeneral().getEndDate())
                             .creationDate(initiativeModel.getCreationDate())
                             .updateDate(initiativeModel.getUpdateDate())
                             .rankingEnabled(initiativeModel.getGeneral() != null ? initiativeModel.getGeneral().getRankingEnabled() : null)
