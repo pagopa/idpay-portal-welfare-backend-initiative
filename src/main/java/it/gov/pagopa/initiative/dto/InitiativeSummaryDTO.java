@@ -38,10 +38,17 @@ public class InitiativeSummaryDTO   {
 
   @JsonProperty("startDate")
   private LocalDate startDate;
+
   @JsonProperty("endDate")
   private LocalDate endDate;
 
   @JsonProperty("rankingEnabled")
   private Boolean rankingEnabled;
+
+  @JsonProperty("serviceId")
+  private String serviceId;
+
+  @JsonProperty("organizationName")
+  private String organizationName;
 
 }
