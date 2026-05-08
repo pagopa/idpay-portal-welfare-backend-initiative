@@ -960,17 +960,23 @@ class InitiativeModelToDTOMapperTest {
         InitiativeSummaryDTO initiativeSummaryDTO = new InitiativeSummaryDTO();
         initiativeSummaryDTO.setInitiativeId("Id1");
         initiativeSummaryDTO.setInitiativeName("initiativeName1");
+        initiativeSummaryDTO.setServiceId("SERVICE_ID");
         initiativeSummaryDTO.setStatus("DRAFT");
         initiativeSummaryDTO.setInitiativeRewardType("REFUND");
+        initiativeSummaryDTO.setStartDate(LocalDate.now().plusDays(2));
+        initiativeSummaryDTO.setEndDate(LocalDate.now().plusDays(3));
         return initiativeSummaryDTO;
     }
     private InitiativeSummaryDTO createInitiativeSummaryDTO2() {
         InitiativeSummaryDTO initiativeSummaryDTO2 = new InitiativeSummaryDTO();
         initiativeSummaryDTO2.setInitiativeId("Id1");
         initiativeSummaryDTO2.setInitiativeName("initiativeName1");
+        initiativeSummaryDTO2.setServiceId("SERVICE_ID");
         initiativeSummaryDTO2.setStatus("DRAFT");
         initiativeSummaryDTO2.setRankingEnabled(Boolean.FALSE);
         initiativeSummaryDTO2.setInitiativeRewardType("REFUND");
+        initiativeSummaryDTO2.setStartDate(LocalDate.now().plusDays(2));
+        initiativeSummaryDTO2.setEndDate(LocalDate.now().plusDays(3));
         return initiativeSummaryDTO2;
     }
 

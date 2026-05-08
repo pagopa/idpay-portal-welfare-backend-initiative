@@ -281,12 +281,16 @@ public class InitiativeModelToDTOMapper {
                             initiativeModel.getAdditionalInfo().getServiceName() : StringUtils.EMPTY;
             return InitiativeSummaryDTO.builder()
                             .initiativeId(initiativeModel.getInitiativeId())
+                            .serviceId(initiativeModel.getAdditionalInfo().getServiceId())
                             .initiativeName(StringUtils.isNotBlank(initiativeModel.getInitiativeName()) ?
                                     initiativeModel.getInitiativeName() : serviceName
                             )
+                            .organizationName(initiativeModel.getOrganizationName())
                             .initiativeRewardType(initiativeModel.getInitiativeRewardType() != null ?
                                     initiativeModel.getInitiativeRewardType().name() : null)
                             .status(InitiativeUtils.checkEndDateToSetStatus(initiativeModel))
+                            .startDate(initiativeModel.getGeneral().getStartDate())
+                            .endDate(initiativeModel.getGeneral().getEndDate())
                             .creationDate(initiativeModel.getCreationDate())
                             .updateDate(initiativeModel.getUpdateDate())
                             .rankingEnabled(initiativeModel.getGeneral() != null ? initiativeModel.getGeneral().getRankingEnabled() : null)
