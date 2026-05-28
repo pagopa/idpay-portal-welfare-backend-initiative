@@ -98,7 +98,7 @@ spring:
             errorDecoder: it.gov.pagopa.initiative.connector.error.decoder.Custom5xxErrorDecoder
             retryer: feign.Retryer.Default
           backend-io-manage:
-            loggerLevel: ${FEIGN_CLIENT_CONFIG_IO_LOG_LEVEL:basic}
+            loggerLevel: ${FEIGN_CLIENT_CONFIG_IO_LOG_LEVEL:full}
           ms-group:
             loggerLevel: ${FEIGN_CLIENT_CONFIG_IO_LOG_LEVEL:basic}
 
