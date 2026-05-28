@@ -436,6 +436,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         ServiceRequestDTO serviceRequestDTO = initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(additionalInfo, initiativeOrganizationInfoDTO);
 
         if (StringUtils.isBlank(serviceId)) {
+            log.info("[Calling IO Service] Request service for request {}", serviceRequestDTO);
             ServiceResponseDTO serviceResponseDTO = ioManageBackEndRestConnector.createService(serviceRequestDTO);
             serviceId = serviceResponseDTO.getId();
             log.info("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Created new service to ServiceIO", initiative.getInitiativeId());
