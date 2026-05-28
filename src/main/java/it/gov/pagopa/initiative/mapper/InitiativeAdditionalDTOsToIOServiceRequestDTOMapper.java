@@ -41,7 +41,7 @@ public class InitiativeAdditionalDTOsToIOServiceRequestDTOMapper {
                 .scope(initiativeAdditional.getServiceScope().name())
                 .topicId(0)
                 .build();
-        log.info("[SERVICE_METADATA] Service metadata to send {}", serviceMetadataDTO);
+        log.info("[SERVICE_METADATA] Service metadata to send {}, and additional initiative info {}", serviceMetadataDTO, initiativeAdditional);
         OrganizationDTO organizationDTO = OrganizationDTO.builder()
                 .departmentName(StringUtils.isNotBlank(initiativeOrganizationInfoDTO.getOrganizationName()) ? initiativeOrganizationInfoDTO.getOrganizationName() : productDepartmentName)
                 .organizationName(initiativeOrganizationInfoDTO.getOrganizationName())
