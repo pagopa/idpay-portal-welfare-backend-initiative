@@ -6,6 +6,7 @@ import it.gov.pagopa.initiative.dto.io.service.ServiceRequestDTO;
 import it.gov.pagopa.initiative.dto.io.service.ServiceRequestMetadataDTO;
 import it.gov.pagopa.initiative.model.Channel;
 import it.gov.pagopa.initiative.model.InitiativeAdditional;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 public class InitiativeAdditionalDTOsToIOServiceRequestDTOMapper {
 
@@ -39,6 +41,7 @@ public class InitiativeAdditionalDTOsToIOServiceRequestDTOMapper {
                 .scope(initiativeAdditional.getServiceScope().name())
                 .topicId(0)
                 .build();
+        log.info("[SERVICE_METADATA] Service metadata to send {}", serviceMetadataDTO);
         OrganizationDTO organizationDTO = OrganizationDTO.builder()
                 .departmentName(StringUtils.isNotBlank(initiativeOrganizationInfoDTO.getOrganizationName()) ? initiativeOrganizationInfoDTO.getOrganizationName() : productDepartmentName)
                 .organizationName(initiativeOrganizationInfoDTO.getOrganizationName())
