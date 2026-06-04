@@ -10,7 +10,9 @@ import lombok.experimental.SuperBuilder;
  */
 
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder(toBuilder = true)
 public class ServiceRequestMetadataDTO extends ServiceMetadataDTO{
