@@ -231,7 +231,7 @@ public class InitiativeModelToDTOMapper {
                 .stream().map(x -> {
                     if (x instanceof SelfCriteriaBool selfCriteriaBool) {
                         return SelfCriteriaBoolDTO.builder()
-                                .type(it.gov.pagopa.initiative.dto.TypeBoolEnum.valueOf(selfCriteriaBool.get_type().name()))
+                                .type(it.gov.pagopa.initiative.dto.TypeBoolEnum.valueOf(selfCriteriaBool.getType().name()))
                                 .code(selfCriteriaBool.getCode())
                                 .description(selfCriteriaBool.getDescription())
                                 .subDescription(selfCriteriaBool.getSubDescription())
@@ -239,7 +239,7 @@ public class InitiativeModelToDTOMapper {
                                 .build();
                     } else if (x instanceof SelfCriteriaMulti selfCriteriaMulti) {
                         return SelfCriteriaMultiDTO.builder()
-                                .type(it.gov.pagopa.initiative.dto.TypeMultiEnum.valueOf(selfCriteriaMulti.get_type().name()))
+                                .type(it.gov.pagopa.initiative.dto.TypeMultiEnum.valueOf(selfCriteriaMulti.getType().name()))
                                 .code(selfCriteriaMulti.getCode())
                                 .description(selfCriteriaMulti.getDescription())
                                 .subDescription(selfCriteriaMulti.getSubDescription())
@@ -247,7 +247,7 @@ public class InitiativeModelToDTOMapper {
                                 .build();
                     } else if (x instanceof SelfCriteriaText selfCriteriaText) {
                         return SelfCriteriaTextDTO.builder()
-                                .type(TypeTextEnum.valueOf(selfCriteriaText.get_type().name()))
+                                .type(TypeTextEnum.valueOf(selfCriteriaText.getType().name()))
                                 .code(selfCriteriaText.getCode())
                                 .description(selfCriteriaText.getDescription())
                                 .subDescription(selfCriteriaText.getSubDescription())
@@ -255,7 +255,7 @@ public class InitiativeModelToDTOMapper {
                                 .build();
                     } else if (x instanceof SelfCriteriaMultiConsent selfCriteriaMultiConsent) {
                         return SelfCriteriaMultiConsentDTO.builder()
-                                .type(TypeMultiConsentEnum.valueOf(selfCriteriaMultiConsent.get_type().name()))
+                                .type(TypeMultiConsentEnum.valueOf(selfCriteriaMultiConsent.getType().name()))
                                 .code(selfCriteriaMultiConsent.getCode())
                                 .description(selfCriteriaMultiConsent.getDescription())
                                 .subDescription(selfCriteriaMultiConsent.getSubDescription())
