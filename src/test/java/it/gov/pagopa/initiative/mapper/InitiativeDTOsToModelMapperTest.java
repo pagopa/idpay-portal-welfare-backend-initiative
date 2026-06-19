@@ -462,12 +462,12 @@ class InitiativeDTOsToModelMapperTest {
     private InitiativeBeneficiaryRule createInitiativeBeneficiaryRule() {
         InitiativeBeneficiaryRule localInitiativeBeneficiaryRule = new InitiativeBeneficiaryRule();
         SelfCriteriaBool selfCriteriaBool = new SelfCriteriaBool();
-        selfCriteriaBool.set_type(TypeBoolEnum.BOOLEAN);
+        selfCriteriaBool.setType(TypeBoolEnum.BOOLEAN);
         selfCriteriaBool.setCode("B001");
         selfCriteriaBool.setDescription("Desc_bool");
         selfCriteriaBool.setValue(true);
         SelfCriteriaMulti selfCriteriaMulti = new SelfCriteriaMulti();
-        selfCriteriaMulti.set_type(TypeMultiEnum.MULTI);
+        selfCriteriaMulti.setType(TypeMultiEnum.MULTI);
         selfCriteriaMulti.setCode("B001");
         selfCriteriaMulti.setDescription("Desc_Multi");
         List<String> values = new ArrayList<>();
@@ -475,12 +475,12 @@ class InitiativeDTOsToModelMapperTest {
         values.add("valore2");
         selfCriteriaMulti.setValue(values);
         SelfCriteriaText selfCriteriaText = new SelfCriteriaText();
-        selfCriteriaText.set_type(TypeTextEnum.TEXT);
+        selfCriteriaText.setType(TypeTextEnum.TEXT);
         selfCriteriaText.setCode("T001");
         selfCriteriaText.setDescription("Text");
         selfCriteriaText.setValue("valore libero");
         SelfCriteriaMultiConsent selfCriteriaMultiConsent = new SelfCriteriaMultiConsent();
-        selfCriteriaMultiConsent.set_type(TypeMultiConsentEnum.MULTI_CONSENT);
+        selfCriteriaMultiConsent.setType(TypeMultiConsentEnum.MULTI_CONSENT);
         selfCriteriaMultiConsent.setCode("MC001");
         selfCriteriaMultiConsent.setDescription("Desc_Multi_Consent");
         selfCriteriaMultiConsent.setSubDescription("Sub_Desc_Multi_Consent");

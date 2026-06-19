@@ -269,12 +269,12 @@ class EmailNotificationServiceTest {
     private InitiativeBeneficiaryRule createInitiativeBeneficiaryRule() {
         InitiativeBeneficiaryRule initiativeBeneficiaryRule = new InitiativeBeneficiaryRule();
         SelfCriteriaBool selfCriteriaBool = new SelfCriteriaBool();
-        selfCriteriaBool.set_type(TypeBoolEnum.BOOLEAN);
+        selfCriteriaBool.setType(TypeBoolEnum.BOOLEAN);
         selfCriteriaBool.setCode("B001");
         selfCriteriaBool.setDescription("Desc_bool");
         selfCriteriaBool.setValue(true);
         SelfCriteriaMulti selfCriteriaMulti = new SelfCriteriaMulti();
-        selfCriteriaMulti.set_type(TypeMultiEnum.MULTI);
+        selfCriteriaMulti.setType(TypeMultiEnum.MULTI);
         selfCriteriaMulti.setCode("B001");
         selfCriteriaMulti.setDescription("Desc_Multi");
         List<String> values = new ArrayList<>();
