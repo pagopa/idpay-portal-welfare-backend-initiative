@@ -14,6 +14,7 @@ import it.gov.pagopa.initiative.service.OrganizationService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.LocaleUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -375,6 +376,27 @@ public class InitiativeApiController implements InitiativeApi {
         List<InitiativeMilDTO> initiativeMilDTOList = this.initiativeModelToDTOMapper.toInitiativeListMilDTO(this.initiativeService.getPublishedInitiativesList());
         log.info("[GET_INITIATIVES] - User %s requested initiatives list through MIL".formatted(userId));
         return ResponseEntity.ok(initiativeMilDTOList);
+    }
+
+    @Override
+    public ResponseEntity<PageResponse<InitiativeResponse>> searchInitiatives(
+            InitiativeSearchRequest request,
+            Pageable pageable) {
+
+        Page<InitiativeResponse> page = initiativeService.searchInitiatives(
+                request.getOnboardedIds(),
+                request.getAtecoCodes(),
+                pageable
+        );
+
+        PageResponse<InitiativeResponse> response = new PageResponse<>(
+                page.getContent(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements()
+        );
+
+        return ResponseEntity.ok(response);
     }
 
     private void performanceLog(long startTime, String service){

@@ -31,6 +31,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -678,6 +680,34 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             throw new IOBackEndInvocationException("An error occurred during the IO Back-end invocation", true, e);
         }
     }
+
+    @Override
+    public Page<InitiativeResponse> searchInitiatives(
+            Set<String> onboardedIds,
+            List<String> atecoCodes,
+            Pageable pageable) {
+
+        Page<InitiativePageItem> page = initiativeRepository.findInitiatives(
+                onboardedIds, atecoCodes, pageable);
+
+        List<InitiativeResponse> content = page.getContent().stream()
+                .map(this::toInitiativeResponse)
+                .toList();
+
+        return new PageImpl<>(content, pageable, page.getTotalElements());
+    }
+
+    private InitiativeResponse toInitiativeResponse(InitiativePageItem item) {
+        return InitiativeResponse.builder()
+                .initiativeId(item.getInitiativeId())
+                .initiativeName(item.getInitiativeName())
+                .status(item.getStatus())
+                .startDate(item.getStartDate())
+                .endDate(item.getEndDate())
+                .onboardStatus(item.getOnboardStatus())
+                .build();
+    }
+
     public void validate(String contentType, String fileName) {
         Assert.notNull(fileName, "file name cannot be null");
 

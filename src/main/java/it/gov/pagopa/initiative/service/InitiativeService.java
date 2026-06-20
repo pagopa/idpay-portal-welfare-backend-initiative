@@ -6,11 +6,13 @@ import it.gov.pagopa.initiative.model.Initiative;
 import it.gov.pagopa.initiative.model.InitiativeBeneficiaryRule;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
 
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 @Service
 public interface InitiativeService {
@@ -63,4 +65,9 @@ public interface InitiativeService {
     void deleteInitiative(String initiativeId);
     void initializeStatistics(String initiativeId, String organizationId);
     KeysDTO getTokenKeys(String initiativeId);
+
+    Page<InitiativeResponse> searchInitiatives(
+            Set<String> onboardedIds,
+            List<String> atecoCodes,
+            Pageable pageable);
 }

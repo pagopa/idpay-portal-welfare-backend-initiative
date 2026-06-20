@@ -462,5 +462,10 @@ public interface InitiativeApi {
   ResponseEntity<List<InitiativeMilDTO>> getInitiativeListMil(
           @RequestHeader("x-user-id") String userId
   );
+
+  @PostMapping("/initiatives/search")
+  ResponseEntity<PageResponse<InitiativeResponse>> searchInitiatives(
+          @RequestBody InitiativeSearchRequest request,
+          Pageable pageable);
 }
 
