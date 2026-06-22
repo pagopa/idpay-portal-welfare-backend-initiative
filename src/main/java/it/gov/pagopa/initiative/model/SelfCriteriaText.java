@@ -12,7 +12,7 @@ import lombok.*;
 public class SelfCriteriaText implements ISelfDeclarationCriteria {
 
   @JsonProperty("_type")
-  private TypeTextEnum type;
+  private TypeTextEnum _type;
   private String description;
   private String subDescription;
   private String value;
