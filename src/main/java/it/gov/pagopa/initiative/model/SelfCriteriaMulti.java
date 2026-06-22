@@ -14,7 +14,7 @@ import java.util.List;
 public class SelfCriteriaMulti implements ISelfDeclarationCriteria {
 
   @JsonProperty("_type")
-  private TypeMultiEnum type;
+  private TypeMultiEnum _type;
   private String description;
   private String subDescription;
   private List<String> value;
