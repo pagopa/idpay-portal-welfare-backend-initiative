@@ -149,7 +149,7 @@ public class InitiativeRepositoryExtendedImpl implements InitiativeRepositoryExt
                 ).getMappedResults();
 
         long total = mongoTemplate.count(
-                Query.query(Criteria.where("status").is("ACTIVE")),
+                Query.query(Criteria.where("status").is("PUBLISHED")),
                 Initiative.class
         );
 
