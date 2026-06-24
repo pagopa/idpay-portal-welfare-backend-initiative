@@ -12,7 +12,7 @@ import lombok.*;
 public class SelfCriteriaBool implements ISelfDeclarationCriteria {
 
   @JsonProperty("_type")
-  private TypeBoolEnum type;
+  private TypeBoolEnum _type;
   private String description;
   private String subDescription;
   private Boolean value;
