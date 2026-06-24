@@ -69,5 +69,6 @@ public interface InitiativeService {
     Page<InitiativeResponse> searchInitiatives(
             Set<String> onboardedIds,
             List<String> atecoCodes,
+            String initiativeName,
             Pageable pageable);
 }

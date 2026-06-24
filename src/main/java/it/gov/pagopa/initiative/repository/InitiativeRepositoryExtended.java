@@ -15,6 +15,7 @@ public interface InitiativeRepositoryExtended {
     Page<InitiativePageItem> findInitiatives(
             Set<String> onboardedIds,
             List<String> atecoCodes,
+            String initiativeName,
             Pageable pageable);
 
 }

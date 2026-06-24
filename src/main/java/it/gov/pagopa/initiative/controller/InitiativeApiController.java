@@ -8,7 +8,6 @@ import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
 import it.gov.pagopa.initiative.mapper.InitiativeDTOsToModelMapper;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.Initiative;
-import it.gov.pagopa.initiative.model.InitiativeGeneral;
 import it.gov.pagopa.initiative.service.InitiativeService;
 import it.gov.pagopa.initiative.service.OrganizationService;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -386,6 +384,7 @@ public class InitiativeApiController implements InitiativeApi {
         Page<InitiativeResponse> page = initiativeService.searchInitiatives(
                 request.getOnboardedIds(),
                 request.getAtecoCodes(),
+                request.getInitiativeName(),
                 pageable
         );
 

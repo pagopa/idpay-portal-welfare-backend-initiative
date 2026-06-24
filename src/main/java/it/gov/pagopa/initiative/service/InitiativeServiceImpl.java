@@ -685,10 +685,11 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     public Page<InitiativeResponse> searchInitiatives(
             Set<String> onboardedIds,
             List<String> atecoCodes,
+            String initiativeName,
             Pageable pageable) {
 
         Page<InitiativePageItem> page = initiativeRepository.findInitiatives(
-                onboardedIds, atecoCodes, pageable);
+                onboardedIds, atecoCodes,initiativeName, pageable);
 
         List<InitiativeResponse> content = page.getContent().stream()
                 .map(this::toInitiativeResponse)

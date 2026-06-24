@@ -5,6 +5,7 @@ import it.gov.pagopa.initiative.dto.OrganizationDTO;
 import it.gov.pagopa.initiative.model.Initiative;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +18,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 @Slf4j
 public class InitiativeRepositoryExtendedImpl implements InitiativeRepositoryExtended {
@@ -54,21 +56,31 @@ public class InitiativeRepositoryExtendedImpl implements InitiativeRepositoryExt
     public Page<InitiativePageItem> findInitiatives(
             Set<String> onboardedIds,
             List<String> atecoCodes,
+            String initiativeName,
             Pageable pageable) {
 
-        Set<String> safeOnboardedIds = onboardedIds != null ? onboardedIds : Collections.emptySet();
+        List<ObjectId> safeOnboardedIds = onboardedIds.stream()
+                .map(ObjectId::new)
+                .toList();
+
         List<String> safeAtecoCodes = atecoCodes != null ? atecoCodes : Collections.emptyList();
 
-        // MATCH
-        MatchOperation match = Aggregation.match(
-                Criteria.where("status").is("PUBLISHED")
-        );
+        Criteria criteria = Criteria.where("status").is("PUBLISHED");
 
-        // "initiativeId" è contenuto in onboardedIds  ->  { $in: ["$initiativeId", [...]] }
-        AggregationExpression isOnboarded = context -> new Document("$in",
-                List.of("$initiativeId", safeOnboardedIds));
+        if (initiativeName != null && !initiativeName.isBlank()) {
+            Pattern pattern = Pattern.compile(
+                    Pattern.quote(initiativeName),
+                    Pattern.CASE_INSENSITIVE
+            );
+            criteria = criteria.and("initiativeName").regex(pattern);
+        }
 
-        // size( $setIntersection: ["$atecoCodes", [...]] ) > 0
+        MatchOperation match = Aggregation.match(criteria);
+
+        AggregationExpression isOnboarded =
+                ArrayOperators.In.arrayOf(safeOnboardedIds)
+                        .containsValue(Fields.field("_id"));
+
         AggregationExpression hasAtecoMatch = context -> new Document("$gt",
                 List.of(
                         new Document("$size",
@@ -77,11 +89,11 @@ public class InitiativeRepositoryExtendedImpl implements InitiativeRepositoryExt
                         0
                 ));
 
-        // PROJECT
+
         ProjectionOperation project = Aggregation.project()
                 .and("general.startDate").as("startDate")
                 .and("general.endDate").as("endDate")
-                .andInclude("_id","initiativeName", "status")
+                .andInclude("_id", "initiativeName", "status")
 
                 .and(
                         ConditionalOperators.switchCases(
@@ -102,16 +114,15 @@ public class InitiativeRepositoryExtendedImpl implements InitiativeRepositoryExt
 
                                         ConditionalOperators.Switch.CaseOperator
                                                 .when(isOnboarded)
-                                                .then(0),
+                                                .then(2),
 
                                         ConditionalOperators.Switch.CaseOperator
                                                 .when(hasAtecoMatch)
-                                                .then(1)
+                                                .then(0)
                                 )
-                                .defaultTo(2)
+                                .defaultTo(1)
                 ).as("onboardStatusOrder");
 
-        // SORT MAPPING
         Sort sort = pageable.getSort().isUnsorted()
                 ? Sort.by("initiativeName")
                 : Sort.by(
@@ -133,6 +144,7 @@ public class InitiativeRepositoryExtendedImpl implements InitiativeRepositoryExt
         SkipOperation skip = Aggregation.skip(pageable.getOffset());
         LimitOperation limit = Aggregation.limit(pageable.getPageSize());
 
+
         Aggregation aggregation = Aggregation.newAggregation(
                 match,
                 project,
@@ -148,8 +160,9 @@ public class InitiativeRepositoryExtendedImpl implements InitiativeRepositoryExt
                         InitiativePageItem.class
                 ).getMappedResults();
 
+
         long total = mongoTemplate.count(
-                Query.query(Criteria.where("status").is("PUBLISHED")),
+                Query.query(criteria),
                 Initiative.class
         );
 
