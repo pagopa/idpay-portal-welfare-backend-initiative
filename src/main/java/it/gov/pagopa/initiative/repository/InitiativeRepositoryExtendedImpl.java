@@ -90,13 +90,24 @@ public class InitiativeRepositoryExtendedImpl implements InitiativeRepositoryExt
                 ));
 
 
+        AggregationExpression isExpired = context -> new Document("$and",
+                List.of(
+                        new Document("$ne", List.of("$general.endDate", null)),
+                        new Document("$lt", List.of("$general.endDate", "$$NOW"))
+                ));
+
         ProjectionOperation project = Aggregation.project()
                 .and("general.startDate").as("startDate")
                 .and("general.endDate").as("endDate")
-                .andInclude("_id", "initiativeName", "status")
+                .andInclude("_id", "initiativeName", "status","organizationName","atecoCodes")
+
 
                 .and(
                         ConditionalOperators.switchCases(
+
+                                        ConditionalOperators.Switch.CaseOperator
+                                                .when(isExpired)
+                                                .then("NON_ONBOARDABILE"),
 
                                         ConditionalOperators.Switch.CaseOperator
                                                 .when(isOnboarded)
@@ -113,6 +124,10 @@ public class InitiativeRepositoryExtendedImpl implements InitiativeRepositoryExt
                         ConditionalOperators.switchCases(
 
                                         ConditionalOperators.Switch.CaseOperator
+                                                .when(isExpired)
+                                                .then(1),
+
+                                        ConditionalOperators.Switch.CaseOperator
                                                 .when(isOnboarded)
                                                 .then(2),
 
@@ -123,22 +138,23 @@ public class InitiativeRepositoryExtendedImpl implements InitiativeRepositoryExt
                                 .defaultTo(1)
                 ).as("onboardStatusOrder");
 
-        Sort sort = pageable.getSort().isUnsorted()
-                ? Sort.by("initiativeName")
+        Sort userSort = pageable.getSort().isUnsorted()
+                ? Sort.by(Sort.Order.asc("initiativeName"))
                 : Sort.by(
                 pageable.getSort().stream()
+                        .filter(order -> !order.getProperty().equals("onboardStatus"))
                         .map(order -> {
                             String field = switch (order.getProperty()) {
                                 case "initiativeName" -> "initiativeName";
-                                case "status" -> "status";
-                                case "startDate" -> "startDate";
-                                case "onboardStatus" -> "onboardStatusOrder";
+                                case "organizationName" -> "organizationName";
                                 default -> throw new IllegalArgumentException(
                                         "Unsupported sort property: " + order.getProperty());
                             };
                             return new Sort.Order(order.getDirection(), field);
                         }).toList()
         );
+
+        Sort sort = Sort.by(Sort.Order.asc("onboardStatusOrder")).and(userSort);
 
         SortOperation sortOp = Aggregation.sort(sort);
         SkipOperation skip = Aggregation.skip(pageable.getOffset());
