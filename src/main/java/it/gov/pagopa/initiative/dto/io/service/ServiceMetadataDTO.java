@@ -1,5 +1,6 @@
 package it.gov.pagopa.initiative.dto.io.service;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -7,6 +8,7 @@ import lombok.experimental.SuperBuilder;
 /**
  * ServiceMetadata
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
