@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -65,7 +66,8 @@ public class InitiativeRepositoryExtendedImpl implements InitiativeRepositoryExt
 
         List<String> safeAtecoCodes = atecoCodes != null ? atecoCodes : Collections.emptyList();
 
-        Criteria criteria = Criteria.where("status").is("PUBLISHED");
+        Criteria criteria = Criteria.where("status").is("PUBLISHED")
+                .and("_id").not().in(safeOnboardedIds);
 
         if (initiativeName != null && !initiativeName.isBlank()) {
             Pattern pattern = Pattern.compile(
@@ -77,10 +79,6 @@ public class InitiativeRepositoryExtendedImpl implements InitiativeRepositoryExt
 
         MatchOperation match = Aggregation.match(criteria);
 
-        AggregationExpression isOnboarded =
-                ArrayOperators.In.arrayOf(safeOnboardedIds)
-                        .containsValue(Fields.field("_id"));
-
         AggregationExpression hasAtecoMatch = context -> new Document("$gt",
                 List.of(
                         new Document("$size",
@@ -89,35 +87,29 @@ public class InitiativeRepositoryExtendedImpl implements InitiativeRepositoryExt
                         0
                 ));
 
-
         AggregationExpression isExpired = context -> new Document("$and",
                 List.of(
-                        new Document("$ne", List.of("$general.endDate", null)),
+                        new Document("$ne", Arrays.asList("$general.endDate", null)),
                         new Document("$lt", List.of("$general.endDate", "$$NOW"))
                 ));
 
         ProjectionOperation project = Aggregation.project()
                 .and("general.startDate").as("startDate")
                 .and("general.endDate").as("endDate")
-                .andInclude("_id", "initiativeName", "status","organizationName","atecoCodes")
-
+                .andInclude("_id", "initiativeName", "status", "organizationName", "atecoCodes")
 
                 .and(
                         ConditionalOperators.switchCases(
 
                                         ConditionalOperators.Switch.CaseOperator
                                                 .when(isExpired)
-                                                .then("NON_ONBOARDABILE"),
-
-                                        ConditionalOperators.Switch.CaseOperator
-                                                .when(isOnboarded)
-                                                .then("ONBOARDATO"),
+                                                .then("NOT_ONBOARDABLE"),
 
                                         ConditionalOperators.Switch.CaseOperator
                                                 .when(hasAtecoMatch)
-                                                .then("ONBOARDABILE")
+                                                .then("ONBOARDABLE")
                                 )
-                                .defaultTo("NON_ONBOARDABILE")
+                                .defaultTo("NOT_ONBOARDABLE")
                 ).as("onboardStatus")
 
                 .and(
@@ -126,10 +118,6 @@ public class InitiativeRepositoryExtendedImpl implements InitiativeRepositoryExt
                                         ConditionalOperators.Switch.CaseOperator
                                                 .when(isExpired)
                                                 .then(1),
-
-                                        ConditionalOperators.Switch.CaseOperator
-                                                .when(isOnboarded)
-                                                .then(2),
 
                                         ConditionalOperators.Switch.CaseOperator
                                                 .when(hasAtecoMatch)
@@ -160,7 +148,6 @@ public class InitiativeRepositoryExtendedImpl implements InitiativeRepositoryExt
         SkipOperation skip = Aggregation.skip(pageable.getOffset());
         LimitOperation limit = Aggregation.limit(pageable.getPageSize());
 
-
         Aggregation aggregation = Aggregation.newAggregation(
                 match,
                 project,
@@ -175,7 +162,6 @@ public class InitiativeRepositoryExtendedImpl implements InitiativeRepositoryExt
                         "initiative",
                         InitiativePageItem.class
                 ).getMappedResults();
-
 
         long total = mongoTemplate.count(
                 Query.query(criteria),

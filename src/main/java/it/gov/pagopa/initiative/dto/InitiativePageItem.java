@@ -4,6 +4,7 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -19,4 +20,5 @@ public class InitiativePageItem {
     private LocalDate endDate;
     private String onboardStatus;
     private Integer onboardStatusOrder;
+    private List<String> atecoCodes;
 }
