@@ -163,6 +163,14 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     }
 
     @Override
+    public Initiative getInitiativeInfo(String initiativeId, String role) {
+        long startTime = System.currentTimeMillis();
+        auditUtilities.logGetInitiativeInfo(this.getUserId(),initiativeId);
+        performanceLog(startTime, "GET_INITIATIVE_DETAIL_INFO");
+        return initiativeValidationService.getInitiativeInfo(initiativeId, role);
+    }
+
+    @Override
     public Initiative getInitiativeBeneficiaryView(String initiativeId) {
         return initiativeRepository.retrieveInitiativeBeneficiaryView(initiativeId, true)
                 .orElseThrow(() -> new InitiativeNotFoundException(InitiativeConstants.Exception.NotFound.INITIATIVE_NOT_FOUND_MESSAGE.formatted(initiativeId)));

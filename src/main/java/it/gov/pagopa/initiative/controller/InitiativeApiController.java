@@ -93,6 +93,12 @@ public class InitiativeApiController implements InitiativeApi {
         return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDTO(this.initiativeService.getInitiative(organizationId, initiativeId, role), true));
     }
 
+    @Override
+    public ResponseEntity<InitiativeDTO> getInitiativeDetailInfo(String initiativeId, String role) {
+        log.info("[{}][GET_INITIATIVE_DETAIL] - Initiative: {}. Start processing...", role, initiativeId);
+        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDTO(this.initiativeService.getInitiativeInfo(initiativeId, role), true));
+    }
+
     @ResponseStatus(HttpStatus.CREATED)
     @Override
     public ResponseEntity<InitiativeDTO> saveInitiativeServiceInfo(String organizationId, InitiativeAdditionalDTO initiativeAdditionalDTO) {
