@@ -94,8 +94,6 @@ public class InitiativeRepositoryExtendedImpl implements InitiativeRepositoryExt
                 ));
 
         ProjectionOperation project = Aggregation.project()
-                .and("general.startDate").as("startDate")
-                .and("general.endDate").as("endDate")
                 .andInclude("_id", "initiativeName", "status", "organizationName", "atecoCodes")
 
                 .and(
