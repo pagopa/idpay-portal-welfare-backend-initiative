@@ -477,7 +477,7 @@ public interface InitiativeApi {
           @RequestHeader("x-user-id") String userId
   );
 
-  @PostMapping("/initiatives/search")
+  @PostMapping("/idpay/initiatives/search")
   ResponseEntity<PageResponse<InitiativeResponse>> searchInitiatives(
           @RequestBody InitiativeSearchRequest request,
           Pageable pageable);
