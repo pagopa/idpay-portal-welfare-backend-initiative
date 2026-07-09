@@ -95,8 +95,17 @@ public class InitiativeApiController implements InitiativeApi {
 
     @Override
     public ResponseEntity<InitiativeDTO> getInitiativeDetailInfo(String initiativeId, String role) {
-        log.info("[{}][GET_INITIATIVE_DETAIL] - Initiative: {}. Start processing...", role, initiativeId);
+        log.info("[{}][GET_INITIATIVE_DETAIL] - Initiative: {}. Start processing...", sanitizeForLog(role), initiativeId);
         return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDTO(this.initiativeService.getInitiativeInfo(initiativeId, role), true));
+    }
+
+    private String sanitizeForLog(String value) {
+        if (value == null) {
+            return null;
+        }
+        return value
+                .replace('\n', '_')
+                .replace('\r', '_');
     }
 
     @ResponseStatus(HttpStatus.CREATED)
