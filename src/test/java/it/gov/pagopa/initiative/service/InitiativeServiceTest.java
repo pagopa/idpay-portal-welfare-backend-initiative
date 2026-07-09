@@ -1693,6 +1693,141 @@ class InitiativeServiceTest {
             assertEquals("An error occurred during the IO Back-end invocation", e.getMessage());
         }
     }
+    @Test
+    void getInitiativeInfo_ok() {
+
+        Initiative initiative = createStep5Initiative();
+
+        when(initiativeValidationService.getInitiativeInfo(
+                INITIATIVE_ID,
+                ROLE))
+                .thenReturn(initiative);
+
+        Initiative result =
+                initiativeService.getInitiativeInfo(
+                        INITIATIVE_ID,
+                        ROLE);
+
+        assertEquals(initiative, result);
+
+        verify(initiativeValidationService, times(1))
+                .getInitiativeInfo(
+                        INITIATIVE_ID,
+                        ROLE);
+
+        verify(auditUtilities, times(1))
+                .logGetInitiativeInfo(
+                        any(),
+                        eq(INITIATIVE_ID));
+    }
+
+    @Test
+    void getInitiativeInfo_notFound() {
+
+        doThrow(new InitiativeNotFoundException(
+                InitiativeConstants.Exception.NotFound.INITIATIVE_NOT_FOUND,
+                InitiativeConstants.Exception.NotFound.INITIATIVE_NOT_FOUND_MESSAGE
+                        .formatted(INITIATIVE_ID)))
+                .when(initiativeValidationService)
+                .getInitiativeInfo(INITIATIVE_ID, ROLE);
+
+        InitiativeNotFoundException exception = assertThrows(
+                InitiativeNotFoundException.class,
+                () -> initiativeService.getInitiativeInfo(
+                        INITIATIVE_ID,
+                        ROLE));
+
+        assertEquals(
+                InitiativeConstants.Exception.NotFound.INITIATIVE_NOT_FOUND,
+                exception.getCode());
+
+        verify(initiativeValidationService)
+                .getInitiativeInfo(INITIATIVE_ID, ROLE);
+    }
+
+    @Test
+    void searchInitiatives_ok() {
+
+        Set<String> onboardedIds = Set.of("ID1", "ID2");
+        List<String> atecoCodes = List.of("47110");
+        String initiativeName = "Cashback";
+
+        Pageable pageable = Pageable.ofSize(10);
+
+        InitiativePageItem item = InitiativePageItem.builder()
+                .initiativeId(INITIATIVE_ID)
+                .initiativeName("Cashback Test")
+                .status(InitiativeConstants.Status.PUBLISHED)
+                .startDate(LocalDate.now())
+                .endDate(LocalDate.now().plusDays(30))
+                .onboardStatus("ONBOARDED")
+                .onboardStatusOrder(1)
+                .atecoCodes(List.of("47110"))
+                .build();
+
+        Page<InitiativePageItem> repositoryPage =
+                new PageImpl<>(List.of(item), pageable, 1);
+
+        when(initiativeRepository.findInitiatives(
+                onboardedIds,
+                atecoCodes,
+                initiativeName,
+                pageable))
+                .thenReturn(repositoryPage);
+
+        Page<InitiativeResponse> result =
+                initiativeService.searchInitiatives(
+                        onboardedIds,
+                        atecoCodes,
+                        initiativeName,
+                        pageable);
+
+        assertNotNull(result);
+        assertEquals(1, result.getContent().size());
+        assertEquals(1, result.getTotalElements());
+
+        InitiativeResponse response = result.getContent().get(0);
+
+        assertEquals(INITIATIVE_ID, response.getInitiativeId());
+        assertEquals("Cashback Test", response.getInitiativeName());
+
+        verify(initiativeRepository, times(1))
+                .findInitiatives(
+                        onboardedIds,
+                        atecoCodes,
+                        initiativeName,
+                        pageable);
+    }
+
+    @Test
+    void searchInitiatives_emptyPage() {
+
+        Pageable pageable = Pageable.ofSize(10);
+
+        when(initiativeRepository.findInitiatives(
+                anySet(),
+                anyList(),
+                any(),
+                eq(pageable)))
+                .thenReturn(Page.empty(pageable));
+
+        Page<InitiativeResponse> result =
+                initiativeService.searchInitiatives(
+                        Set.of(),
+                        List.of(),
+                        null,
+                        pageable);
+
+        assertTrue(result.getContent().isEmpty());
+        assertEquals(0, result.getTotalElements());
+
+        verify(initiativeRepository)
+                .findInitiatives(
+                        anySet(),
+                        anyList(),
+                        any(),
+                        eq(pageable));
+    }
 
     private ServiceResponseErrorDTO createServiceResponseErrorDTO(int httpStatus) {
         return ServiceResponseErrorDTO.builder()
