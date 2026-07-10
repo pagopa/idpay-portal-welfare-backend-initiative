@@ -704,6 +704,16 @@ class InitiativeModelToDTOMapperTest {
         assertNull(result.getDescription());
     }
 
+    @Test
+    void toInitiativeGeneral_withProductType() {
+        Initiative initiative = createFullInitiative();
+        initiative.getGeneral().setProductTypeBudgetCents(Map.of("CODE", 100L));
+        InitiativeDTO initiativeActual = initiativeModelToDTOMapper.toInitiativeDTO(initiative, false);
+
+        assertNotNull(initiativeActual.getGeneral());
+        assertEquals(initiativeActual.getGeneral().getProductTypeBudgetCents(), initiative.getGeneral().getProductTypeBudgetCents());
+    }
+
     private Initiative createFullInitiative() {
         return createStep5Initiative();
     }

@@ -129,6 +129,5 @@ public class InitiativeGeneralDTO extends InitiativeOrganizationInfoDTO {
     private Map<String, String> descriptionMap;
 
     @JsonProperty("productTypeBudgetCents")
-    @FutureOrPresent(groups = ValidationApiEnabledGroup.class)
-    private Map<String, Long> productTypeBudgetCents;
+    private Map<@NotBlank String, @Positive Long> productTypeBudgetCents;
 }
