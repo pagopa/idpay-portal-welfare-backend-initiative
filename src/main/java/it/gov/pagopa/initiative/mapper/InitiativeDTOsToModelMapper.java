@@ -72,7 +72,9 @@ public class InitiativeDTOsToModelMapper {
                 .rankingEndDate(generalDTO.getRankingEndDate())
                 .rankingStartDate(generalDTO.getRankingStartDate())
                 .rankingEnabled(generalDTO.getRankingEnabled())
-                .descriptionMap(generalDTO.getDescriptionMap()).build();
+                .descriptionMap(generalDTO.getDescriptionMap())
+                .productTypeBudgetCents(generalDTO.getProductTypeBudgetCents())
+                .build();
     }
 
     private InitiativeAdditional toInitiativeAdditional(InitiativeAdditionalDTO additionalDTO) {
