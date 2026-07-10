@@ -269,7 +269,102 @@ class InitiativeRepositoryExtendedImplTest {
                 item.getOnboardStatusOrder()
         );
     }
+    @Test
+    void shouldHandleNullAtecoCodes() {
 
+        initiativeRepository.save(
+                createInitiative(
+                        700,
+                        InitiativeConstants.Status.PUBLISHED,
+                        List.of("ATECO1"),
+                        LocalDate.now().plusYears(1)
+                )
+        );
+
+        Page<InitiativePageItem> result =
+                initiativeRepository.findInitiatives(
+                        Collections.emptySet(),
+                        null,
+                        null,
+                        PageRequest.of(0, 10)
+                );
+
+        Assertions.assertEquals(1, result.getTotalElements());
+    }
+
+    @Test
+    void shouldIgnoreBlankInitiativeNameFilter() {
+
+        initiativeRepository.save(
+                createInitiative(
+                        701,
+                        InitiativeConstants.Status.PUBLISHED,
+                        List.of("1111"),
+                        LocalDate.now().plusYears(1)
+                )
+        );
+
+        Page<InitiativePageItem> result =
+                initiativeRepository.findInitiatives(
+                        Collections.emptySet(),
+                        List.of("1111"),
+                        "   ",
+                        PageRequest.of(0, 10)
+                );
+
+        Assertions.assertEquals(1, result.getTotalElements());
+    }
+
+    @Test
+    void shouldSortByOrganizationName() {
+
+        initiativeRepository.saveAll(List.of(
+                createInitiative(
+                        702,
+                        InitiativeConstants.Status.PUBLISHED,
+                        List.of("1111"),
+                        LocalDate.now().plusYears(1)
+                ),
+                createInitiative(
+                        703,
+                        InitiativeConstants.Status.PUBLISHED,
+                        List.of("1111"),
+                        LocalDate.now().plusYears(1)
+                )
+        ));
+
+        Page<InitiativePageItem> result =
+                initiativeRepository.findInitiatives(
+                        Collections.emptySet(),
+                        List.of("1111"),
+                        null,
+                        PageRequest.of(
+                                0,
+                                10,
+                                org.springframework.data.domain.Sort.by("organizationName")
+                        )
+                );
+
+        Assertions.assertEquals(2, result.getTotalElements());
+    }
+
+    @Test
+    void shouldThrowExceptionForUnsupportedSortProperty() {
+
+        Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> initiativeRepository.findInitiatives(
+                        Collections.emptySet(),
+                        List.of(),
+                        null,
+                        PageRequest.of(
+                                0,
+                                10,
+                                org.springframework.data.domain.Sort.by("unsupportedField")
+                        )
+                )
+        );
+    }
     private Initiative createInitiativeForFindInitiatives(
             int bias,
             String status,
