@@ -123,7 +123,7 @@ class InitiativeDTOsToModelMapperTest {
     private Initiative initiativeInfoOnlyInfoGeneralFamilyUnitNotNull;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         initiativeOnlyInfoGeneral = createStep1InitiativeOnlyInfoGeneral();
         initiativeInfoOnlyInfoGeneralFamilyUnitNotNull = createStep1InitiativeOnlyInfoGeneralFamilyUnitNotNull();
         initiativeNoBaseFields = createStep1InitiativeNoBaseFields();

@@ -99,7 +99,7 @@ class InitiativeModelToDTOMapperTest {
     private InitiativeDTO initiativeStep2DTOFamilyUnitNotNull;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         fullInitiative = createFullInitiative();
         Initiative fullInitiative2 = createFullInitiative2();
         initiativeList = new ArrayList<>();

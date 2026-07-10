@@ -20,7 +20,7 @@ class SecondValueGreaterThanFirstWithBTWValidatorTest {
     private Validator validator;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
     }

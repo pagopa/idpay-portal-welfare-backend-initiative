@@ -45,7 +45,7 @@ public class MongoRequestRateTooLargeRetryerTest {
   private MemoryAppender memoryAppender;
 
   @BeforeEach
-  public void setup() {
+  void setup() {
     ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(
         MongoRequestRateTooLargeRetryer.class.getName());
     memoryAppender = new MemoryAppender();
