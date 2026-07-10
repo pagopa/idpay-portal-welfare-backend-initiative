@@ -5,10 +5,11 @@ import it.gov.pagopa.common.azure.storage.AzureBlobClient;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+
+import static org.mockito.Mockito.*;
 
 class InitiativeFileStorageClientImplTest {
 
@@ -16,16 +17,16 @@ class InitiativeFileStorageClientImplTest {
 
     @BeforeEach
     void init(){
-        initiativeFileStorageConnector = Mockito.spy(new InitiativeFileStorageClient("UseDevelopmentStorage=true;", "test"));
+        initiativeFileStorageConnector = spy(new InitiativeFileStorageClient("UseDevelopmentStorage=true;", "test"));
     }
 
     @Test
     void whenUploadInitiativeLogoThenUploadMethodIsInvoked(){
         // Given
-        InputStream is = Mockito.mock(InputStream.class);
+        InputStream is = mock(InputStream.class);
         String destination = "FILENAME";
         String contentType = "text";
-        Mockito.doReturn(Mockito.mock(Response.class))
+        doReturn(mock(Response.class))
                 .when((AzureBlobClient) initiativeFileStorageConnector)
                 .upload(is, destination, contentType);
 
@@ -33,7 +34,7 @@ class InitiativeFileStorageClientImplTest {
         initiativeFileStorageConnector.uploadInitiativeLogo(is, destination, contentType);
 
         // Then
-        Mockito.verify((AzureBlobClient) initiativeFileStorageConnector)
+        verify((AzureBlobClient) initiativeFileStorageConnector)
                 .upload(is, destination, contentType);
     }
 
@@ -41,8 +42,8 @@ class InitiativeFileStorageClientImplTest {
     void whenDownloadInitiativeLogoThenDownloadMethodIsInvoked(){
         // Given
         String filename = "FILENAME";
-        ByteArrayOutputStream expectedResult = Mockito.mock(ByteArrayOutputStream.class);
-        Mockito.doReturn(expectedResult)
+        ByteArrayOutputStream expectedResult = mock(ByteArrayOutputStream.class);
+        doReturn(expectedResult)
                 .when((AzureBlobClient) initiativeFileStorageConnector)
                 .download(filename);
 

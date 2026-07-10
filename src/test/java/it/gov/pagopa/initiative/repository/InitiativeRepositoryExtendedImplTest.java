@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.mongodb.test.autoconfigure.DataMongoTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -351,20 +352,23 @@ class InitiativeRepositoryExtendedImplTest {
     @Test
     void shouldThrowExceptionForUnsupportedSortProperty() {
 
+        PageRequest pageRequest = PageRequest.of(
+                0,
+                10,
+                Sort.by("unsupportedField")
+        );
+
         Assertions.assertThrows(
                 IllegalArgumentException.class,
                 () -> initiativeRepository.findInitiatives(
                         Collections.emptySet(),
                         List.of(),
                         null,
-                        PageRequest.of(
-                                0,
-                                10,
-                                org.springframework.data.domain.Sort.by("unsupportedField")
-                        )
+                        pageRequest
                 )
         );
     }
+
     private Initiative createInitiativeForFindInitiatives(
             int bias,
             String status,
