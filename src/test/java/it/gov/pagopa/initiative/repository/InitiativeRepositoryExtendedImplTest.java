@@ -1,21 +1,24 @@
 package it.gov.pagopa.initiative.repository;
 
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
+import it.gov.pagopa.initiative.dto.InitiativePageItem;
 import it.gov.pagopa.initiative.dto.OrganizationDTO;
 import it.gov.pagopa.initiative.model.Initiative;
+import it.gov.pagopa.initiative.model.InitiativeGeneral;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.mongodb.test.autoconfigure.DataMongoTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.IntStream;
 
 @DataMongoTest(properties = {
@@ -30,55 +33,325 @@ class InitiativeRepositoryExtendedImplTest {
     @Autowired
     private InitiativeRepository initiativeRepository;
 
-    private final List<Initiative> testData = createInitiativeList();
-
-    @BeforeEach
-    void prepareData() {
-        initiativeRepository.saveAll(testData);
-    }
-
     @AfterEach
     void cleanData() {
-        initiativeRepository.deleteAll(testData);
+        initiativeRepository.deleteAll();
     }
 
-
     @ParameterizedTest
-    @ValueSource(strings = {InitiativeConstants.Role.ADMIN, InitiativeConstants.Role.PAGOPA_ADMIN, "default"})
+    @ValueSource(strings = {
+            InitiativeConstants.Role.ADMIN,
+            InitiativeConstants.Role.PAGOPA_ADMIN,
+            "default"
+    })
     void test(String role) {
-        List<OrganizationDTO> result = initiativeRepository.findAllBy(createStatusList(role));
+
+        initiativeRepository.saveAll(createInitiativeList());
+
+        List<OrganizationDTO> result =
+                initiativeRepository.findAllBy(createStatusList(role));
 
         List<OrganizationDTO> expectedResult = role.equals("default")
                 ? Collections.emptyList()
                 : createOrganizationDTOList(role);
+
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(new HashSet<>(expectedResult), new HashSet<>(result));
+        Assertions.assertEquals(
+                new HashSet<>(expectedResult),
+                new HashSet<>(result)
+        );
     }
 
-    private List<Initiative> createInitiativeList() {
-        return IntStream.range(0, DATA_LIST_SIZE).mapToObj(this::createInitiative).toList();
+    @Test
+    void shouldReturnOnlyPublishedInitiatives() {
+
+        initiativeRepository.saveAll(List.of(
+                createInitiative(
+                        100,
+                        "PUBLISHED",
+                        List.of("1111"),
+                        LocalDate.now().plusYears(1)
+                ),
+                createInitiative(
+                        101,
+                        InitiativeConstants.Status.DRAFT,
+                        List.of("1111"),
+                        LocalDate.now().plusYears(1)
+                )
+        ));
+
+        Page<InitiativePageItem> result = initiativeRepository.findInitiatives(
+                Collections.emptySet(),
+                List.of("1111"),
+                null,
+                PageRequest.of(0, 10)
+        );
+
+        Assertions.assertEquals(1, result.getTotalElements());
+
+        InitiativePageItem item = result.getContent().get(0);
+
+        Assertions.assertEquals(
+                "initiativeId_100",
+                item.getInitiativeId()
+        );
+        Assertions.assertEquals(
+                "PUBLISHED",
+                item.getStatus()
+        );
     }
 
-    private Initiative createInitiative(int bias) {
+    @Test
+    void shouldExcludeAlreadyOnboardedInitiatives() {
+
+        Initiative first = createInitiativeForFindInitiatives(
+                200,
+                "PUBLISHED",
+                List.of("1111"),
+                LocalDate.now().plusYears(1)
+        );
+
+        Initiative second = createInitiativeForFindInitiatives(
+                201,
+                "PUBLISHED",
+                List.of("1111"),
+                LocalDate.now().plusYears(1)
+        );
+
+        initiativeRepository.saveAll(List.of(first, second));
+
+        Page<InitiativePageItem> result = initiativeRepository.findInitiatives(
+                Set.of(first.getInitiativeId()),
+                List.of("1111"),
+                null,
+                PageRequest.of(0, 10)
+        );
+
+        Assertions.assertEquals(1, result.getContent().size());
+
+        Assertions.assertEquals(
+                second.getInitiativeId(),
+                result.getContent().get(0).getInitiativeId()
+        );
+    }
+
+    @Test
+    void shouldFilterByInitiativeNameIgnoringCase() {
+
+        initiativeRepository.saveAll(List.of(
+                createInitiative(
+                        300,
+                        "PUBLISHED",
+                        List.of("1111"),
+                        LocalDate.now().plusYears(1)
+                ),
+                createInitiative(
+                        301,
+                        "PUBLISHED",
+                        List.of("1111"),
+                        LocalDate.now().plusYears(1)
+                )
+        ));
+
+        Page<InitiativePageItem> result = initiativeRepository.findInitiatives(
+                Collections.emptySet(),
+                List.of("1111"),
+                "NAME_300",
+                PageRequest.of(0, 10)
+        );
+
+        Assertions.assertEquals(1, result.getContent().size());
+
+        Assertions.assertEquals(
+                "initiativeId_300",
+                result.getContent().get(0).getInitiativeId()
+        );
+    }
+
+    @Test
+    void shouldMarkInitiativeAsOnboardable() {
+
+        initiativeRepository.save(
+                createInitiative(
+                        400,
+                        "PUBLISHED",
+                        List.of("ATECO1", "ATECO2"),
+                        LocalDate.now().plusYears(1)
+                )
+        );
+
+        Page<InitiativePageItem> result = initiativeRepository.findInitiatives(
+                Collections.emptySet(),
+                List.of("ATECO2"),
+                null,
+                PageRequest.of(0, 10)
+        );
+
+        Assertions.assertEquals(1, result.getContent().size());
+
+        InitiativePageItem item = result.getContent().get(0);
+
+        Assertions.assertEquals(
+                "ONBOARDABLE",
+                item.getOnboardStatus()
+        );
+
+        Assertions.assertEquals(
+                0,
+                item.getOnboardStatusOrder()
+        );
+    }
+
+    @Test
+    void shouldMarkExpiredInitiativeAsNotOnboardable() {
+
+        initiativeRepository.save(
+                createInitiative(
+                        500,
+                        "PUBLISHED",
+                        List.of("ATECO1"),
+                        LocalDate.now().minusYears(1)
+                )
+        );
+
+        Page<InitiativePageItem> result = initiativeRepository.findInitiatives(
+                Collections.emptySet(),
+                List.of("ATECO1"),
+                null,
+                PageRequest.of(0, 10)
+        );
+
+        Assertions.assertEquals(1, result.getContent().size());
+
+        InitiativePageItem item = result.getContent().get(0);
+
+        Assertions.assertEquals(
+                "NOT_ONBOARDABLE",
+                item.getOnboardStatus()
+        );
+
+        Assertions.assertEquals(
+                1,
+                item.getOnboardStatusOrder()
+        );
+    }
+
+    @Test
+    void shouldPrioritizeExpiredOverAtecoMatch() {
+
+        initiativeRepository.save(
+                createInitiative(
+                        600,
+                        "PUBLISHED",
+                        List.of("ATECO1", "ATECO2"),
+                        LocalDate.now().minusYears(1)
+                )
+        );
+
+        Page<InitiativePageItem> result = initiativeRepository.findInitiatives(
+                Collections.emptySet(),
+                List.of("ATECO2"),
+                null,
+                PageRequest.of(0, 10)
+        );
+
+        Assertions.assertEquals(1, result.getContent().size());
+
+        InitiativePageItem item = result.getContent().get(0);
+
+        Assertions.assertEquals(
+                "NOT_ONBOARDABLE",
+                item.getOnboardStatus()
+        );
+
+        Assertions.assertEquals(
+                1,
+                item.getOnboardStatusOrder()
+        );
+    }
+
+    private Initiative createInitiativeForFindInitiatives(
+            int bias,
+            String status,
+            List<String> atecoCodes,
+            LocalDate endDate) {
+
         LocalDateTime now = LocalDateTime.now();
 
         return Initiative.builder()
-                .initiativeId("initiativeid_%d".formatted(bias))
+                .initiativeId(new ObjectId().toHexString())
                 .initiativeName("initiativeName_%d".formatted(bias))
                 .organizationId("organizationId_%d".formatted(bias))
                 .organizationName("organizationName_%d".formatted(bias))
                 .creationDate(now.minusWeeks(2))
                 .updateDate(now)
-                .status(bias % 2 == 0
-                        ? InitiativeConstants.Status.APPROVED
-                        : InitiativeConstants.Status.DRAFT)
+                .status(status)
+                .enabled(true)
+                .atecoCodes(atecoCodes)
+                .general(
+                        InitiativeGeneral.builder()
+                                .endDate(endDate)
+                                .build()
+                )
+                .build();
+    }
+
+    private Initiative createInitiative(
+            int bias,
+            String status,
+            List<String> atecoCodes,
+            LocalDate endDate) {
+
+        LocalDateTime now = LocalDateTime.now();
+
+        return Initiative.builder()
+                .initiativeId("initiativeId_%d".formatted(bias))
+                .initiativeName("initiativeName_%d".formatted(bias))
+                .organizationId("organizationId_%d".formatted(bias))
+                .organizationName("organizationName_%d".formatted(bias))
+                .creationDate(now.minusWeeks(2))
+                .updateDate(now)
+                .status(status)
+                .enabled(true)
+                .atecoCodes(atecoCodes)
+                .general(
+                        InitiativeGeneral.builder()
+                                .endDate(endDate)
+                                .build()
+                )
+                .build();
+    }
+
+    private List<Initiative> createInitiativeList() {
+        return IntStream.range(0, DATA_LIST_SIZE)
+                .mapToObj(this::createInitiative)
+                .toList();
+    }
+
+    private Initiative createInitiative(int bias) {
+
+        LocalDateTime now = LocalDateTime.now();
+
+        return Initiative.builder()
+                .initiativeId("initiativeId_%d".formatted(bias))
+                .initiativeName("initiativeName_%d".formatted(bias))
+                .organizationId("organizationId_%d".formatted(bias))
+                .organizationName("organizationName_%d".formatted(bias))
+                .creationDate(now.minusWeeks(2))
+                .updateDate(now)
+                .status(
+                        bias % 2 == 0
+                                ? InitiativeConstants.Status.APPROVED
+                                : InitiativeConstants.Status.DRAFT
+                )
                 .enabled(true)
                 .build();
     }
 
     private List<String> createStatusList(String role) {
         return switch (role) {
-            case InitiativeConstants.Role.ADMIN -> InitiativeConstants.Status.INITIATIVE_STATUS_LIST_FOR_ADMIN_OPERATOR;
+            case InitiativeConstants.Role.ADMIN ->
+                    InitiativeConstants.Status.INITIATIVE_STATUS_LIST_FOR_ADMIN_OPERATOR;
             case InitiativeConstants.Role.PAGOPA_ADMIN ->
                     InitiativeConstants.Status.INITIATIVE_STATUS_LIST_FOR_PAGOPA_ADMIN_OPERATOR;
             default -> Collections.emptyList();
@@ -86,29 +359,31 @@ class InitiativeRepositoryExtendedImplTest {
     }
 
     private List<OrganizationDTO> createOrganizationDTOList(String role) {
+
         List<OrganizationDTO> list = new ArrayList<>(
-                IntStream.range(0, DATA_LIST_SIZE).mapToObj(this::createOrganizationDTO).toList()
+                IntStream.range(0, DATA_LIST_SIZE)
+                        .mapToObj(this::createOrganizationDTO)
+                        .toList()
         );
 
-        // Remove results that only ADMINs can see
-        for (int i = list.size()-1; i >= 0; i--) {
-            if(role.equals(InitiativeConstants.Role.PAGOPA_ADMIN) && i%2!=0) {
+        for (int i = list.size() - 1; i >= 0; i--) {
+            if (role.equals(InitiativeConstants.Role.PAGOPA_ADMIN) && i % 2 != 0) {
                 list.remove(list.get(i));
             }
         }
 
-        //Reverse list order to match Aggregation result
-        for(int i = 0, j = list.size() - 1; i < j; i++) {
+        for (int i = 0, j = list.size() - 1; i < j; i++) {
             list.add(i, list.remove(j));
         }
+
         return list;
     }
 
     private OrganizationDTO createOrganizationDTO(int bias) {
+
         return OrganizationDTO.builder()
                 .organizationId("organizationId_%d".formatted(bias))
                 .organizationName("organizationName_%d".formatted(bias))
                 .build();
     }
-
 }
