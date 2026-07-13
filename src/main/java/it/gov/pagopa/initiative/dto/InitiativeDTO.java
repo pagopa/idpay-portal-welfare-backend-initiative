@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * InitiativeDTO
@@ -104,4 +105,7 @@ public class InitiativeDTO   {
   private InitiativeRefundRuleDTO refundRule;
   @JsonProperty("isLogoPresent")
   private Boolean isLogoPresent;
+
+  @JsonProperty("atecoCodes")
+  private List<String> atecoCodes;
 }

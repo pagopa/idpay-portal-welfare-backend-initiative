@@ -8,19 +8,18 @@ import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
 import it.gov.pagopa.initiative.mapper.InitiativeDTOsToModelMapper;
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.Initiative;
-import it.gov.pagopa.initiative.model.InitiativeGeneral;
 import it.gov.pagopa.initiative.service.InitiativeService;
 import it.gov.pagopa.initiative.service.OrganizationService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.LocaleUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -92,6 +91,21 @@ public class InitiativeApiController implements InitiativeApi {
     public ResponseEntity<InitiativeDTO> getInitiativeDetail(String organizationId, String initiativeId, String role) {
         log.info("[{}][GET_INITIATIVE_DETAIL] - Initiative: {}. Start processing...", role, initiativeId);
         return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDTO(this.initiativeService.getInitiative(organizationId, initiativeId, role), true));
+    }
+
+    @Override
+    public ResponseEntity<InitiativeDTO> getInitiativeDetailInfo(String initiativeId, String role) {
+        log.info("[{}][GET_INITIATIVE_DETAIL] - Initiative: {}. Start processing...", sanitizeForLog(role), sanitizeForLog(initiativeId));
+        return ResponseEntity.ok(this.initiativeModelToDTOMapper.toInitiativeDTO(this.initiativeService.getInitiativeInfo(initiativeId, role), true));
+    }
+
+    private String sanitizeForLog(String value) {
+        if (value == null) {
+            return null;
+        }
+        return value
+                .replace('\n', '_')
+                .replace('\r', '_');
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -375,6 +389,28 @@ public class InitiativeApiController implements InitiativeApi {
         List<InitiativeMilDTO> initiativeMilDTOList = this.initiativeModelToDTOMapper.toInitiativeListMilDTO(this.initiativeService.getPublishedInitiativesList());
         log.info("[GET_INITIATIVES] - User %s requested initiatives list through MIL".formatted(userId));
         return ResponseEntity.ok(initiativeMilDTOList);
+    }
+
+    @Override
+    public ResponseEntity<PageResponse<InitiativeResponse>> searchInitiatives(
+            InitiativeSearchRequest request,
+            Pageable pageable) {
+
+        Page<InitiativeResponse> page = initiativeService.searchInitiatives(
+                request.getOnboardedIds(),
+                request.getAtecoCodes(),
+                request.getInitiativeName(),
+                pageable
+        );
+
+        PageResponse<InitiativeResponse> response = new PageResponse<>(
+                page.getContent(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements()
+        );
+
+        return ResponseEntity.ok(response);
     }
 
     private void performanceLog(long startTime, String service){

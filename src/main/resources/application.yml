@@ -213,16 +213,19 @@ assistance:
   rest-client:
     wallet:
       serviceCode: idpay-wallet
-      baseUrl: ${WALLET_URI:}
+      baseUrl: ${WALLET_URI:http://localhost:8081}
     merchant:
       serviceCode: idpay-merchant
-      baseUrl: ${MERCHANT_URI:}
+      baseUrl: ${MERCHANT_URI:http://localhost:8081}
     timeline:
       serviceCode: idpay-timeline
-      baseUrl: ${TIMELINE_URI:}
+      baseUrl: ${TIMELINE_URI:http://localhost:8081}
     transactions:
       serviceCode: idpay-transaction
-      baseUrl: ${TRANSACTION_URI:}
+      baseUrl: ${TRANSACTION_URI:http://localhost:8081}
     onboarding:
       serviceCode: idpay-onboarding-assistance
-      uri: ${ONBOARDING_URI:}
+      uri: ${ONBOARDING_URI:http://localhost:8081}
+
+server:
+  port: 8082

@@ -101,6 +101,20 @@ public interface InitiativeApi {
       @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId,
       @RequestParam(required = false) String role);
 
+  @Operation(summary = "Returns the detail of an active initiative", description = "", security = {
+          @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = InitiativeDTO.class))),
+          @ApiResponse(responseCode = "401", description = "Authentication failed", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+          @ApiResponse(responseCode = "404", description = "The requested initiative was not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+          @ApiResponse(responseCode = "429", description = "Too many Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+          @ApiResponse(responseCode = "500", description = "Server ERROR", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))})
+  @GetMapping(value = "/idpay/initiative/{initiativeId}",
+          produces = {"application/json"})
+  ResponseEntity<InitiativeDTO> getInitiativeDetailInfo(
+          @Parameter(in = ParameterIn.PATH, description = "The initiative ID", required = true, schema = @Schema()) @PathVariable("initiativeId") String initiativeId,
+          @RequestParam(required = false) String role);
+
     @Operation(summary = "Save initiative and first subset of data 'general info'", description = "", security = {
             @SecurityRequirement(name = "Bearer")}, tags = {"initiative"})
     @ApiResponses(value = {
@@ -462,5 +476,10 @@ public interface InitiativeApi {
   ResponseEntity<List<InitiativeMilDTO>> getInitiativeListMil(
           @RequestHeader("x-user-id") String userId
   );
+
+  @PostMapping("/idpay/initiatives/search")
+  ResponseEntity<PageResponse<InitiativeResponse>> searchInitiatives(
+          @RequestBody InitiativeSearchRequest request,
+          Pageable pageable);
 }
 
