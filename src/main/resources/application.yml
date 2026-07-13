@@ -226,6 +226,3 @@ assistance:
     onboarding:
       serviceCode: idpay-onboarding-assistance
       uri: ${ONBOARDING_URI:http://localhost:8081}
-
-server:
-  port: 8082
