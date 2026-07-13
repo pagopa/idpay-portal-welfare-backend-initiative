@@ -387,11 +387,11 @@ class InitiativeDTOsToModelMapperTest {
     @Test
     void toInitiativeGeneral_withProductType() {
         InitiativeGeneralDTO initiativeGeneral = createStep1InitiativeInfoDTOonlyInfoGeneral();
-        initiativeGeneral.setProductTypeBudgetCents(Map.of("CODE", 100L));
+        initiativeGeneral.setProductTypeBudget(Map.of("CODE", BigDecimal.valueOf(100L)));
         Initiative initiativeActual = initiativeDTOsToModelMapper.toInitiative(initiativeGeneral);
 
         assertNotNull(initiativeActual.getGeneral());
-        assertEquals(initiativeActual.getGeneral().getProductTypeBudgetCents(), initiativeGeneral.getProductTypeBudgetCents());
+        assertEquals(Map.of("CODE", 10000L), initiativeActual.getGeneral().getProductTypeBudgetCents());
     }
 
     private void createInitiativeBaseFields(Initiative initiative) {

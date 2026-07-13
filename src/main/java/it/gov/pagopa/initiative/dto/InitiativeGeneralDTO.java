@@ -129,5 +129,5 @@ public class InitiativeGeneralDTO extends InitiativeOrganizationInfoDTO {
     private Map<String, String> descriptionMap;
 
     @JsonProperty("productTypeBudgetCents")
-    private Map<@NotBlank String, @Positive Long> productTypeBudgetCents;
+    private Map<@NotBlank String, @Positive BigDecimal> productTypeBudget;
 }

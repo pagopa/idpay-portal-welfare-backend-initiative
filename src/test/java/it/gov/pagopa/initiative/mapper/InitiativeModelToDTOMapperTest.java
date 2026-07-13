@@ -29,7 +29,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -37,6 +36,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -711,7 +711,7 @@ class InitiativeModelToDTOMapperTest {
         InitiativeDTO initiativeActual = initiativeModelToDTOMapper.toInitiativeDTO(initiative, false);
 
         assertNotNull(initiativeActual.getGeneral());
-        assertEquals(initiativeActual.getGeneral().getProductTypeBudgetCents(), initiative.getGeneral().getProductTypeBudgetCents());
+        assertEquals(Map.of("CODE", BigDecimal.valueOf(1).setScale(2, RoundingMode.HALF_DOWN)), initiativeActual.getGeneral().getProductTypeBudget());
     }
 
     private Initiative createFullInitiative() {

@@ -171,8 +171,14 @@ public class InitiativeModelToDTOMapper {
                 .rankingStartDate(general.getRankingStartDate())
                 .rankingEnabled(general.getRankingEnabled())
                 .descriptionMap(general.getDescriptionMap())
-                .productTypeBudgetCents(general.getProductTypeBudgetCents())
+                .productTypeBudget(general.getProductTypeBudgetCents() != null ? productTypeBudgetCentsToEuro(general.getProductTypeBudgetCents()) : null)
                 .build();
+    }
+
+    private Map<String, BigDecimal> productTypeBudgetCentsToEuro(Map<String, Long> productTypeBudgetCents) {
+        Map<String, BigDecimal> productTypeBudget = new HashMap<>();
+        productTypeBudgetCents.forEach((k,v) -> productTypeBudget.put(k, centsToEuro(v)));
+        return productTypeBudget;
     }
 
     private InitiativeAdditionalDTO toInitiativeAdditionalDTO(InitiativeAdditional additional) {

@@ -21,14 +21,14 @@ import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
 import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
 import it.gov.pagopa.initiative.model.rule.trx.*;
 import it.gov.pagopa.initiative.service.AESTokenService;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 public class InitiativeDTOsToModelMapper {
@@ -73,8 +73,15 @@ public class InitiativeDTOsToModelMapper {
                 .rankingStartDate(generalDTO.getRankingStartDate())
                 .rankingEnabled(generalDTO.getRankingEnabled())
                 .descriptionMap(generalDTO.getDescriptionMap())
-                .productTypeBudgetCents(generalDTO.getProductTypeBudgetCents())
+                .productTypeBudgetCents(generalDTO.getProductTypeBudget() != null ? productTypeBudgetToCents(generalDTO.getProductTypeBudget()) : null)
                 .build();
+
+    }
+
+    private Map<String, Long> productTypeBudgetToCents(Map<String, BigDecimal> productTypeBudget) {
+        Map<String, Long> productTypeBudgetCents = new HashMap<>();
+        productTypeBudget.forEach((k,v) -> productTypeBudgetCents.put(k, euroToCents(v)));
+        return productTypeBudgetCents;
     }
 
     private InitiativeAdditional toInitiativeAdditional(InitiativeAdditionalDTO additionalDTO) {
