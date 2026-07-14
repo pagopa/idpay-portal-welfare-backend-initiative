@@ -22,4 +22,6 @@ public interface InitiativeValidationService {
     void checkStartDateAndEndDate(Initiative initiative);
     void checkFieldYearLengthAndValues(List<AutomatedCriteria> initiativeBeneficiaryRuleModel);
     void checkReward(Initiative initiative);
+
+    void checkProductTypeBudget(Initiative initiative);
 }

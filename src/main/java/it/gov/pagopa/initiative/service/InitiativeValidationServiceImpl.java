@@ -25,8 +25,7 @@ import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
 import java.time.Year;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -218,6 +217,16 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
                 RewardValue.RewardValueTypeEnum.PERCENTAGE.equals(rewardValue.getRewardValueType()) &&
                 rewardValue.getRewardValue().intValue()>100){
             throw new InvalidRewardRuleException("Reward rules of initiative [%s] is not valid".formatted(initiative.getInitiativeId()));
+        }
+    }
+
+    @Override
+    public void checkProductTypeBudget(Initiative initiative) {
+        if (initiative.getGeneral().getProductTypeBudgetCents() != null && !initiative.getGeneral().getProductTypeBudgetCents().isEmpty()){
+            Long maxProductBudget = initiative.getGeneral().getProductTypeBudgetCents().entrySet().stream().max(Map.Entry.comparingByValue()).get().getValue();
+            if(initiative.getGeneral().getBeneficiaryBudgetMaxCents() < maxProductBudget) {
+                throw new InitiativeProductTypeBudgetException("In the initiative [%s] the beneficiary budget must be greater than product type budget".formatted(initiative.getInitiativeId()));
+            }
         }
     }
 }
