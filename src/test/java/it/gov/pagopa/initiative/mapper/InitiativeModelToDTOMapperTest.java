@@ -29,11 +29,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
@@ -44,6 +43,7 @@ import java.time.LocalTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ContextConfiguration(classes = {InitiativeModelToDTOMapper.class})
@@ -99,7 +99,7 @@ class InitiativeModelToDTOMapperTest {
     private InitiativeDTO initiativeStep2DTOFamilyUnitNotNull;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         fullInitiative = createFullInitiative();
         Initiative fullInitiative2 = createFullInitiative2();
         initiativeList = new ArrayList<>();
@@ -137,8 +137,8 @@ class InitiativeModelToDTOMapperTest {
         initiativeStep2FamilyUnitNotNull = createStep2InitiativeFamilyUnitNotNull();
         initiativeStep2DTOFamilyUnitNotNull = createStep2InitiativeDTOFamilyUnitNotNull();
 
-        Mockito.when(aesTokenServiceMock.decrypt(ENCRYPTED_API_KEY_CLIENT_ID)).thenReturn(API_KEY_CLIENT_ID);
-        Mockito.when(aesTokenServiceMock.decrypt(ENCRYPTED_API_KEY_CLIENT_ASSERTION)).thenReturn(API_KEY_CLIENT_ASSERTION);
+        when(aesTokenServiceMock.decrypt(ENCRYPTED_API_KEY_CLIENT_ID)).thenReturn(API_KEY_CLIENT_ID);
+        when(aesTokenServiceMock.decrypt(ENCRYPTED_API_KEY_CLIENT_ASSERTION)).thenReturn(API_KEY_CLIENT_ASSERTION);
     }
 
     @Test
@@ -154,7 +154,7 @@ class InitiativeModelToDTOMapperTest {
         initiative.getAdditionalInfo().setLogoFileName("logo.png");
         Locale acceptLanguage = Locale.ENGLISH;
 
-        Mockito.when(initiativeUtilsMock.createLogoUrl(initiative.getOrganizationId(), initiative.getInitiativeId())).thenReturn("https://test" + String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE,
+        when(initiativeUtilsMock.createLogoUrl(initiative.getOrganizationId(), initiative.getInitiativeId())).thenReturn("https://test" + String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE,
                 initiative.getOrganizationId(),initiative.getInitiativeId(), InitiativeConstants.Logo.LOGO_NAME));
 
         InitiativeDataDTO initiativeDataDTO = initiativeModelToDTOMapper.toInitiativeDataDTO(initiative, acceptLanguage);
@@ -330,7 +330,7 @@ class InitiativeModelToDTOMapperTest {
         fullInitiative.setAdditionalInfo(createInitiativeAdditional());
         fullInitiative.getAdditionalInfo().setLogoFileName("test.png");
 
-        Mockito.when(initiativeUtilsMock.createLogoUrl(anyString(),anyString())).thenReturn("test.it");
+        when(initiativeUtilsMock.createLogoUrl(anyString(),anyString())).thenReturn("test.it");
 
         InitiativeDTO initiativeDTOExpected = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiative, true);
 
@@ -394,7 +394,7 @@ class InitiativeModelToDTOMapperTest {
         Locale acceptLanguage = Locale.ITALIAN;
         fullInitiative.getAdditionalInfo().setLogoFileName("test.png");
 
-        Mockito.when(initiativeUtilsMock.createLogoUrl(anyString(),anyString())).thenReturn("test.it");
+        when(initiativeUtilsMock.createLogoUrl(anyString(),anyString())).thenReturn("test.it");
 
         InitiativeDetailDTO initiativeDetailDTO = initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative,acceptLanguage, false);
 
@@ -605,7 +605,7 @@ class InitiativeModelToDTOMapperTest {
         ArrayList<Initiative> localInitiativeList = new ArrayList<>();
         localInitiativeList.add(initiative);
 
-        Mockito.when(initiativeUtilsMock.createLogoUrl(initiative.getOrganizationId(), initiative.getInitiativeId()))
+        when(initiativeUtilsMock.createLogoUrl(initiative.getOrganizationId(), initiative.getInitiativeId()))
                 .thenReturn("https://test" + String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE,
                         initiative.getOrganizationId(),initiative.getInitiativeId(), InitiativeConstants.Logo.LOGO_NAME));
 
@@ -635,7 +635,7 @@ class InitiativeModelToDTOMapperTest {
         ArrayList<Initiative> localInitiativeList = new ArrayList<>();
         localInitiativeList.add(initiative);
 
-        Mockito.when(initiativeUtilsMock.createLogoUrl(initiative.getOrganizationId(), initiative.getInitiativeId()))
+        when(initiativeUtilsMock.createLogoUrl(initiative.getOrganizationId(), initiative.getInitiativeId()))
                 .thenReturn("https://test" + String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE,
                         initiative.getOrganizationId(),initiative.getInitiativeId(), InitiativeConstants.Logo.LOGO_NAME));
 
@@ -668,7 +668,7 @@ class InitiativeModelToDTOMapperTest {
 
         ArrayList<Initiative> localInitiativeList = new ArrayList<>();
         localInitiativeList.add(initiative);
-        Mockito.when(initiativeUtilsMock.createLogoUrl(initiative.getOrganizationId(), initiative.getInitiativeId()))
+        when(initiativeUtilsMock.createLogoUrl(initiative.getOrganizationId(), initiative.getInitiativeId()))
                 .thenReturn("https://test" + String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE,
                 initiative.getOrganizationId(),initiative.getInitiativeId(), InitiativeConstants.Logo.LOGO_NAME));
 
@@ -681,7 +681,7 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void testToRewardRuleDTO() {
         Initiative initiative = createStep3Initiative();
-        Mockito.when(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true).getRewardRule()).thenReturn(null);
+        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true).getRewardRule()).thenReturn(null);
         assertNull(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true).getRewardRule());
     }
 

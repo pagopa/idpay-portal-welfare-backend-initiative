@@ -66,6 +66,23 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
     }
 
     @Override
+    public Initiative  getInitiativeInfo(String initiativeId, String role){
+        Initiative initiative = initiativeRepository.findByInitiativeIdAndEnabled(initiativeId, true)
+                .orElseThrow(() -> new InitiativeNotFoundException(InitiativeConstants.Exception.NotFound.INITIATIVE_NOT_FOUND_MESSAGE.formatted(initiativeId)));
+        if (InitiativeConstants.Role.PAGOPA_ADMIN.equals(role)){
+            if (InitiativeConstants.Status.PUBLISHED.equals(initiative.getStatus()) || initiative.getStatus().equals(InitiativeConstants.Status.IN_REVISION) || initiative.getStatus().equals(InitiativeConstants.Status.TO_CHECK) || initiative.getStatus().equals(InitiativeConstants.Status.APPROVED)){
+                return initiative;
+            }else {
+                throw new AdminPermissionException(
+                        "Admin permission not allowed for current initiative [%s]".formatted(initiative.getInitiativeId())
+                );
+            }
+        }else{
+            return initiative;
+        }
+    }
+
+    @Override
     public void checkPermissionBeforeInsert(String role) {
         log.debug("[CHECK PERMISSION] role: {}", role);
         if (InitiativeConstants.Role.PAGOPA_ADMIN.equals(role)){

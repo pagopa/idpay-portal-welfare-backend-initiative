@@ -14,14 +14,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Mockito;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.mongodb.UncategorizedMongoDbException;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.function.Supplier;
@@ -46,7 +45,7 @@ public class MongoRequestRateTooLargeRetryerTest {
   private MemoryAppender memoryAppender;
 
   @BeforeEach
-  public void setup() {
+  void setup() {
     ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(
         MongoRequestRateTooLargeRetryer.class.getName());
     memoryAppender = new MemoryAppender();
@@ -126,7 +125,7 @@ public class MongoRequestRateTooLargeRetryerTest {
     // Given
     long[] counter = {0};
 
-    Mockito.doAnswer(invocationOnMock -> {
+    doAnswer(invocationOnMock -> {
       if (counter[0]++ < REQUEST_RATE_TOO_LARGE_MAX_RETRY) {
         throw retriableException;
       }
@@ -225,7 +224,7 @@ public class MongoRequestRateTooLargeRetryerTest {
     UncategorizedMongoDbException mongoDbException = new UncategorizedMongoDbException(
         "TooManyRequests", new Throwable());
 
-    Mockito.doAnswer(invocationOnMock -> {
+    doAnswer(invocationOnMock -> {
       if (counter[0] < REQUEST_RATE_TOO_LARGE_MAX_RETRY) {
         counter[0]++;
         throw mongoDbException;
