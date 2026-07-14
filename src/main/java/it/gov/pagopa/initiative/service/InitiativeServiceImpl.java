@@ -710,6 +710,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         return InitiativeResponse.builder()
                 .initiativeId(item.getInitiativeId())
                 .initiativeName(item.getInitiativeName())
+                .organizationName(item.getOrganizationName())
                 .status(item.getStatus())
                 .startDate(item.getStartDate())
                 .endDate(item.getEndDate())
