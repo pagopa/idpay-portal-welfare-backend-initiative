@@ -1792,6 +1792,7 @@ class InitiativeServiceTest {
         assertEquals(INITIATIVE_ID, response.getInitiativeId());
         assertEquals("Cashback Test", response.getInitiativeName());
         assertEquals("Organization Test", response.getOrganizationName());
+        assertEquals(List.of("47110"), response.getAtecoCodes());
 
         verify(initiativeRepository, times(1))
                 .findInitiatives(

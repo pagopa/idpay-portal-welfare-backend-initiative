@@ -432,7 +432,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             initiativeRepository.save(initiative);
             performanceLog(startTime, "STORE_INITIATIVE_LOGO");
             return new LogoDTO(fileName, initiativeUtils.createLogoUrl(organizationId, initiativeId), localDateTime);
-        } catch (Exception e) {
+        } catch (Exception _) {
             performanceLog(startTime, "STORE_INITIATIVE_LOGO");
             throw new InitiativeLogoException("An error occurred during the uploading logo");
         }
@@ -715,6 +715,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                 .startDate(item.getStartDate())
                 .endDate(item.getEndDate())
                 .onboardStatus(item.getOnboardStatus())
+                .atecoCodes(item.getAtecoCodes())
                 .build();
     }
 
