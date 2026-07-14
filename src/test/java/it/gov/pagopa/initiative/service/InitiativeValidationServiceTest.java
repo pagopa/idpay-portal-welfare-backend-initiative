@@ -583,6 +583,32 @@ class InitiativeValidationServiceTest {
         }
     }
 
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            InitiativeConstants.Status.PUBLISHED,
+            InitiativeConstants.Status.IN_REVISION,
+            InitiativeConstants.Status.TO_CHECK,
+            InitiativeConstants.Status.APPROVED
+    })
+    void getInitiativeInfo_pagopaAdminAllowedStatuses_returnsInitiative(String status) {
+
+        Initiative initiative = Initiative.builder()
+                .initiativeId(INITIATIVE_ID)
+                .status(status)
+                .build();
+
+        when(initiativeRepository.findByInitiativeIdAndEnabled(
+                INITIATIVE_ID,
+                true))
+                .thenReturn(Optional.of(initiative));
+
+        Initiative result = initiativeValidationService.getInitiativeInfo(
+                INITIATIVE_ID,
+                InitiativeConstants.Role.PAGOPA_ADMIN);
+
+        assertEquals(status, result.getStatus());
+    }
     /*
      * ############### Step 1 ###############
      */

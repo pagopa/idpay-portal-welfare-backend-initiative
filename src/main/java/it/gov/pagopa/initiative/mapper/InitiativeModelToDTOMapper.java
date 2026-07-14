@@ -137,6 +137,7 @@ public class InitiativeModelToDTOMapper {
         initiativeDto.setRewardRule(this.toRewardRuleDTO(initiative.getRewardRule()));
         initiativeDto.setTrxRule(this.toTrxRuleDTO(initiative.getTrxRule()));
         initiativeDto.setRefundRule(this.toInitiativeRefundRuleDTO(initiative.getRefundRule()));
+        initiativeDto.setAtecoCodes(initiative.getAtecoCodes());
         return initiativeDto;
     }
 

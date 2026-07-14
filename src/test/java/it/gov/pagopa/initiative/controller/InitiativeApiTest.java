@@ -40,6 +40,10 @@ import org.springframework.boot.security.autoconfigure.SecurityAutoConfiguration
 import org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -1211,6 +1215,81 @@ class InitiativeApiTest {
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
                 .andDo(print())
                 .andReturn();
+    }
+
+    @Test
+    void getInitiativeDetailInfo_statusOk() throws Exception {
+
+        Initiative initiative = createStep5Initiative();
+        InitiativeDTO initiativeDTO = createStep5InitiativeDTO();
+
+        when(initiativeService.getInitiativeInfo(INITIATIVE_ID, ROLE))
+                .thenReturn(initiative);
+
+        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true))
+                .thenReturn(initiativeDTO);
+
+        mvc.perform(
+                        MockMvcRequestBuilders.get(
+                                        BASE_URL + "/initiative/" + INITIATIVE_ID)
+                                .queryParam("role", ROLE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andDo(print())
+                .andReturn();
+
+        verify(initiativeService).getInitiativeInfo(INITIATIVE_ID, ROLE);
+    }
+
+    @Test
+    void searchInitiatives_statusOk() throws Exception {
+
+        InitiativeSearchRequest request = new InitiativeSearchRequest();
+        request.setInitiativeName("test");
+        request.setOnboardedIds(Set.of("ID1", "ID2"));
+        request.setAtecoCodes(List.of("12345"));
+
+        InitiativeResponse initiativeResponse = new InitiativeResponse();
+        initiativeResponse.setInitiativeId("initiativeId");
+        initiativeResponse.setInitiativeName("initiativeName");
+
+        Page<InitiativeResponse> page = new PageImpl<>(
+                List.of(initiativeResponse),
+                PageRequest.of(0, 10),
+                1
+        );
+
+        when(initiativeService.searchInitiatives(
+                eq(request.getOnboardedIds()),
+                eq(request.getAtecoCodes()),
+                eq(request.getInitiativeName()),
+                any(Pageable.class)
+        )).thenReturn(page);
+
+        mvc.perform(
+                        MockMvcRequestBuilders.post(BASE_URL + "/initiatives/search")
+                                .param("page", "0")
+                                .param("size", "10")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].initiativeId")
+                        .value("initiativeId"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].initiativeName")
+                        .value("initiativeName"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.page").value(0))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.size").value(10))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.totalElements").value(1))
+                .andDo(print());
+
+        verify(initiativeService).searchInitiatives(
+                eq(request.getOnboardedIds()),
+                eq(request.getAtecoCodes()),
+                eq(request.getInitiativeName()),
+                any(Pageable.class)
+        );
     }
 
     private List<OrganizationDTO> createOrganizationDTOList() {
