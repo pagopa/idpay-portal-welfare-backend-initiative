@@ -14,6 +14,7 @@ import java.time.LocalDate;
 public class InitiativeResponse {
     private String initiativeId;
     private String initiativeName;
+    private String organizationName;
     private String status;
     private LocalDate startDate;
     private LocalDate endDate;

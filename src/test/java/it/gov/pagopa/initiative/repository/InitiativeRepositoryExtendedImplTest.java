@@ -90,11 +90,15 @@ class InitiativeRepositoryExtendedImplTest {
 
         Assertions.assertEquals(1, result.getTotalElements());
 
-        InitiativePageItem item = result.getContent().get(0);
+        InitiativePageItem item = result.getContent().getFirst();
 
         Assertions.assertEquals(
                 "initiativeId_100",
                 item.getInitiativeId()
+        );
+        Assertions.assertEquals(
+                "organizationName_100",
+                item.getOrganizationName()
         );
         Assertions.assertEquals(
                 "PUBLISHED",
@@ -107,14 +111,12 @@ class InitiativeRepositoryExtendedImplTest {
 
         Initiative first = createInitiativeForFindInitiatives(
                 200,
-                "PUBLISHED",
                 List.of("1111"),
                 LocalDate.now().plusYears(1)
         );
 
         Initiative second = createInitiativeForFindInitiatives(
                 201,
-                "PUBLISHED",
                 List.of("1111"),
                 LocalDate.now().plusYears(1)
         );
@@ -132,7 +134,7 @@ class InitiativeRepositoryExtendedImplTest {
 
         Assertions.assertEquals(
                 second.getInitiativeId(),
-                result.getContent().get(0).getInitiativeId()
+                result.getContent().getFirst().getInitiativeId()
         );
     }
 
@@ -165,7 +167,7 @@ class InitiativeRepositoryExtendedImplTest {
 
         Assertions.assertEquals(
                 "initiativeId_300",
-                result.getContent().get(0).getInitiativeId()
+                result.getContent().getFirst().getInitiativeId()
         );
     }
 
@@ -190,7 +192,7 @@ class InitiativeRepositoryExtendedImplTest {
 
         Assertions.assertEquals(1, result.getContent().size());
 
-        InitiativePageItem item = result.getContent().get(0);
+        InitiativePageItem item = result.getContent().getFirst();
 
         Assertions.assertEquals(
                 "ONBOARDABLE",
@@ -224,7 +226,7 @@ class InitiativeRepositoryExtendedImplTest {
 
         Assertions.assertEquals(1, result.getContent().size());
 
-        InitiativePageItem item = result.getContent().get(0);
+        InitiativePageItem item = result.getContent().getFirst();
 
         Assertions.assertEquals(
                 "NOT_ONBOARDABLE",
@@ -258,7 +260,7 @@ class InitiativeRepositoryExtendedImplTest {
 
         Assertions.assertEquals(1, result.getContent().size());
 
-        InitiativePageItem item = result.getContent().get(0);
+        InitiativePageItem item = result.getContent().getFirst();
 
         Assertions.assertEquals(
                 "NOT_ONBOARDABLE",
@@ -371,7 +373,6 @@ class InitiativeRepositoryExtendedImplTest {
 
     private Initiative createInitiativeForFindInitiatives(
             int bias,
-            String status,
             List<String> atecoCodes,
             LocalDate endDate) {
 
@@ -384,7 +385,7 @@ class InitiativeRepositoryExtendedImplTest {
                 .organizationName("organizationName_%d".formatted(bias))
                 .creationDate(now.minusWeeks(2))
                 .updateDate(now)
-                .status(status)
+                .status("PUBLISHED")
                 .enabled(true)
                 .atecoCodes(atecoCodes)
                 .general(

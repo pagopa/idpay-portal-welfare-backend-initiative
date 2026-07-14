@@ -1352,7 +1352,7 @@ class InitiativeServiceTest {
         when(decryptRestConnector.getPiiByToken(USER_ID)).thenReturn(decryptCfDTO);
         BeneficiaryRankingPageDTO beneficiaryRankingDTO = initiativeService.getRankingList(ORGANIZATION_ID,INITIATIVE_ID,null, encryptedCfDTO.getToken(),
                 Status.PUBLISHED);
-        assertEquals(CF,beneficiaryRankingDTO.getContent().get(0).getBeneficiary());
+        assertEquals(CF,beneficiaryRankingDTO.getContent().getFirst().getBeneficiary());
 
     }
     @Test
@@ -1458,9 +1458,9 @@ class InitiativeServiceTest {
 
         BeneficiaryRankingPageDTO beneficiaryRankingDTO = initiativeService.getRankingList(ORGANIZATION_ID,INITIATIVE_ID,null, "",
                 Status.PUBLISHED);
-        assertEquals(CF,beneficiaryRankingDTO.getContent().get(0).getBeneficiary());
-        assertEquals("FAMILY_ID", beneficiaryRankingDTO.getContent().get(0).getFamilyId());
-        assertTrue(beneficiaryRankingDTO.getContent().get(0).getMemberIds().containsAll(List.of(CF, "CF_2")));
+        assertEquals(CF,beneficiaryRankingDTO.getContent().getFirst().getBeneficiary());
+        assertEquals("FAMILY_ID", beneficiaryRankingDTO.getContent().getFirst().getFamilyId());
+        assertTrue(beneficiaryRankingDTO.getContent().getFirst().getMemberIds().containsAll(List.of(CF, "CF_2")));
         }
 
     @Test
@@ -1477,9 +1477,9 @@ class InitiativeServiceTest {
         when(onboardingRestConnector.getOnboarding(INITIATIVE_ID, null, USER_ID, STARTDATE, ENDDATE, STATUS)).thenReturn(onboardingDTO);
         when(decryptRestConnector.getPiiByToken(USER_ID)).thenReturn(decryptCfDTO);
         OnboardingDTO onboardingDTO1 = initiativeService.getOnboardingStatusList(ORGANIZATION_ID, INITIATIVE_ID, CF, STARTDATE, ENDDATE, STATUS, null);
-        assertEquals(CF,onboardingDTO1.getContent().get(0).getBeneficiary());
-        assertEquals(STATUS,onboardingDTO1.getContent().get(0).getBeneficiaryState());
-        assertEquals("familyId", onboardingDTO1.getContent().get(0).getFamilyId());
+        assertEquals(CF,onboardingDTO1.getContent().getFirst().getBeneficiary());
+        assertEquals(STATUS,onboardingDTO1.getContent().getFirst().getBeneficiaryState());
+        assertEquals("familyId", onboardingDTO1.getContent().getFirst().getFamilyId());
 
     }
 
@@ -1757,6 +1757,7 @@ class InitiativeServiceTest {
         InitiativePageItem item = InitiativePageItem.builder()
                 .initiativeId(INITIATIVE_ID)
                 .initiativeName("Cashback Test")
+                .organizationName("Organization Test")
                 .status(InitiativeConstants.Status.PUBLISHED)
                 .startDate(LocalDate.now())
                 .endDate(LocalDate.now().plusDays(30))
@@ -1786,10 +1787,11 @@ class InitiativeServiceTest {
         assertEquals(1, result.getContent().size());
         assertEquals(1, result.getTotalElements());
 
-        InitiativeResponse response = result.getContent().get(0);
+        InitiativeResponse response = result.getContent().getFirst();
 
         assertEquals(INITIATIVE_ID, response.getInitiativeId());
         assertEquals("Cashback Test", response.getInitiativeName());
+        assertEquals("Organization Test", response.getOrganizationName());
 
         verify(initiativeRepository, times(1))
                 .findInitiatives(
