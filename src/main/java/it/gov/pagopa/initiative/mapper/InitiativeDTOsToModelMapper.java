@@ -21,8 +21,6 @@ import it.gov.pagopa.initiative.model.rule.reward.RewardGroups;
 import it.gov.pagopa.initiative.model.rule.reward.RewardValue;
 import it.gov.pagopa.initiative.model.rule.trx.*;
 import it.gov.pagopa.initiative.service.AESTokenService;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Positive;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
