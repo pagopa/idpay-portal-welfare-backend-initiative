@@ -186,6 +186,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         if (!isDraft) {
             initiativeValidationService.checkBeneficiaryTypeAndFamilyUnit(initiativeInfoModel);
             initiativeValidationService.checkStartDateAndEndDate(initiativeInfoModel);
+            initiativeValidationService.checkProductTypeBudget(initiativeInfoModel);
         }
         initiative.setGeneral(initiativeInfoModel.getGeneral());
         if (!initiative.getAdditionalInfo().getServiceName().equals(initiative.getInitiativeName())) {

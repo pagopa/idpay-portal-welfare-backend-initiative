@@ -36,6 +36,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -702,6 +703,16 @@ class InitiativeModelToDTOMapperTest {
         assertNotNull(result.getRuleDescription());
         assertNotNull(result.getServiceId());
         assertNull(result.getDescription());
+    }
+
+    @Test
+    void toInitiativeGeneral_withProductType() {
+        Initiative initiative = createFullInitiative();
+        initiative.getGeneral().setProductTypeBudgetCents(Map.of("CODE", 100L));
+        InitiativeDTO initiativeActual = initiativeModelToDTOMapper.toInitiativeDTO(initiative, false);
+
+        assertNotNull(initiativeActual.getGeneral());
+        assertEquals(Map.of("CODE", BigDecimal.valueOf(1).setScale(2, RoundingMode.HALF_DOWN)), initiativeActual.getGeneral().getProductTypeBudget());
     }
 
     private Initiative createFullInitiative() {
