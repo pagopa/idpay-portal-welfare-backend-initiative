@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -14,8 +15,10 @@ import java.time.LocalDate;
 public class InitiativeResponse {
     private String initiativeId;
     private String initiativeName;
+    private String organizationName;
     private String status;
     private LocalDate startDate;
     private LocalDate endDate;
     private String onboardStatus;
+    private List<String> atecoCodes;
 }

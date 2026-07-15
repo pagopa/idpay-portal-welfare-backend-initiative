@@ -15,6 +15,7 @@ public class InitiativePageItem {
     @Id
     private String initiativeId;
     private String initiativeName;
+    private String organizationName;
     private String status;
     private LocalDate startDate;
     private LocalDate endDate;
