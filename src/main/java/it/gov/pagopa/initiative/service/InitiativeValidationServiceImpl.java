@@ -240,9 +240,18 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
     @Override
     public void checkProductTypeBudget(Initiative initiative) {
         if (initiative.getGeneral().getProductTypeBudgetCents() != null && !initiative.getGeneral().getProductTypeBudgetCents().isEmpty()){
-            Long maxProductBudget = initiative.getGeneral().getProductTypeBudgetCents().entrySet().stream().max(Map.Entry.comparingByValue()).get().getValue();
-            if(initiative.getGeneral().getBeneficiaryBudgetMaxCents() < maxProductBudget) {
-                throw new InitiativeProductTypeBudgetException("In the initiative [%s] the beneficiary budget must be greater than product type budget".formatted(initiative.getInitiativeId()));
+            Long maxProductBudget = initiative.getGeneral().getProductTypeBudgetCents().values()
+                    .stream()
+                    .max(Long::compareTo)
+                    .orElseThrow(() -> new InitiativeProductTypeBudgetException(
+                            "Invalid product type budget configuration for initiative [%s]"
+                                    .formatted(initiative.getInitiativeId())
+                    ));
+
+            if (initiative.getGeneral().getBeneficiaryBudgetMaxCents() < maxProductBudget) {
+                throw new InitiativeProductTypeBudgetException(
+                        "The beneficiary budget must be greater than or equal to the product type budget for initiative [%s]"
+                                .formatted(initiative.getInitiativeId()));
             }
         }
     }

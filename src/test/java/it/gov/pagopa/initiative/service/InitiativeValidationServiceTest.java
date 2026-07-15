@@ -1145,7 +1145,7 @@ class InitiativeValidationServiceTest {
             Assertions.fail("Expected InitiativeProductTypeBudgetException to be thrown");
         } catch (InitiativeProductTypeBudgetException e) {
             assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_PRODUCT_TYPE_NOT_VALID, e.getCode());
-            assertEquals("In the initiative [%s] the beneficiary budget must be greater than product type budget".formatted(initiative.getInitiativeId()), e.getMessage());
+            assertEquals("The beneficiary budget must be greater than or equal to the product type budget for initiative [%s]".formatted(initiative.getInitiativeId()), e.getMessage());
         }
     }
 }
