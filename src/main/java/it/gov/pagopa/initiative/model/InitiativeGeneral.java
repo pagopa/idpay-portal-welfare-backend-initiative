@@ -39,6 +39,7 @@ public class InitiativeGeneral {
     private LocalDate rankingEndDate;
     private Boolean rankingEnabled;
     private Map<String, String> descriptionMap;
+    private Map<String, Long> productTypeBudgetCents;
 
     /**
      * Gets or Sets beneficiaryType

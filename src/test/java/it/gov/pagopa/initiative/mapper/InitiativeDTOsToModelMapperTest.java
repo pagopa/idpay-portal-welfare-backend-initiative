@@ -384,6 +384,16 @@ class InitiativeDTOsToModelMapperTest {
         assertEquals(initiativeOnlyRefundRule3, initiative);
     }
 
+    @Test
+    void toInitiativeGeneral_withProductType() {
+        InitiativeGeneralDTO initiativeGeneral = createStep1InitiativeInfoDTOonlyInfoGeneral();
+        initiativeGeneral.setProductTypeBudget(Map.of("CODE", BigDecimal.valueOf(100L)));
+        Initiative initiativeActual = initiativeDTOsToModelMapper.toInitiative(initiativeGeneral);
+
+        assertNotNull(initiativeActual.getGeneral());
+        assertEquals(Map.of("CODE", 10000L), initiativeActual.getGeneral().getProductTypeBudgetCents());
+    }
+
     private void createInitiativeBaseFields(Initiative initiative) {
         initiative.setInitiativeId("Id1");
         initiative.setInitiativeName("initiativeName1");

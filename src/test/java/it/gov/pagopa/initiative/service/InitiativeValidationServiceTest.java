@@ -1091,4 +1091,61 @@ class InitiativeValidationServiceTest {
                 Arguments.of("BIRTHDATE","Age", "120")
         );
     }
+
+    @Test
+    void checkProductTypeBudget_whenProductTypeBudgetIsNull_thenDoNothing() {
+        Initiative initiative = createStep2Initiative(false);
+        initiative.getGeneral().setProductTypeBudgetCents(null);
+
+        Executable executable = () -> initiativeValidationService.checkProductTypeBudget(initiative);
+        assertDoesNotThrow(executable);
+    }
+
+    @Test
+    void checkProductTypeBudget_whenProductTypeBudgetIsEmpty_thenDoNothing() {
+        Initiative initiative = createStep2Initiative(false);
+        initiative.getGeneral().setProductTypeBudgetCents(new HashMap<>());
+
+        Executable executable = () -> initiativeValidationService.checkProductTypeBudget(initiative);
+        assertDoesNotThrow(executable);
+    }
+
+    @Test
+    void checkProductTypeBudget_whenBeneficiaryBudgetMaxIsSet_thenUseMaxBudget() {
+        Initiative initiative = createStep2Initiative(false);
+        InitiativeGeneral general = initiative.getGeneral();
+
+        Map<String, Long> productTypeBudgetCents = new HashMap<>();
+        productTypeBudgetCents.put("PRODUCT_1", 5000L);
+        productTypeBudgetCents.put("PRODUCT_2", 7000L);
+        general.setProductTypeBudgetCents(productTypeBudgetCents);
+
+        general.setBeneficiaryBudgetCents(3000L);
+        general.setBeneficiaryBudgetMaxCents(8000L);
+
+        Executable executable = () -> initiativeValidationService.checkProductTypeBudget(initiative);
+        assertDoesNotThrow(executable);
+    }
+
+    @Test
+    void checkProductTypeBudget_whenBeneficiaryBudgetMaxIsSetButLessThanMaxProductBudget_thenThrowException() {
+        Initiative initiative = createStep2Initiative(false);
+        InitiativeGeneral general = initiative.getGeneral();
+
+        Map<String, Long> productTypeBudgetCents = new HashMap<>();
+        productTypeBudgetCents.put("PRODUCT_1", 5000L);
+        productTypeBudgetCents.put("PRODUCT_2", 10000L);
+        general.setProductTypeBudgetCents(productTypeBudgetCents);
+
+        general.setBeneficiaryBudgetCents(3000L);
+        general.setBeneficiaryBudgetMaxCents(8000L);
+
+        try {
+            initiativeValidationService.checkProductTypeBudget(initiative);
+            Assertions.fail("Expected InitiativeProductTypeBudgetException to be thrown");
+        } catch (InitiativeProductTypeBudgetException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_PRODUCT_TYPE_NOT_VALID, e.getCode());
+            assertEquals("The beneficiary budget must be greater than or equal to the product type budget for initiative [%s]".formatted(initiative.getInitiativeId()), e.getMessage());
+        }
+    }
 }
