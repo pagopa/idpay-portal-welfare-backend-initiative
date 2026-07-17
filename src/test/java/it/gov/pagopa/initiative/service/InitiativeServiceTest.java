@@ -81,6 +81,7 @@ class InitiativeServiceTest {
     public static final String INITIATIVE_NAME = "initiativeName1";
     public static final String ORGANIZATION_ID = "organizationId1";
     public static final String INITIATIVE_ID = "initiativeId";
+    public static final String INITIATIVE_ID_2 = "ffdd003fffe8c534d1da22ff";
     private static final String ORGANIZATION_NAME = "organizationName";
     private static final String ORGANIZATION_VAT = "organizationVat";
     private static final String ORGANIZATION_USER_ROLE = "organizationUserRole";
@@ -1547,16 +1548,16 @@ class InitiativeServiceTest {
 
     @Test
     void deleteInitiative_initiative_no_service_id_sendMessageOnCommandQueueError() {
-        when(initiativeRepository.findById(INITIATIVE_ID)).thenReturn(Optional.ofNullable(createStep1Initiative()));
+        when(initiativeRepository.findById(INITIATIVE_ID_2)).thenReturn(Optional.ofNullable(createStep1Initiative()));
         when(commandsProducer.sendCommand(any()))
                 .thenReturn(false);
 
         try {
-            initiativeService.deleteInitiative(INITIATIVE_ID);
+            initiativeService.deleteInitiative(INITIATIVE_ID_2);
             Assertions.fail();
         } catch (CommandProducerException e) {
             assertEquals(InternalServerError.INITIATIVE_GENERIC_ERROR, e.getCode());
-            assertEquals("Something went wrong while sending the message with entityId [%s] and operationType [%s] on the Commands Queue".formatted(INITIATIVE_ID,"DELETE_INITIATIVE"),e.getMessage());
+            assertEquals("Something went wrong while sending the message with entityId [%s] and operationType [%s] on the Commands Queue".formatted(INITIATIVE_ID_2,"DELETE_INITIATIVE"),e.getMessage());
             log.info(e.getMessage());
         }
 
@@ -1569,15 +1570,15 @@ class InitiativeServiceTest {
     void deleteInitiative() {
         Initiative initiative = createFullInitiative();
         initiative.getAdditionalInfo().setServiceId("test");
-        when(initiativeRepository.findById(INITIATIVE_ID)).thenReturn(Optional.of(initiative));
+        when(initiativeRepository.findById(INITIATIVE_ID_2)).thenReturn(Optional.of(initiative));
         when(commandsProducer.sendCommand(any()))
                 .thenReturn(true);
 
-        initiativeService.deleteInitiative(INITIATIVE_ID);
+        initiativeService.deleteInitiative(INITIATIVE_ID_2);
 
         verify(ioManageBackEndRestConnector, times(1)).deleteService("test");
         verify(commandsProducer, times(1)).sendCommand(any());
-        verify(initiativeRepository, times(1)).deleteById(INITIATIVE_ID);
+        verify(initiativeRepository, times(1)).deleteById(INITIATIVE_ID_2);
     }
 
     @Test
@@ -1585,44 +1586,84 @@ class InitiativeServiceTest {
         when(commandsProducer.sendCommand(any()))
                 .thenReturn(true);
 
-        initiativeService.deleteInitiative(INITIATIVE_ID);
+        initiativeService.deleteInitiative(INITIATIVE_ID_2);
 
         verify(ioManageBackEndRestConnector, times(0)).deleteService(anyString());
         verify(commandsProducer, times(1)).sendCommand(any());
-        verify(initiativeRepository, times(1)).deleteById(INITIATIVE_ID);
+        verify(initiativeRepository, times(1)).deleteById(INITIATIVE_ID_2);
     }
 
     @Test
     void deleteInitiative_initiative_no_additional_info() {
         Initiative initiative = createStep1Initiative();
         initiative.setAdditionalInfo(null);
-        when(initiativeRepository.findById(INITIATIVE_ID)).thenReturn(Optional.of(initiative));
+        initiative.setInitiativeId(INITIATIVE_ID_2);
+        when(initiativeRepository.findById(INITIATIVE_ID_2)).thenReturn(Optional.of(initiative));
 
         when(commandsProducer.sendCommand(any()))
                 .thenReturn(true);
 
-        initiativeService.deleteInitiative(INITIATIVE_ID);
+        initiativeService.deleteInitiative(INITIATIVE_ID_2);
 
         verify(ioManageBackEndRestConnector, times(0)).deleteService(anyString());
         verify(commandsProducer, times(1)).sendCommand(any());
-        verify(initiativeRepository, times(1)).deleteById(INITIATIVE_ID);
+        verify(initiativeRepository, times(1)).deleteById(INITIATIVE_ID_2);
     }
 
     @Test
     void deleteInitiative_throw_ioManageBackEndRestConnector_exception() {
         Initiative initiative = createFullInitiative();
         initiative.getAdditionalInfo().setServiceId("test");
-        when(initiativeRepository.findById(INITIATIVE_ID)).thenReturn(Optional.of(initiative));
+        initiative.setInitiativeId(INITIATIVE_ID_2);
+        when(initiativeRepository.findById(INITIATIVE_ID_2)).thenReturn(Optional.of(initiative));
 
         doThrow(new RuntimeException()).when(ioManageBackEndRestConnector).deleteService("test");
 
         when(commandsProducer.sendCommand(any()))
                 .thenReturn(true);
 
-        initiativeService.deleteInitiative(INITIATIVE_ID);
+        initiativeService.deleteInitiative(INITIATIVE_ID_2);
 
         verify(commandsProducer, times(1)).sendCommand(any());
-        verify(initiativeRepository, times(1)).deleteById(INITIATIVE_ID);
+        verify(initiativeRepository, times(1)).deleteById(INITIATIVE_ID_2);
+    }
+
+    @Test
+    void deleteInitiative_whenInitiativeIdIsNull_thenThrowDeleteInitiativeException() {
+        DeleteInitiativeException exception = assertThrows(
+                DeleteInitiativeException.class,
+                () -> initiativeService.deleteInitiative("null")
+        );
+
+        assertEquals(
+                "Initiative [null] cannot be deleted because the initiative ID is invalid",
+                exception.getMessage()
+        );
+        verifyNoInteractions(initiativeRepository, ioManageBackEndRestConnector, commandsProducer);
+    }
+
+    @Test
+    void deleteInitiative_whenInitiativeIdIsInvalid_thenThrowDeleteInitiativeException() {
+        DeleteInitiativeException exception = assertThrows(
+                DeleteInitiativeException.class,
+                () -> initiativeService.deleteInitiative(INITIATIVE_ID)
+        );
+
+        assertEquals(
+                "Initiative [%s] cannot be deleted because the initiative ID is invalid".formatted(INITIATIVE_ID),
+                exception.getMessage()
+        );
+        verifyNoInteractions(initiativeRepository, ioManageBackEndRestConnector, commandsProducer);
+    }
+
+    @Test
+    void deleteInitiative_whenInitiativeIdIsValid_thenContinueFlow() {
+        when(commandsProducer.sendCommand(any())).thenReturn(true);
+
+        assertDoesNotThrow(() -> initiativeService.deleteInitiative(INITIATIVE_ID_2));
+
+        verify(commandsProducer, times(1)).sendCommand(any());
+        verify(initiativeRepository, times(1)).deleteById(INITIATIVE_ID_2);
     }
 
     @Test

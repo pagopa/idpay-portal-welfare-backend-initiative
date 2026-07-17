@@ -45,6 +45,7 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.regex.Pattern;
 
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Email.*;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_NOT_VALID_END_DATE;
@@ -76,6 +77,8 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     private static final String DELETE_INITIATIVE_SERVICE = "DELETE_INITIATIVE";
     private static final String DELETE_INITIATIVE_OPERATION_TYPE = "DELETE_INITIATIVE";
     private static final String CREATE_STATISTICS_OPERATION_TYPE = "CREATE_INITIATIVE_STATISTICS";
+    private static final Pattern INITIATIVE_ID_PATTERN = Pattern.compile("^[a-f0-9]{24}$");
+    private static final String NULL_STRING = "null";
 
     public InitiativeServiceImpl(
             @Value("${app.initiative.conditions.notifyEmail}") boolean notifyEmail,
@@ -628,6 +631,10 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     public void deleteInitiative(String initiativeId){
         long startTime = System.currentTimeMillis();
 
+        if(!isValidInitiativeId(initiativeId)){
+            throw new DeleteInitiativeException("Initiative [%s] cannot be deleted because the initiative ID is invalid".formatted(initiativeId));
+        }
+
         try{
             Optional<Initiative> initiative = initiativeRepository.findById(initiativeId);
             if (initiative.isPresent() && initiative.get().getAdditionalInfo() != null &&
@@ -658,6 +665,12 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         auditUtilities.logDeletedInitiative(initiativeId);
 
         performanceLog(startTime, DELETE_INITIATIVE_SERVICE);
+    }
+
+    public static boolean isValidInitiativeId(String initiativeId) {
+        return initiativeId != null
+                && !NULL_STRING.equalsIgnoreCase(initiativeId)
+                && INITIATIVE_ID_PATTERN.matcher(initiativeId).matches();
     }
 
     @Override
