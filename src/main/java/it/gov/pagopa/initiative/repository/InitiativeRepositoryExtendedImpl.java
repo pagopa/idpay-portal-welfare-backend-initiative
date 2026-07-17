@@ -15,7 +15,7 @@ import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
-import java.util.Arrays;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -31,8 +31,7 @@ public class InitiativeRepositoryExtendedImpl implements InitiativeRepositoryExt
     private static final String INITIATIVE_NAME = "initiativeName";
     private static final String ORGANIZATION_NAME = "organizationName";
     private static final String ATECO_CODES = "atecoCodes";
-
-    private static final String END_DATE = "$general.endDate";
+    private static final String GENERAL_END_DATE = "general.endDate";
 
     private static final String ONBOARD_STATUS = "onboardStatus";
     private static final String ONBOARD_STATUS_ORDER = "onboardStatusOrder";
@@ -110,6 +109,8 @@ public class InitiativeRepositoryExtendedImpl implements InitiativeRepositoryExt
             String initiativeName,
             Pageable pageable) {
 
+        LocalDate today = LocalDate.now();
+
         List<ObjectId> safeOnboardedIds = onboardedIds.stream()
                 .map(ObjectId::new)
                 .toList();
@@ -124,6 +125,9 @@ public class InitiativeRepositoryExtendedImpl implements InitiativeRepositoryExt
                 .and(ID)
                 .not()
                 .in(safeOnboardedIds);
+
+         Criteria validEndDateCriteria = Criteria.where(GENERAL_END_DATE).gte(today);
+         criteria = new Criteria().andOperator(criteria, validEndDateCriteria);
 
         if (initiativeName != null && !initiativeName.isBlank()) {
             Pattern pattern = Pattern.compile(
@@ -155,24 +159,6 @@ public class InitiativeRepositoryExtendedImpl implements InitiativeRepositoryExt
                         )
                 );
 
-        AggregationExpression isExpired =
-                context -> new Document(
-                        "$and",
-                        List.of(
-                                new Document(
-                                        "$ne",
-                                        Arrays.asList(END_DATE, null)
-                                ),
-                                new Document(
-                                        "$lt",
-                                        List.of(
-                                                END_DATE,
-                                                "$$NOW"
-                                        )
-                                )
-                        )
-                );
-
         ProjectionOperation project = Aggregation.project()
                 .andInclude(
                         ID,
@@ -185,10 +171,6 @@ public class InitiativeRepositoryExtendedImpl implements InitiativeRepositoryExt
                 .and(
                         ConditionalOperators.switchCases(
                                         ConditionalOperators.Switch.CaseOperator
-                                                .when(isExpired)
-                                                .then(NOT_ONBOARDABLE),
-
-                                        ConditionalOperators.Switch.CaseOperator
                                                 .when(hasAtecoMatch)
                                                 .then(ONBOARDABLE)
                                 )
@@ -198,9 +180,6 @@ public class InitiativeRepositoryExtendedImpl implements InitiativeRepositoryExt
 
                 .and(
                         ConditionalOperators.switchCases(
-                                        ConditionalOperators.Switch.CaseOperator
-                                                .when(isExpired)
-                                                .then(1),
 
                                         ConditionalOperators.Switch.CaseOperator
                                                 .when(hasAtecoMatch)
