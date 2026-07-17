@@ -81,7 +81,7 @@ class InitiativeServiceTest {
     public static final String INITIATIVE_NAME = "initiativeName1";
     public static final String ORGANIZATION_ID = "organizationId1";
     public static final String INITIATIVE_ID = "initiativeId";
-    public static final String INITIATIVE_ID_2 = "68dd003ccce8c534d1da22bc";
+    public static final String INITIATIVE_ID_2 = "ffdd003fffe8c534d1da22ff";
     private static final String ORGANIZATION_NAME = "organizationName";
     private static final String ORGANIZATION_VAT = "organizationVat";
     private static final String ORGANIZATION_USER_ROLE = "organizationUserRole";
