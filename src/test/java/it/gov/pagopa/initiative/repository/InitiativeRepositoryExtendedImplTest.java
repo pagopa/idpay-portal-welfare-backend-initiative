@@ -179,7 +179,7 @@ class InitiativeRepositoryExtendedImplTest {
                         400,
                         "PUBLISHED",
                         List.of("ATECO1", "ATECO2"),
-                        LocalDate.now().plusYears(1)
+                        LocalDate.now().plusDays(1)
                 )
         );
 
@@ -206,7 +206,30 @@ class InitiativeRepositoryExtendedImplTest {
     }
 
     @Test
-    void shouldMarkExpiredInitiativeAsNotOnboardable() {
+    void shouldIncludeInitiativeEndingTomorrowIfAtecoMatch() {
+
+        initiativeRepository.save(
+                createInitiative(
+                        401,
+                        "PUBLISHED",
+                        List.of("ATECO1", "ATECO2"),
+                        LocalDate.now().plusDays(1)
+                )
+        );
+
+        Page<InitiativePageItem> result = initiativeRepository.findInitiatives(
+                Collections.emptySet(),
+                List.of("ATECO2"),
+                null,
+                PageRequest.of(0, 10)
+        );
+
+        Assertions.assertEquals(1, result.getContent().size());
+        Assertions.assertEquals("ONBOARDABLE", result.getContent().getFirst().getOnboardStatus());
+    }
+
+    @Test
+    void shouldExcludeExpiredInitiative() {
 
         initiativeRepository.save(
                 createInitiative(
@@ -224,32 +247,96 @@ class InitiativeRepositoryExtendedImplTest {
                 PageRequest.of(0, 10)
         );
 
-        Assertions.assertEquals(1, result.getContent().size());
-
-        InitiativePageItem item = result.getContent().getFirst();
-
-        Assertions.assertEquals(
-                "NOT_ONBOARDABLE",
-                item.getOnboardStatus()
-        );
-
-        Assertions.assertEquals(
-                1,
-                item.getOnboardStatusOrder()
-        );
+        Assertions.assertTrue(result.getContent().isEmpty());
+        Assertions.assertEquals(0, result.getTotalElements());
     }
 
     @Test
-    void shouldPrioritizeExpiredOverAtecoMatch() {
+    void shouldExcludeInitiativeEndingToday() {
 
         initiativeRepository.save(
+                createInitiative(
+                        501,
+                        "PUBLISHED",
+                        List.of("ATECO1"),
+                        LocalDate.now()
+                )
+        );
+
+        Page<InitiativePageItem> result = initiativeRepository.findInitiatives(
+                Collections.emptySet(),
+                List.of("ATECO1"),
+                null,
+                PageRequest.of(0, 10)
+        );
+
+        Assertions.assertEquals(1, result.getContent().size());
+        Assertions.assertEquals("ONBOARDABLE", result.getContent().getFirst().getOnboardStatus());
+    }
+
+    @Test
+    void shouldExcludeInitiativeEndingYesterday() {
+
+        initiativeRepository.save(
+                createInitiative(
+                        503,
+                        "PUBLISHED",
+                        List.of("ATECO1"),
+                        LocalDate.now().minusDays(1)
+                )
+        );
+
+        Page<InitiativePageItem> result = initiativeRepository.findInitiatives(
+                Collections.emptySet(),
+                List.of("ATECO1"),
+                null,
+                PageRequest.of(0, 10)
+        );
+
+        Assertions.assertTrue(result.getContent().isEmpty());
+        Assertions.assertEquals(0, result.getTotalElements());
+    }
+
+    @Test
+    void shouldExcludeInitiativeWithNullEndDate() {
+
+        initiativeRepository.save(
+                createInitiative(
+                        502,
+                        "PUBLISHED",
+                        List.of("ATECO1"),
+                        null
+                )
+        );
+
+        Page<InitiativePageItem> result = initiativeRepository.findInitiatives(
+                Collections.emptySet(),
+                List.of("ATECO1"),
+                null,
+                PageRequest.of(0, 10)
+        );
+
+        Assertions.assertTrue(result.getContent().isEmpty());
+        Assertions.assertEquals(0, result.getTotalElements());
+    }
+
+    @Test
+    void shouldReturnOnlyNotExpiredWhenMixedWithExpiredInitiatives() {
+
+        initiativeRepository.saveAll(List.of(
                 createInitiative(
                         600,
                         "PUBLISHED",
                         List.of("ATECO1", "ATECO2"),
                         LocalDate.now().minusYears(1)
+                ),
+                createInitiative(
+                        601,
+                        "PUBLISHED",
+                        List.of("ATECO2"),
+                        LocalDate.now().plusYears(1)
                 )
-        );
+        ));
 
         Page<InitiativePageItem> result = initiativeRepository.findInitiatives(
                 Collections.emptySet(),
@@ -260,17 +347,7 @@ class InitiativeRepositoryExtendedImplTest {
 
         Assertions.assertEquals(1, result.getContent().size());
 
-        InitiativePageItem item = result.getContent().getFirst();
-
-        Assertions.assertEquals(
-                "NOT_ONBOARDABLE",
-                item.getOnboardStatus()
-        );
-
-        Assertions.assertEquals(
-                1,
-                item.getOnboardStatusOrder()
-        );
+        Assertions.assertEquals("initiativeId_601", result.getContent().getFirst().getInitiativeId());
     }
     @Test
     void shouldHandleNullAtecoCodes() {
@@ -293,6 +370,30 @@ class InitiativeRepositoryExtendedImplTest {
                 );
 
         Assertions.assertEquals(1, result.getTotalElements());
+    }
+
+    @Test
+    void shouldIncludeInitiativeEndingTodayWithAtecoMatch() {
+
+        initiativeRepository.save(
+                createInitiative(
+                        710,
+                        InitiativeConstants.Status.PUBLISHED,
+                        List.of("ATECO1", "ATECO2"),
+                        LocalDate.now()
+                )
+        );
+
+        Page<InitiativePageItem> result =
+                initiativeRepository.findInitiatives(
+                        Collections.emptySet(),
+                        List.of("ATECO1"),
+                        null,
+                        PageRequest.of(0, 10)
+                );
+
+        Assertions.assertEquals(1, result.getTotalElements());
+        Assertions.assertEquals("ONBOARDABLE", result.getContent().getFirst().getOnboardStatus());
     }
 
     @Test
