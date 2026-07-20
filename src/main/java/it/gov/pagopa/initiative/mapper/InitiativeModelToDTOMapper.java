@@ -174,7 +174,7 @@ public class InitiativeModelToDTOMapper {
             return null;
         }
         return InitiativeGeneralDTO.builder()
-                .beneficiaryBudgetFixed(centsToEuro(general.getBeneficiaryBudgetFixedCents()))
+                .beneficiaryBudgetFixed(general.getBeneficiaryBudgetFixedCents() != null ? centsToEuro(general.getBeneficiaryBudgetFixedCents()) : null)
                 .beneficiaryKnown(general.getBeneficiaryKnown())
                 .beneficiaryType(general.getBeneficiaryType()!=null?InitiativeGeneralDTO.BeneficiaryTypeEnum.valueOf(general.getBeneficiaryType().name()):null)
                 .familyUnitComposition(general.getFamilyUnitComposition()!=null?general.getFamilyUnitComposition():null)

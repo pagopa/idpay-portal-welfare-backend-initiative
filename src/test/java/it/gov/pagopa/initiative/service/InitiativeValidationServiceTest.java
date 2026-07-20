@@ -1132,7 +1132,7 @@ class InitiativeValidationServiceTest {
     }
 
     @Test
-    void checkProductTypeBudget_whenBeneficiaryBudgetMaxIsSet_thenUseMaxBudget() {
+    void checkProductTypeBudget_whenBeneficiaryBudgetFixedIsEqualsToMaxProductBudgetSet() {
         Initiative initiative = createStep2Initiative(false);
         InitiativeGeneral general = initiative.getGeneral();
 
@@ -1141,15 +1141,14 @@ class InitiativeValidationServiceTest {
         productTypeBudgetCents.put("PRODUCT_2", 7000L);
         general.setProductTypeBudgetCents(productTypeBudgetCents);
 
-        general.setBeneficiaryBudgetCents(3000L);
-        general.setBeneficiaryBudgetMaxCents(8000L);
+        general.setBeneficiaryBudgetFixedCents(7000L);
 
         Executable executable = () -> initiativeValidationService.checkProductTypeBudget(initiative);
         assertDoesNotThrow(executable);
     }
 
     @Test
-    void checkProductTypeBudget_whenBeneficiaryBudgetMaxIsSetButLessThanMaxProductBudget_thenThrowException() {
+    void checkProductTypeBudget_whenBeneficiaryBudgetFixedIsLessThanMaxProductBudgetSet() {
         Initiative initiative = createStep2Initiative(false);
         InitiativeGeneral general = initiative.getGeneral();
 
@@ -1158,8 +1157,7 @@ class InitiativeValidationServiceTest {
         productTypeBudgetCents.put("PRODUCT_2", 10000L);
         general.setProductTypeBudgetCents(productTypeBudgetCents);
 
-        general.setBeneficiaryBudgetCents(3000L);
-        general.setBeneficiaryBudgetMaxCents(8000L);
+        general.setBeneficiaryBudgetFixedCents(8000L);
 
         try {
             initiativeValidationService.checkProductTypeBudget(initiative);
