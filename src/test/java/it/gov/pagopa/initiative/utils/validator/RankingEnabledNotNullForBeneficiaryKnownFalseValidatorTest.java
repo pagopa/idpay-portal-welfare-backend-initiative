@@ -69,6 +69,7 @@ class RankingEnabledNotNullForBeneficiaryKnownFalseValidatorTest {
         initiativeGeneralDTO.setStartDate(startDate);
         initiativeGeneralDTO.setEndDate(endDate);
         initiativeGeneralDTO.setDescriptionMap(language);
+        initiativeGeneralDTO.setProductTypeBudget(Map.of("CODE", BigDecimal.valueOf(100L)));
         return initiativeGeneralDTO;
     }
 
@@ -89,6 +90,7 @@ class RankingEnabledNotNullForBeneficiaryKnownFalseValidatorTest {
         initiativeGeneralDTO.setStartDate(startDate);
         initiativeGeneralDTO.setEndDate(endDate);
         initiativeGeneralDTO.setDescriptionMap(language);
+        initiativeGeneralDTO.setProductTypeBudget(Map.of("CODE", BigDecimal.valueOf(100L)));
         return initiativeGeneralDTO;
     }
 }

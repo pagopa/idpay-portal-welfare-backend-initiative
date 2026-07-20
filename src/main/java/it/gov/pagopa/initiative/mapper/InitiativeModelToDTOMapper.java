@@ -151,16 +151,15 @@ public class InitiativeModelToDTOMapper {
         initiativeDto.setRewardRule(this.toRewardRuleDTO(initiative.getRewardRule()));
         initiativeDto.setTrxRule(this.toTrxRuleDTO(initiative.getTrxRule()));
         initiativeDto.setRefundRule(this.toInitiativeRefundRuleDTO(initiative.getRefundRule()));
+        initiativeDto.setAtecoCodes(initiative.getAtecoCodes());
         return initiativeDto;
     }
 
     private static BigDecimal centsToEuro(Long cents) {
-        if (cents == null) {
-            return null;
-        }
-        return BigDecimal.valueOf(cents).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_DOWN);
+        Long value = cents != null ? cents : 0L;
+        return BigDecimal.valueOf(value).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_DOWN);
     }
-
+    
     public InitiativeDTO toDtoOnlyId(Initiative initiative) {
         if (initiative == null) {
             return null;
@@ -177,10 +176,8 @@ public class InitiativeModelToDTOMapper {
         return InitiativeGeneralDTO.builder()
                 .beneficiaryBudgetFixed(centsToEuro(general.getBeneficiaryBudgetFixedCents()))
                 .beneficiaryKnown(general.getBeneficiaryKnown())
-                .beneficiaryType(general.getBeneficiaryType() != null
-                        ? InitiativeGeneralDTO.BeneficiaryTypeEnum.valueOf(general.getBeneficiaryType().name())
-                        : null)
-                .familyUnitComposition(general.getFamilyUnitComposition() != null ? general.getFamilyUnitComposition() : null)
+                .beneficiaryType(general.getBeneficiaryType()!=null?InitiativeGeneralDTO.BeneficiaryTypeEnum.valueOf(general.getBeneficiaryType().name()):null)
+                .familyUnitComposition(general.getFamilyUnitComposition()!=null?general.getFamilyUnitComposition():null)
                 .budget(centsToEuro(general.getBudgetCents()))
                 .endDate(general.getEndDate())
                 .startDate(general.getStartDate())
@@ -188,7 +185,14 @@ public class InitiativeModelToDTOMapper {
                 .rankingStartDate(general.getRankingStartDate())
                 .rankingEnabled(general.getRankingEnabled())
                 .descriptionMap(general.getDescriptionMap())
+                .productTypeBudget(general.getProductTypeBudgetCents() != null ? productTypeBudgetCentsToEuro(general.getProductTypeBudgetCents()) : null)
                 .build();
+    }
+
+    private Map<String, BigDecimal> productTypeBudgetCentsToEuro(Map<String, Long> productTypeBudgetCents) {
+        Map<String, BigDecimal> productTypeBudget = new HashMap<>();
+        productTypeBudgetCents.forEach((k,v) -> productTypeBudget.put(k, centsToEuro(v)));
+        return productTypeBudget;
     }
 
     private InitiativeAdditionalDTO toInitiativeAdditionalDTO(InitiativeAdditional additional) {
@@ -227,12 +231,10 @@ public class InitiativeModelToDTOMapper {
         }
 
         InitiativeBeneficiaryRuleDTO beneficiaryRuleDto = new InitiativeBeneficiaryRuleDTO();
-
-        beneficiaryRuleDto.setAutomatedCriteria(
-                Optional.ofNullable(beneficiaryRule.getAutomatedCriteria())
-                        .orElse(Collections.emptyList())
-                        .stream()
-                        .map(modelAC -> AutomatedCriteriaDTO.builder()
+        beneficiaryRuleDto.setAutomatedCriteria(Optional.ofNullable(beneficiaryRule.getAutomatedCriteria())
+                .orElse(Collections.emptyList())
+                .stream().map(modelAC ->
+                        AutomatedCriteriaDTO.builder()
                                 .code(modelAC.getCode())
                                 .field(modelAC.getField())
                                 .operator(FilterOperatorEnum.valueOf(modelAC.getOperator().name()))
@@ -243,9 +245,8 @@ public class InitiativeModelToDTOMapper {
                                         ? AutomatedCriteriaDTO.OrderDirection.valueOf(modelAC.getOrderDirection().name())
                                         : null)
                                 .iseeTypes(modelAC.getIseeTypes())
-                                .build())
-                        .toList()
-        );
+                                .build()
+                ).toList());
 
         beneficiaryRuleDto.setSelfDeclarationCriteria(
                 Optional.ofNullable(beneficiaryRule.getSelfDeclarationCriteria())
@@ -303,64 +304,47 @@ public class InitiativeModelToDTOMapper {
             return Collections.emptyList();
         }
         return initiatives.stream().map(initiativeModel -> {
-            String serviceName = initiativeModel.getAdditionalInfo() != null
-                    ? initiativeModel.getAdditionalInfo().getServiceName()
-                    : StringUtils.EMPTY;
-
+                    String serviceName = initiativeModel.getAdditionalInfo() != null ?
+                            initiativeModel.getAdditionalInfo().getServiceName() : StringUtils.EMPTY;
             return InitiativeSummaryDTO.builder()
-                    .initiativeId(initiativeModel.getInitiativeId())
-                    .initiativeName(StringUtils.isNotBlank(initiativeModel.getInitiativeName())
-                            ? initiativeModel.getInitiativeName()
-                            : serviceName)
-                    .initiativeRewardType(initiativeModel.getInitiativeRewardType() != null
-                            ? initiativeModel.getInitiativeRewardType().name()
-                            : null)
-                    .status(InitiativeUtils.checkEndDateToSetStatus(initiativeModel))
-                    .creationDate(initiativeModel.getCreationDate())
-                    .updateDate(initiativeModel.getUpdateDate())
-                    .rankingEnabled(initiativeModel.getGeneral() != null
-                            ? initiativeModel.getGeneral().getRankingEnabled()
-                            : null)
-                    .build();
+                            .initiativeId(initiativeModel.getInitiativeId())
+                            .serviceId(initiativeModel.getAdditionalInfo().getServiceId())
+                            .initiativeName(StringUtils.isNotBlank(initiativeModel.getInitiativeName()) ?
+                                    initiativeModel.getInitiativeName() : serviceName
+                            )
+                            .organizationName(initiativeModel.getOrganizationName())
+                            .initiativeRewardType(initiativeModel.getInitiativeRewardType() != null ?
+                                    initiativeModel.getInitiativeRewardType().name() : null)
+                            .status(InitiativeUtils.checkEndDateToSetStatus(initiativeModel))
+                            .startDate(initiativeModel.getGeneral().getStartDate())
+                            .endDate(initiativeModel.getGeneral().getEndDate())
+                            .creationDate(initiativeModel.getCreationDate())
+                            .updateDate(initiativeModel.getUpdateDate())
+                            .rankingEnabled(initiativeModel.getGeneral() != null ? initiativeModel.getGeneral().getRankingEnabled() : null)
+                            .build();
         }).toList();
     }
 
     public List<InitiativeIssuerDTO> toInitiativeIssuerDTOList(List<Initiative> initiatives) {
         return Optional.ofNullable(initiatives)
                 .orElse(Collections.emptyList())
-                .stream()
-                .map(initiativeModel -> {
+                .stream().map(initiativeModel -> {
                     InitiativeIssuerDTO initiativeIssuerDTO = new InitiativeIssuerDTO();
                     initiativeIssuerDTO.setInitiativeId(initiativeModel.getInitiativeId());
-
-                    String serviceName = initiativeModel.getAdditionalInfo() != null
-                            ? initiativeModel.getAdditionalInfo().getServiceName()
-                            : StringUtils.EMPTY;
-
-                    initiativeIssuerDTO.setInitiativeName(
-                            StringUtils.isNotBlank(initiativeModel.getInitiativeName())
-                                    ? initiativeModel.getInitiativeName()
-                                    : serviceName
-                    );
+                    String serviceName = initiativeModel.getAdditionalInfo() != null ? initiativeModel.getAdditionalInfo().getServiceName() : StringUtils.EMPTY;
+                    initiativeIssuerDTO.setInitiativeName(StringUtils.isNotBlank(initiativeModel.getInitiativeName()) ?
+                            initiativeModel.getInitiativeName() : serviceName);
                     initiativeIssuerDTO.setOrganizationName(initiativeModel.getOrganizationName());
                     initiativeIssuerDTO.setStatus(initiativeModel.getStatus());
-
-                    if (initiativeModel.getAdditionalInfo() != null) {
+                    if(initiativeModel.getAdditionalInfo() != null){
                         initiativeIssuerDTO.setTcLink(initiativeModel.getAdditionalInfo().getTcLink());
                         initiativeIssuerDTO.setPrivacyLink(initiativeModel.getAdditionalInfo().getPrivacyLink());
-                        initiativeIssuerDTO.setLogoURL(
-                                initiativeModel.getAdditionalInfo().getLogoFileName() != null
-                                        ? initiativeUtils.createLogoUrl(initiativeModel.getOrganizationId(), initiativeModel.getInitiativeId())
-                                        : null
-                        );
+                        initiativeIssuerDTO.setLogoURL(initiativeModel.getAdditionalInfo().getLogoFileName() != null
+                                ? initiativeUtils.createLogoUrl(initiativeModel.getOrganizationId(), initiativeModel.getInitiativeId()) : null);
                     }
-
-                    if (initiativeModel.getGeneral() != null) {
-                        initiativeIssuerDTO.setDescriptionMap(
-                                initiativeModel.getGeneral().getDescriptionMap() != null
-                                        ? this.languageMap(initiativeModel.getGeneral().getDescriptionMap())
-                                        : null
-                        );
+                    if(initiativeModel.getGeneral() != null){
+                        initiativeIssuerDTO.setDescriptionMap(initiativeModel.getGeneral().getDescriptionMap() != null ?
+                                this.languageMap(initiativeModel.getGeneral().getDescriptionMap()) : null);
                         initiativeIssuerDTO.setStartDate(initiativeModel.getGeneral().getStartDate());
                         initiativeIssuerDTO.setEndDate(initiativeModel.getGeneral().getEndDate());
                         initiativeIssuerDTO.setRankingEnabled(initiativeModel.getGeneral().getRankingEnabled());
@@ -368,32 +352,25 @@ public class InitiativeModelToDTOMapper {
                         initiativeIssuerDTO.setRankingEndDate(initiativeModel.getGeneral().getRankingEndDate());
                         initiativeIssuerDTO.setBeneficiaryKnown(initiativeModel.getGeneral().getBeneficiaryKnown());
                     }
-
                     return initiativeIssuerDTO;
-                })
-                .toList();
+                }).toList();
     }
 
     public List<InitiativeMilDTO> toInitiativeListMilDTO(List<Initiative> initiatives) {
         return Optional.ofNullable(initiatives)
                 .orElse(Collections.emptyList())
-                .stream()
-                .map(initiativeModel -> {
+                .stream().map(initiativeModel -> {
                     InitiativeMilDTO initiativeMilDTO = new InitiativeMilDTO();
                     String serviceName = StringUtils.EMPTY;
 
-                    if (initiativeModel.getAdditionalInfo() != null) {
+                    if(initiativeModel.getAdditionalInfo() != null) {
                         initiativeMilDTO.setTcLink(initiativeModel.getAdditionalInfo().getTcLink());
                         initiativeMilDTO.setPrivacyLink(initiativeModel.getAdditionalInfo().getPrivacyLink());
-                        initiativeMilDTO.setLogoURL(
-                                initiativeModel.getAdditionalInfo().getLogoFileName() != null
-                                        ? initiativeUtils.createLogoUrl(initiativeModel.getOrganizationId(), initiativeModel.getInitiativeId())
-                                        : null
-                        );
+                        initiativeMilDTO.setLogoURL(initiativeModel.getAdditionalInfo().getLogoFileName() != null
+                                ? initiativeUtils.createLogoUrl(initiativeModel.getOrganizationId(), initiativeModel.getInitiativeId()) : null);
                         serviceName = initiativeModel.getAdditionalInfo().getServiceName();
                     }
-
-                    if (initiativeModel.getGeneral() != null) {
+                    if(initiativeModel.getGeneral() != null) {
                         initiativeMilDTO.setBeneficiaryType(initiativeModel.getGeneral().getBeneficiaryType());
                         initiativeMilDTO.setFruitionStartDate(initiativeModel.getGeneral().getStartDate());
                         initiativeMilDTO.setFruitionEndDate(initiativeModel.getGeneral().getEndDate());
@@ -404,17 +381,13 @@ public class InitiativeModelToDTOMapper {
                     }
 
                     initiativeMilDTO.setInitiativeId(initiativeModel.getInitiativeId());
-                    initiativeMilDTO.setInitiativeName(
-                            StringUtils.isNotBlank(initiativeModel.getInitiativeName())
-                                    ? initiativeModel.getInitiativeName()
-                                    : serviceName
-                    );
+                    initiativeMilDTO.setInitiativeName(StringUtils.isNotBlank(initiativeModel.getInitiativeName()) ?
+                            initiativeModel.getInitiativeName() : serviceName);
                     initiativeMilDTO.setOrganizationId(initiativeModel.getOrganizationId());
                     initiativeMilDTO.setOrganizationName(initiativeModel.getOrganizationName());
                     initiativeMilDTO.setInitiativeRewardType(initiativeModel.getInitiativeRewardType());
                     return initiativeMilDTO;
-                })
-                .toList();
+                }).toList();
     }
 
     private Map<String, String> languageMap(Map<String, String> map) {
@@ -444,16 +417,14 @@ public class InitiativeModelToDTOMapper {
         } else if (rewardRule instanceof RewardGroups rewardGroupsInput) {
             dto = RewardGroupsDTO.builder()
                     .type(rewardGroupsInput.getType())
-                    .rewardGroups(rewardGroupsInput.getRewardGroups().stream()
-                            .map(x -> RewardGroupsDTO.RewardGroupDTO.builder()
-                                    .from(centsToEuro(x.getFromCents()))
-                                    .to(centsToEuro(x.getToCents()))
-                                    .rewardValue(x.getRewardValue())
-                                    .build())
-                            .toList())
+                    .rewardGroups(rewardGroupsInput.getRewardGroups().stream().map(
+                    x -> RewardGroupsDTO.RewardGroupDTO.builder()
+                            .from(centsToEuro(x.getFromCents()))
+                            .to(centsToEuro(x.getToCents()))
+                            .rewardValue(x.getRewardValue()).build()
+            ).toList())
                     .build();
         }
-
         return dto;
     }
 
@@ -461,9 +432,7 @@ public class InitiativeModelToDTOMapper {
         if (rewardRule == null) {
             return null;
         }
-
         InitiativeRewardRuleDTO dto = null;
-
         if (rewardRule instanceof RewardValue rewardValueInput) {
             dto = RewardValueDTO.builder()
                     .rewardValueType(RewardValueDTO.RewardValueTypeEnum.valueOf(rewardValueInput.getRewardValueType().name()))
@@ -471,16 +440,14 @@ public class InitiativeModelToDTOMapper {
                     .build();
         } else if (rewardRule instanceof RewardGroups rewardGroupsInput) {
             dto = RewardGroupsDTO.builder()
-                    .rewardGroups(rewardGroupsInput.getRewardGroups().stream()
-                            .map(x -> RewardGroupsDTO.RewardGroupDTO.builder()
+                    .rewardGroups(rewardGroupsInput.getRewardGroups().stream().map(
+                            x -> RewardGroupsDTO.RewardGroupDTO.builder()
                                     .from(centsToEuro(x.getFromCents()))
                                     .to(centsToEuro(x.getToCents()))
-                                    .rewardValue(x.getRewardValue())
-                                    .build())
-                            .toList())
+                                    .rewardValue(x.getRewardValue()).build()
+                    ).toList())
                     .build();
         }
-
         return dto;
     }
 
@@ -501,12 +468,10 @@ public class InitiativeModelToDTOMapper {
         if (trxCount == null) {
             return null;
         }
-        return TrxCountDTO.builder()
-                .to(trxCount.getTo())
+        return TrxCountDTO.builder().to(trxCount.getTo())
                 .from(trxCount.getFrom())
                 .fromIncluded(trxCount.isFromIncluded())
-                .toIncluded(trxCount.isToIncluded())
-                .build();
+                .toIncluded(trxCount.isToIncluded()).build();
     }
 
     private MccFilterDTO toMccFilterDTO(MccFilter mccFilter) {
@@ -520,27 +485,22 @@ public class InitiativeModelToDTOMapper {
     }
 
     private DayOfWeekDTO toDaysOfWeekDTO(DayOfWeek dayOfWeek) {
-        return new DayOfWeekDTO(
-                dayOfWeek.stream()
-                        .map(x -> DayOfWeekDTO.DayConfig.builder()
-                                .daysOfWeek(x.getDaysOfWeek())
-                                .intervals(x.getIntervals().stream()
-                                        .map(i -> DayOfWeekDTO.Interval.builder()
-                                                .startTime(i.getStartTime())
-                                                .endTime(i.getEndTime())
-                                                .build())
-                                        .toList())
-                                .build())
-                        .toList()
-        );
+        return new DayOfWeekDTO(dayOfWeek.stream().map(x -> DayOfWeekDTO.DayConfig.builder()
+                        .daysOfWeek(x.getDaysOfWeek())
+                        .intervals(x.getIntervals().stream().map(i -> DayOfWeekDTO.Interval.builder()
+                                        .startTime(i.getStartTime())
+                                        .endTime(i.getEndTime())
+                                        .build())
+                                .toList())
+                        .build())
+                .toList());
     }
 
     private List<RewardLimitsDTO> toRewardLimitsDTO(List<RewardLimits> rewardLimit) {
         if (CollectionUtils.isEmpty(rewardLimit)) {
             return Collections.emptyList();
         }
-        return rewardLimit.stream()
-                .map(x -> RewardLimitsDTO.builder()
+        return rewardLimit.stream().map(x -> RewardLimitsDTO.builder()
                         .frequency(RewardLimitsDTO.RewardLimitFrequency.valueOf(x.getFrequency().name()))
                         .rewardLimit(centsToEuro(x.getRewardLimitCents()))
                         .build())
@@ -551,16 +511,14 @@ public class InitiativeModelToDTOMapper {
         if (threshold == null) {
             return null;
         }
-        return ThresholdDTO.builder()
-                .from(centsToEuro(threshold.getFromCents()))
+        return ThresholdDTO.builder().from(centsToEuro(threshold.getFromCents()))
                 .to(centsToEuro(threshold.getToCents()))
                 .fromIncluded(threshold.isFromIncluded())
-                .toIncluded(threshold.isToIncluded())
-                .build();
+                .toIncluded(threshold.isToIncluded()).build();
     }
 
-    public InitiativeRefundRuleDTO toInitiativeRefundRuleDTO(InitiativeRefundRule refundRule) {
-        if (refundRule == null) {
+    public InitiativeRefundRuleDTO toInitiativeRefundRuleDTO(InitiativeRefundRule refundRule){
+        if (refundRule == null){
             return null;
         }
         InitiativeRefundRuleDTO initiativeRefundRuleDTO = new InitiativeRefundRuleDTO();
@@ -569,9 +527,8 @@ public class InitiativeModelToDTOMapper {
         initiativeRefundRuleDTO.setAdditionalInfo(toAdditionalInfoDTO(refundRule.getAdditionalInfo()));
         return initiativeRefundRuleDTO;
     }
-
-    public InitiativeRefundRuleDTO toInitiativeRefundRuleDTOWithoutAdditionalInfo(InitiativeRefundRule refundRule) {
-        if (refundRule == null) {
+    public InitiativeRefundRuleDTO toInitiativeRefundRuleDTOWithoutAdditionalInfo(InitiativeRefundRule refundRule){
+        if (refundRule == null){
             return null;
         }
         InitiativeRefundRuleDTO initiativeRefundRuleDTO = new InitiativeRefundRuleDTO();
@@ -580,31 +537,26 @@ public class InitiativeModelToDTOMapper {
         return initiativeRefundRuleDTO;
     }
 
-    private AccumulatedAmountDTO toAccumulatedAmountDTO(AccumulatedAmount accumulatedAmount) {
-        if (accumulatedAmount == null) {
+    private AccumulatedAmountDTO toAccumulatedAmountDTO(AccumulatedAmount accumulatedAmount){
+        if(accumulatedAmount == null){
             return null;
         }
-        return AccumulatedAmountDTO.builder()
-                .accumulatedType(AccumulatedAmountDTO.AccumulatedTypeEnum.valueOf(accumulatedAmount.getAccumulatedType().name()))
-                .refundThreshold(centsToEuro(accumulatedAmount.getRefundThresholdCents()))
-                .build();
+        return AccumulatedAmountDTO.builder().accumulatedType(AccumulatedAmountDTO.AccumulatedTypeEnum.valueOf(accumulatedAmount.getAccumulatedType().name()))
+                .refundThreshold(centsToEuro(accumulatedAmount.getRefundThresholdCents())).build();
     }
 
-    private TimeParameterDTO toTimeParameterDTO(TimeParameter timeParameter) {
-        if (timeParameter == null) {
+    private TimeParameterDTO toTimeParameterDTO(TimeParameter timeParameter){
+        if (timeParameter == null){
             return null;
         }
-        return TimeParameterDTO.builder()
-                .timeType(TimeParameterDTO.TimeTypeEnum.valueOf(timeParameter.getTimeType().name()))
-                .build();
+        return TimeParameterDTO.builder().timeType(TimeParameterDTO.TimeTypeEnum.valueOf(timeParameter.getTimeType().name())).build();
     }
 
-    private RefundAdditionalInfoDTO toAdditionalInfoDTO(AdditionalInfo additionalInfo) {
-        if (additionalInfo == null) {
+    private RefundAdditionalInfoDTO toAdditionalInfoDTO(AdditionalInfo additionalInfo){
+        if (additionalInfo == null){
             return null;
         }
-        return RefundAdditionalInfoDTO.builder()
-                .identificationCode(additionalInfo.getIdentificationCode())
-                .build();
+        return RefundAdditionalInfoDTO.builder().identificationCode(additionalInfo.getIdentificationCode()).build();
     }
+
 }

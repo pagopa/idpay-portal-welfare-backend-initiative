@@ -31,6 +31,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -43,6 +45,7 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.regex.Pattern;
 
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Email.*;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.BadRequest.INITIATIVE_BY_INITIATIVE_ID_UNPROCESSABLE_FOR_NOT_VALID_END_DATE;
@@ -74,6 +77,8 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     private static final String DELETE_INITIATIVE_SERVICE = "DELETE_INITIATIVE";
     private static final String DELETE_INITIATIVE_OPERATION_TYPE = "DELETE_INITIATIVE";
     private static final String CREATE_STATISTICS_OPERATION_TYPE = "CREATE_INITIATIVE_STATISTICS";
+    private static final Pattern INITIATIVE_ID_PATTERN = Pattern.compile("^[a-f0-9]{24}$");
+    private static final String NULL_STRING = "null";
 
     public InitiativeServiceImpl(
             @Value("${app.initiative.conditions.notifyEmail}") boolean notifyEmail,
@@ -161,6 +166,14 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     }
 
     @Override
+    public Initiative getInitiativeInfo(String initiativeId, String role) {
+        long startTime = System.currentTimeMillis();
+        auditUtilities.logGetInitiativeInfo(this.getUserId(),initiativeId);
+        performanceLog(startTime, "GET_INITIATIVE_DETAIL_INFO");
+        return initiativeValidationService.getInitiativeInfo(initiativeId, role);
+    }
+
+    @Override
     public Initiative getInitiativeBeneficiaryView(String initiativeId) {
         return initiativeRepository.retrieveInitiativeBeneficiaryView(initiativeId, true)
                 .orElseThrow(() -> new InitiativeNotFoundException(InitiativeConstants.Exception.NotFound.INITIATIVE_NOT_FOUND_MESSAGE.formatted(initiativeId)));
@@ -176,6 +189,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         if (!isDraft) {
             initiativeValidationService.checkBeneficiaryTypeAndFamilyUnit(initiativeInfoModel);
             initiativeValidationService.checkStartDateAndEndDate(initiativeInfoModel);
+            initiativeValidationService.checkProductTypeBudget(initiativeInfoModel);
         }
         initiative.setGeneral(initiativeInfoModel.getGeneral());
         if (!initiative.getAdditionalInfo().getServiceName().equals(initiative.getInitiativeName())) {
@@ -424,7 +438,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             initiativeRepository.save(initiative);
             performanceLog(startTime, "STORE_INITIATIVE_LOGO");
             return new LogoDTO(fileName, initiativeUtils.createLogoUrl(organizationId, initiativeId), localDateTime);
-        } catch (Exception e) {
+        } catch (Exception _) {
             performanceLog(startTime, "STORE_INITIATIVE_LOGO");
             throw new InitiativeLogoException("An error occurred during the uploading logo");
         }
@@ -619,6 +633,10 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
     public void deleteInitiative(String initiativeId){
         long startTime = System.currentTimeMillis();
 
+        if(!isValidInitiativeId(initiativeId)){
+            throw new DeleteInitiativeException("Initiative [%s] cannot be deleted because the initiative ID is invalid".formatted(initiativeId));
+        }
+
         try{
             Optional<Initiative> initiative = initiativeRepository.findById(initiativeId);
             if (initiative.isPresent() && initiative.get().getAdditionalInfo() != null &&
@@ -651,6 +669,12 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         performanceLog(startTime, DELETE_INITIATIVE_SERVICE);
     }
 
+    public static boolean isValidInitiativeId(String initiativeId) {
+        return initiativeId != null
+                && !NULL_STRING.equalsIgnoreCase(initiativeId)
+                && INITIATIVE_ID_PATTERN.matcher(initiativeId).matches();
+    }
+
     @Override
     public void initializeStatistics(String initiativeId, String organizationId) {
         QueueCommandOperationDTO createInitiativeStatistics = QueueCommandOperationDTO.builder()
@@ -680,6 +704,37 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             throw new IOBackEndInvocationException("An error occurred during the IO Back-end invocation", true, e);
         }
     }
+
+    @Override
+    public Page<InitiativeResponse> searchInitiatives(
+            Set<String> onboardedIds,
+            List<String> atecoCodes,
+            String initiativeName,
+            Pageable pageable) {
+
+        Page<InitiativePageItem> page = initiativeRepository.findInitiatives(
+                onboardedIds, atecoCodes,initiativeName, pageable);
+
+        List<InitiativeResponse> content = page.getContent().stream()
+                .map(this::toInitiativeResponse)
+                .toList();
+
+        return new PageImpl<>(content, pageable, page.getTotalElements());
+    }
+
+    private InitiativeResponse toInitiativeResponse(InitiativePageItem item) {
+        return InitiativeResponse.builder()
+                .initiativeId(item.getInitiativeId())
+                .initiativeName(item.getInitiativeName())
+                .organizationName(item.getOrganizationName())
+                .status(item.getStatus())
+                .startDate(item.getStartDate())
+                .endDate(item.getEndDate())
+                .onboardStatus(item.getOnboardStatus())
+                .atecoCodes(item.getAtecoCodes())
+                .build();
+    }
+
     public void validate(String contentType, String fileName) {
         Assert.notNull(fileName, "file name cannot be null");
 

@@ -25,8 +25,7 @@ import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
 import java.time.Year;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -51,6 +50,23 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
     @Override
     public Initiative  getInitiative(String organizationId, String initiativeId, String role){
         Initiative initiative = initiativeRepository.findByOrganizationIdAndInitiativeIdAndEnabled(organizationId, initiativeId, true)
+                .orElseThrow(() -> new InitiativeNotFoundException(InitiativeConstants.Exception.NotFound.INITIATIVE_NOT_FOUND_MESSAGE.formatted(initiativeId)));
+        if (InitiativeConstants.Role.PAGOPA_ADMIN.equals(role)){
+            if (InitiativeConstants.Status.PUBLISHED.equals(initiative.getStatus()) || initiative.getStatus().equals(InitiativeConstants.Status.IN_REVISION) || initiative.getStatus().equals(InitiativeConstants.Status.TO_CHECK) || initiative.getStatus().equals(InitiativeConstants.Status.APPROVED)){
+                return initiative;
+            }else {
+                throw new AdminPermissionException(
+                        "Admin permission not allowed for current initiative [%s]".formatted(initiative.getInitiativeId())
+                );
+            }
+        }else{
+            return initiative;
+        }
+    }
+
+    @Override
+    public Initiative  getInitiativeInfo(String initiativeId, String role){
+        Initiative initiative = initiativeRepository.findByInitiativeIdAndEnabled(initiativeId, true)
                 .orElseThrow(() -> new InitiativeNotFoundException(InitiativeConstants.Exception.NotFound.INITIATIVE_NOT_FOUND_MESSAGE.formatted(initiativeId)));
         if (InitiativeConstants.Role.PAGOPA_ADMIN.equals(role)){
             if (InitiativeConstants.Status.PUBLISHED.equals(initiative.getStatus()) || initiative.getStatus().equals(InitiativeConstants.Status.IN_REVISION) || initiative.getStatus().equals(InitiativeConstants.Status.TO_CHECK) || initiative.getStatus().equals(InitiativeConstants.Status.APPROVED)){
@@ -218,6 +234,25 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
                 RewardValue.RewardValueTypeEnum.PERCENTAGE.equals(rewardValue.getRewardValueType()) &&
                 rewardValue.getRewardValue().intValue()>100){
             throw new InvalidRewardRuleException("Reward rules of initiative [%s] is not valid".formatted(initiative.getInitiativeId()));
+        }
+    }
+
+    @Override
+    public void checkProductTypeBudget(Initiative initiative) {
+        if (initiative.getGeneral().getProductTypeBudgetCents() != null && !initiative.getGeneral().getProductTypeBudgetCents().isEmpty()){
+            Long maxProductBudget = initiative.getGeneral().getProductTypeBudgetCents().values()
+                    .stream()
+                    .max(Long::compareTo)
+                    .orElseThrow(() -> new InitiativeProductTypeBudgetException(
+                            "Invalid product type budget configuration for initiative [%s]"
+                                    .formatted(initiative.getInitiativeId())
+                    ));
+
+            if (initiative.getGeneral().getBeneficiaryBudgetMaxCents() < maxProductBudget) {
+                throw new InitiativeProductTypeBudgetException(
+                        "The beneficiary budget must be greater than or equal to the product type budget for initiative [%s]"
+                                .formatted(initiative.getInitiativeId()));
+            }
         }
     }
 }

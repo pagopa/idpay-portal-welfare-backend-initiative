@@ -10,6 +10,7 @@ import org.springframework.data.annotation.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -43,5 +44,5 @@ public class Initiative {
     private InitiativeTrxConditions trxRule;
     private InitiativeRefundRule refundRule;
     private Boolean enabled;
-
+    private List<String> atecoCodes;
 }

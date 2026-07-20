@@ -1,5 +1,6 @@
 package it.gov.pagopa.initiative.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
 import lombok.AllArgsConstructor;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class InitiativeDetailDTO {
     private String initiativeName;
     private String status;

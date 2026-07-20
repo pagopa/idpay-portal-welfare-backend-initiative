@@ -1,5 +1,6 @@
 package it.gov.pagopa.initiative.dto.io.service;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
@@ -9,6 +10,7 @@ import java.util.List;
 /**
  * A payload used to create/update a service for a user.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 @EqualsAndHashCode
 @AllArgsConstructor

@@ -6,7 +6,6 @@ import it.gov.pagopa.assistance.dto.response.VouchersStatusDTO;
 import it.gov.pagopa.assistance.enums.Channel;
 import it.gov.pagopa.assistance.service.AssistanceService;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.security.autoconfigure.SecurityAutoConfiguration;
 import org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration;
@@ -17,6 +16,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static it.gov.pagopa.assistance.costants.AssistanceConstants.USED;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -37,7 +37,7 @@ class AssistanceControllerTest {
     @Test
     void onboardingStatus_OK() throws Exception {
         OnboardingStatusDTO onboardingStatusDTO = OnboardingStatusDTO.builder().channel(Channel.IO).build();
-        Mockito.when(assistanceService.onboardingStatus(INITIATIVE_ID, USER_ID))
+        when(assistanceService.onboardingStatus(INITIATIVE_ID, USER_ID))
                 .thenReturn(onboardingStatusDTO);
 
         mockMvc.perform(post("/idpay/assistance/onboardings/status/{initiativeId}/{userId}", INITIATIVE_ID, USER_ID))
@@ -47,7 +47,7 @@ class AssistanceControllerTest {
     @Test
     void vouchersStatus_OK() throws Exception {
         VouchersStatusDTO vouchersStatusDTO = VouchersStatusDTO.builder().status(USED).build();
-        Mockito.when(assistanceService.vouchersStatus(INITIATIVE_ID, USER_ID))
+        when(assistanceService.vouchersStatus(INITIATIVE_ID, USER_ID))
                 .thenReturn(vouchersStatusDTO);
 
         mockMvc.perform(post("/idpay/assistance/vouchers/status/{initiativeId}/{userId}", INITIATIVE_ID, USER_ID))

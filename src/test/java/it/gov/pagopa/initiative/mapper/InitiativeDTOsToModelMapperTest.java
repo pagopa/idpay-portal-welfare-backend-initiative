@@ -1,5 +1,6 @@
 package it.gov.pagopa.initiative.mapper;
 
+import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.rule.refund.AccumulatedAmountDTO;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
@@ -9,10 +10,11 @@ import it.gov.pagopa.initiative.dto.rule.reward.InitiativeRewardRuleDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardGroupsDTO;
 import it.gov.pagopa.initiative.dto.rule.reward.RewardValueDTO;
 import it.gov.pagopa.initiative.dto.rule.trx.*;
-import it.gov.pagopa.initiative.model.*;
+import it.gov.pagopa.initiative.exception.custom.InvalidRewardRuleException;
 import it.gov.pagopa.initiative.model.TypeBoolEnum;
 import it.gov.pagopa.initiative.model.TypeMultiEnum;
 import it.gov.pagopa.initiative.model.TypeTextEnum;
+import it.gov.pagopa.initiative.model.*;
 import it.gov.pagopa.initiative.model.rule.refund.AccumulatedAmount;
 import it.gov.pagopa.initiative.model.rule.refund.AdditionalInfo;
 import it.gov.pagopa.initiative.model.rule.refund.InitiativeRefundRule;
@@ -26,6 +28,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -42,6 +45,7 @@ import java.util.*;
 
 import static com.mongodb.assertions.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 @ContextConfiguration(classes = {InitiativeDTOsToModelMapper.class})
 @ExtendWith(SpringExtension.class)
@@ -112,7 +116,7 @@ class InitiativeDTOsToModelMapperTest {
     private Initiative initiativeInfoOnlyInfoGeneralFamilyUnitNotNull;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         initiativeOnlyInfoGeneral = createStep1InitiativeOnlyInfoGeneral();
         initiativeInfoOnlyInfoGeneralFamilyUnitNotNull = createStep1InitiativeOnlyInfoGeneralFamilyUnitNotNull();
         initiativeNoBaseFields = createStep1InitiativeNoBaseFields();
@@ -151,8 +155,8 @@ class InitiativeDTOsToModelMapperTest {
         initiativeDTO = createStep5InitiativeDTO();
         initiativeExpected = createStep5Initiative();
 
-        Mockito.when(aesTokenService.encrypt(API_KEY_CLIENT_ID)).thenReturn(ENCRYPTED_API_KEY_CLIENT_ID);
-        Mockito.when(aesTokenService.encrypt(API_KEY_CLIENT_ASSERTION)).thenReturn(ENCRYPTED_API_KEY_CLIENT_ASSERTION);
+        when(aesTokenService.encrypt(API_KEY_CLIENT_ID)).thenReturn(ENCRYPTED_API_KEY_CLIENT_ID);
+        when(aesTokenService.encrypt(API_KEY_CLIENT_ASSERTION)).thenReturn(ENCRYPTED_API_KEY_CLIENT_ASSERTION);
     }
 
     @Test
@@ -379,6 +383,16 @@ class InitiativeDTOsToModelMapperTest {
         assertEquals(initiativeOnlyRefundRule3, initiative);
     }
 
+    @Test
+    void toInitiativeGeneral_withProductType() {
+        InitiativeGeneralDTO initiativeGeneral = createStep1InitiativeInfoDTOonlyInfoGeneral();
+        initiativeGeneral.setProductTypeBudget(Map.of("CODE", BigDecimal.valueOf(100L)));
+        Initiative initiativeActual = initiativeDTOsToModelMapper.toInitiative(initiativeGeneral);
+
+        assertNotNull(initiativeActual.getGeneral());
+        assertEquals(Map.of("CODE", 10000L), initiativeActual.getGeneral().getProductTypeBudgetCents());
+    }
+
     private void createInitiativeBaseFields(Initiative initiative) {
         initiative.setInitiativeId("Id1");
         initiative.setInitiativeName("initiativeName1");
@@ -557,6 +571,8 @@ class InitiativeDTOsToModelMapperTest {
         language.put(Locale.ITALIAN.getLanguage(), "it");
 
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
+        initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
+        initiativeGeneralDTO.setBeneficiaryBudgetMax(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
@@ -579,6 +595,8 @@ class InitiativeDTOsToModelMapperTest {
         language.put(Locale.ITALIAN.getLanguage(), "it");
 
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
+        initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
+        initiativeGeneralDTO.setBeneficiaryBudgetMax(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.NF);
         initiativeGeneralDTO.setFamilyUnitComposition("INPS");

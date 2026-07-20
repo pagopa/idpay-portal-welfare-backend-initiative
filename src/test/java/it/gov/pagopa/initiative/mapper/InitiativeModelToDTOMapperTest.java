@@ -29,7 +29,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.test.context.ContextConfiguration;
@@ -37,6 +36,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -44,6 +44,7 @@ import java.time.LocalTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ContextConfiguration(classes = {InitiativeModelToDTOMapper.class})
@@ -99,7 +100,7 @@ class InitiativeModelToDTOMapperTest {
     private InitiativeDTO initiativeStep2DTOFamilyUnitNotNull;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         fullInitiative = createFullInitiative();
         Initiative fullInitiative2 = createFullInitiative2();
         initiativeList = new ArrayList<>();
@@ -137,8 +138,8 @@ class InitiativeModelToDTOMapperTest {
         initiativeStep2FamilyUnitNotNull = createStep2InitiativeFamilyUnitNotNull();
         initiativeStep2DTOFamilyUnitNotNull = createStep2InitiativeDTOFamilyUnitNotNull();
 
-        Mockito.when(aesTokenServiceMock.decrypt(ENCRYPTED_API_KEY_CLIENT_ID)).thenReturn(API_KEY_CLIENT_ID);
-        Mockito.when(aesTokenServiceMock.decrypt(ENCRYPTED_API_KEY_CLIENT_ASSERTION)).thenReturn(API_KEY_CLIENT_ASSERTION);
+        when(aesTokenServiceMock.decrypt(ENCRYPTED_API_KEY_CLIENT_ID)).thenReturn(API_KEY_CLIENT_ID);
+        when(aesTokenServiceMock.decrypt(ENCRYPTED_API_KEY_CLIENT_ASSERTION)).thenReturn(API_KEY_CLIENT_ASSERTION);
     }
 
     @Test
@@ -153,9 +154,8 @@ class InitiativeModelToDTOMapperTest {
         initiative.getAdditionalInfo().setLogoFileName("logo.png");
         Locale acceptLanguage = Locale.ENGLISH;
 
-        Mockito.when(initiativeUtilsMock.createLogoUrl(initiative.getOrganizationId(), initiative.getInitiativeId()))
-                .thenReturn("https://test" + String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE,
-                        initiative.getOrganizationId(), initiative.getInitiativeId(), InitiativeConstants.Logo.LOGO_NAME));
+        when(initiativeUtilsMock.createLogoUrl(initiative.getOrganizationId(), initiative.getInitiativeId())).thenReturn("https://test" + String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE,
+                initiative.getOrganizationId(),initiative.getInitiativeId(), InitiativeConstants.Logo.LOGO_NAME));
 
         InitiativeDataDTO initiativeDataDTO = initiativeModelToDTOMapper.toInitiativeDataDTO(initiative, acceptLanguage);
 
@@ -167,7 +167,7 @@ class InitiativeModelToDTOMapperTest {
         assertEquals(initiative.getAdditionalInfo().getTcLink(), initiativeDataDTO.getTcLink());
         assertEquals(initiative.getAdditionalInfo().getPrivacyLink(), initiativeDataDTO.getPrivacyLink());
         assertEquals("https://test" + String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE,
-                initiative.getOrganizationId(), initiative.getInitiativeId(), InitiativeConstants.Logo.LOGO_NAME), initiativeDataDTO.getLogoURL());
+                initiative.getOrganizationId(),initiative.getInitiativeId(), InitiativeConstants.Logo.LOGO_NAME), initiativeDataDTO.getLogoURL());
     }
 
     @Test
@@ -188,6 +188,7 @@ class InitiativeModelToDTOMapperTest {
         assertEquals(initiative.getAdditionalInfo().getTcLink(), initiativeDataDTO.getTcLink());
         assertEquals(initiative.getAdditionalInfo().getPrivacyLink(), initiativeDataDTO.getPrivacyLink());
         assertNull(initiativeDataDTO.getLogoURL());
+
     }
 
     @Test
@@ -218,7 +219,7 @@ class InitiativeModelToDTOMapperTest {
 
         try {
             initiativeModelToDTOMapper.toInitiativeDataDTO(initiative, language);
-        } catch (Exception e) {
+        } catch (Exception e){
             Assertions.assertTrue(e.getMessage().contains("null"));
         }
     }
@@ -328,7 +329,7 @@ class InitiativeModelToDTOMapperTest {
         fullInitiative.setAdditionalInfo(createInitiativeAdditional());
         fullInitiative.getAdditionalInfo().setLogoFileName("test.png");
 
-        Mockito.when(initiativeUtilsMock.createLogoUrl(anyString(), anyString())).thenReturn("test.it");
+        when(initiativeUtilsMock.createLogoUrl(anyString(),anyString())).thenReturn("test.it");
 
         InitiativeDTO initiativeDTOExpected = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiative, true);
 
@@ -338,92 +339,85 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void toInitiativeDetailDTO_equals() {
         Locale acceptLanguage = Locale.ITALIAN;
-        fullInitiative.setUpdateDate(LocalDateTime.of(2023, 3, 20, 12, 0));
-        InitiativeDetailDTO initiativeDetailDTO = initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative, acceptLanguage, false);
+        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0));
+        InitiativeDetailDTO initiativeDetailDTO = initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative,acceptLanguage, false);
 
         assertEquals(fullInitiativeDetailDTO, initiativeDetailDTO);
     }
-
     @Test
     void toInitiativeDetailDTO_rewardNull() {
         Locale acceptLanguage = Locale.ITALIAN;
-        fullInitiative.setUpdateDate(LocalDateTime.of(2023, 3, 20, 12, 0));
+        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0));
         fullInitiative.setRewardRule(null);
         fullInitiativeDetailDTO.setRewardRule(null);
 
-        InitiativeDetailDTO initiativeDetailDTO = initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative, acceptLanguage, false);
+        InitiativeDetailDTO initiativeDetailDTO = initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative,acceptLanguage, false);
 
         assertEquals(fullInitiativeDetailDTO, initiativeDetailDTO);
     }
-
     @Test
     void toInitiativeDetailDTO_withRewardGroups() {
         Locale acceptLanguage = Locale.ITALIAN;
-        fullInitiative.setUpdateDate(LocalDateTime.of(2023, 3, 20, 12, 0));
+        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0));
         fullInitiative.setRewardRule(createInitiativeRewardRuleRewardGroup());
         InitiativeRewardRuleDTO rewardGroup = createInitiativeRewardRuleDTORewardGroupDTO();
         ((RewardGroupsDTO) rewardGroup).setType(null);
         fullInitiativeDetailDTO.setRewardRule(rewardGroup);
 
-        InitiativeDetailDTO initiativeDetailDTO = initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative, acceptLanguage, false);
+        InitiativeDetailDTO initiativeDetailDTO = initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative,acceptLanguage, false);
 
         assertEquals(fullInitiativeDetailDTO, initiativeDetailDTO);
     }
-
     @Test
     void toInitiativeDetailDTO_refundRule() {
         Locale acceptLanguage = Locale.ITALIAN;
-        fullInitiative.setUpdateDate(LocalDateTime.of(2023, 3, 20, 12, 0));
+        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0));
         fullInitiative.setRefundRule(createRefundRuleValidWithTimeParameter());
         fullInitiativeDetailDTO.setRefundRule(createRefundRuleDTOValidWithTimeParameterAndAdditionalNull());
-        InitiativeDetailDTO initiativeDetailDTO = initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative, acceptLanguage, false);
+        InitiativeDetailDTO initiativeDetailDTO = initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative,acceptLanguage, false);
 
         assertEquals(fullInitiativeDetailDTO, initiativeDetailDTO);
     }
-
     @Test
-    void toInitiativeDetailDTOAdditionalInfo_Null() {
+    void toInitiativeDetailDTOAdditionalInfo_Null () {
         Locale acceptLanguage = Locale.ITALIAN;
         fullInitiative.setAdditionalInfo(null);
         try {
-            initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative, acceptLanguage, false);
+            initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative,acceptLanguage, false);
         } catch (Exception e) {
             Assertions.assertTrue(e.getMessage().contains("null"));
         }
     }
-
     @Test
     void toInitiativeDetailDTOWithLogoURL() {
         Locale acceptLanguage = Locale.ITALIAN;
         fullInitiative.getAdditionalInfo().setLogoFileName("test.png");
 
-        Mockito.when(initiativeUtilsMock.createLogoUrl(anyString(), anyString())).thenReturn("test.it");
+        when(initiativeUtilsMock.createLogoUrl(anyString(),anyString())).thenReturn("test.it");
 
-        InitiativeDetailDTO initiativeDetailDTO = initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative, acceptLanguage, false);
+        InitiativeDetailDTO initiativeDetailDTO = initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative,acceptLanguage, false);
 
         assertEquals("test.it", initiativeDetailDTO.getLogoURL());
     }
-
     @Test
     void toInitiativeDetailDTOWithGeneralInfo_Null() {
         Locale acceptLanguage = Locale.ITALIAN;
-        fullInitiative.setUpdateDate(LocalDateTime.of(2023, 3, 20, 12, 0));
+        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0));
         fullInitiative.setGeneral(null);
         try {
-            initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative, acceptLanguage, false);
+            initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative,acceptLanguage, false);
         } catch (Exception e) {
             Assertions.assertTrue(e.getMessage().contains("null"));
         }
     }
-
     @Test
     void toInitiativeDetailDTOWithRuleDescription_Null() {
         Locale acceptLanguage = Locale.ITALIAN;
-        fullInitiative.setUpdateDate(LocalDateTime.of(2023, 3, 20, 12, 0));
+        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0));
         fullInitiative.getGeneral().setDescriptionMap(null);
         fullInitiativeDetailDTO.setRuleDescription(StringUtils.EMPTY);
 
-        InitiativeDetailDTO initiativeDetailDTO = initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative, acceptLanguage, false);
+        InitiativeDetailDTO initiativeDetailDTO = initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative,acceptLanguage, false);
 
         assertEquals(fullInitiativeDetailDTO, initiativeDetailDTO);
     }
@@ -431,11 +425,11 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void toInitiativeDetailDTO_nullStartAndEndDate() {
         Locale acceptLanguage = Locale.ITALIAN;
-        fullInitiative.setUpdateDate(LocalDateTime.of(2023, 3, 20, 12, 0));
+        fullInitiative.setUpdateDate(LocalDateTime.of(2023,3,20,12,0));
         fullInitiative.getGeneral().setRankingStartDate(null);
         fullInitiative.getGeneral().setRankingEndDate(null);
 
-        InitiativeDetailDTO initiativeDetailDTO = initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative, acceptLanguage, false);
+        InitiativeDetailDTO initiativeDetailDTO = initiativeModelToDTOMapper.toInitiativeDetailDTO(fullInitiative,acceptLanguage, false);
 
         assertEquals(fullInitiative.getGeneral().getStartDate(), initiativeDetailDTO.getFruitionStartDate());
         assertEquals(fullInitiative.getGeneral().getEndDate(), initiativeDetailDTO.getFruitionEndDate());
@@ -574,6 +568,7 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void testToInitiativeIssuerDTOList_OK() {
         Initiative initiative = createFullInitiative();
+
         ArrayList<Initiative> localInitiativeList = new ArrayList<>();
         localInitiativeList.add(initiative);
 
@@ -604,7 +599,7 @@ class InitiativeModelToDTOMapperTest {
         ArrayList<Initiative> localInitiativeList = new ArrayList<>();
         localInitiativeList.add(initiative);
 
-        Mockito.when(initiativeUtilsMock.createLogoUrl(initiative.getOrganizationId(), initiative.getInitiativeId()))
+        when(initiativeUtilsMock.createLogoUrl(initiative.getOrganizationId(), initiative.getInitiativeId()))
                 .thenReturn("https://test" + String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE,
                         initiative.getOrganizationId(), initiative.getInitiativeId(), InitiativeConstants.Logo.LOGO_NAME));
 
@@ -634,7 +629,7 @@ class InitiativeModelToDTOMapperTest {
         ArrayList<Initiative> localInitiativeList = new ArrayList<>();
         localInitiativeList.add(initiative);
 
-        Mockito.when(initiativeUtilsMock.createLogoUrl(initiative.getOrganizationId(), initiative.getInitiativeId()))
+        when(initiativeUtilsMock.createLogoUrl(initiative.getOrganizationId(), initiative.getInitiativeId()))
                 .thenReturn("https://test" + String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE,
                         initiative.getOrganizationId(), initiative.getInitiativeId(), InitiativeConstants.Logo.LOGO_NAME));
 
@@ -667,7 +662,7 @@ class InitiativeModelToDTOMapperTest {
 
         ArrayList<Initiative> localInitiativeList = new ArrayList<>();
         localInitiativeList.add(initiative);
-        Mockito.when(initiativeUtilsMock.createLogoUrl(initiative.getOrganizationId(), initiative.getInitiativeId()))
+        when(initiativeUtilsMock.createLogoUrl(initiative.getOrganizationId(), initiative.getInitiativeId()))
                 .thenReturn("https://test" + String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE,
                         initiative.getOrganizationId(), initiative.getInitiativeId(), InitiativeConstants.Logo.LOGO_NAME));
 
@@ -680,7 +675,7 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void testToRewardRuleDTO() {
         Initiative initiative = createStep3Initiative();
-        Mockito.when(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true).getRewardRule()).thenReturn(null);
+        when(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true).getRewardRule()).thenReturn(null);
         assertNull(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true).getRewardRule());
     }
 
@@ -692,7 +687,7 @@ class InitiativeModelToDTOMapperTest {
     }
 
     @Test
-    void testToInitiativeDataDto_onlyRuleDescription() {
+    void testToInitiativeDataDto_onlyRuleDescription(){
         Initiative initiative = createFullInitiative();
 
         InitiativeDetailDTO result = initiativeModelToDTOMapper.toInitiativeDetailDTO(initiative, Locale.ITALIAN, true);
@@ -700,6 +695,16 @@ class InitiativeModelToDTOMapperTest {
         assertNotNull(result.getRuleDescription());
         assertNotNull(result.getServiceId());
         assertNull(result.getDescription());
+    }
+
+    @Test
+    void toInitiativeGeneral_withProductType() {
+        Initiative initiative = createFullInitiative();
+        initiative.getGeneral().setProductTypeBudgetCents(Map.of("CODE", 100L));
+        InitiativeDTO initiativeActual = initiativeModelToDTOMapper.toInitiativeDTO(initiative, false);
+
+        assertNotNull(initiativeActual.getGeneral());
+        assertEquals(Map.of("CODE", BigDecimal.valueOf(1).setScale(2, RoundingMode.HALF_DOWN)), initiativeActual.getGeneral().getProductTypeBudget());
     }
 
     private Initiative createFullInitiative() {
@@ -711,11 +716,9 @@ class InitiativeModelToDTOMapperTest {
         initiative2.getGeneral().setRankingEnabled(Boolean.FALSE);
         return initiative2;
     }
-
     private InitiativeDTO createFullInitiativeDTO() {
         return createStep5InitiativeDTO();
     }
-
     private Initiative createStep1Initiative() {
         Initiative initiative = new Initiative();
         initiative.setInitiativeId("Id1");
@@ -967,8 +970,11 @@ class InitiativeModelToDTOMapperTest {
         InitiativeSummaryDTO initiativeSummaryDTO = new InitiativeSummaryDTO();
         initiativeSummaryDTO.setInitiativeId("Id1");
         initiativeSummaryDTO.setInitiativeName("initiativeName1");
+        initiativeSummaryDTO.setServiceId("SERVICE_ID");
         initiativeSummaryDTO.setStatus("DRAFT");
         initiativeSummaryDTO.setInitiativeRewardType("REFUND");
+        initiativeSummaryDTO.setStartDate(LocalDate.now().plusDays(2));
+        initiativeSummaryDTO.setEndDate(LocalDate.now().plusDays(3));
         return initiativeSummaryDTO;
     }
 
@@ -976,9 +982,12 @@ class InitiativeModelToDTOMapperTest {
         InitiativeSummaryDTO initiativeSummaryDTO2 = new InitiativeSummaryDTO();
         initiativeSummaryDTO2.setInitiativeId("Id1");
         initiativeSummaryDTO2.setInitiativeName("initiativeName1");
+        initiativeSummaryDTO2.setServiceId("SERVICE_ID");
         initiativeSummaryDTO2.setStatus("DRAFT");
         initiativeSummaryDTO2.setRankingEnabled(Boolean.FALSE);
         initiativeSummaryDTO2.setInitiativeRewardType("REFUND");
+        initiativeSummaryDTO2.setStartDate(LocalDate.now().plusDays(2));
+        initiativeSummaryDTO2.setEndDate(LocalDate.now().plusDays(3));
         return initiativeSummaryDTO2;
     }
 
@@ -1130,14 +1139,31 @@ class InitiativeModelToDTOMapperTest {
 
     private InitiativeTrxConditionsDTO createInitiativeTrxConditionsDTODayOfWeekNull() {
         InitiativeTrxConditionsDTO initiativeTrxConditionsDTO = new InitiativeTrxConditionsDTO();
+        List<DayOfWeekDTO.DayConfig> dayConfigs = new ArrayList<>();
+        DayOfWeekDTO.DayConfig dayConfig1 = new DayOfWeekDTO.DayConfig();
+        Set<DayOfWeek> dayOfWeeks = new HashSet<>();
+        dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
+        dayOfWeeks.add(DayOfWeek.THURSDAY);
+        dayConfig1.setDaysOfWeek(dayOfWeeks);
+        List<DayOfWeekDTO.Interval> intervals = new ArrayList<>();
+        DayOfWeekDTO.Interval interval1 = new DayOfWeekDTO.Interval();
+        LocalTime t1 = LocalTime.of(6, 0, 0);
+        LocalTime t2 = LocalTime.of(12, 0, 0);
+        interval1.setStartTime(t1);
+        interval1.setEndTime(t2);
+        intervals.add(interval1);
+        dayConfig1.setIntervals(intervals);
+        dayConfigs.add(dayConfig1);
 
         ThresholdDTO thresholdDTO = new ThresholdDTO();
+
         thresholdDTO.setFrom(new BigDecimal("10.00"));
         thresholdDTO.setFromIncluded(true);
         thresholdDTO.setTo(new BigDecimal("30.00"));
         thresholdDTO.setToIncluded(true);
 
         TrxCountDTO trxCountDTO = new TrxCountDTO();
+
         trxCountDTO.setFrom(10L);
         trxCountDTO.setFromIncluded(true);
         trxCountDTO.setTo(30L);
@@ -1506,6 +1532,21 @@ class InitiativeModelToDTOMapperTest {
 
     private InitiativeTrxConditions createInitiativeTrxConditionsDayOfWeekNull() {
         InitiativeTrxConditions initiativeTrxConditions = new InitiativeTrxConditions();
+        List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig> dayConfigs = new ArrayList<>();
+        it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig dayConfig1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.DayConfig();
+        Set<DayOfWeek> dayOfWeeks = new HashSet<>();
+        dayOfWeeks.add(java.time.DayOfWeek.MONDAY);
+        dayOfWeeks.add(DayOfWeek.THURSDAY);
+        dayConfig1.setDaysOfWeek(dayOfWeeks);
+        List<it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval> intervals = new ArrayList<>();
+        it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval interval1 = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek.Interval();
+        LocalTime t1 = LocalTime.of(6, 0, 0);
+        LocalTime t2 = LocalTime.of(12, 0, 0);
+        interval1.setStartTime(t1);
+        interval1.setEndTime(t2);
+        intervals.add(interval1);
+        dayConfig1.setIntervals(intervals);
+        dayConfigs.add(dayConfig1);
 
         Threshold threshold = new Threshold();
         threshold.setFromCents(1000L);
