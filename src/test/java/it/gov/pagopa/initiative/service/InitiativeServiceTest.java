@@ -1165,11 +1165,9 @@ class InitiativeServiceTest {
                         anyString());
         //Execute the method on your system under test
         //You are expecting FeignException to be caught otherwise the test fail
-        try {
+        assertDoesNotThrow(() -> {
             initiativeService.updateInitiativeApprovedStatus(ORGANIZATION_ID, INITIATIVE_ID, PAGOPA_ADMIN);
-        } catch (FeignException e) {
-            Assertions.fail();
-        }
+        });
     }
 
     @Test
@@ -1233,10 +1231,9 @@ class InitiativeServiceTest {
         doThrow(new FeignException.BadRequest("", request, new byte[0], null))
                 .when(emailNotificationService).sendInitiativeToPagoPA(any(), anyString(),
                         anyString());
-        try {
+        assertDoesNotThrow(() -> {
             initiativeService.logicallyDeleteInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
-        } catch (FeignException e) {
-            Assertions.fail();}
+        });
     }
 
     @Test
@@ -1311,10 +1308,9 @@ class InitiativeServiceTest {
                         anyString());
         //Execute the method on your system under test
         //You are expecting FeignException to be caught otherwise the test fail
-        try {
+        assertDoesNotThrow(() -> {
             initiativeService.updateInitiativeToCheckStatus(ORGANIZATION_ID, INITIATIVE_ID, PAGOPA_ADMIN);
-        } catch (FeignException e) {
-            Assertions.fail();}
+        });
     }
 
     @Test
