@@ -1877,7 +1877,7 @@ class InitiativeServiceTest {
 
     @Test
     void getTokenKeys_ok(){
-        try{
+        assertDoesNotThrow(() -> {
             KeysDTO expectedKeysDTO= KeysDTO.builder()
                     .primaryKey("key1")
                     .secondaryKey("key2")
@@ -1888,9 +1888,7 @@ class InitiativeServiceTest {
             when(ioManageBackEndRestConnector.getServiceKeys("test")).thenReturn(expectedKeysDTO);
             KeysDTO actualKeysDTO = initiativeService.getTokenKeys(INITIATIVE_ID);
             assertEquals(expectedKeysDTO, actualKeysDTO);
-        } catch (Exception e) {
-            Assertions.fail();
-        }
+        });
     }
 
     @Test
