@@ -59,8 +59,8 @@ public class InitiativeDTOsToModelMapper {
         if (generalDTO == null) {
             return null;
         }
-        return InitiativeGeneral.builder().beneficiaryBudgetCents(euroToCents(generalDTO.getBeneficiaryBudget()))
-                .beneficiaryBudgetMaxCents(euroToCents(generalDTO.getBeneficiaryBudgetMax()))
+        return InitiativeGeneral.builder()
+                .beneficiaryBudgetFixedCents(euroToCents(generalDTO.getBeneficiaryBudgetFixed()))
                 .beneficiaryKnown(generalDTO.getBeneficiaryKnown())
                 .beneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.valueOf(generalDTO.getBeneficiaryType().name()))
                 .familyUnitComposition(generalDTO.getFamilyUnitComposition()!=null?generalDTO.getFamilyUnitComposition():null)
@@ -164,7 +164,6 @@ public class InitiativeDTOsToModelMapper {
                                 .code(selfCriteriaMultiConsentDTO.getCode())
                                 .description(selfCriteriaMultiConsentDTO.getDescription())
                                 .subDescription(selfCriteriaMultiConsentDTO.getSubDescription())
-                                .thresholdCode(selfCriteriaMultiConsentDTO.getThresholdCode())
                                 .value(selfCriteriaMultiConsentDTO.getValue())
                                 .build();
                     }

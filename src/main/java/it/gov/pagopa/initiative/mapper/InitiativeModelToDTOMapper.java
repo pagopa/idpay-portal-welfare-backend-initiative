@@ -29,12 +29,10 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
 
-
 @Component
 public class InitiativeModelToDTOMapper {
 
     private final AESTokenService aesTokenService;
-
     private final InitiativeUtils initiativeUtils;
 
     public InitiativeModelToDTOMapper(AESTokenService aesTokenService, InitiativeUtils initiativeUtils) {
@@ -46,19 +44,24 @@ public class InitiativeModelToDTOMapper {
         if (initiative == null) {
             return null;
         }
+
         String description = StringUtils.EMPTY;
         String logoURL = null;
+
         if (initiative.getGeneral() != null && initiative.getGeneral().getDescriptionMap() != null) {
-            //if no description for the given accepted language, try the default to italian
             description = StringUtils.defaultString(
                     initiative.getGeneral().getDescriptionMap().get(acceptLanguage.getLanguage()),
                     initiative.getGeneral().getDescriptionMap().get(Locale.ITALIAN.getLanguage())
             );
         }
-        if(initiative.getAdditionalInfo() != null && initiative.getAdditionalInfo().getLogoFileName() != null){
-            logoURL = initiativeUtils.createLogoUrl(initiative.getOrganizationId(),
-                    initiative.getInitiativeId());
+
+        if (initiative.getAdditionalInfo() != null && initiative.getAdditionalInfo().getLogoFileName() != null) {
+            logoURL = initiativeUtils.createLogoUrl(
+                    initiative.getOrganizationId(),
+                    initiative.getInitiativeId()
+            );
         }
+
         return InitiativeDataDTO.builder()
                 .initiativeId(initiative.getInitiativeId())
                 .initiativeName(initiative.getInitiativeName())
@@ -72,39 +75,46 @@ public class InitiativeModelToDTOMapper {
                 .build();
     }
 
-    public  InitiativeDetailDTO toInitiativeDetailDTO(Initiative initiative,Locale acceptLanguage, Boolean viewMinimalInfo) {
+    public InitiativeDetailDTO toInitiativeDetailDTO(Initiative initiative, Locale acceptLanguage, Boolean viewMinimalInfo) {
         String ruleDescription = StringUtils.EMPTY;
         String logoURL = null;
+
         if (initiative.getGeneral() != null && initiative.getGeneral().getDescriptionMap() != null) {
-            //if no description for the given accepted language, try the default to italian
             ruleDescription = StringUtils.defaultString(
                     initiative.getGeneral().getDescriptionMap().get(acceptLanguage.getLanguage()),
                     initiative.getGeneral().getDescriptionMap().get(Locale.ITALIAN.getLanguage())
             );
-            if(Boolean.TRUE.equals(viewMinimalInfo)){
+
+            if (Boolean.TRUE.equals(viewMinimalInfo)) {
                 return InitiativeDetailDTO.builder()
                         .ruleDescription(ruleDescription)
                         .serviceId(initiative.getAdditionalInfo().getServiceId())
                         .build();
             }
         }
-        if(initiative.getAdditionalInfo() != null && initiative.getAdditionalInfo().getLogoFileName() != null){
-            logoURL = initiativeUtils.createLogoUrl(initiative.getOrganizationId(),
-                    initiative.getInitiativeId());
+
+        if (initiative.getAdditionalInfo() != null && initiative.getAdditionalInfo().getLogoFileName() != null) {
+            logoURL = initiativeUtils.createLogoUrl(
+                    initiative.getOrganizationId(),
+                    initiative.getInitiativeId()
+            );
         }
+
         return InitiativeDetailDTO.builder()
                 .initiativeName(initiative.getInitiativeName())
                 .status(initiative.getStatus())
                 .description(initiative.getAdditionalInfo().getDescription())
                 .ruleDescription(ruleDescription)
-                .onboardingStartDate(initiative.getGeneral().getRankingStartDate() != null ?
-                        initiative.getGeneral().getRankingStartDate() : initiative.getGeneral().getStartDate())
-                .onboardingEndDate(initiative.getGeneral().getRankingEndDate() != null ?
-                        initiative.getGeneral().getRankingEndDate() : initiative.getGeneral().getEndDate())
+                .onboardingStartDate(initiative.getGeneral().getRankingStartDate() != null
+                        ? initiative.getGeneral().getRankingStartDate()
+                        : initiative.getGeneral().getStartDate())
+                .onboardingEndDate(initiative.getGeneral().getRankingEndDate() != null
+                        ? initiative.getGeneral().getRankingEndDate()
+                        : initiative.getGeneral().getEndDate())
                 .fruitionStartDate(initiative.getGeneral().getStartDate())
                 .fruitionEndDate(initiative.getGeneral().getEndDate())
                 .rewardRule(this.toRewardRuleDTOWithoutType(initiative.getRewardRule()))
-                .refundRule(this.toInitiativeRefundRuleDTOWithoutAdditionalInfo((initiative.getRefundRule())))
+                .refundRule(this.toInitiativeRefundRuleDTOWithoutAdditionalInfo(initiative.getRefundRule()))
                 .privacyLink(initiative.getAdditionalInfo().getPrivacyLink())
                 .tcLink(initiative.getAdditionalInfo().getTcLink())
                 .logoURL(logoURL)
@@ -117,6 +127,7 @@ public class InitiativeModelToDTOMapper {
         if (initiative == null) {
             return null;
         }
+
         InitiativeDTO initiativeDto = this.toDtoOnlyId(initiative);
         initiativeDto.setInitiativeName(initiative.getInitiativeName());
         initiativeDto.setStatus(checkEndDate ? InitiativeUtils.checkEndDateToSetStatus(initiative) : initiative.getStatus());
@@ -127,11 +138,14 @@ public class InitiativeModelToDTOMapper {
         initiativeDto.setGeneral(this.toInitiativeGeneralDTO(initiative.getGeneral()));
         initiativeDto.setAdditionalInfo(this.toInitiativeAdditionalDTO(initiative.getAdditionalInfo()));
         initiativeDto.setIsLogoPresent(false);
-        if(initiativeDto.getAdditionalInfo() != null && initiativeDto.getAdditionalInfo().getLogoFileName() != null){
-            initiativeDto.getAdditionalInfo().setLogoURL(initiativeUtils.createLogoUrl(initiative.getOrganizationId(),
-                    initiative.getInitiativeId()));
+
+        if (initiativeDto.getAdditionalInfo() != null && initiativeDto.getAdditionalInfo().getLogoFileName() != null) {
+            initiativeDto.getAdditionalInfo().setLogoURL(
+                    initiativeUtils.createLogoUrl(initiative.getOrganizationId(), initiative.getInitiativeId())
+            );
             initiativeDto.setIsLogoPresent(true);
         }
+
         initiativeDto.setBeneficiaryRule(this.toInitiativeBeneficiaryRuleDTO(initiative.getBeneficiaryRule()));
         initiativeDto.setInitiativeRewardType(initiative.getInitiativeRewardType());
         initiativeDto.setRewardRule(this.toRewardRuleDTO(initiative.getRewardRule()));
@@ -160,8 +174,7 @@ public class InitiativeModelToDTOMapper {
             return null;
         }
         return InitiativeGeneralDTO.builder()
-                .beneficiaryBudget(centsToEuro(general.getBeneficiaryBudgetCents()))
-                .beneficiaryBudgetMax(centsToEuro(general.getBeneficiaryBudgetMaxCents()))
+                .beneficiaryBudgetFixed(general.getBeneficiaryBudgetFixedCents() != null ? centsToEuro(general.getBeneficiaryBudgetFixedCents()) : null)
                 .beneficiaryKnown(general.getBeneficiaryKnown())
                 .beneficiaryType(general.getBeneficiaryType()!=null?InitiativeGeneralDTO.BeneficiaryTypeEnum.valueOf(general.getBeneficiaryType().name()):null)
                 .familyUnitComposition(general.getFamilyUnitComposition()!=null?general.getFamilyUnitComposition():null)
@@ -203,20 +216,20 @@ public class InitiativeModelToDTOMapper {
     private List<ChannelDTO> toChannelsDTO(List<Channel> channels) {
         if (CollectionUtils.isEmpty(channels)) {
             return Collections.emptyList();
-        } else {
-            return channels.stream().map(channel ->
-                    ChannelDTO.builder()
-                            .type(ChannelDTO.TypeEnum.valueOf(channel.getType().name()))
-                            .contact(channel.getContact())
-                            .build()
-            ).toList();
         }
+        return channels.stream()
+                .map(channel -> ChannelDTO.builder()
+                        .type(ChannelDTO.TypeEnum.valueOf(channel.getType().name()))
+                        .contact(channel.getContact())
+                        .build())
+                .toList();
     }
 
     public InitiativeBeneficiaryRuleDTO toInitiativeBeneficiaryRuleDTO(InitiativeBeneficiaryRule beneficiaryRule) {
         if (beneficiaryRule == null) {
             return null;
         }
+
         InitiativeBeneficiaryRuleDTO beneficiaryRuleDto = new InitiativeBeneficiaryRuleDTO();
         beneficiaryRuleDto.setAutomatedCriteria(Optional.ofNullable(beneficiaryRule.getAutomatedCriteria())
                 .orElse(Collections.emptyList())
@@ -235,49 +248,54 @@ public class InitiativeModelToDTOMapper {
                                 .build()
                 ).toList());
 
-        beneficiaryRuleDto.setSelfDeclarationCriteria(Optional.ofNullable(beneficiaryRule.getSelfDeclarationCriteria())
-                .orElse(Collections.emptyList())
-                .stream().map(x -> {
-                    if (x instanceof SelfCriteriaBool selfCriteriaBool) {
-                        return SelfCriteriaBoolDTO.builder()
-                                .type(it.gov.pagopa.initiative.dto.TypeBoolEnum.valueOf(selfCriteriaBool.get_type().name()))
-                                .code(selfCriteriaBool.getCode())
-                                .description(selfCriteriaBool.getDescription())
-                                .subDescription(selfCriteriaBool.getSubDescription())
-                                .value(selfCriteriaBool.getValue())
-                                .build();
-                    } else if (x instanceof SelfCriteriaMulti selfCriteriaMulti) {
-                        return SelfCriteriaMultiDTO.builder()
-                                .type(it.gov.pagopa.initiative.dto.TypeMultiEnum.valueOf(selfCriteriaMulti.get_type().name()))
-                                .code(selfCriteriaMulti.getCode())
-                                .description(selfCriteriaMulti.getDescription())
-                                .subDescription(selfCriteriaMulti.getSubDescription())
-                                .value(selfCriteriaMulti.getValue())
-                                .build();
-                    } else if (x instanceof SelfCriteriaText selfCriteriaText) {
-                        return SelfCriteriaTextDTO.builder()
-                                .type(TypeTextEnum.valueOf(selfCriteriaText.get_type().name()))
-                                .code(selfCriteriaText.getCode())
-                                .description(selfCriteriaText.getDescription())
-                                .subDescription(selfCriteriaText.getSubDescription())
-                                .value(selfCriteriaText.getValue())
-                                .build();
-                    } else if (x instanceof SelfCriteriaMultiConsent selfCriteriaMultiConsent) {
-                        return SelfCriteriaMultiConsentDTO.builder()
-                                .type(TypeMultiConsentEnum.valueOf(selfCriteriaMultiConsent.get_type().name()))
-                                .code(selfCriteriaMultiConsent.getCode())
-                                .description(selfCriteriaMultiConsent.getDescription())
-                                .subDescription(selfCriteriaMultiConsent.getSubDescription())
-                                .thresholdCode(selfCriteriaMultiConsent.getThresholdCode())
-                                .value(selfCriteriaMultiConsent.getValue())
-                                .build();
-                    }
-                    return null;
-                }).toList());
-        if(beneficiaryRule.getApiKeyClientId() != null && beneficiaryRule.getApiKeyClientAssertion() != null) {
+        beneficiaryRuleDto.setSelfDeclarationCriteria(
+                Optional.ofNullable(beneficiaryRule.getSelfDeclarationCriteria())
+                        .orElse(Collections.emptyList())
+                        .stream()
+                        .map(x -> {
+                            if (x instanceof SelfCriteriaBool selfCriteriaBool) {
+                                return SelfCriteriaBoolDTO.builder()
+                                        .type(it.gov.pagopa.initiative.dto.TypeBoolEnum.valueOf(selfCriteriaBool.get_type().name()))
+                                        .code(selfCriteriaBool.getCode())
+                                        .description(selfCriteriaBool.getDescription())
+                                        .subDescription(selfCriteriaBool.getSubDescription())
+                                        .value(selfCriteriaBool.getValue())
+                                        .build();
+                            } else if (x instanceof SelfCriteriaMulti selfCriteriaMulti) {
+                                return SelfCriteriaMultiDTO.builder()
+                                        .type(it.gov.pagopa.initiative.dto.TypeMultiEnum.valueOf(selfCriteriaMulti.get_type().name()))
+                                        .code(selfCriteriaMulti.getCode())
+                                        .description(selfCriteriaMulti.getDescription())
+                                        .subDescription(selfCriteriaMulti.getSubDescription())
+                                        .value(selfCriteriaMulti.getValue())
+                                        .build();
+                            } else if (x instanceof SelfCriteriaText selfCriteriaText) {
+                                return SelfCriteriaTextDTO.builder()
+                                        .type(TypeTextEnum.valueOf(selfCriteriaText.get_type().name()))
+                                        .code(selfCriteriaText.getCode())
+                                        .description(selfCriteriaText.getDescription())
+                                        .subDescription(selfCriteriaText.getSubDescription())
+                                        .value(selfCriteriaText.getValue())
+                                        .build();
+                            } else if (x instanceof SelfCriteriaMultiConsent selfCriteriaMultiConsent) {
+                                return SelfCriteriaMultiConsentDTO.builder()
+                                        .type(TypeMultiConsentEnum.valueOf(selfCriteriaMultiConsent.get_type().name()))
+                                        .code(selfCriteriaMultiConsent.getCode())
+                                        .description(selfCriteriaMultiConsent.getDescription())
+                                        .subDescription(selfCriteriaMultiConsent.getSubDescription())
+                                        .value(selfCriteriaMultiConsent.getValue())
+                                        .build();
+                            }
+                            return null;
+                        })
+                        .toList()
+        );
+
+        if (beneficiaryRule.getApiKeyClientId() != null && beneficiaryRule.getApiKeyClientAssertion() != null) {
             beneficiaryRuleDto.setApiKeyClientId(aesTokenService.decrypt(beneficiaryRule.getApiKeyClientId()));
             beneficiaryRuleDto.setApiKeyClientAssertion(aesTokenService.decrypt(beneficiaryRule.getApiKeyClientAssertion()));
         }
+
         return beneficiaryRuleDto;
     }
 
@@ -361,6 +379,7 @@ public class InitiativeModelToDTOMapper {
                         initiativeMilDTO.setOnboardingEndDate(initiativeModel.getGeneral().getRankingEndDate());
                         initiativeMilDTO.setBeneficiaryKnown(initiativeModel.getGeneral().getBeneficiaryKnown());
                     }
+
                     initiativeMilDTO.setInitiativeId(initiativeModel.getInitiativeId());
                     initiativeMilDTO.setInitiativeName(StringUtils.isNotBlank(initiativeModel.getInitiativeName()) ?
                             initiativeModel.getInitiativeName() : serviceName);
@@ -371,7 +390,7 @@ public class InitiativeModelToDTOMapper {
                 }).toList();
     }
 
-    private Map<String,String> languageMap(Map<String,String> map){
+    private Map<String, String> languageMap(Map<String, String> map) {
         Map<String, String> descriptionItaEng = new HashMap<>();
         descriptionItaEng.put(Locale.ITALIAN.getLanguage(),
                 map.get(map.get(Locale.ITALIAN.getLanguage())));
@@ -386,7 +405,9 @@ public class InitiativeModelToDTOMapper {
         if (rewardRule == null) {
             return null;
         }
+
         InitiativeRewardRuleDTO dto = null;
+
         if (rewardRule instanceof RewardValue rewardValueInput) {
             dto = RewardValueDTO.builder()
                     .type(rewardValueInput.getType())

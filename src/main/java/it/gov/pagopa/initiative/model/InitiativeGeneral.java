@@ -19,8 +19,7 @@ public class InitiativeGeneral {
     private BeneficiaryTypeEnum beneficiaryType;
     private String familyUnitComposition;
     private Boolean beneficiaryKnown;
-    private Long beneficiaryBudgetCents;
-    private Long beneficiaryBudgetMaxCents;
+    private Long beneficiaryBudgetFixedCents;
     /**
      * Start of period of spending funds in an initiative
      */

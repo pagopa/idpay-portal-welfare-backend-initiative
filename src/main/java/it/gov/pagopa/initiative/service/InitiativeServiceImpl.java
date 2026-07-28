@@ -227,6 +227,8 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         }
         //Check Initiative Status
         isInitiativeAllowedToBeEditableThenThrows(initiative);
+        //check Initiative Self declaration criteria
+        checkSelfDeclarationCriteria(initiative, initiativeBeneficiaryRuleModel);
         initiative.setBeneficiaryRule(initiativeBeneficiaryRuleModel);
         initiative.setStatus(InitiativeConstants.Status.DRAFT);
         this.initiativeRepository.save(initiative);
