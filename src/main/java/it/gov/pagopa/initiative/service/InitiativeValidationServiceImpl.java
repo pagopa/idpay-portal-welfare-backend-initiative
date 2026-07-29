@@ -248,7 +248,7 @@ public class InitiativeValidationServiceImpl implements InitiativeValidationServ
                                     .formatted(initiative.getInitiativeId())
                     ));
 
-            if (initiative.getGeneral().getBeneficiaryBudgetMaxCents() < maxProductBudget) {
+            if (initiative.getGeneral().getBeneficiaryBudgetFixedCents() < maxProductBudget) {
                 throw new InitiativeProductTypeBudgetException(
                         "The beneficiary budget must be greater than or equal to the product type budget for initiative [%s]"
                                 .formatted(initiative.getInitiativeId()));

@@ -144,7 +144,6 @@ class InitiativeModelToDTOMapperTest {
 
     @Test
     void toInitiativeDataDTO_Null() {
-
         initiativeModelToDTOMapper.toInitiativeDataDTO(null, Locale.ITALIAN);
         assertNull(null);
     }
@@ -241,17 +240,17 @@ class InitiativeModelToDTOMapperTest {
         assertEquals(initiative.getAdditionalInfo().getPrivacyLink(), initiativeDataDTO.getPrivacyLink());
         assertNull(initiativeDataDTO.getLogoURL());
     }
+
     @Test
     void toInitiativeGeneralDTOBeneficiaryTypeNull() {
         InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(initiativeStep2BeneficiaryTypeNull, true);
         assertEquals(initiativeStep2DTOBeneficiaryTypeNull, initiativeDTO);
-
     }
+
     @Test
     void toInitiativeGeneralDTOFamilyUnitNotNull() {
         InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(initiativeStep2FamilyUnitNotNull, true);
         assertEquals(initiativeStep2DTOFamilyUnitNotNull, initiativeDTO);
-
     }
 
     @Test
@@ -317,10 +316,9 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void toInitiativeDTO_equals() {
         InitiativeDTO initiativeDTOtoBeVerified = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiative, true);
-
-        //Check the equality of the results
         assertEquals(fullInitiativeDTO, initiativeDTOtoBeVerified);
     }
+
     @Test
     void toInitiativeDTOIsLogoPresent_true() {
         InitiativeDTO initiativeDTO = createFullInitiativeDTO();
@@ -335,7 +333,7 @@ class InitiativeModelToDTOMapperTest {
 
         InitiativeDTO initiativeDTOExpected = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiative, true);
 
-        assertEquals(initiativeDTO,initiativeDTOExpected);
+        assertEquals(initiativeDTO, initiativeDTOExpected);
     }
 
     @Test
@@ -445,7 +443,6 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void toDtoOnlyId_equals() {
         InitiativeDTO initiativeDTOtoBeVerified = initiativeModelToDTOMapper.toDtoOnlyId(fullInitiative);
-        //Check the equality of the results
         assertEquals(fullInitiative.getInitiativeId(), initiativeDTOtoBeVerified.getInitiativeId());
     }
 
@@ -457,7 +454,6 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void toInitiativeBeneficiaryRuleDTO_equals() {
         InitiativeBeneficiaryRuleDTO initiativeBeneficiaryRuleDTOtoBeVerified = initiativeModelToDTOMapper.toInitiativeBeneficiaryRuleDTO(initiativeBeneficiaryRule);
-        //Check the equality of the results
         assertEquals(initiativeBeneficiaryRuleDTO, initiativeBeneficiaryRuleDTOtoBeVerified);
     }
 
@@ -465,7 +461,6 @@ class InitiativeModelToDTOMapperTest {
     void givenApiKeyClientIdNotPresent_toInitiativeDTO() {
         fullInitiative.getBeneficiaryRule().setApiKeyClientId(null);
         InitiativeDTO initiativeDTOActual = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiative, true);
-        //Check the equality of the results
         assertEquals(fullInitiative.getBeneficiaryRule().getApiKeyClientId(), initiativeDTOActual.getBeneficiaryRule().getApiKeyClientId());
     }
 
@@ -473,14 +468,12 @@ class InitiativeModelToDTOMapperTest {
     void givenApiKeyClientAssertionNotPresent_toInitiativeDTO() {
         fullInitiative.getBeneficiaryRule().setApiKeyClientAssertion(null);
         InitiativeDTO initiativeDTOActual = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiative, true);
-        //Check the equality of the results
         assertEquals(fullInitiative.getBeneficiaryRule().getApiKeyClientAssertion(), initiativeDTOActual.getBeneficiaryRule().getApiKeyClientAssertion());
     }
 
     @Test
     void toInitiativeAdditionalDTO() {
         Initiative initiative = createStep1Initiative();
-
         initiative.setAdditionalInfo(null);
         assertNull(initiativeModelToDTOMapper.toInitiativeDTO(initiative, true).getAdditionalInfo());
     }
@@ -549,6 +542,7 @@ class InitiativeModelToDTOMapperTest {
         initiativeSummaryDTOS.forEach(initiativeSummaryDTO ->
                 assertEquals(InitiativeConstants.Status.CLOSED, initiativeSummaryDTO.getStatus()));
     }
+
     @Test
     void toInitiativeSummaryDTOList_statusPUBLISHED() {
         Initiative step2Initiative = createFullInitiative();
@@ -563,7 +557,6 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void toInitiativeSummaryDTOList_equals() {
         List<InitiativeSummaryDTO> initiativeSummaryDTOListActual = initiativeModelToDTOMapper.toInitiativeSummaryDTOList(initiativeList);
-        //Check the equality of the results
         assertEquals(initiativeSummaryDTOList, initiativeSummaryDTOListActual);
     }
 
@@ -608,7 +601,7 @@ class InitiativeModelToDTOMapperTest {
 
         when(initiativeUtilsMock.createLogoUrl(initiative.getOrganizationId(), initiative.getInitiativeId()))
                 .thenReturn("https://test" + String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE,
-                        initiative.getOrganizationId(),initiative.getInitiativeId(), InitiativeConstants.Logo.LOGO_NAME));
+                        initiative.getOrganizationId(), initiative.getInitiativeId(), InitiativeConstants.Logo.LOGO_NAME));
 
         InitiativeMilDTO expectedDTO = InitiativeMilDTO.builder()
                 .initiativeId("Id1")
@@ -638,7 +631,7 @@ class InitiativeModelToDTOMapperTest {
 
         when(initiativeUtilsMock.createLogoUrl(initiative.getOrganizationId(), initiative.getInitiativeId()))
                 .thenReturn("https://test" + String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE,
-                        initiative.getOrganizationId(),initiative.getInitiativeId(), InitiativeConstants.Logo.LOGO_NAME));
+                        initiative.getOrganizationId(), initiative.getInitiativeId(), InitiativeConstants.Logo.LOGO_NAME));
 
         InitiativeMilDTO expectedDTO = InitiativeMilDTO.builder()
                 .initiativeId("Id1")
@@ -665,13 +658,13 @@ class InitiativeModelToDTOMapperTest {
         Map<String, String> language = new HashMap<>();
         language.put(Locale.ENGLISH.getLanguage(), "en");
         initiative.getGeneral().setDescriptionMap(language);
-        initiative.getAdditionalInfo().setLogoFileName("test.png") ;
+        initiative.getAdditionalInfo().setLogoFileName("test.png");
 
         ArrayList<Initiative> localInitiativeList = new ArrayList<>();
         localInitiativeList.add(initiative);
         when(initiativeUtilsMock.createLogoUrl(initiative.getOrganizationId(), initiative.getInitiativeId()))
                 .thenReturn("https://test" + String.format(InitiativeConstants.Logo.LOGO_PATH_TEMPLATE,
-                initiative.getOrganizationId(),initiative.getInitiativeId(), InitiativeConstants.Logo.LOGO_NAME));
+                        initiative.getOrganizationId(), initiative.getInitiativeId(), InitiativeConstants.Logo.LOGO_NAME));
 
         List<InitiativeIssuerDTO> initiativeIssuerDTOList = initiativeModelToDTOMapper.toInitiativeIssuerDTOList(localInitiativeList);
         assertEquals(1, initiativeIssuerDTOList.size());
@@ -688,10 +681,9 @@ class InitiativeModelToDTOMapperTest {
 
     @Test
     void testBeneficiaryView() {
-            Initiative step2Initiative = createStep2Initiative();
-
-            InitiativeDTO initiative = initiativeModelToDTOMapper.toInitiativeDTO(step2Initiative, false);
-                    assertEquals(InitiativeConstants.Status.DRAFT, initiative.getStatus());
+        Initiative step2Initiative = createStep2Initiative();
+        InitiativeDTO initiative = initiativeModelToDTOMapper.toInitiativeDTO(step2Initiative, false);
+        assertEquals(InitiativeConstants.Status.DRAFT, initiative.getStatus());
     }
 
     @Test
@@ -733,7 +725,6 @@ class InitiativeModelToDTOMapperTest {
         initiative.setInitiativeName("initiativeName1");
         initiative.setOrganizationId("organizationId1");
         initiative.setStatus("DRAFT");
-
         initiative.setAdditionalInfo(createInitiativeAdditional());
         return initiative;
     }
@@ -742,8 +733,6 @@ class InitiativeModelToDTOMapperTest {
         Map<String, String> language = new HashMap<>();
         language.put(Locale.ITALIAN.getLanguage(), ITALIAN_LANGUAGE);
         InitiativeGeneral initiativeGeneral = new InitiativeGeneral();
-        initiativeGeneral.setBeneficiaryBudgetCents(1000L);
-        initiativeGeneral.setBeneficiaryBudgetMaxCents(1000L);
         initiativeGeneral.setBeneficiaryKnown(true);
         initiativeGeneral.setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.PF);
         initiativeGeneral.setBudgetCents(100000000000L);
@@ -779,11 +768,13 @@ class InitiativeModelToDTOMapperTest {
 
     private InitiativeBeneficiaryRule createInitiativeBeneficiaryRule() {
         InitiativeBeneficiaryRule localInitiativeBeneficiaryRule = new InitiativeBeneficiaryRule();
+
         SelfCriteriaBool selfCriteriaBool = new SelfCriteriaBool();
         selfCriteriaBool.set_type(TypeBoolEnum.BOOLEAN);
         selfCriteriaBool.setCode("B001");
         selfCriteriaBool.setDescription("Desc_bool");
         selfCriteriaBool.setValue(true);
+
         SelfCriteriaMulti selfCriteriaMulti = new SelfCriteriaMulti();
         selfCriteriaMulti.set_type(TypeMultiEnum.MULTI);
         selfCriteriaMulti.setCode("B001");
@@ -792,20 +783,21 @@ class InitiativeModelToDTOMapperTest {
         values.add("valore1");
         values.add("valore2");
         selfCriteriaMulti.setValue(values);
+
         SelfCriteriaMultiConsent selfCriteriaMultiConsent = new SelfCriteriaMultiConsent();
         selfCriteriaMultiConsent.set_type(TypeMultiConsentEnum.MULTI_CONSENT);
         selfCriteriaMultiConsent.setCode("ISEE");
         selfCriteriaMultiConsent.setDescription("Desc_Multi_Consent");
         selfCriteriaMultiConsent.setSubDescription("Sub_Desc_Multi_Consent");
-        selfCriteriaMultiConsent.setThresholdCode("thresholdCode");
         List<SelfCriteriaMultiConsentValueDTO> selfCriteriaMultiConsentValueDTO = new ArrayList<>();
-        selfCriteriaMultiConsentValueDTO.add(new SelfCriteriaMultiConsentValueDTO("description", "subDescription", "1"));
         selfCriteriaMultiConsent.setValue(selfCriteriaMultiConsentValueDTO);
+
         SelfCriteriaText selfCriteriaText = new SelfCriteriaText();
         selfCriteriaText.set_type(TypeTextEnum.TEXT);
         selfCriteriaText.setCode("T001");
         selfCriteriaText.setDescription("Text");
         selfCriteriaText.setValue("valore libero");
+
         List<ISelfDeclarationCriteria> iSelfDeclarationCriteriaList = new ArrayList<>();
         iSelfDeclarationCriteriaList.add(selfCriteriaBool);
         iSelfDeclarationCriteriaList.add(selfCriteriaMulti);
@@ -813,6 +805,7 @@ class InitiativeModelToDTOMapperTest {
         iSelfDeclarationCriteriaList.add(selfCriteriaText);
         iSelfDeclarationCriteriaList.add(null);
         localInitiativeBeneficiaryRule.setSelfDeclarationCriteria(iSelfDeclarationCriteriaList);
+
         AutomatedCriteria automatedCriteria = new AutomatedCriteria();
         automatedCriteria.setAuthority("Authority_ISEE");
         automatedCriteria.setCode("Code_ISEE");
@@ -841,8 +834,6 @@ class InitiativeModelToDTOMapperTest {
         Map<String, String> language = new HashMap<>();
         language.put(Locale.ITALIAN.getLanguage(), ITALIAN_LANGUAGE);
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
-        initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal("10.00"));
-        initiativeGeneralDTO.setBeneficiaryBudgetMax(new BigDecimal("10.00"));
         initiativeGeneralDTO.setBeneficiaryKnown(true);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
         initiativeGeneralDTO.setBudget(new BigDecimal("1000000000.00"));
@@ -881,12 +872,14 @@ class InitiativeModelToDTOMapperTest {
         initiative.setGeneral(createInitiativeGeneral());
         return initiative;
     }
+
     private Initiative createStep2InitiativeBeneficiaryTypeNull() {
         Initiative initiative = createStep1Initiative();
         initiative.setGeneral(createInitiativeGeneral());
         initiative.getGeneral().setBeneficiaryType(null);
         return initiative;
     }
+
     private Initiative createStep2InitiativeFamilyUnitNotNull() {
         Initiative initiative = createStep1Initiative();
         initiative.setGeneral(createInitiativeGeneral());
@@ -900,6 +893,7 @@ class InitiativeModelToDTOMapperTest {
         initiativeDTO.setGeneral(createInitiativeGeneralDTO());
         return initiativeDTO;
     }
+
     private InitiativeDTO createStep2InitiativeDTOBeneficiaryTypeNull() {
         InitiativeDTO initiativeDTO = createStep1InitiativeDTO();
         initiativeDTO.setGeneral(createInitiativeGeneralDTO());
@@ -907,6 +901,7 @@ class InitiativeModelToDTOMapperTest {
         initiativeDTO.setIsLogoPresent(false);
         return initiativeDTO;
     }
+
     private InitiativeDTO createStep2InitiativeDTOFamilyUnitNotNull() {
         InitiativeDTO initiativeDTO = createStep1InitiativeDTO();
         initiativeDTO.setGeneral(createInitiativeGeneralDTO());
@@ -918,11 +913,13 @@ class InitiativeModelToDTOMapperTest {
 
     private InitiativeBeneficiaryRuleDTO createInitiativeBeneficiaryRuleDTO() {
         InitiativeBeneficiaryRuleDTO localInitiativeBeneficiaryRuleDTO = new InitiativeBeneficiaryRuleDTO();
+
         SelfCriteriaBoolDTO selfCriteriaBoolDTO = new SelfCriteriaBoolDTO();
         selfCriteriaBoolDTO.setType(it.gov.pagopa.initiative.dto.TypeBoolEnum.BOOLEAN);
         selfCriteriaBoolDTO.setCode("B001");
         selfCriteriaBoolDTO.setDescription("Desc_bool");
         selfCriteriaBoolDTO.setValue(true);
+
         SelfCriteriaMultiDTO selfCriteriaMultiDTO = new SelfCriteriaMultiDTO();
         selfCriteriaMultiDTO.setType(it.gov.pagopa.initiative.dto.TypeMultiEnum.MULTI);
         selfCriteriaMultiDTO.setCode("B001");
@@ -931,20 +928,20 @@ class InitiativeModelToDTOMapperTest {
         values.add("valore1");
         values.add("valore2");
         selfCriteriaMultiDTO.setValue(values);
+
         SelfCriteriaMultiConsentDTO selfCriteriaMultiConsentDTO = new SelfCriteriaMultiConsentDTO();
         selfCriteriaMultiConsentDTO.setType(TypeMultiConsentEnum.MULTI_CONSENT);
         selfCriteriaMultiConsentDTO.setCode("ISEE");
         selfCriteriaMultiConsentDTO.setDescription("Desc_Multi_Consent");
         selfCriteriaMultiConsentDTO.setSubDescription("Sub_Desc_Multi_Consent");
-        selfCriteriaMultiConsentDTO.setThresholdCode("thresholdCode");
-        List<SelfCriteriaMultiConsentValueDTO> selfCriteriaMultiConsentValueDTO = new ArrayList<>();
-        selfCriteriaMultiConsentValueDTO.add(new SelfCriteriaMultiConsentValueDTO("description", "subDescription", "1"));
-        selfCriteriaMultiConsentDTO.setValue(selfCriteriaMultiConsentValueDTO);
+        selfCriteriaMultiConsentDTO.setValue(new ArrayList<>());
+
         SelfCriteriaTextDTO selfCriteriaTextDTO = new SelfCriteriaTextDTO();
         selfCriteriaTextDTO.setType(it.gov.pagopa.initiative.dto.TypeTextEnum.TEXT);
         selfCriteriaTextDTO.setCode("T001");
         selfCriteriaTextDTO.setDescription("Text");
         selfCriteriaTextDTO.setValue("valore libero");
+
         List<AnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems> anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems = new ArrayList<>();
         anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems.add(selfCriteriaBoolDTO);
         anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems.add(selfCriteriaMultiDTO);
@@ -952,6 +949,7 @@ class InitiativeModelToDTOMapperTest {
         anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems.add(selfCriteriaTextDTO);
         anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems.add(null);
         localInitiativeBeneficiaryRuleDTO.setSelfDeclarationCriteria(anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems);
+
         AutomatedCriteriaDTO automatedCriteriaDTO = new AutomatedCriteriaDTO();
         automatedCriteriaDTO.setAuthority("Authority_ISEE");
         automatedCriteriaDTO.setCode("Code_ISEE");
@@ -962,6 +960,7 @@ class InitiativeModelToDTOMapperTest {
         List<AutomatedCriteriaDTO> automatedCriteriaList = new ArrayList<>();
         automatedCriteriaList.add(automatedCriteriaDTO);
         localInitiativeBeneficiaryRuleDTO.setAutomatedCriteria(automatedCriteriaList);
+
         localInitiativeBeneficiaryRuleDTO.setApiKeyClientId(API_KEY_CLIENT_ID);
         localInitiativeBeneficiaryRuleDTO.setApiKeyClientAssertion(API_KEY_CLIENT_ASSERTION);
         return localInitiativeBeneficiaryRuleDTO;
@@ -978,6 +977,7 @@ class InitiativeModelToDTOMapperTest {
         initiativeSummaryDTO.setEndDate(LocalDate.now().plusDays(3));
         return initiativeSummaryDTO;
     }
+
     private InitiativeSummaryDTO createInitiativeSummaryDTO2() {
         InitiativeSummaryDTO initiativeSummaryDTO2 = new InitiativeSummaryDTO();
         initiativeSummaryDTO2.setInitiativeId("Id1");
@@ -1006,7 +1006,6 @@ class InitiativeModelToDTOMapperTest {
         return initiativeDTO;
     }
 
-
     private InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardValueDTO() {
         return RewardValueDTO.builder()
                 .rewardValue(new BigDecimal(5000))
@@ -1014,6 +1013,7 @@ class InitiativeModelToDTOMapperTest {
                 .rewardValueType(RewardValueDTO.RewardValueTypeEnum.PERCENTAGE)
                 .build();
     }
+
     private InitiativeRewardRuleDTO createInitiativeRewardRuleDTORewardValueDTOWithoutType() {
         return RewardValueDTO.builder()
                 .rewardValue(new BigDecimal(5000))
@@ -1052,14 +1052,12 @@ class InitiativeModelToDTOMapperTest {
         DayOfWeekDTO dayOfWeekDTO = new DayOfWeekDTO(dayConfigs);
 
         ThresholdDTO thresholdDTO = new ThresholdDTO();
-
         thresholdDTO.setFrom(new BigDecimal("10.00"));
         thresholdDTO.setFromIncluded(true);
         thresholdDTO.setTo(new BigDecimal("30.00"));
         thresholdDTO.setToIncluded(true);
 
         TrxCountDTO trxCountDTO = new TrxCountDTO();
-
         trxCountDTO.setFrom(10L);
         trxCountDTO.setFromIncluded(true);
         trxCountDTO.setTo(30L);
@@ -1112,14 +1110,12 @@ class InitiativeModelToDTOMapperTest {
         DayOfWeekDTO dayOfWeekDTO = new DayOfWeekDTO(dayConfigs);
 
         ThresholdDTO thresholdDTO = new ThresholdDTO();
-
         thresholdDTO.setFrom(new BigDecimal("10.00"));
         thresholdDTO.setFromIncluded(true);
         thresholdDTO.setTo(new BigDecimal("30.00"));
         thresholdDTO.setToIncluded(true);
 
         TrxCountDTO trxCountDTO = new TrxCountDTO();
-
         trxCountDTO.setFrom(10L);
         trxCountDTO.setFromIncluded(true);
         trxCountDTO.setTo(30L);
@@ -1132,13 +1128,11 @@ class InitiativeModelToDTOMapperTest {
         values.add("456");
         mccFilterDTO.setValues(values);
 
-        List<RewardLimitsDTO> rewardLimitsDTOList = new ArrayList<>();
-
         initiativeTrxConditionsDTO.setDaysOfWeek(dayOfWeekDTO);
         initiativeTrxConditionsDTO.setThreshold(thresholdDTO);
         initiativeTrxConditionsDTO.setTrxCount(trxCountDTO);
         initiativeTrxConditionsDTO.setMccFilter(mccFilterDTO);
-        initiativeTrxConditionsDTO.setRewardLimits(rewardLimitsDTOList);
+        initiativeTrxConditionsDTO.setRewardLimits(new ArrayList<>());
 
         return initiativeTrxConditionsDTO;
     }
@@ -1222,14 +1216,12 @@ class InitiativeModelToDTOMapperTest {
         DayOfWeekDTO dayOfWeekDTO = new DayOfWeekDTO(dayConfigs);
 
         ThresholdDTO thresholdDTO = new ThresholdDTO();
-
         thresholdDTO.setFrom(new BigDecimal("10.00"));
         thresholdDTO.setFromIncluded(true);
         thresholdDTO.setTo(new BigDecimal("30.00"));
         thresholdDTO.setToIncluded(true);
 
         TrxCountDTO trxCountDTO = new TrxCountDTO();
-
         trxCountDTO.setFrom(10L);
         trxCountDTO.setFromIncluded(true);
         trxCountDTO.setTo(30L);
@@ -1275,7 +1267,6 @@ class InitiativeModelToDTOMapperTest {
         DayOfWeekDTO dayOfWeekDTO = new DayOfWeekDTO(dayConfigs);
 
         ThresholdDTO thresholdDTO = new ThresholdDTO();
-
         thresholdDTO.setFrom(new BigDecimal("10.00"));
         thresholdDTO.setFromIncluded(true);
         thresholdDTO.setTo(new BigDecimal("30.00"));
@@ -1328,7 +1319,6 @@ class InitiativeModelToDTOMapperTest {
         DayOfWeekDTO dayOfWeekDTO = new DayOfWeekDTO(dayConfigs);
 
         TrxCountDTO trxCountDTO = new TrxCountDTO();
-
         trxCountDTO.setFrom(10L);
         trxCountDTO.setFromIncluded(true);
         trxCountDTO.setTo(30L);
@@ -1367,7 +1357,6 @@ class InitiativeModelToDTOMapperTest {
         initiativeDTO.setTrxRule(createInitiativeTrxConditionsDTOValid());
         return initiativeDTO;
     }
-
 
     private InitiativeDTO createStep4InitiativeDTORewardLimitEmpty() {
         InitiativeDTO initiativeDTO = createStep3InitiativeDTO();
@@ -1417,7 +1406,6 @@ class InitiativeModelToDTOMapperTest {
         return initiativeDTO;
     }
 
-
     private InitiativeRewardRule createInitiativeRewardRuleRewardValue() {
         return RewardValue.builder()
                 .rewardValue(BigDecimal.valueOf(5000))
@@ -1457,14 +1445,12 @@ class InitiativeModelToDTOMapperTest {
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek dayOfWeek = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek(dayConfigs);
 
         Threshold threshold = new Threshold();
-
         threshold.setFromCents(1000L);
         threshold.setFromIncluded(true);
         threshold.setToCents(3000L);
         threshold.setToIncluded(true);
 
         TrxCount trxCount = new TrxCount();
-
         trxCount.setFrom(10L);
         trxCount.setFromIncluded(true);
         trxCount.setTo(30L);
@@ -1517,14 +1503,12 @@ class InitiativeModelToDTOMapperTest {
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek dayOfWeek = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek(dayConfigs);
 
         Threshold threshold = new Threshold();
-
         threshold.setFromCents(1000L);
         threshold.setFromIncluded(true);
         threshold.setToCents(3000L);
         threshold.setToIncluded(true);
 
         TrxCount trxCount = new TrxCount();
-
         trxCount.setFrom(10L);
         trxCount.setFromIncluded(true);
         trxCount.setTo(30L);
@@ -1537,13 +1521,11 @@ class InitiativeModelToDTOMapperTest {
         values.add("456");
         mccFilter.setValues(values);
 
-        List<RewardLimits> rewardLimitsList = new ArrayList<>();
-
         initiativeTrxConditions.setDaysOfWeek(dayOfWeek);
         initiativeTrxConditions.setThreshold(threshold);
         initiativeTrxConditions.setTrxCount(trxCount);
         initiativeTrxConditions.setMccFilter(mccFilter);
-        initiativeTrxConditions.setRewardLimits(rewardLimitsList);
+        initiativeTrxConditions.setRewardLimits(new ArrayList<>());
 
         return initiativeTrxConditions;
     }
@@ -1567,14 +1549,12 @@ class InitiativeModelToDTOMapperTest {
         dayConfigs.add(dayConfig1);
 
         Threshold threshold = new Threshold();
-
         threshold.setFromCents(1000L);
         threshold.setFromIncluded(true);
         threshold.setToCents(3000L);
         threshold.setToIncluded(true);
 
         TrxCount trxCount = new TrxCount();
-
         trxCount.setFrom(10L);
         trxCount.setFromIncluded(true);
         trxCount.setTo(30L);
@@ -1627,14 +1607,12 @@ class InitiativeModelToDTOMapperTest {
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek dayOfWeek = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek(dayConfigs);
 
         Threshold threshold = new Threshold();
-
         threshold.setFromCents(1000L);
         threshold.setFromIncluded(true);
         threshold.setToCents(3000L);
         threshold.setToIncluded(true);
 
         TrxCount trxCount = new TrxCount();
-
         trxCount.setFrom(10L);
         trxCount.setFromIncluded(true);
         trxCount.setTo(30L);
@@ -1680,7 +1658,6 @@ class InitiativeModelToDTOMapperTest {
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek dayOfWeek = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek(dayConfigs);
 
         Threshold threshold = new Threshold();
-
         threshold.setFromCents(1000L);
         threshold.setFromIncluded(true);
         threshold.setToCents(3000L);
@@ -1733,7 +1710,6 @@ class InitiativeModelToDTOMapperTest {
         it.gov.pagopa.initiative.model.rule.trx.DayOfWeek dayOfWeek = new it.gov.pagopa.initiative.model.rule.trx.DayOfWeek(dayConfigs);
 
         TrxCount trxCount = new TrxCount();
-
         trxCount.setFrom(10L);
         trxCount.setFromIncluded(true);
         trxCount.setTo(30L);
@@ -1835,7 +1811,6 @@ class InitiativeModelToDTOMapperTest {
         return initiative;
     }
 
-
     private AccumulatedAmountDTO createAccumulatedAmountDTOValid() {
         AccumulatedAmountDTO amountDTO = new AccumulatedAmountDTO();
         amountDTO.setAccumulatedType(AccumulatedAmountDTO.AccumulatedTypeEnum.THRESHOLD_REACHED);
@@ -1879,7 +1854,6 @@ class InitiativeModelToDTOMapperTest {
         return refundRuleDTO;
     }
 
-
     private AccumulatedAmount createAccumulatedAmountValid() {
         AccumulatedAmount amount = new AccumulatedAmount();
         amount.setAccumulatedType(AccumulatedAmount.AccumulatedTypeEnum.THRESHOLD_REACHED);
@@ -1898,7 +1872,6 @@ class InitiativeModelToDTOMapperTest {
         additionalInfo.setIdentificationCode("B002");
         return additionalInfo;
     }
-
 
     private InitiativeRefundRule createRefundRuleValidWithTimeParameter() {
         InitiativeRefundRule refundRule = new InitiativeRefundRule();
@@ -1923,7 +1896,6 @@ class InitiativeModelToDTOMapperTest {
         refundRule.setAdditionalInfo(createAdditionalInfoValid());
         return refundRule;
     }
-
 
     private Initiative createStep5Initiative() {
         return createStep4Initiative();
@@ -1953,9 +1925,8 @@ class InitiativeModelToDTOMapperTest {
         initiativeDetailDTO.setPrivacyLink("privacyLink");
         initiativeDetailDTO.setTcLink("tcLink");
         initiativeDetailDTO.setLogoURL(null);
-        initiativeDetailDTO.setUpdateDate(LocalDateTime.of(2023,3,20,12,0));
+        initiativeDetailDTO.setUpdateDate(LocalDateTime.of(2023, 3, 20, 12, 0));
         initiativeDetailDTO.setServiceId(SERVICE_ID);
         return initiativeDetailDTO;
     }
-
 }

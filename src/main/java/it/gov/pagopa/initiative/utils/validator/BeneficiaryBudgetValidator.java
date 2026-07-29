@@ -8,6 +8,7 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.math.BigDecimal;
 
+
 public class BeneficiaryBudgetValidator implements ConstraintValidator<BeneficiaryBudgetValue, InitiativeGeneralDTO> {
 
     private static final SpelExpressionParser PARSER = new SpelExpressionParser();
@@ -22,16 +23,20 @@ public class BeneficiaryBudgetValidator implements ConstraintValidator<Beneficia
 
     @Override
     public boolean isValid(InitiativeGeneralDTO value, ConstraintValidatorContext context) {
-        BigDecimal budget1 = null;
-        BigDecimal budget2 = null;
-        if (PARSER.parseExpression(budgetField1).getValue(value) instanceof BigDecimal bigDecimalInput)
-            budget1 = bigDecimalInput;
-        if (PARSER.parseExpression(budgetField2).getValue(value) instanceof BigDecimal bigDecimalInput){
-            budget2 = bigDecimalInput;
+        BigDecimal beneficiaryBudgetFixed = null;
+        BigDecimal budget = null;
+        if (PARSER.parseExpression(budgetField1).getValue(value) instanceof BigDecimal bigDecimalInput) {
+            beneficiaryBudgetFixed= bigDecimalInput;
         }
-        if(budget1 != null && budget2 != null)
-            return budget1.compareTo(budget2) < 0;
+        if (PARSER.parseExpression(budgetField2).getValue(value) instanceof BigDecimal bigDecimalInput) {
+            budget = bigDecimalInput;
+        }
+        if (beneficiaryBudgetFixed == null) {
+            return true;
+        }
+        if (budget != null) {
+            return beneficiaryBudgetFixed.compareTo(budget) < 0;
+        }
         return false;
     }
-
 }
