@@ -96,6 +96,7 @@ public class InitiativeDTOsToModelMapper {
                 .tcLink(additionalDTO.getTcLink())
                 .channels(toInitiativeAdditionalChannels(additionalDTO.getChannels()))
                 .thumbnailUrl(additionalDTO.getThumbnailUrl())
+                .ctaLabelMap(additionalDTO.getCtaLabelMap())
                 .build();
     }
 
