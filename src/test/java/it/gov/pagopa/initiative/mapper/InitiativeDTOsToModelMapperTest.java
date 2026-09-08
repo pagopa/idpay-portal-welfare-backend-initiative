@@ -291,6 +291,18 @@ class InitiativeDTOsToModelMapperTest {
     }
 
     @Test
+    void testToInitiativeAdditional_mapsCtaLabelMap() {
+        InitiativeAdditionalDTO additionalDTO = new InitiativeAdditionalDTO();
+        additionalDTO.setServiceScope(InitiativeAdditionalDTO.ServiceScope.LOCAL);
+        additionalDTO.setChannels(new ArrayList<>());
+        Map<String, String> ctaLabelMap = Map.of("it", "Attiva il tuo decoder", "en", "Activate your decoder");
+        additionalDTO.setCtaLabelMap(ctaLabelMap);
+
+        assertEquals(ctaLabelMap,
+                initiativeDTOsToModelMapper.toInitiative(additionalDTO).getAdditionalInfo().getCtaLabelMap());
+    }
+
+    @Test
     void testToInitiativeAdditionalChannels_empty() {
         Initiative initiative = createStep1Initiative();
         InitiativeAdditional additionalInfo = createInitiativeAdditional();

@@ -476,12 +476,10 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         }
 
         log.info("[UPDATE_TO_PUBLISHED_STATUS] - Initiative: {}. Update CTA to ServiceIO", initiative.getInitiativeId());
-        serviceRequestDTO.getServiceMetadata().setCta(
-                InitiativeConstants.CtaConstant.START +
-                        InitiativeConstants.CtaConstant.IT + InitiativeConstants.CtaConstant.CTA_1_IT + InitiativeConstants.CtaConstant.TEXT_IT + InitiativeConstants.CtaConstant.ACTION_IT + serviceId +
-                        InitiativeConstants.CtaConstant.EN + InitiativeConstants.CtaConstant.CTA_1_EN + InitiativeConstants.CtaConstant.TEXT_EN + InitiativeConstants.CtaConstant.ACTION_EN + serviceId +
-                        InitiativeConstants.CtaConstant.END
-        );
+        // NB: il campo initiative.additionalInfo.ctaLabelMap è predisposto per una futura configurazione lato FE.
+        // Finché il FE non lo valorizza, la mappa resta null e buildIoCta applica SEMPRE il fallback ai testi di
+        // default (InitiativeConstants.CtaConstant.DEFAULT_LABEL_IT/EN): comportamento trasparente e identico all'as-is.
+        serviceRequestDTO.getServiceMetadata().setCta(buildIoCta(serviceId, additionalInfo));
 
         try{
             ioManageBackEndRestConnector.updateService(serviceId, serviceRequestDTO);
@@ -492,6 +490,31 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
 
         auditUtilities.logInitiativePublished(this.getUserId(), initiative.getInitiativeId(), initiative.getOrganizationId());
         return initiative;
+    }
+
+    /**
+     * Costruisce la stringa YAML della CTA per la card IO usando le label configurate per iniziativa
+     * (per lingua "it"/"en"), con fallback ai testi di default in {@link InitiativeConstants.CtaConstant}.
+     */
+    private String buildIoCta(String serviceId, InitiativeAdditional additionalInfo) {
+        String labelIt = resolveCtaLabel(additionalInfo, Locale.ITALIAN.getLanguage(), InitiativeConstants.CtaConstant.DEFAULT_LABEL_IT);
+        String labelEn = resolveCtaLabel(additionalInfo, Locale.ENGLISH.getLanguage(), InitiativeConstants.CtaConstant.DEFAULT_LABEL_EN);
+        return InitiativeConstants.CtaConstant.START +
+                InitiativeConstants.CtaConstant.IT + InitiativeConstants.CtaConstant.CTA_1_IT +
+                InitiativeConstants.CtaConstant.TEXT_PREFIX + labelIt + InitiativeConstants.CtaConstant.TEXT_SUFFIX +
+                InitiativeConstants.CtaConstant.ACTION_IT + serviceId +
+                InitiativeConstants.CtaConstant.EN + InitiativeConstants.CtaConstant.CTA_1_EN +
+                InitiativeConstants.CtaConstant.TEXT_PREFIX + labelEn + InitiativeConstants.CtaConstant.TEXT_SUFFIX +
+                InitiativeConstants.CtaConstant.ACTION_EN + serviceId +
+                InitiativeConstants.CtaConstant.END;
+    }
+
+    private String resolveCtaLabel(InitiativeAdditional additionalInfo, String language, String defaultLabel) {
+        Map<String, String> ctaLabelMap = additionalInfo.getCtaLabelMap();
+        if (ctaLabelMap == null) {
+            return defaultLabel;
+        }
+        return StringUtils.defaultIfBlank(ctaLabelMap.get(language), defaultLabel);
     }
 
     @Override
