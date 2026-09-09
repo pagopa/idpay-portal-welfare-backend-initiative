@@ -28,7 +28,6 @@ import it.gov.pagopa.initiative.mapper.InitiativeAdditionalDTOsToIOServiceReques
 import it.gov.pagopa.initiative.mapper.InitiativeModelToDTOMapper;
 import it.gov.pagopa.initiative.model.*;
 import it.gov.pagopa.initiative.model.TypeBoolEnum;
-import it.gov.pagopa.initiative.model.TypeMultiEnum;
 import it.gov.pagopa.initiative.model.rule.refund.AccumulatedAmount;
 import it.gov.pagopa.initiative.model.rule.refund.AdditionalInfo;
 import it.gov.pagopa.initiative.model.rule.refund.InitiativeRefundRule;
@@ -1523,6 +1522,96 @@ class InitiativeServiceTest {
         assertEquals(SERVICE_ID, initiativeActual.getAdditionalInfo().getServiceId());
 
         verify(ioManageBackEndRestConnector, times(1)).updateService(serviceId,serviceRequestDTOexpected);
+    }
+
+    @Test
+    void sendInitiativeInfoToIO_whenCtaLabelMapIsNull_thenCtaUsesDefaultLabels() {
+        Initiative initiative = createStep5Initiative();
+        InitiativeAdditional additional = createInitiativeAdditional();
+        additional.setCtaLabelMap(null);
+        initiative.setAdditionalInfo(additional);
+
+        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = InitiativeOrganizationInfoDTO.builder()
+                .organizationName(ORGANIZATION_NAME)
+                .organizationVat(ORGANIZATION_VAT)
+                .organizationUserRole(ORGANIZATION_USER_ROLE)
+                .build();
+
+        ServiceRequestDTO serviceRequestDTOexpected = createServiceRequestDTO();
+        ServiceResponseDTO serviceResponseDTOexpected = createServiceResponseDTO();
+
+        when(initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(any(), any())).thenReturn(serviceRequestDTOexpected);
+        when(ioManageBackEndRestConnector.createService(serviceRequestDTOexpected)).thenReturn(serviceResponseDTOexpected);
+
+        initiativeService.sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(initiative, initiativeOrganizationInfoDTO);
+
+        String cta = serviceRequestDTOexpected.getServiceMetadata().getCta();
+        assertNotNull(cta);
+        assertTrue(cta.contains(InitiativeConstants.CtaConstant.DEFAULT_LABEL_IT));
+        assertTrue(cta.contains(InitiativeConstants.CtaConstant.DEFAULT_LABEL_EN));
+    }
+
+    @Test
+    void sendInitiativeInfoToIO_whenCtaLabelMapIsConfigured_thenCtaUsesCustomLabels() {
+        String customIt = "Attiva il tuo decoder";
+        String customEn = "Activate your decoder";
+
+        Initiative initiative = createStep5Initiative();
+        InitiativeAdditional additional = createInitiativeAdditional();
+        additional.setCtaLabelMap(Map.of("it", customIt, "en", customEn));
+        initiative.setAdditionalInfo(additional);
+
+        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = InitiativeOrganizationInfoDTO.builder()
+                .organizationName(ORGANIZATION_NAME)
+                .organizationVat(ORGANIZATION_VAT)
+                .organizationUserRole(ORGANIZATION_USER_ROLE)
+                .build();
+
+        ServiceRequestDTO serviceRequestDTOexpected = createServiceRequestDTO();
+        ServiceResponseDTO serviceResponseDTOexpected = createServiceResponseDTO();
+
+        when(initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(any(), any())).thenReturn(serviceRequestDTOexpected);
+        when(ioManageBackEndRestConnector.createService(serviceRequestDTOexpected)).thenReturn(serviceResponseDTOexpected);
+
+        initiativeService.sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(initiative, initiativeOrganizationInfoDTO);
+
+        String cta = serviceRequestDTOexpected.getServiceMetadata().getCta();
+        assertNotNull(cta);
+        assertTrue(cta.contains(customIt));
+        assertTrue(cta.contains(customEn));
+        assertFalse(cta.contains(InitiativeConstants.CtaConstant.DEFAULT_LABEL_IT));
+        assertFalse(cta.contains(InitiativeConstants.CtaConstant.DEFAULT_LABEL_EN));
+    }
+
+    @Test
+    void sendInitiativeInfoToIO_whenCtaLabelMapMissingLanguage_thenCtaFallsBackForThatLanguage() {
+        String customIt = "Attiva il tuo decoder";
+
+        Initiative initiative = createStep5Initiative();
+        InitiativeAdditional additional = createInitiativeAdditional();
+        // Solo la lingua "it" è configurata: "en" deve ricadere sul default
+        additional.setCtaLabelMap(Map.of("it", customIt));
+        initiative.setAdditionalInfo(additional);
+
+        InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO = InitiativeOrganizationInfoDTO.builder()
+                .organizationName(ORGANIZATION_NAME)
+                .organizationVat(ORGANIZATION_VAT)
+                .organizationUserRole(ORGANIZATION_USER_ROLE)
+                .build();
+
+        ServiceRequestDTO serviceRequestDTOexpected = createServiceRequestDTO();
+        ServiceResponseDTO serviceResponseDTOexpected = createServiceResponseDTO();
+
+        when(initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(any(), any())).thenReturn(serviceRequestDTOexpected);
+        when(ioManageBackEndRestConnector.createService(serviceRequestDTOexpected)).thenReturn(serviceResponseDTOexpected);
+
+        initiativeService.sendInitiativeInfoToIOBackEndServiceAndUpdateInitiative(initiative, initiativeOrganizationInfoDTO);
+
+        String cta = serviceRequestDTOexpected.getServiceMetadata().getCta();
+        assertNotNull(cta);
+        assertTrue(cta.contains(customIt));
+        assertTrue(cta.contains(InitiativeConstants.CtaConstant.DEFAULT_LABEL_EN));
+        assertFalse(cta.contains(InitiativeConstants.CtaConstant.DEFAULT_LABEL_IT));
     }
 
     @Test

@@ -210,6 +210,7 @@ public class InitiativeModelToDTOMapper {
                 .channels(toChannelsDTO(additional.getChannels()))
                 .logoFileName(additional.getLogoFileName())
                 .logoUploadDate(additional.getLogoUploadDate())
+                .ctaLabelMap(additional.getCtaLabelMap())
                 .build();
     }
 
