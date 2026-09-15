@@ -47,8 +47,6 @@ public class InitiativeAdditionalDTOsToIOServiceRequestDTOMapper {
 
     public ServiceRequestDTO toServiceRequestDTO(InitiativeAdditional initiativeAdditional, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO){
         Map<Channel.TypeEnum, String> channelMap = initiativeAdditional.getChannels().stream().collect(Collectors.toMap(Channel::getType, Channel::getContact));
-        // support_url: preferisce il valore configurato per iniziativa (additionalInfo.supportUrl);
-        // in sua assenza mantiene il comportamento as-is basato sul canale WEB.
         String supportUrl = StringUtils.isNotBlank(initiativeAdditional.getSupportUrl())
                 ? initiativeAdditional.getSupportUrl()
                 : channelMap.get(Channel.TypeEnum.WEB);
@@ -56,7 +54,6 @@ public class InitiativeAdditionalDTOsToIOServiceRequestDTOMapper {
                 .email(channelMap.get(Channel.TypeEnum.EMAIL))
                 .phone(channelMap.get(Channel.TypeEnum.MOBILE))
                 .supportUrl(supportUrl)
-                // web_url: valorizzato con il link "prodotti compatibili" solo quando presente
                 .webUrl(StringUtils.trimToNull(initiativeAdditional.getCompatibleProductsUrl()))
                 .privacyUrl(initiativeAdditional.getPrivacyLink())
                 .tosUrl(initiativeAdditional.getTcLink())
