@@ -41,4 +41,10 @@ public class InitiativeAdditional {
    */
   private Map<String, String> ctaLabelMap;
 
+  // --- Nuovi link configurabili per la card AppIO ---
+  /** URL "Visita il sito" (portale cittadino). */
+  private String websiteUrl;
+  /** URL "Richiedi assistenza" (link di richiesta assistenza). */
+  private String supportUrl;
+
 }

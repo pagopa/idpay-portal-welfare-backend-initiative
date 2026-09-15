@@ -211,6 +211,8 @@ public class InitiativeModelToDTOMapper {
                 .logoFileName(additional.getLogoFileName())
                 .logoUploadDate(additional.getLogoUploadDate())
                 .ctaLabelMap(additional.getCtaLabelMap())
+                .websiteUrl(additional.getWebsiteUrl())
+                .supportUrl(additional.getSupportUrl())
                 .build();
     }
 

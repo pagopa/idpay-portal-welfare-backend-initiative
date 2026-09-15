@@ -303,6 +303,20 @@ class InitiativeDTOsToModelMapperTest {
     }
 
     @Test
+    void testToInitiativeAdditional_mapsNewLinks() {
+        InitiativeAdditionalDTO additionalDTO = new InitiativeAdditionalDTO();
+        additionalDTO.setServiceScope(InitiativeAdditionalDTO.ServiceScope.LOCAL);
+        additionalDTO.setChannels(new ArrayList<>());
+        additionalDTO.setWebsiteUrl("https://portale.cittadino");
+        additionalDTO.setSupportUrl("https://assistenza.url");
+
+        InitiativeAdditional result = initiativeDTOsToModelMapper.toInitiative(additionalDTO).getAdditionalInfo();
+
+        assertEquals("https://portale.cittadino", result.getWebsiteUrl());
+        assertEquals("https://assistenza.url", result.getSupportUrl());
+    }
+
+    @Test
     void testToInitiativeAdditionalChannels_empty() {
         Initiative initiative = createStep1Initiative();
         InitiativeAdditional additionalInfo = createInitiativeAdditional();

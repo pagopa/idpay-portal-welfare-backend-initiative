@@ -97,6 +97,8 @@ public class InitiativeDTOsToModelMapper {
                 .channels(toInitiativeAdditionalChannels(additionalDTO.getChannels()))
                 .thumbnailUrl(additionalDTO.getThumbnailUrl())
                 .ctaLabelMap(additionalDTO.getCtaLabelMap())
+                .websiteUrl(additionalDTO.getWebsiteUrl())
+                .supportUrl(additionalDTO.getSupportUrl())
                 .build();
     }
 

@@ -86,5 +86,16 @@ public class InitiativeAdditionalDTO extends InitiativeOrganizationInfoDTO {
   @JsonProperty("ctaLabelMap")
   private Map<String, String> ctaLabelMap;
 
+  // --- Nuovi link configurabili per la card AppIO ---
+
+  @JsonProperty("websiteUrl")
+  @URL(protocol = "https", regexp = VALID_LINK, groups = ValidationApiEnabledGroup.class)
+  private String websiteUrl;
+
+  @JsonProperty("supportUrl")
+  @URL(protocol = "https", regexp = VALID_LINK, groups = ValidationApiEnabledGroup.class)
+  private String supportUrl;
+
+
 
 }

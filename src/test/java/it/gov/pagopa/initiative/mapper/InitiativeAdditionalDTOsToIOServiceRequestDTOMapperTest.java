@@ -7,6 +7,7 @@ import it.gov.pagopa.initiative.dto.io.service.ServiceRequestMetadataDTO;
 import it.gov.pagopa.initiative.model.Channel;
 import it.gov.pagopa.initiative.model.InitiativeAdditional;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.util.CollectionUtils;
@@ -16,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 //@TestPropertySource(
 //        locations = "classpath:application.yml",
@@ -138,4 +140,66 @@ class InitiativeAdditionalDTOsToIOServiceRequestDTOMapperTest {
         return initiativeAdditional;
     }
 
+    @Test
+    void givenSupportUrl_whenToServiceRequestDTO_thenSupportUrlOverridesWebChannel() {
+        initiativeAdditionalDTOsToIOServiceRequestDTOMapper = new InitiativeAdditionalDTOsToIOServiceRequestDTOMapper(PRODUCT_DEPARTMENT_NAME, null);
+        InitiativeAdditional initiativeAdditional = createInitiativeAdditional();
+        initiativeAdditional.setSupportUrl("https://assistenza.url");
+
+        ServiceRequestDTO result = initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(initiativeAdditional, organizationInfo());
+
+        assertEquals("https://assistenza.url", result.getServiceMetadata().getSupportUrl());
+    }
+
+    @Test
+    void givenNoSupportUrl_whenToServiceRequestDTO_thenSupportUrlFallsBackToWebChannel() {
+        initiativeAdditionalDTOsToIOServiceRequestDTOMapper = new InitiativeAdditionalDTOsToIOServiceRequestDTOMapper(PRODUCT_DEPARTMENT_NAME, null);
+        InitiativeAdditional initiativeAdditional = createInitiativeAdditional();
+
+        ServiceRequestDTO result = initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(initiativeAdditional, organizationInfo());
+
+        assertEquals(SUPPORT_URL, result.getServiceMetadata().getSupportUrl());
+    }
+
+    @Test
+    void givenWebsiteUrl_whenToServiceRequestDTO_thenWebUrlIsValued() {
+        initiativeAdditionalDTOsToIOServiceRequestDTOMapper = new InitiativeAdditionalDTOsToIOServiceRequestDTOMapper(PRODUCT_DEPARTMENT_NAME, null);
+        InitiativeAdditional initiativeAdditional = createInitiativeAdditional();
+        initiativeAdditional.setWebsiteUrl("https://portale.cittadino");
+
+        ServiceRequestDTO result = initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(initiativeAdditional, organizationInfo());
+
+        assertEquals("https://portale.cittadino", result.getServiceMetadata().getWebUrl());
+    }
+
+    @Test
+    void givenNoWebsiteUrl_whenToServiceRequestDTO_thenWebUrlIsNull() {
+        initiativeAdditionalDTOsToIOServiceRequestDTOMapper = new InitiativeAdditionalDTOsToIOServiceRequestDTOMapper(PRODUCT_DEPARTMENT_NAME, null);
+        InitiativeAdditional initiativeAdditional = createInitiativeAdditional();
+
+        ServiceRequestDTO result = initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(initiativeAdditional, organizationInfo());
+
+        assertNull(result.getServiceMetadata().getWebUrl());
+    }
+
+    @Test
+    void givenNoNewFields_whenToServiceRequestDTO_thenDescriptionUnchanged() {
+        initiativeAdditionalDTOsToIOServiceRequestDTOMapper = new InitiativeAdditionalDTOsToIOServiceRequestDTOMapper(PRODUCT_DEPARTMENT_NAME, null);
+        InitiativeAdditional initiativeAdditional = createInitiativeAdditional();
+
+        ServiceRequestDTO result = initiativeAdditionalDTOsToIOServiceRequestDTOMapper.toServiceRequestDTO(initiativeAdditional, organizationInfo());
+
+        assertEquals(DESCRIPTION, result.getDescription());
+    }
+
+    private InitiativeOrganizationInfoDTO organizationInfo() {
+        return InitiativeOrganizationInfoDTO.builder()
+                .organizationName(ORGANIZATION_NAME)
+                .organizationVat(ORGANIZATION_VAT)
+                .organizationUserRole(ORGANIZATION_USER_ROLE)
+                .build();
+    }
+
+
 }
+
