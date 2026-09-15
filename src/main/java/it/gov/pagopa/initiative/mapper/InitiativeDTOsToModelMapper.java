@@ -97,6 +97,18 @@ public class InitiativeDTOsToModelMapper {
                 .channels(toInitiativeAdditionalChannels(additionalDTO.getChannels()))
                 .thumbnailUrl(additionalDTO.getThumbnailUrl())
                 .ctaLabelMap(additionalDTO.getCtaLabelMap())
+                .eligibilityInfoMap(additionalDTO.getEligibilityInfoMap())
+                .benefitInfoMap(additionalDTO.getBenefitInfoMap())
+                .howToRequestInfoMap(additionalDTO.getHowToRequestInfoMap())
+                .howToUseInfoMap(additionalDTO.getHowToUseInfoMap())
+                .reminderInfoMap(additionalDTO.getReminderInfoMap())
+                .compatibleProductsUrl(additionalDTO.getCompatibleProductsUrl())
+                .storeListUrl(additionalDTO.getStoreListUrl())
+                .supportUrl(additionalDTO.getSupportUrl())
+                .requestStartDate(additionalDTO.getRequestStartDate())
+                .bonusValidityDays(additionalDTO.getBonusValidityDays())
+                .serviceAvailabilityDate(additionalDTO.getServiceAvailabilityDate())
+                .organizationFiscalCode(additionalDTO.getOrganizationFiscalCode())
                 .build();
     }
 

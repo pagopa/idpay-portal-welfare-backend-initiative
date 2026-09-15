@@ -492,6 +492,46 @@ class InitiativeModelToDTOMapperTest {
     }
 
     @Test
+    void toInitiativeAdditionalDTO_mapsNewBonusFields() {
+        Initiative initiative = createStep1Initiative();
+        InitiativeAdditional additionalInfo = new InitiativeAdditional();
+        additionalInfo.setServiceScope(InitiativeAdditional.ServiceScope.LOCAL);
+        Map<String, String> eligibility = Map.of("it", "Chi IT");
+        Map<String, String> benefit = Map.of("it", "Offre IT");
+        Map<String, String> howToRequest = Map.of("it", "Richiedi IT");
+        Map<String, String> howToUse = Map.of("it", "Usa IT");
+        Map<String, String> reminder = Map.of("it", "Ricorda IT");
+        additionalInfo.setEligibilityInfoMap(eligibility);
+        additionalInfo.setBenefitInfoMap(benefit);
+        additionalInfo.setHowToRequestInfoMap(howToRequest);
+        additionalInfo.setHowToUseInfoMap(howToUse);
+        additionalInfo.setReminderInfoMap(reminder);
+        additionalInfo.setCompatibleProductsUrl("https://bonusdecoder.it/elenco");
+        additionalInfo.setStoreListUrl("https://bonusdecoder.it/negozi");
+        additionalInfo.setSupportUrl("https://bonusdecoder.it/assistenza");
+        additionalInfo.setRequestStartDate(LocalDate.of(2025, 11, 18));
+        additionalInfo.setBonusValidityDays(15);
+        additionalInfo.setServiceAvailabilityDate(LocalDateTime.of(2025, 11, 18, 9, 30));
+        additionalInfo.setOrganizationFiscalCode("80230390587");
+        initiative.setAdditionalInfo(additionalInfo);
+
+        InitiativeAdditionalDTO result = initiativeModelToDTOMapper.toInitiativeDTO(initiative, true).getAdditionalInfo();
+
+        assertEquals(eligibility, result.getEligibilityInfoMap());
+        assertEquals(benefit, result.getBenefitInfoMap());
+        assertEquals(howToRequest, result.getHowToRequestInfoMap());
+        assertEquals(howToUse, result.getHowToUseInfoMap());
+        assertEquals(reminder, result.getReminderInfoMap());
+        assertEquals("https://bonusdecoder.it/elenco", result.getCompatibleProductsUrl());
+        assertEquals("https://bonusdecoder.it/negozi", result.getStoreListUrl());
+        assertEquals("https://bonusdecoder.it/assistenza", result.getSupportUrl());
+        assertEquals(LocalDate.of(2025, 11, 18), result.getRequestStartDate());
+        assertEquals(15, result.getBonusValidityDays());
+        assertEquals(LocalDateTime.of(2025, 11, 18, 9, 30), result.getServiceAvailabilityDate());
+        assertEquals("80230390587", result.getOrganizationFiscalCode());
+    }
+
+    @Test
     void testToChannelsDTO_empty() {
         Initiative initiative = createStep1Initiative();
         InitiativeAdditional additionalInfo = new InitiativeAdditional();
