@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.validator.constraints.URL;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -87,46 +86,16 @@ public class InitiativeAdditionalDTO extends InitiativeOrganizationInfoDTO {
   @JsonProperty("ctaLabelMap")
   private Map<String, String> ctaLabelMap;
 
-  // --- Nuove informazioni bonus per la card AppIO (predisposte da analisi Figma) ---
+  // --- Nuovi link configurabili per la card AppIO ---
 
-  @JsonProperty("eligibilityInfoMap")
-  private Map<String, String> eligibilityInfoMap;
-
-  @JsonProperty("benefitInfoMap")
-  private Map<String, String> benefitInfoMap;
-
-  @JsonProperty("howToRequestInfoMap")
-  private Map<String, String> howToRequestInfoMap;
-
-  @JsonProperty("howToUseInfoMap")
-  private Map<String, String> howToUseInfoMap;
-
-  @JsonProperty("reminderInfoMap")
-  private Map<String, String> reminderInfoMap;
-
-  @JsonProperty("compatibleProductsUrl")
+  @JsonProperty("websiteUrl")
   @URL(protocol = "https", regexp = VALID_LINK, groups = ValidationApiEnabledGroup.class)
-  private String compatibleProductsUrl;
-
-  @JsonProperty("storeListUrl")
-  @URL(protocol = "https", regexp = VALID_LINK, groups = ValidationApiEnabledGroup.class)
-  private String storeListUrl;
+  private String websiteUrl;
 
   @JsonProperty("supportUrl")
   @URL(protocol = "https", regexp = VALID_LINK, groups = ValidationApiEnabledGroup.class)
   private String supportUrl;
 
-  @JsonProperty("requestStartDate")
-  private LocalDate requestStartDate;
-
-  @JsonProperty("bonusValidityDays")
-  private Integer bonusValidityDays;
-
-  @JsonProperty("serviceAvailabilityDate")
-  private LocalDateTime serviceAvailabilityDate;
-
-  @JsonProperty("organizationFiscalCode")
-  private String organizationFiscalCode;
 
 
 }

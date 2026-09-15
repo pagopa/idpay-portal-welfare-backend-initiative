@@ -211,18 +211,8 @@ public class InitiativeModelToDTOMapper {
                 .logoFileName(additional.getLogoFileName())
                 .logoUploadDate(additional.getLogoUploadDate())
                 .ctaLabelMap(additional.getCtaLabelMap())
-                .eligibilityInfoMap(additional.getEligibilityInfoMap())
-                .benefitInfoMap(additional.getBenefitInfoMap())
-                .howToRequestInfoMap(additional.getHowToRequestInfoMap())
-                .howToUseInfoMap(additional.getHowToUseInfoMap())
-                .reminderInfoMap(additional.getReminderInfoMap())
-                .compatibleProductsUrl(additional.getCompatibleProductsUrl())
-                .storeListUrl(additional.getStoreListUrl())
+                .websiteUrl(additional.getWebsiteUrl())
                 .supportUrl(additional.getSupportUrl())
-                .requestStartDate(additional.getRequestStartDate())
-                .bonusValidityDays(additional.getBonusValidityDays())
-                .serviceAvailabilityDate(additional.getServiceAvailabilityDate())
-                .organizationFiscalCode(additional.getOrganizationFiscalCode())
                 .build();
     }
 

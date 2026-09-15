@@ -36,7 +36,6 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 
@@ -304,42 +303,17 @@ class InitiativeDTOsToModelMapperTest {
     }
 
     @Test
-    void testToInitiativeAdditional_mapsNewBonusFields() {
+    void testToInitiativeAdditional_mapsNewLinks() {
         InitiativeAdditionalDTO additionalDTO = new InitiativeAdditionalDTO();
         additionalDTO.setServiceScope(InitiativeAdditionalDTO.ServiceScope.LOCAL);
         additionalDTO.setChannels(new ArrayList<>());
-        Map<String, String> eligibility = Map.of("it", "Chi IT");
-        Map<String, String> benefit = Map.of("it", "Offre IT");
-        Map<String, String> howToRequest = Map.of("it", "Richiedi IT");
-        Map<String, String> howToUse = Map.of("it", "Usa IT");
-        Map<String, String> reminder = Map.of("it", "Ricorda IT");
-        additionalDTO.setEligibilityInfoMap(eligibility);
-        additionalDTO.setBenefitInfoMap(benefit);
-        additionalDTO.setHowToRequestInfoMap(howToRequest);
-        additionalDTO.setHowToUseInfoMap(howToUse);
-        additionalDTO.setReminderInfoMap(reminder);
-        additionalDTO.setCompatibleProductsUrl("https://bonusdecoder.it/elenco");
-        additionalDTO.setStoreListUrl("https://bonusdecoder.it/negozi");
-        additionalDTO.setSupportUrl("https://bonusdecoder.it/assistenza");
-        additionalDTO.setRequestStartDate(LocalDate.of(2025, 11, 18));
-        additionalDTO.setBonusValidityDays(15);
-        additionalDTO.setServiceAvailabilityDate(LocalDateTime.of(2025, 11, 18, 9, 30));
-        additionalDTO.setOrganizationFiscalCode("80230390587");
+        additionalDTO.setWebsiteUrl("https://portale.cittadino");
+        additionalDTO.setSupportUrl("https://assistenza.url");
 
         InitiativeAdditional result = initiativeDTOsToModelMapper.toInitiative(additionalDTO).getAdditionalInfo();
 
-        assertEquals(eligibility, result.getEligibilityInfoMap());
-        assertEquals(benefit, result.getBenefitInfoMap());
-        assertEquals(howToRequest, result.getHowToRequestInfoMap());
-        assertEquals(howToUse, result.getHowToUseInfoMap());
-        assertEquals(reminder, result.getReminderInfoMap());
-        assertEquals("https://bonusdecoder.it/elenco", result.getCompatibleProductsUrl());
-        assertEquals("https://bonusdecoder.it/negozi", result.getStoreListUrl());
-        assertEquals("https://bonusdecoder.it/assistenza", result.getSupportUrl());
-        assertEquals(LocalDate.of(2025, 11, 18), result.getRequestStartDate());
-        assertEquals(15, result.getBonusValidityDays());
-        assertEquals(LocalDateTime.of(2025, 11, 18, 9, 30), result.getServiceAvailabilityDate());
-        assertEquals("80230390587", result.getOrganizationFiscalCode());
+        assertEquals("https://portale.cittadino", result.getWebsiteUrl());
+        assertEquals("https://assistenza.url", result.getSupportUrl());
     }
 
     @Test
