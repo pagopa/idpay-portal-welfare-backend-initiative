@@ -24,7 +24,8 @@ public class InitiativeBeneficiaryRuleDTO extends InitiativeOrganizationInfoDTO 
   @JsonProperty("selfDeclarationCriteria")
   @Schema(
           description = "List of possible self criteria",
-          anyOf = {SelfCriteriaBoolDTO.class, SelfCriteriaMultiDTO.class, SelfCriteriaMultiConsentDTO.class})
+          // BND-1883: expose informative criteria in the schema union
+          anyOf = {SelfCriteriaBoolDTO.class, SelfCriteriaMultiDTO.class, SelfCriteriaMultiConsentDTO.class, SelfCriteriaInformativeDTO.class})
   @Valid
   private List<AnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems> selfDeclarationCriteria;
 

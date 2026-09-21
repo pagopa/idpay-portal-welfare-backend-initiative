@@ -15,7 +15,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
   @JsonSubTypes.Type(value = SelfCriteriaTextDTO.class, name = "text"),
   @JsonSubTypes.Type(value = SelfCriteriaMultiDTO.class, name = "multi"),
   @JsonSubTypes.Type(value = SelfCriteriaMultiConsentDTO.class, name = "multi_consent"),
-  @JsonSubTypes.Type(value = SelfCriteriaBoolDTO.class, name = "boolean")
+  @JsonSubTypes.Type(value = SelfCriteriaBoolDTO.class, name = "boolean"),
+  // BND-1882 / BND-1883: register informative discriminator (end-to-end informative requirements ANPR/ADE)
+  @JsonSubTypes.Type(value = SelfCriteriaInformativeDTO.class, name = "informative")
 })
 public interface AnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems {
 
