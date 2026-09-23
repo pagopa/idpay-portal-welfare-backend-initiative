@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 @Component
 public class InitiativeAdditionalDTOsToIOServiceRequestDTOMapper {
 
+
     private final String productDepartmentName;
     private final List<String> authorizedRecipients;
 
@@ -30,10 +31,18 @@ public class InitiativeAdditionalDTOsToIOServiceRequestDTOMapper {
 
     public ServiceRequestDTO toServiceRequestDTO(InitiativeAdditional initiativeAdditional, InitiativeOrganizationInfoDTO initiativeOrganizationInfoDTO){
         Map<Channel.TypeEnum, String> channelMap = initiativeAdditional.getChannels().stream().collect(Collectors.toMap(Channel::getType, Channel::getContact));
+        // support_url: preferisce il link "Richiedi assistenza" configurato per iniziativa;
+        // in sua assenza mantiene il comportamento as-is basato sul canale WEB.
+        String supportUrl = StringUtils.isNotBlank(initiativeAdditional.getSupportUrl())
+                ? initiativeAdditional.getSupportUrl()
+                : channelMap.get(Channel.TypeEnum.WEB);
         ServiceRequestMetadataDTO serviceMetadataDTO = ServiceRequestMetadataDTO.builder()
                 .email(channelMap.get(Channel.TypeEnum.EMAIL))
                 .phone(channelMap.get(Channel.TypeEnum.MOBILE))
-                .supportUrl(channelMap.get(Channel.TypeEnum.WEB))
+                .supportUrl(supportUrl)
+                // web_url: valorizzato con il link "Visita il sito" (portale cittadino) solo quando presente
+                // (campo NON_NULL: se null non viene serializzato -> nessuna modifica rispetto all'as-is).
+                .webUrl(StringUtils.trimToNull(initiativeAdditional.getWebsiteUrl()))
                 .privacyUrl(initiativeAdditional.getPrivacyLink())
                 .tosUrl(initiativeAdditional.getTcLink())
                 .scope(initiativeAdditional.getServiceScope().name())
@@ -51,5 +60,6 @@ public class InitiativeAdditionalDTOsToIOServiceRequestDTOMapper {
                 .organization(organizationDTO);
         return CollectionUtils.isEmpty(authorizedRecipients) ? serviceRequestDTOBuilder.build() : serviceRequestDTOBuilder.authorizedRecipients(authorizedRecipients).build();
     }
+
 
 }

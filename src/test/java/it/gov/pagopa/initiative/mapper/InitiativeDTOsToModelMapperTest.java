@@ -303,6 +303,20 @@ class InitiativeDTOsToModelMapperTest {
     }
 
     @Test
+    void testToInitiativeAdditional_mapsNewLinks() {
+        InitiativeAdditionalDTO additionalDTO = new InitiativeAdditionalDTO();
+        additionalDTO.setServiceScope(InitiativeAdditionalDTO.ServiceScope.LOCAL);
+        additionalDTO.setChannels(new ArrayList<>());
+        additionalDTO.setWebsiteUrl("https://portale.cittadino");
+        additionalDTO.setSupportUrl("https://assistenza.url");
+
+        InitiativeAdditional result = initiativeDTOsToModelMapper.toInitiative(additionalDTO).getAdditionalInfo();
+
+        assertEquals("https://portale.cittadino", result.getWebsiteUrl());
+        assertEquals("https://assistenza.url", result.getSupportUrl());
+    }
+
+    @Test
     void testToInitiativeAdditionalChannels_empty() {
         Initiative initiative = createStep1Initiative();
         InitiativeAdditional additionalInfo = createInitiativeAdditional();
@@ -357,6 +371,34 @@ class InitiativeDTOsToModelMapperTest {
         InitiativeBeneficiaryRuleDTO beneficiaryRuleDTO = createInitiativeBeneficiaryRuleDTO();
         beneficiaryRuleDTO.setSelfDeclarationCriteria(Collections.emptyList());
         assertTrue(initiativeDTOsToModelMapper.toBeneficiaryRule(beneficiaryRuleDTO).getSelfDeclarationCriteria().isEmpty());
+    }
+
+    // BND-1883: informative criteria dto -> model mapping
+    @Test
+    void toBeneficiaryRule_informativeCriteria() {
+        SelfCriteriaInformativeDTO informativeDTO = SelfCriteriaInformativeDTO.builder()
+                .type(it.gov.pagopa.initiative.dto.TypeInformativeEnum.INFORMATIVE)
+                .code("ADE")
+                .description("Canone TV")
+                .organization("Agenzia delle Entrate")
+                .value("Descrizione estesa del requisito")
+                .build();
+
+        InitiativeBeneficiaryRuleDTO beneficiaryRuleDTO = new InitiativeBeneficiaryRuleDTO();
+        beneficiaryRuleDTO.setAutomatedCriteria(Collections.emptyList());
+        beneficiaryRuleDTO.setSelfDeclarationCriteria(new ArrayList<>(List.of(informativeDTO)));
+
+        InitiativeBeneficiaryRule result = initiativeDTOsToModelMapper.toBeneficiaryRule(beneficiaryRuleDTO);
+
+        assertEquals(1, result.getSelfDeclarationCriteria().size());
+        ISelfDeclarationCriteria mapped = result.getSelfDeclarationCriteria().get(0);
+        assertInstanceOf(SelfCriteriaInformative.class, mapped);
+        SelfCriteriaInformative informative = (SelfCriteriaInformative) mapped;
+        assertEquals(it.gov.pagopa.initiative.model.TypeInformativeEnum.INFORMATIVE, informative.get_type());
+        assertEquals("ADE", informative.getCode());
+        assertEquals("Canone TV", informative.getDescription());
+        assertEquals("Agenzia delle Entrate", informative.getOrganization());
+        assertEquals("Descrizione estesa del requisito", informative.getValue());
     }
 
     @Test

@@ -492,6 +492,21 @@ class InitiativeModelToDTOMapperTest {
     }
 
     @Test
+    void toInitiativeAdditionalDTO_mapsNewLinks() {
+        Initiative initiative = createStep1Initiative();
+        InitiativeAdditional additionalInfo = new InitiativeAdditional();
+        additionalInfo.setServiceScope(InitiativeAdditional.ServiceScope.LOCAL);
+        additionalInfo.setWebsiteUrl("https://portale.cittadino");
+        additionalInfo.setSupportUrl("https://assistenza.url");
+        initiative.setAdditionalInfo(additionalInfo);
+
+        InitiativeAdditionalDTO result = initiativeModelToDTOMapper.toInitiativeDTO(initiative, true).getAdditionalInfo();
+
+        assertEquals("https://portale.cittadino", result.getWebsiteUrl());
+        assertEquals("https://assistenza.url", result.getSupportUrl());
+    }
+
+    @Test
     void testToChannelsDTO_empty() {
         Initiative initiative = createStep1Initiative();
         InitiativeAdditional additionalInfo = new InitiativeAdditional();
@@ -537,6 +552,35 @@ class InitiativeModelToDTOMapperTest {
     @Test
     void toInitiativeBeneficiaryRuleDTONull_equals() {
         assertNull(initiativeModelToDTOMapper.toInitiativeBeneficiaryRuleDTO(null));
+    }
+
+    // BND-1883: informative criteria model -> dto mapping
+    @Test
+    void toInitiativeBeneficiaryRuleDTO_informativeCriteria() {
+        SelfCriteriaInformative informative = SelfCriteriaInformative.builder()
+                ._type(it.gov.pagopa.initiative.model.TypeInformativeEnum.INFORMATIVE)
+                .code("ANPR")
+                .description("Famiglia anagrafica")
+                .organization("ANPR")
+                .value("Descrizione estesa del requisito")
+                .build();
+
+        InitiativeBeneficiaryRule localInitiativeBeneficiaryRule = new InitiativeBeneficiaryRule();
+        localInitiativeBeneficiaryRule.setAutomatedCriteria(new ArrayList<>());
+        localInitiativeBeneficiaryRule.setSelfDeclarationCriteria(new ArrayList<>(List.of(informative)));
+
+        InitiativeBeneficiaryRuleDTO result = initiativeModelToDTOMapper
+                .toInitiativeBeneficiaryRuleDTO(localInitiativeBeneficiaryRule);
+
+        assertEquals(1, result.getSelfDeclarationCriteria().size());
+        AnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems mapped = result.getSelfDeclarationCriteria().get(0);
+        assertInstanceOf(SelfCriteriaInformativeDTO.class, mapped);
+        SelfCriteriaInformativeDTO informativeDTO = (SelfCriteriaInformativeDTO) mapped;
+        assertEquals(it.gov.pagopa.initiative.dto.TypeInformativeEnum.INFORMATIVE, informativeDTO.getType());
+        assertEquals("ANPR", informativeDTO.getCode());
+        assertEquals("Famiglia anagrafica", informativeDTO.getDescription());
+        assertEquals("ANPR", informativeDTO.getOrganization());
+        assertEquals("Descrizione estesa del requisito", informativeDTO.getValue());
     }
 
     @Test

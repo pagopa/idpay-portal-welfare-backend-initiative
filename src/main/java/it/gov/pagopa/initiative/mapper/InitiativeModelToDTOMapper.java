@@ -211,6 +211,8 @@ public class InitiativeModelToDTOMapper {
                 .logoFileName(additional.getLogoFileName())
                 .logoUploadDate(additional.getLogoUploadDate())
                 .ctaLabelMap(additional.getCtaLabelMap())
+                .websiteUrl(additional.getWebsiteUrl())
+                .supportUrl(additional.getSupportUrl())
                 .build();
     }
 
@@ -285,6 +287,16 @@ public class InitiativeModelToDTOMapper {
                                         .description(selfCriteriaMultiConsent.getDescription())
                                         .subDescription(selfCriteriaMultiConsent.getSubDescription())
                                         .value(selfCriteriaMultiConsent.getValue())
+                                        .build();
+                            }
+                            // BND-1883: map informative criteria model -> dto
+                            else if (x instanceof SelfCriteriaInformative selfCriteriaInformative) {
+                                return SelfCriteriaInformativeDTO.builder()
+                                        .type(it.gov.pagopa.initiative.dto.TypeInformativeEnum.valueOf(selfCriteriaInformative.get_type().name()))
+                                        .code(selfCriteriaInformative.getCode())
+                                        .description(selfCriteriaInformative.getDescription())
+                                        .organization(selfCriteriaInformative.getOrganization())
+                                        .value(selfCriteriaInformative.getValue())
                                         .build();
                             }
                             return null;

@@ -97,6 +97,8 @@ public class InitiativeDTOsToModelMapper {
                 .channels(toInitiativeAdditionalChannels(additionalDTO.getChannels()))
                 .thumbnailUrl(additionalDTO.getThumbnailUrl())
                 .ctaLabelMap(additionalDTO.getCtaLabelMap())
+                .websiteUrl(additionalDTO.getWebsiteUrl())
+                .supportUrl(additionalDTO.getSupportUrl())
                 .build();
     }
 
@@ -166,6 +168,16 @@ public class InitiativeDTOsToModelMapper {
                                 .description(selfCriteriaMultiConsentDTO.getDescription())
                                 .subDescription(selfCriteriaMultiConsentDTO.getSubDescription())
                                 .value(selfCriteriaMultiConsentDTO.getValue())
+                                .build();
+                    }
+                    // BND-1883: map informative criteria dto -> model
+                    else if (dto instanceof SelfCriteriaInformativeDTO selfCriteriaInformativeDTO) {
+                        return SelfCriteriaInformative.builder()
+                                ._type(it.gov.pagopa.initiative.model.TypeInformativeEnum.valueOf(selfCriteriaInformativeDTO.getType().name()))
+                                .code(selfCriteriaInformativeDTO.getCode())
+                                .description(selfCriteriaInformativeDTO.getDescription())
+                                .organization(selfCriteriaInformativeDTO.getOrganization())
+                                .value(selfCriteriaInformativeDTO.getValue())
                                 .build();
                     }
                     return null;
