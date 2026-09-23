@@ -178,6 +178,16 @@ public class InitiativeDTOsToModelMapper {
                                 .value(selfCriteriaMultiConsentDTO.getValue())
                                 .build();
                     }
+                    // BND-1883: map informative criteria dto -> model
+                    else if (dto instanceof SelfCriteriaInformativeDTO selfCriteriaInformativeDTO) {
+                        return SelfCriteriaInformative.builder()
+                                ._type(it.gov.pagopa.initiative.model.TypeInformativeEnum.valueOf(selfCriteriaInformativeDTO.getType().name()))
+                                .code(selfCriteriaInformativeDTO.getCode())
+                                .description(selfCriteriaInformativeDTO.getDescription())
+                                .organization(selfCriteriaInformativeDTO.getOrganization())
+                                .value(selfCriteriaInformativeDTO.getValue())
+                                .build();
+                    }
                     return null;
                 }).toList());
 

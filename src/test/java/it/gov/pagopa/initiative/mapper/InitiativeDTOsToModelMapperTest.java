@@ -373,6 +373,34 @@ class InitiativeDTOsToModelMapperTest {
         assertTrue(initiativeDTOsToModelMapper.toBeneficiaryRule(beneficiaryRuleDTO).getSelfDeclarationCriteria().isEmpty());
     }
 
+    // BND-1883: informative criteria dto -> model mapping
+    @Test
+    void toBeneficiaryRule_informativeCriteria() {
+        SelfCriteriaInformativeDTO informativeDTO = SelfCriteriaInformativeDTO.builder()
+                .type(it.gov.pagopa.initiative.dto.TypeInformativeEnum.INFORMATIVE)
+                .code("ADE")
+                .description("Canone TV")
+                .organization("Agenzia delle Entrate")
+                .value("Descrizione estesa del requisito")
+                .build();
+
+        InitiativeBeneficiaryRuleDTO beneficiaryRuleDTO = new InitiativeBeneficiaryRuleDTO();
+        beneficiaryRuleDTO.setAutomatedCriteria(Collections.emptyList());
+        beneficiaryRuleDTO.setSelfDeclarationCriteria(new ArrayList<>(List.of(informativeDTO)));
+
+        InitiativeBeneficiaryRule result = initiativeDTOsToModelMapper.toBeneficiaryRule(beneficiaryRuleDTO);
+
+        assertEquals(1, result.getSelfDeclarationCriteria().size());
+        ISelfDeclarationCriteria mapped = result.getSelfDeclarationCriteria().get(0);
+        assertInstanceOf(SelfCriteriaInformative.class, mapped);
+        SelfCriteriaInformative informative = (SelfCriteriaInformative) mapped;
+        assertEquals(it.gov.pagopa.initiative.model.TypeInformativeEnum.INFORMATIVE, informative.get_type());
+        assertEquals("ADE", informative.getCode());
+        assertEquals("Canone TV", informative.getDescription());
+        assertEquals("Agenzia delle Entrate", informative.getOrganization());
+        assertEquals("Descrizione estesa del requisito", informative.getValue());
+    }
+
     @Test
     void givenApiKeyCientIdNotPresent_toInitiative() {
         initiativeDTO.getBeneficiaryRule().setApiKeyClientId(null);
