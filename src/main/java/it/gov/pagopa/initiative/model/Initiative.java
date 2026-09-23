@@ -45,4 +45,5 @@ public class Initiative {
     private InitiativeRefundRule refundRule;
     private Boolean enabled;
     private List<String> atecoCodes;
+    private String emailFlux;
 }

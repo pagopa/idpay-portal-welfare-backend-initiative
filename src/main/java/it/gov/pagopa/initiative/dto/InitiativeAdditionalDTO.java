@@ -79,6 +79,9 @@ public class InitiativeAdditionalDTO extends InitiativeOrganizationInfoDTO {
   @JsonProperty("thumbnailUrl")
   private String thumbnailUrl;
 
+  @JsonProperty("emailFlux")
+  private String emailFlux;
+
   /**
    * Testi configurabili della label CTA della card IO, indicizzati per lingua ("it", "en").
    * Se assente/vuoto per una lingua si applica il fallback ai default in InitiativeConstants.CtaConstant.

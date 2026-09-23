@@ -35,6 +35,7 @@ public class InitiativeAdditional {
   private LocalDateTime logoUploadDate;
   private String logoURL;
   private String thumbnailUrl;
+  private String emailFlux;
   /**
    * Testi configurabili della label CTA mostrata nella card IO, indicizzati per lingua ("it", "en").
    * Se assente/vuoto per una lingua si applica il fallback ai default in InitiativeConstants.CtaConstant.
