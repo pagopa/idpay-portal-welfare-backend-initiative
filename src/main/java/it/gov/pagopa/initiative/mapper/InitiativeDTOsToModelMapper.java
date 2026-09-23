@@ -106,6 +106,7 @@ public class InitiativeDTOsToModelMapper {
                 .ctaLabelMap(additionalDTO.getCtaLabelMap())
                 .websiteUrl(additionalDTO.getWebsiteUrl())
                 .supportUrl(additionalDTO.getSupportUrl())
+                .emailFlux(additionalDTO.getEmailFlux())
                 .build();
     }
 
