@@ -108,4 +108,7 @@ public class InitiativeDTO   {
 
   @JsonProperty("atecoCodes")
   private List<String> atecoCodes;
+
+  @JsonProperty("emailFlux")
+  private String emailFlux;
 }

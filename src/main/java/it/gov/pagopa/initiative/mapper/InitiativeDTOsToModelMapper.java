@@ -44,8 +44,15 @@ public class InitiativeDTOsToModelMapper {
     public Initiative toInitiative(InitiativeAdditionalDTO initiativeAdditionalDTO) {
         Initiative initiative = new Initiative();
         initiative.setAdditionalInfo(this.toInitiativeAdditional(initiativeAdditionalDTO));
-        if(null != initiative.getAdditionalInfo() && null != initiative.getAdditionalInfo().getServiceName())
-            initiative.setInitiativeName(initiative.getAdditionalInfo().getServiceName());
+        if(null != initiative.getAdditionalInfo()){
+            if(null != initiative.getAdditionalInfo().getServiceName()){
+                initiative.setInitiativeName(initiative.getAdditionalInfo().getServiceName());
+            }
+            if(null != initiative.getAdditionalInfo().getEmailFlux()){
+                initiative.setEmailFlux(initiative.getAdditionalInfo().getEmailFlux());
+            }
+        }
+
         return initiative;
     }
 
@@ -99,6 +106,7 @@ public class InitiativeDTOsToModelMapper {
                 .ctaLabelMap(additionalDTO.getCtaLabelMap())
                 .websiteUrl(additionalDTO.getWebsiteUrl())
                 .supportUrl(additionalDTO.getSupportUrl())
+                .emailFlux(additionalDTO.getEmailFlux())
                 .build();
     }
 
