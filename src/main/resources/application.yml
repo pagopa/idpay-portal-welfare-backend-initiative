@@ -221,8 +221,8 @@ assistance:
       serviceCode: idpay-timeline
       baseUrl: ${TIMELINE_URI:http://localhost:8081}
     transactions:
-      serviceCode: idpay-transaction
-      baseUrl: ${TRANSACTION_URI:http://localhost:8081}
+      serviceCode: idpay-payment
+      baseUrl: ${PAYMENT_URI:http://localhost:8081}
     onboarding:
       serviceCode: idpay-onboarding-assistance
       uri: ${ONBOARDING_URI:http://localhost:8081}
