@@ -1,6 +1,5 @@
 package it.gov.pagopa.initiative.service;
 
-
 import it.gov.pagopa.initiative.constants.InitiativeConstants;
 import it.gov.pagopa.initiative.dto.*;
 import it.gov.pagopa.initiative.dto.rule.refund.InitiativeRefundRuleDTO;
@@ -67,13 +66,11 @@ class InitiativeValidationServiceTest {
     public static final String API_KEY_CLIENT_ID = "apiKeyClientId";
     public static final String API_KEY_CLIENT_ASSERTION = "apiKeyClientAssertion";
 
-
     @Autowired
     InitiativeValidationService initiativeValidationService;
 
     @MockitoBean
     InitiativeRepository initiativeRepository;
-
 
     @Test
     void givenAdminRole_whenInitiativeStatusIsValid_thenOk() {
@@ -154,6 +151,7 @@ class InitiativeValidationServiceTest {
         assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_ADMIN_ROLE_NOT_ALLOWED, exception.getCode());
         assertEquals(String.format("Admin permission not allowed for current initiative [%s]", step2Initiative.getInitiativeId()), exception.getMessage());
     }
+
     @Test
     void updateGeneralInfoWhenBeneficiaryTypeIsNF_ok() {
         Initiative fullInitiative = createStep2Initiative(true);
@@ -164,6 +162,7 @@ class InitiativeValidationServiceTest {
         Executable executable = () -> initiativeValidationService.checkBeneficiaryTypeAndFamilyUnit(fullInitiative);
         assertDoesNotThrow(executable);
     }
+
     @Test
     void updateGeneralInfoWhenBeneficiaryTypeIsNFAndFamilyUnitCompositionIsNull_ko() {
         Initiative fullInitiative = createFullInitiative(false);
@@ -546,6 +545,7 @@ class InitiativeValidationServiceTest {
             assertEquals("Refund rules is not valid", e.getMessage());
         }
     }
+
     @ParameterizedTest
     @MethodSource("rangeDate")
     void checkStartDateAndEndDate(LocalDate startDate, LocalDate endDate) {
@@ -562,6 +562,7 @@ class InitiativeValidationServiceTest {
             assertEquals("In the initiative [%s] the startDate and endDate cannot be less than today".formatted(step2Initiative.getInitiativeId()), e.getMessage());
         }
     }
+
     @ParameterizedTest
     @MethodSource("fieldsAndDate")
     void checkValuesWhenCodeIsBirthdateAndFieldIsYear(String code, String field, String value) {
@@ -583,6 +584,32 @@ class InitiativeValidationServiceTest {
         }
     }
 
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            InitiativeConstants.Status.PUBLISHED,
+            InitiativeConstants.Status.IN_REVISION,
+            InitiativeConstants.Status.TO_CHECK,
+            InitiativeConstants.Status.APPROVED
+    })
+    void getInitiativeInfo_pagopaAdminAllowedStatuses_returnsInitiative(String status) {
+
+        Initiative initiative = Initiative.builder()
+                .initiativeId(INITIATIVE_ID)
+                .status(status)
+                .build();
+
+        when(initiativeRepository.findByInitiativeIdAndEnabled(
+                INITIATIVE_ID,
+                true))
+                .thenReturn(Optional.of(initiative));
+
+        Initiative result = initiativeValidationService.getInitiativeInfo(
+                INITIATIVE_ID,
+                InitiativeConstants.Role.PAGOPA_ADMIN);
+
+        assertEquals(status, result.getStatus());
+    }
     /*
      * ############### Step 1 ###############
      */
@@ -661,15 +688,18 @@ class InitiativeValidationServiceTest {
     private InitiativeGeneral createInitiativeGeneral(Boolean rankingEnabled) {
         Map<String, String> language = new HashMap<>();
         language.put(Locale.ITALIAN.getLanguage(), "it");
+
         InitiativeGeneral initiativeGeneral = new InitiativeGeneral();
-        initiativeGeneral.setBeneficiaryBudgetCents(1000L);
         initiativeGeneral.setBeneficiaryKnown(false);
         initiativeGeneral.setBeneficiaryType(PF);
         initiativeGeneral.setBudgetCents(100000000000L);
+        initiativeGeneral.setBeneficiaryBudgetFixedCents(100000L);
+
         LocalDate rankingStartDate = LocalDate.now();
         LocalDate rankingEndDate = rankingStartDate.plusDays(1);
         LocalDate startDate = rankingEndDate.plusDays(1);
         LocalDate endDate = startDate.plusDays(1);
+
         initiativeGeneral.setRankingStartDate(rankingStartDate);
         initiativeGeneral.setRankingEndDate(rankingEndDate);
         initiativeGeneral.setStartDate(startDate);
@@ -688,16 +718,18 @@ class InitiativeValidationServiceTest {
     private InitiativeGeneralDTO createInitiativeGeneralDTO(Boolean rankingEnabled) {
         Map<String, String> language = new HashMap<>();
         language.put(Locale.ITALIAN.getLanguage(), "it");
+
         InitiativeGeneralDTO initiativeGeneralDTO = new InitiativeGeneralDTO();
-        initiativeGeneralDTO.setBeneficiaryBudget(new BigDecimal(10));
-        initiativeGeneralDTO.setBeneficiaryBudgetMax(new BigDecimal(10));
         initiativeGeneralDTO.setBeneficiaryKnown(false);
         initiativeGeneralDTO.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
-        initiativeGeneralDTO.setBudget(new BigDecimal(1000000000));
+        initiativeGeneralDTO.setBudget(new BigDecimal("1000000000"));
+        initiativeGeneralDTO.setBeneficiaryBudgetFixed(new BigDecimal("1000"));
+
         LocalDate rankingStartDate = LocalDate.now();
         LocalDate rankingEndDate = rankingStartDate.plusDays(1);
         LocalDate startDate = rankingEndDate.plusDays(1);
         LocalDate endDate = startDate.plusDays(1);
+
         initiativeGeneralDTO.setRankingStartDate(rankingStartDate);
         initiativeGeneralDTO.setRankingEndDate(rankingEndDate);
         initiativeGeneralDTO.setStartDate(startDate);
@@ -725,11 +757,13 @@ class InitiativeValidationServiceTest {
 
     private InitiativeBeneficiaryRule createInitiativeBeneficiaryRule() {
         InitiativeBeneficiaryRule initiativeBeneficiaryRule = new InitiativeBeneficiaryRule();
+
         SelfCriteriaBool selfCriteriaBool = new SelfCriteriaBool();
         selfCriteriaBool.set_type(TypeBoolEnum.BOOLEAN);
         selfCriteriaBool.setCode("B001");
         selfCriteriaBool.setDescription("Desc_bool");
         selfCriteriaBool.setValue(true);
+
         SelfCriteriaMulti selfCriteriaMulti = new SelfCriteriaMulti();
         selfCriteriaMulti.set_type(TypeMultiEnum.MULTI);
         selfCriteriaMulti.setCode("B001");
@@ -738,10 +772,12 @@ class InitiativeValidationServiceTest {
         values.add("valore1");
         values.add("valore2");
         selfCriteriaMulti.setValue(values);
+
         List<ISelfDeclarationCriteria> iSelfDeclarationCriteriaList = new ArrayList<>();
         iSelfDeclarationCriteriaList.add(selfCriteriaBool);
         iSelfDeclarationCriteriaList.add(selfCriteriaMulti);
         initiativeBeneficiaryRule.setSelfDeclarationCriteria(iSelfDeclarationCriteriaList);
+
         AutomatedCriteria automatedCriteriaLocal = new AutomatedCriteria();
         automatedCriteriaLocal.setAuthority("INPS");
         automatedCriteriaLocal.setCode(ISEE);
@@ -749,18 +785,23 @@ class InitiativeValidationServiceTest {
         automatedCriteriaLocal.setOperator(FilterOperatorEnumModel.EQ);
         automatedCriteriaLocal.setValue("value");
         automatedCriteriaLocal.setIseeTypes(List.of(IseeTypologyEnum.CORRENTE, IseeTypologyEnum.DOTTORATO, IseeTypologyEnum.RESIDENZIALE));
+
         List<AutomatedCriteria> automatedCriteriaList = new ArrayList<>();
         automatedCriteriaList.add(automatedCriteriaLocal);
         initiativeBeneficiaryRule.setAutomatedCriteria(automatedCriteriaList);
+
         return initiativeBeneficiaryRule;
     }
+
     private InitiativeBeneficiaryRule createInitiativeBeneficiaryRuleWithoutISEE() {
         InitiativeBeneficiaryRule initiativeBeneficiaryRule = new InitiativeBeneficiaryRule();
+
         SelfCriteriaBool selfCriteriaBool = new SelfCriteriaBool();
         selfCriteriaBool.set_type(TypeBoolEnum.BOOLEAN);
         selfCriteriaBool.setCode("B001");
         selfCriteriaBool.setDescription("Desc_bool");
         selfCriteriaBool.setValue(true);
+
         SelfCriteriaMulti selfCriteriaMulti = new SelfCriteriaMulti();
         selfCriteriaMulti.set_type(TypeMultiEnum.MULTI);
         selfCriteriaMulti.setCode("B001");
@@ -769,19 +810,23 @@ class InitiativeValidationServiceTest {
         values.add("valore1");
         values.add("valore2");
         selfCriteriaMulti.setValue(values);
+
         List<ISelfDeclarationCriteria> iSelfDeclarationCriteriaList = new ArrayList<>();
         iSelfDeclarationCriteriaList.add(selfCriteriaBool);
         iSelfDeclarationCriteriaList.add(selfCriteriaMulti);
         initiativeBeneficiaryRule.setSelfDeclarationCriteria(iSelfDeclarationCriteriaList);
+
         AutomatedCriteria automatedCriteriaLocal = new AutomatedCriteria();
         automatedCriteriaLocal.setCode("BIRTHDATE");
         automatedCriteriaLocal.setField("Year");
         automatedCriteriaLocal.setOperator(FilterOperatorEnumModel.EQ);
         automatedCriteriaLocal.setValue("value");
         automatedCriteriaLocal.setIseeTypes(List.of(IseeTypologyEnum.CORRENTE, IseeTypologyEnum.DOTTORATO, IseeTypologyEnum.RESIDENZIALE));
+
         List<AutomatedCriteria> automatedCriteriaList = new ArrayList<>();
         automatedCriteriaList.add(automatedCriteriaLocal);
         initiativeBeneficiaryRule.setAutomatedCriteria(automatedCriteriaList);
+
         return initiativeBeneficiaryRule;
     }
 
@@ -843,10 +888,12 @@ class InitiativeValidationServiceTest {
         values.add("valore1");
         values.add("valore2");
         selfCriteriaMultiDTO.setValue(values);
-        List<AnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems> anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems = new ArrayList<>();
-        anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems.add(selfCriteriaBoolDTO);
-        anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems.add(selfCriteriaMultiDTO);
-        initiativeBeneficiaryRuleDTO.setSelfDeclarationCriteria(anyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems);
+
+        List<AnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems> criteriaItems = new ArrayList<>();
+        criteriaItems.add(selfCriteriaBoolDTO);
+        criteriaItems.add(selfCriteriaMultiDTO);
+        initiativeBeneficiaryRuleDTO.setSelfDeclarationCriteria(criteriaItems);
+
         AutomatedCriteriaDTO automatedCriteriaDTO = new AutomatedCriteriaDTO();
         automatedCriteriaDTO.setAuthority("Authority_ISEE");
         automatedCriteriaDTO.setCode("Code_ISEE");
@@ -1031,11 +1078,11 @@ class InitiativeValidationServiceTest {
         Map<String, String> language = new HashMap<>();
         language.put(Locale.ITALIAN.getLanguage(), "it");
         InitiativeGeneral initiativeGeneral = new InitiativeGeneral();
-        initiativeGeneral.setBeneficiaryBudgetCents(1000L);
         initiativeGeneral.setBeneficiaryKnown(true);
         initiativeGeneral.setBeneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.NF);
         initiativeGeneral.setFamilyUnitComposition(InitiativeConstants.FamilyUnitCompositionConstant.INPS);
         initiativeGeneral.setBudgetCents(100000000000L);
+        initiativeGeneral.setBeneficiaryBudgetFixedCents(100000L);
         initiativeGeneral.setEndDate(LocalDate.of(2022, 9, 8));
         initiativeGeneral.setStartDate(LocalDate.of(2022, 8, 8));
         initiativeGeneral.setRankingStartDate(LocalDate.of(2022, 9, 18));
@@ -1064,5 +1111,60 @@ class InitiativeValidationServiceTest {
                 Arguments.of("BIRTHDATE","Age", Year.now().minusYears(180).toString()),
                 Arguments.of("BIRTHDATE","Age", "120")
         );
+    }
+
+    @Test
+    void checkProductTypeBudget_whenProductTypeBudgetIsNull_thenDoNothing() {
+        Initiative initiative = createStep2Initiative(false);
+        initiative.getGeneral().setProductTypeBudgetCents(null);
+
+        Executable executable = () -> initiativeValidationService.checkProductTypeBudget(initiative);
+        assertDoesNotThrow(executable);
+    }
+
+    @Test
+    void checkProductTypeBudget_whenProductTypeBudgetIsEmpty_thenDoNothing() {
+        Initiative initiative = createStep2Initiative(false);
+        initiative.getGeneral().setProductTypeBudgetCents(new HashMap<>());
+
+        Executable executable = () -> initiativeValidationService.checkProductTypeBudget(initiative);
+        assertDoesNotThrow(executable);
+    }
+
+    @Test
+    void checkProductTypeBudget_whenBeneficiaryBudgetFixedIsEqualsToMaxProductBudgetSet() {
+        Initiative initiative = createStep2Initiative(false);
+        InitiativeGeneral general = initiative.getGeneral();
+
+        Map<String, Long> productTypeBudgetCents = new HashMap<>();
+        productTypeBudgetCents.put("PRODUCT_1", 5000L);
+        productTypeBudgetCents.put("PRODUCT_2", 7000L);
+        general.setProductTypeBudgetCents(productTypeBudgetCents);
+
+        general.setBeneficiaryBudgetFixedCents(7000L);
+
+        Executable executable = () -> initiativeValidationService.checkProductTypeBudget(initiative);
+        assertDoesNotThrow(executable);
+    }
+
+    @Test
+    void checkProductTypeBudget_whenBeneficiaryBudgetFixedIsLessThanMaxProductBudgetSet() {
+        Initiative initiative = createStep2Initiative(false);
+        InitiativeGeneral general = initiative.getGeneral();
+
+        Map<String, Long> productTypeBudgetCents = new HashMap<>();
+        productTypeBudgetCents.put("PRODUCT_1", 5000L);
+        productTypeBudgetCents.put("PRODUCT_2", 10000L);
+        general.setProductTypeBudgetCents(productTypeBudgetCents);
+
+        general.setBeneficiaryBudgetFixedCents(8000L);
+
+        try {
+            initiativeValidationService.checkProductTypeBudget(initiative);
+            Assertions.fail("Expected InitiativeProductTypeBudgetException to be thrown");
+        } catch (InitiativeProductTypeBudgetException e) {
+            assertEquals(InitiativeConstants.Exception.BadRequest.INITIATIVE_PRODUCT_TYPE_NOT_VALID, e.getCode());
+            assertEquals("The beneficiary budget must be greater than or equal to the product type budget for initiative [%s]".formatted(initiative.getInitiativeId()), e.getMessage());
+        }
     }
 }

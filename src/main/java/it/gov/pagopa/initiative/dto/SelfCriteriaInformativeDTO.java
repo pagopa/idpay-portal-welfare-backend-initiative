@@ -4,14 +4,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import java.util.List;
-
+// BND-1882 / BND-1883: informative self declaration criteria (dto side) - codes ANPR and ADE
 /**
- * SelfCriteriaMultiDTO
+ * SelfCriteriaInformativeDTO
  */
 @Data
 @AllArgsConstructor
@@ -19,25 +17,28 @@ import java.util.List;
 @EqualsAndHashCode
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class SelfCriteriaMultiConsentDTO implements AnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems {
+public class SelfCriteriaInformativeDTO implements AnyOfInitiativeBeneficiaryRuleDTOSelfDeclarationCriteriaItems {
 
   @JsonProperty("_type")
   @NotNull(groups = ValidationApiEnabledGroup.class)
-  private TypeMultiConsentEnum type;
+  private TypeInformativeEnum type;
+
+  @JsonProperty("code")
+  @NotBlank(groups = ValidationApiEnabledGroup.class)
+  private String code;
 
   @JsonProperty("description")
   @NotBlank(groups = ValidationApiEnabledGroup.class)
   private String description;
 
-  @JsonProperty("subDescription")
-  //@NotBlank(groups = ValidationApiEnabledGroup.class)
-  private String subDescription;
+  @JsonProperty("organization")
+  @NotBlank(groups = ValidationApiEnabledGroup.class)
+  private String organization;
 
   @JsonProperty("value")
-  @NotEmpty(groups = ValidationApiEnabledGroup.class)
-  private List<SelfCriteriaMultiConsentValueDTO> value;
+  @NotBlank(groups = ValidationApiEnabledGroup.class)
+  private String value;
 
-  @JsonProperty("code")
-  @NotNull(groups = ValidationApiEnabledGroup.class)
-  private String code;
 }
+
+

@@ -5,6 +5,7 @@ import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 /**
  * InitiativeAdditionalDTO
@@ -34,5 +35,17 @@ public class InitiativeAdditional {
   private LocalDateTime logoUploadDate;
   private String logoURL;
   private String thumbnailUrl;
+  private String emailFlux;
+  /**
+   * Testi configurabili della label CTA mostrata nella card IO, indicizzati per lingua ("it", "en").
+   * Se assente/vuoto per una lingua si applica il fallback ai default in InitiativeConstants.CtaConstant.
+   */
+  private Map<String, String> ctaLabelMap;
+
+  // --- Nuovi link configurabili per la card AppIO ---
+  /** URL "Visita il sito" (portale cittadino). */
+  private String websiteUrl;
+  /** URL "Richiedi assistenza" (link di richiesta assistenza). */
+  private String supportUrl;
 
 }

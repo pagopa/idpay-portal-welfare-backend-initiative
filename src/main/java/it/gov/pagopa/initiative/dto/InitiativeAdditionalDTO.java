@@ -3,6 +3,10 @@ package it.gov.pagopa.initiative.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -10,12 +14,9 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.validator.constraints.URL;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 /**
  * InitiativeAdditionalDTO
@@ -77,6 +78,27 @@ public class InitiativeAdditionalDTO extends InitiativeOrganizationInfoDTO {
 
   @JsonProperty("thumbnailUrl")
   private String thumbnailUrl;
+
+  @JsonProperty("emailFlux")
+  private String emailFlux;
+
+  /**
+   * Testi configurabili della label CTA della card IO, indicizzati per lingua ("it", "en").
+   * Se assente/vuoto per una lingua si applica il fallback ai default in InitiativeConstants.CtaConstant.
+   */
+  @JsonProperty("ctaLabelMap")
+  private Map<String, String> ctaLabelMap;
+
+  // --- Nuovi link configurabili per la card AppIO ---
+
+  @JsonProperty("websiteUrl")
+  @URL(protocol = "https", regexp = VALID_LINK, groups = ValidationApiEnabledGroup.class)
+  private String websiteUrl;
+
+  @JsonProperty("supportUrl")
+  @URL(protocol = "https", regexp = VALID_LINK, groups = ValidationApiEnabledGroup.class)
+  private String supportUrl;
+
 
 
 }

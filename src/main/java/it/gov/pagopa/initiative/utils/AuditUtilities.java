@@ -87,6 +87,13 @@ public class AuditUtilities {
             "Get initiative by the user", userId, initiativeId, organizationId
     );
   }
+
+  public void logGetInitiativeInfo(String userId, String initiativeId) {
+    logAuditString(
+            AuditUtilities.CEF_PATTERN,
+            "Get initiative by the user", userId, initiativeId
+    );
+  }
   public void logInitiativeDeleted(String userId, String initiativeId, String organizationId) {
     logAuditString(
             AuditUtilities.CEF_PATTERN,

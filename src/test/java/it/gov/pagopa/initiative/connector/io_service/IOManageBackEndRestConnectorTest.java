@@ -4,13 +4,12 @@ import it.gov.pagopa.initiative.dto.LogoIODTO;
 import it.gov.pagopa.initiative.dto.io.service.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -59,7 +58,7 @@ class IOManageBackEndRestConnectorTest {
         ServiceResponseDTO serviceResponseDTOexpected = createServiceResponseDTO();
 
         ResponseEntity<ServiceResponseDTO> entityExpected = new ResponseEntity<>(serviceResponseDTOexpected, HttpStatus.OK);
-        Mockito.when(ioManageBackEndFeignRestClient.createService(serviceRequestDTO, SUBSCRIPTION_KEY)).thenReturn(entityExpected);
+        when(ioManageBackEndFeignRestClient.createService(serviceRequestDTO, SUBSCRIPTION_KEY)).thenReturn(entityExpected);
 
         //Connector will call the fake server and expecting to reply what we Stub on src\resources\mappings (or can be done with wireMockServer.stubFor)
         ServiceResponseDTO serviceResponseDTO = ioManageBackEndRestConnector.createService(serviceRequestDTO);
@@ -69,7 +68,7 @@ class IOManageBackEndRestConnectorTest {
         assertThat(serviceResponseDTO).isEqualTo(serviceResponseDTOexpected);
         Assertions.assertEquals(entityExpected.getBody(), serviceResponseDTO);
 
-        Mockito.verify(ioManageBackEndFeignRestClient,times(1)).createService(serviceRequestDTO, SUBSCRIPTION_KEY);
+        verify(ioManageBackEndFeignRestClient,times(1)).createService(serviceRequestDTO, SUBSCRIPTION_KEY);
     }
 
 
@@ -149,7 +148,7 @@ class IOManageBackEndRestConnectorTest {
         String serviceId = serviceResponseDTOexpected.getId();
 
         ResponseEntity<ServiceResponseDTO> entityExpected = new ResponseEntity<>(serviceResponseDTOexpected, HttpStatus.OK);
-        Mockito.when(ioManageBackEndFeignRestClient.updateService(serviceId, serviceRequestDTO, SUBSCRIPTION_KEY)).thenReturn(entityExpected);
+        when(ioManageBackEndFeignRestClient.updateService(serviceId, serviceRequestDTO, SUBSCRIPTION_KEY)).thenReturn(entityExpected);
 
         //Connector will call the fake server and expecting to reply what we Stub on src\resources\mappings (or can be done with wireMockServer.stubFor)
         ServiceResponseDTO serviceResponseDTO = ioManageBackEndRestConnector.updateService(serviceId, serviceRequestDTO);
@@ -159,7 +158,7 @@ class IOManageBackEndRestConnectorTest {
         assertThat(serviceResponseDTO).isEqualTo(serviceResponseDTOexpected);
         Assertions.assertEquals(entityExpected.getBody(), serviceResponseDTO);
 
-        Mockito.verify(ioManageBackEndFeignRestClient,times(1)).updateService(serviceId, serviceRequestDTO, SUBSCRIPTION_KEY);
+        verify(ioManageBackEndFeignRestClient,times(1)).updateService(serviceId, serviceRequestDTO, SUBSCRIPTION_KEY);
     }
 
     @Test
@@ -175,7 +174,7 @@ class IOManageBackEndRestConnectorTest {
         KeysDTO serviceResponseDTOexpected = createServiceTokenKeys();
 
         ResponseEntity<KeysDTO> entityExpected = new ResponseEntity<>(serviceResponseDTOexpected, HttpStatus.OK);
-        Mockito.when(ioManageBackEndFeignRestClient.getServiceKeys(SERVICE_ID, SUBSCRIPTION_KEY)).thenReturn(entityExpected);
+        when(ioManageBackEndFeignRestClient.getServiceKeys(SERVICE_ID, SUBSCRIPTION_KEY)).thenReturn(entityExpected);
 
         //Connector will call the fake server and expecting to reply what we Stub on src\resources\mappings (or can be done with wireMockServer.stubFor)
         KeysDTO serviceResponseDTO = ioManageBackEndRestConnector.getServiceKeys(SERVICE_ID);
@@ -185,7 +184,7 @@ class IOManageBackEndRestConnectorTest {
         assertThat(serviceResponseDTO).isEqualTo(serviceResponseDTOexpected);
         Assertions.assertEquals(entityExpected.getBody(), serviceResponseDTO);
 
-        Mockito.verify(ioManageBackEndFeignRestClient,times(1)).getServiceKeys(SERVICE_ID, SUBSCRIPTION_KEY);
+        verify(ioManageBackEndFeignRestClient,times(1)).getServiceKeys(SERVICE_ID, SUBSCRIPTION_KEY);
     }
 
 }

@@ -26,9 +26,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 public class InitiativeDTOsToModelMapper {
@@ -46,8 +44,15 @@ public class InitiativeDTOsToModelMapper {
     public Initiative toInitiative(InitiativeAdditionalDTO initiativeAdditionalDTO) {
         Initiative initiative = new Initiative();
         initiative.setAdditionalInfo(this.toInitiativeAdditional(initiativeAdditionalDTO));
-        if(null != initiative.getAdditionalInfo() && null != initiative.getAdditionalInfo().getServiceName())
-            initiative.setInitiativeName(initiative.getAdditionalInfo().getServiceName());
+        if(null != initiative.getAdditionalInfo()){
+            if(null != initiative.getAdditionalInfo().getServiceName()){
+                initiative.setInitiativeName(initiative.getAdditionalInfo().getServiceName());
+            }
+            if(null != initiative.getAdditionalInfo().getEmailFlux()){
+                initiative.setEmailFlux(initiative.getAdditionalInfo().getEmailFlux());
+            }
+        }
+
         return initiative;
     }
 
@@ -61,8 +66,8 @@ public class InitiativeDTOsToModelMapper {
         if (generalDTO == null) {
             return null;
         }
-        return InitiativeGeneral.builder().beneficiaryBudgetCents(euroToCents(generalDTO.getBeneficiaryBudget()))
-                .beneficiaryBudgetMaxCents(euroToCents(generalDTO.getBeneficiaryBudgetMax()))
+        return InitiativeGeneral.builder()
+                .beneficiaryBudgetFixedCents(euroToCents(generalDTO.getBeneficiaryBudgetFixed()))
                 .beneficiaryKnown(generalDTO.getBeneficiaryKnown())
                 .beneficiaryType(InitiativeGeneral.BeneficiaryTypeEnum.valueOf(generalDTO.getBeneficiaryType().name()))
                 .familyUnitComposition(generalDTO.getFamilyUnitComposition()!=null?generalDTO.getFamilyUnitComposition():null)
@@ -72,7 +77,16 @@ public class InitiativeDTOsToModelMapper {
                 .rankingEndDate(generalDTO.getRankingEndDate())
                 .rankingStartDate(generalDTO.getRankingStartDate())
                 .rankingEnabled(generalDTO.getRankingEnabled())
-                .descriptionMap(generalDTO.getDescriptionMap()).build();
+                .descriptionMap(generalDTO.getDescriptionMap())
+                .productTypeBudgetCents(generalDTO.getProductTypeBudget() != null ? productTypeBudgetToCents(generalDTO.getProductTypeBudget()) : null)
+                .build();
+
+    }
+
+    private Map<String, Long> productTypeBudgetToCents(Map<String, BigDecimal> productTypeBudget) {
+        Map<String, Long> productTypeBudgetCents = new HashMap<>();
+        productTypeBudget.forEach((k,v) -> productTypeBudgetCents.put(k, euroToCents(v)));
+        return productTypeBudgetCents;
     }
 
     private InitiativeAdditional toInitiativeAdditional(InitiativeAdditionalDTO additionalDTO) {
@@ -89,6 +103,10 @@ public class InitiativeDTOsToModelMapper {
                 .tcLink(additionalDTO.getTcLink())
                 .channels(toInitiativeAdditionalChannels(additionalDTO.getChannels()))
                 .thumbnailUrl(additionalDTO.getThumbnailUrl())
+                .ctaLabelMap(additionalDTO.getCtaLabelMap())
+                .websiteUrl(additionalDTO.getWebsiteUrl())
+                .supportUrl(additionalDTO.getSupportUrl())
+                .emailFlux(additionalDTO.getEmailFlux())
                 .build();
     }
 
@@ -157,8 +175,17 @@ public class InitiativeDTOsToModelMapper {
                                 .code(selfCriteriaMultiConsentDTO.getCode())
                                 .description(selfCriteriaMultiConsentDTO.getDescription())
                                 .subDescription(selfCriteriaMultiConsentDTO.getSubDescription())
-                                .thresholdCode(selfCriteriaMultiConsentDTO.getThresholdCode())
                                 .value(selfCriteriaMultiConsentDTO.getValue())
+                                .build();
+                    }
+                    // BND-1883: map informative criteria dto -> model
+                    else if (dto instanceof SelfCriteriaInformativeDTO selfCriteriaInformativeDTO) {
+                        return SelfCriteriaInformative.builder()
+                                ._type(it.gov.pagopa.initiative.model.TypeInformativeEnum.valueOf(selfCriteriaInformativeDTO.getType().name()))
+                                .code(selfCriteriaInformativeDTO.getCode())
+                                .description(selfCriteriaInformativeDTO.getDescription())
+                                .organization(selfCriteriaInformativeDTO.getOrganization())
+                                .value(selfCriteriaInformativeDTO.getValue())
                                 .build();
                     }
                     return null;

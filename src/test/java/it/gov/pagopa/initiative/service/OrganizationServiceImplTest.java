@@ -10,11 +10,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.stream.IntStream;
+
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class OrganizationServiceImplTest {
@@ -43,7 +45,7 @@ class OrganizationServiceImplTest {
         List<OrganizationDTO> organizationDTOList = statusList != null
                 ? createOrganizationDTOList()
                 : null;
-        Mockito.lenient().when(initiativeRepository.findAllBy(statusList)).thenReturn(organizationDTOList);
+        lenient().when(initiativeRepository.findAllBy(statusList)).thenReturn(organizationDTOList);
 
         List<OrganizationDTO> result = organizationService.getOrganizationList(role);
 
@@ -53,7 +55,7 @@ class OrganizationServiceImplTest {
     @Test
     void getSingleOrganization() {
         OrganizationDTO organizationDTO = createOrganizationDTO(1);
-        Mockito.when(initiativeRepository.findFirstByOrganizationId("orgId")).thenReturn(organizationDTO);
+        when(initiativeRepository.findFirstByOrganizationId("orgId")).thenReturn(organizationDTO);
 
         OrganizationDTO result = organizationService.getOrganization("orgId");
 

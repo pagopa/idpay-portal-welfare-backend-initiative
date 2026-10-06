@@ -2,10 +2,12 @@ package it.gov.pagopa.initiative.constants;
 
 
 import java.util.List;
+
 @SuppressWarnings("java:S1118")
 public class InitiativeConstants {
 
-    private InitiativeConstants(){}
+    private InitiativeConstants() {
+    }
 
     public static final class Status {
         public static final List<String> INITIATIVE_STATUS_LIST_FOR_PAGOPA_ADMIN_OPERATOR = List.of(InitiativeConstants.Status.IN_REVISION, InitiativeConstants.Status.TO_CHECK, InitiativeConstants.Status.APPROVED, InitiativeConstants.Status.PUBLISHED);
@@ -21,8 +23,8 @@ public class InitiativeConstants {
         public static final class Validation {
             public static final String REWARD_PERCENTAGE = "PERCENTAGE";
             public static final String REWARD_ABSOLUTE = "ABSOLUTE";
-            public static final String [] INITIATIVES_ALLOWED_STATES_TO_BE_EDITABLE_ARRAY = {Status.DRAFT, Status.TO_CHECK, Status.APPROVED};
-            public static final String [] INITIATIVE_ALLOWED_STATES_TO_BECOME_PUBLISHED_ARRAY = {Status.APPROVED};
+            public static final String[] INITIATIVES_ALLOWED_STATES_TO_BE_EDITABLE_ARRAY = {Status.DRAFT, Status.TO_CHECK, Status.APPROVED};
+            public static final String[] INITIATIVE_ALLOWED_STATES_TO_BECOME_PUBLISHED_ARRAY = {Status.APPROVED};
         }
     }
 
@@ -47,13 +49,21 @@ public class InitiativeConstants {
         public static final String START = "---\n";
         public static final String IT = "it:\n    ";
         public static final String CTA_1_IT = "cta_1: \n        ";
-        public static final String TEXT_IT = "text: \"Richiedi il Bonus\"\n        ";
         public static final String ACTION_IT = "action: \"ioit://idpay/onboarding/";
         public static final String EN = "\"\nen:\n    ";
         public static final String CTA_1_EN = "cta_1: \n        ";
-        public static final String TEXT_EN = "text: \"Request Bonus\"\n        ";
         public static final String ACTION_EN = "action: \"ioit://idpay/onboarding/";
         public static final String END = "\"\n---";
+
+        // Wrapper del testo label: text: "<label>"
+        public static final String TEXT_PREFIX = "text: \"";
+        public static final String TEXT_SUFFIX = "\"\n        ";
+        // Label di default (fallback) usate quando l'iniziativa non configura la CTA per la lingua
+        public static final String DEFAULT_LABEL_IT = "Richiedi il Bonus";
+        public static final String DEFAULT_LABEL_EN = "Request Bonus";
+        // Mantenuti per retrocompatibilità: testo label di default già "wrappato"
+        public static final String TEXT_IT = TEXT_PREFIX + DEFAULT_LABEL_IT + TEXT_SUFFIX;
+        public static final String TEXT_EN = TEXT_PREFIX + DEFAULT_LABEL_EN + TEXT_SUFFIX;
     }
 
     public static final class FamilyUnitCompositionConstant {
@@ -78,6 +88,7 @@ public class InitiativeConstants {
             public static final String INITIATIVE_ADMIN_ROLE_NOT_ALLOWED = "INITIATIVE_ADMIN_ROLE_NOT_ALLOWED";
             public static final String INITIATIVE_STATUS_NOT_VALID = "INITIATIVE_STATUS_NOT_VALID";
             public static final String INITIATIVE_AUTOMATED_CRITERIA_NOT_VALID_ORDER_DIRECTION_MISSING = "INITIATIVE_AUTOMATED_CRITERIA_NOT_VALID_ORDER_DIRECTION_MISSING";
+            public static final String INITIATIVE_SELF_CRITERIA_NOT_VALID = "INITIATIVE_SELF_DECLARATION_CRITERIA_NOT_VALID";
             public static final String INITIATIVE_AUTOMATED_CRITERIA_NOT_VALID_EQUALS_OPERATOR = "INITIATIVE_AUTOMATED_CRITERIA_NOT_VALID_EQUALS_OPERATOR";
             public static final String INITIATIVE_AUTOMATED_CRITERIA_NOT_VALID_ISEE_MISSING = "INITIATIVE_AUTOMATED_CRITERIA_NOT_VALID_ISEE_MISSING";
             public static final String INITIATIVE_AUTOMATED_CRITERIA_NOT_VALID_TYPOLOGY_ISEE_MISSING = "INITIATIVE_AUTOMATED_CRITERIA_NOT_VALID_TYPOLOGY_ISEE_MISSING";
@@ -85,6 +96,7 @@ public class InitiativeConstants {
             public static final String INITIATIVE_VALIDATION_WIZARD_VIOLATIONS = "INITIATIVE_VALIDATION_WIZARD_VIOLATIONS";
             public static final String INITIATIVE_REWARD_RULES_NOT_VALID = "INITIATIVE_REWARD_RULES_NOT_VALID";
             public static final String INITIATIVE_REFUND_RULES_NOT_VALID = "INITIATIVE_REFUND_RULES_NOT_VALID";
+            public static final String INITIATIVE_PRODUCT_TYPE_NOT_VALID = "INITIATIVE_PRODUCT_TYPE_NOT_VALID";
             public static final String INITIATIVE_FAMILY_UNIT_COMPOSITION_NOT_VALID = "INITIATIVE_FAMILY_UNIT_COMPOSITION_NOT_VALID";
             public static final String INITIATIVE_START_DATE_AND_END_DATE_NOT_VALID = "INITIATIVE_START_DATE_AND_END_DATE_NOT_VALID";
             public static final String INITIATIVE_YEAR_VALUE_NOT_VALID = "INITIATIVE_YEAR_VALUE_NOT_VALID";
@@ -100,9 +112,11 @@ public class InitiativeConstants {
             public static final String INITIATIVE_NOT_FOUND = "INITIATIVE_NOT_FOUND";
             public static final String INITIATIVE_NOT_FOUND_MESSAGE = "Initiative with initiativeId [%s] not found";
         }
+
         public static final class UnprocessableEntity { //422
             public static final String CODE = BASE_CODE + ".unprocessable.entity";
         }
+
         public static final class InternalServerError { //500 (5xx)
             public static final String INITIATIVE_LOGO_ERROR = "INITIATIVE_LOGO_ERROR";
             public static final String INITIATIVE_GENERIC_ERROR = "INITIATIVE_GENERIC_ERROR";

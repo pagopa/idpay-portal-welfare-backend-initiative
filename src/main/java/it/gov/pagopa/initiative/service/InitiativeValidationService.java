@@ -11,6 +11,8 @@ public interface InitiativeValidationService {
 
     Initiative getInitiative(String organizationId, String initiativeId, String role);
 
+    Initiative  getInitiativeInfo(String initiativeId, String role);
+
     void checkPermissionBeforeInsert(String role);
 
     void checkAutomatedCriteria(Initiative initiative, List<AutomatedCriteria> initiativeBeneficiaryRuleModel);
@@ -22,4 +24,6 @@ public interface InitiativeValidationService {
     void checkStartDateAndEndDate(Initiative initiative);
     void checkFieldYearLengthAndValues(List<AutomatedCriteria> initiativeBeneficiaryRuleModel);
     void checkReward(Initiative initiative);
+
+    void checkProductTypeBudget(Initiative initiative);
 }
