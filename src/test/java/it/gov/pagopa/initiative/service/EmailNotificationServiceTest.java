@@ -146,7 +146,8 @@ class EmailNotificationServiceTest {
 
     @Test
     void getInstitutionProductUsersEmailsByRole_Exception() {
-        when(selcRestConnector.getInstitutionProductUsers(ORGANIZATION_ID));
+        when(selcRestConnector.getInstitutionProductUsers(ORGANIZATION_ID))
+                .thenThrow(new RuntimeException(EXCEPTION_MESSAGE));
         try {
             emailNotificationServiceImpl.getInstitutionProductUsersEmailsByRole(ORGANIZATION_ID);
         } catch (Exception exception) {

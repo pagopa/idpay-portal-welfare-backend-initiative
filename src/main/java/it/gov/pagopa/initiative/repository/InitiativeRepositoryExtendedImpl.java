@@ -16,6 +16,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -38,6 +39,7 @@ public class InitiativeRepositoryExtendedImpl implements InitiativeRepositoryExt
 
     private static final String ONBOARDABLE = "ONBOARDABLE";
     private static final String NOT_ONBOARDABLE = "NOT_ONBOARDABLE";
+    private static final ZoneId ZONE_ID = ZoneId.of("Europe/Rome");
 
     private static final String INITIATIVE_COLLECTION = "initiative";
 
@@ -109,7 +111,7 @@ public class InitiativeRepositoryExtendedImpl implements InitiativeRepositoryExt
             String initiativeName,
             Pageable pageable) {
 
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now(ZONE_ID);
 
         List<ObjectId> safeOnboardedIds = onboardedIds.stream()
                 .map(ObjectId::new)
