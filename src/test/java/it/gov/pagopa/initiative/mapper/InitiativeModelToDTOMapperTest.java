@@ -764,6 +764,26 @@ class InitiativeModelToDTOMapperTest {
         assertEquals(Map.of("CODE", BigDecimal.valueOf(1).setScale(2, RoundingMode.HALF_DOWN)), initiativeActual.getGeneral().getProductTypeBudget());
     }
 
+    @Test
+    void toInitiativeGeneral_withVoucherDurationDays() {
+        Initiative initiative = createFullInitiative();
+        initiative.getGeneral().setVoucherDurationDays(30);
+        InitiativeDTO initiativeActual = initiativeModelToDTOMapper.toInitiativeDTO(initiative, false);
+
+        assertNotNull(initiativeActual.getGeneral());
+        assertEquals(30, initiativeActual.getGeneral().getVoucherDurationDays());
+    }
+
+    @Test
+    void toInitiativeGeneral_legacyWithoutVoucherDurationDays() {
+        Initiative initiative = createFullInitiative();
+        initiative.getGeneral().setVoucherDurationDays(null);
+        InitiativeDTO initiativeActual = initiativeModelToDTOMapper.toInitiativeDTO(initiative, false);
+
+        assertNotNull(initiativeActual.getGeneral());
+        assertNull(initiativeActual.getGeneral().getVoucherDurationDays());
+    }
+
     private Initiative createFullInitiative() {
         return createStep5Initiative();
     }
