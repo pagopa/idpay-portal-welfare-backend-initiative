@@ -618,6 +618,23 @@ class InitiativeModelToDTOMapperTest {
     }
 
     @Test
+    void toInitiativeSummaryDTOList_generalNull_noNpe() {
+        Initiative draftInitiative = createFullInitiative();
+        draftInitiative.setStatus(InitiativeConstants.Status.DRAFT);
+        draftInitiative.setGeneral(null);
+        draftInitiative.setAdditionalInfo(null);
+        List<Initiative> initiatives = List.of(draftInitiative);
+
+        List<InitiativeSummaryDTO> initiativeSummaryDTOS = initiativeModelToDTOMapper.toInitiativeSummaryDTOList(initiatives);
+
+        assertEquals(1, initiativeSummaryDTOS.size());
+        InitiativeSummaryDTO summary = initiativeSummaryDTOS.getFirst();
+        assertNull(summary.getStartDate());
+        assertNull(summary.getEndDate());
+        assertNull(summary.getServiceId());
+    }
+
+    @Test
     void testToInitiativeIssuerDTOList_empty() {
         assertTrue(initiativeModelToDTOMapper.toInitiativeIssuerDTOList(new ArrayList<>()).isEmpty());
     }
