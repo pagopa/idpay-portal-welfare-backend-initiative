@@ -187,6 +187,7 @@ public class InitiativeModelToDTOMapper {
                 .rankingEnabled(general.getRankingEnabled())
                 .descriptionMap(general.getDescriptionMap())
                 .productTypeBudget(general.getProductTypeBudgetCents() != null ? productTypeBudgetCentsToEuro(general.getProductTypeBudgetCents()) : null)
+                .voucherDurationDays(general.getVoucherDurationDays())
                 .build();
     }
 
@@ -322,7 +323,7 @@ public class InitiativeModelToDTOMapper {
                             initiativeModel.getAdditionalInfo().getServiceName() : StringUtils.EMPTY;
             return InitiativeSummaryDTO.builder()
                             .initiativeId(initiativeModel.getInitiativeId())
-                            .serviceId(initiativeModel.getAdditionalInfo().getServiceId())
+                            .serviceId(initiativeModel.getAdditionalInfo() != null ? initiativeModel.getAdditionalInfo().getServiceId() : null)
                             .initiativeName(StringUtils.isNotBlank(initiativeModel.getInitiativeName()) ?
                                     initiativeModel.getInitiativeName() : serviceName
                             )
@@ -330,8 +331,8 @@ public class InitiativeModelToDTOMapper {
                             .initiativeRewardType(initiativeModel.getInitiativeRewardType() != null ?
                                     initiativeModel.getInitiativeRewardType().name() : null)
                             .status(InitiativeUtils.checkEndDateToSetStatus(initiativeModel))
-                            .startDate(initiativeModel.getGeneral().getStartDate())
-                            .endDate(initiativeModel.getGeneral().getEndDate())
+                            .startDate(initiativeModel.getGeneral() != null ? initiativeModel.getGeneral().getStartDate() : null)
+                            .endDate(initiativeModel.getGeneral() != null ? initiativeModel.getGeneral().getEndDate() : null)
                             .creationDate(initiativeModel.getCreationDate())
                             .updateDate(initiativeModel.getUpdateDate())
                             .rankingEnabled(initiativeModel.getGeneral() != null ? initiativeModel.getGeneral().getRankingEnabled() : null)

@@ -618,6 +618,23 @@ class InitiativeModelToDTOMapperTest {
     }
 
     @Test
+    void toInitiativeSummaryDTOList_generalNull_noNpe() {
+        Initiative draftInitiative = createFullInitiative();
+        draftInitiative.setStatus(InitiativeConstants.Status.DRAFT);
+        draftInitiative.setGeneral(null);
+        draftInitiative.setAdditionalInfo(null);
+        List<Initiative> initiatives = List.of(draftInitiative);
+
+        List<InitiativeSummaryDTO> initiativeSummaryDTOS = initiativeModelToDTOMapper.toInitiativeSummaryDTOList(initiatives);
+
+        assertEquals(1, initiativeSummaryDTOS.size());
+        InitiativeSummaryDTO summary = initiativeSummaryDTOS.getFirst();
+        assertNull(summary.getStartDate());
+        assertNull(summary.getEndDate());
+        assertNull(summary.getServiceId());
+    }
+
+    @Test
     void testToInitiativeIssuerDTOList_empty() {
         assertTrue(initiativeModelToDTOMapper.toInitiativeIssuerDTOList(new ArrayList<>()).isEmpty());
     }
@@ -762,6 +779,26 @@ class InitiativeModelToDTOMapperTest {
 
         assertNotNull(initiativeActual.getGeneral());
         assertEquals(Map.of("CODE", BigDecimal.valueOf(1).setScale(2, RoundingMode.HALF_DOWN)), initiativeActual.getGeneral().getProductTypeBudget());
+    }
+
+    @Test
+    void toInitiativeGeneral_withVoucherDurationDays() {
+        Initiative initiative = createFullInitiative();
+        initiative.getGeneral().setVoucherDurationDays(30);
+        InitiativeDTO initiativeActual = initiativeModelToDTOMapper.toInitiativeDTO(initiative, false);
+
+        assertNotNull(initiativeActual.getGeneral());
+        assertEquals(30, initiativeActual.getGeneral().getVoucherDurationDays());
+    }
+
+    @Test
+    void toInitiativeGeneral_legacyWithoutVoucherDurationDays() {
+        Initiative initiative = createFullInitiative();
+        initiative.getGeneral().setVoucherDurationDays(null);
+        InitiativeDTO initiativeActual = initiativeModelToDTOMapper.toInitiativeDTO(initiative, false);
+
+        assertNotNull(initiativeActual.getGeneral());
+        assertNull(initiativeActual.getGeneral().getVoucherDurationDays());
     }
 
     private Initiative createFullInitiative() {

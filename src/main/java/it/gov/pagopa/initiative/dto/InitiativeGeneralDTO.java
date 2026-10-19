@@ -126,4 +126,11 @@ public class InitiativeGeneralDTO extends InitiativeOrganizationInfoDTO {
     @JsonProperty("productTypeBudget")
     private Map<@NotBlank String, @Positive BigDecimal> productTypeBudget;
 
+    /**
+     * Validity in days of the extended-authorization voucher; when absent the default configured in payment is used
+     */
+    @JsonProperty("voucherDurationDays")
+    @Positive(message = "voucherDurationDays should be at least 1", groups = ValidationApiEnabledGroup.class)
+    private Integer voucherDurationDays;
+
 }
