@@ -443,6 +443,25 @@ class InitiativeDTOsToModelMapperTest {
         assertEquals(Map.of("CODE", 10000L), initiativeActual.getGeneral().getProductTypeBudgetCents());
     }
 
+    @Test
+    void toInitiativeGeneral_withVoucherDurationDays() {
+        InitiativeGeneralDTO initiativeGeneral = createStep1InitiativeInfoDTOonlyInfoGeneral();
+        initiativeGeneral.setVoucherDurationDays(30);
+        Initiative initiativeActual = initiativeDTOsToModelMapper.toInitiative(initiativeGeneral);
+
+        assertNotNull(initiativeActual.getGeneral());
+        assertEquals(30, initiativeActual.getGeneral().getVoucherDurationDays());
+    }
+
+    @Test
+    void toInitiativeGeneral_withoutVoucherDurationDays() {
+        InitiativeGeneralDTO initiativeGeneral = createStep1InitiativeInfoDTOonlyInfoGeneral();
+        Initiative initiativeActual = initiativeDTOsToModelMapper.toInitiative(initiativeGeneral);
+
+        assertNotNull(initiativeActual.getGeneral());
+        assertNull(initiativeActual.getGeneral().getVoucherDurationDays());
+    }
+
     private void createInitiativeBaseFields(Initiative initiative) {
         initiative.setInitiativeId("Id1");
         initiative.setInitiativeName("initiativeName1");

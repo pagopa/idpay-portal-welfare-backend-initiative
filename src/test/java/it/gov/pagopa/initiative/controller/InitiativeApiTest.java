@@ -349,6 +349,41 @@ class InitiativeApiTest {
     }
 
     @Test
+    void updateInitiativeGeneralInfo_withVoucherDurationDays_statusNoContent() throws Exception {
+        Initiative initiative = createStep2Initiative(false);
+        InitiativeGeneralDTO request = createInitiativeGeneralDTO(false);
+        request.setVoucherDurationDays(30);
+
+        when(initiativeDTOsToModelMapper.toInitiative(any(InitiativeGeneralDTO.class))).thenReturn(initiative);
+        doNothing().when(initiativeService).updateInitiativeGeneralInfo(ORGANIZATION_ID, INITIATIVE_ID, initiative, ROLE, false);
+
+        mvc.perform(
+                        put(BASE_URL + String.format(PUT_INITIATIVE_GENERAL_INFO_URL, ORGANIZATION_ID, INITIATIVE_ID))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andDo(print());
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {0, -1})
+    void updateInitiativeGeneralInfo_withNotPositiveVoucherDurationDays_statusBadRequest(int voucherDurationDays) throws Exception {
+        InitiativeGeneralDTO request = createInitiativeGeneralDTO(false);
+        request.setVoucherDurationDays(voucherDurationDays);
+
+        mvc.perform(
+                        put(BASE_URL + String.format(PUT_INITIATIVE_GENERAL_INFO_URL, ORGANIZATION_ID, INITIATIVE_ID))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+
+        verify(initiativeService, never()).updateInitiativeGeneralInfo(any(), any(), any(), any(), anyBoolean());
+    }
+
+    @Test
     void updateInitiativeAdditionalInfo_statusNoContent() throws Exception {
         Initiative initiative = createStep1Initiative();
         InitiativeAdditionalDTO request = createInitiativeAdditionalDTO();

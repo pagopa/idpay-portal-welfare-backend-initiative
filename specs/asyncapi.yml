@@ -173,6 +173,12 @@ components:
               value: "Descrizione delle regole"
             - key: "en"
               value: "Rule description"
+        voucherDurationDays:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: "Validity in days of the extended-authorization voucher; when absent the consumer default applies"
+          example: 30
     AdditionalInfo:
       type: object
       properties:

@@ -371,6 +371,28 @@ class InitiativeValidationServiceTest {
     }
 
     @Test
+    void givenVoucherDurationDaysPositive_whenValidateAllWizardSteps_thenDoNothing() {
+        InitiativeDTO step5InitiativeDTO = createValidStep5InitiativeDTO();
+        step5InitiativeDTO.getGeneral().setVoucherDurationDays(30);
+        Executable executable = () -> initiativeValidationService.validateAllWizardSteps(step5InitiativeDTO);
+        assertDoesNotThrow(executable);
+    }
+
+    @Test
+    void givenVoucherDurationDaysNotPositive_whenValidateAllWizardSteps_thenExceptionThrown() {
+        InitiativeDTO step5InitiativeDTO = createValidStep5InitiativeDTO();
+        step5InitiativeDTO.getGeneral().setVoucherDurationDays(0);
+        assertThrows(ValidationWizardException.class, () -> initiativeValidationService.validateAllWizardSteps(step5InitiativeDTO));
+    }
+
+    private InitiativeDTO createValidStep5InitiativeDTO() {
+        InitiativeDTO step5InitiativeDTO = createStep5InitiativeDTO(true);
+        step5InitiativeDTO.getGeneral().setStartDate(step5InitiativeDTO.getGeneral().getStartDate().plusDays(20));
+        step5InitiativeDTO.getGeneral().setEndDate(step5InitiativeDTO.getGeneral().getEndDate().plusDays(20));
+        return step5InitiativeDTO;
+    }
+
+    @Test
     void checkRewardRuleAbsolute_noInstanceOf(){
         Initiative step4Initiative = createStep4Initiative(false);
         Executable executable = () -> initiativeValidationService.checkRewardRuleAbsolute(step4Initiative);
