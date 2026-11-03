@@ -79,6 +79,7 @@ public class InitiativeDTOsToModelMapper {
                 .rankingEnabled(generalDTO.getRankingEnabled())
                 .descriptionMap(generalDTO.getDescriptionMap())
                 .productTypeBudgetCents(generalDTO.getProductTypeBudget() != null ? productTypeBudgetToCents(generalDTO.getProductTypeBudget()) : null)
+                .voucherDurationDays(generalDTO.getVoucherDurationDays())
                 .build();
 
     }

@@ -39,6 +39,11 @@ public class InitiativeGeneral {
     private Boolean rankingEnabled;
     private Map<String, String> descriptionMap;
     private Map<String, Long> productTypeBudgetCents;
+    /**
+     * Validity in days of the extended-authorization voucher (nullable)
+     */
+    private Integer voucherDurationDays;
+
 
     /**
      * Gets or Sets beneficiaryType
