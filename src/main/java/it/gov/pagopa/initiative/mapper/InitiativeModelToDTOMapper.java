@@ -189,7 +189,7 @@ public class InitiativeModelToDTOMapper {
                 .productTypeBudget(general.getProductTypeBudgetCents() != null ? productTypeBudgetCentsToEuro(general.getProductTypeBudgetCents()) : null)
                 .voucherDurationDays(general.getVoucherDurationDays())
                 .initiativeSeries(general.getInitiativeSeries())
-                .checkPastOnboardings(general.getCheckPastOnboardings())
+                .checkPastOnboardingsSeries(general.getCheckPastOnboardingsSeries())
                 .build();
     }
 

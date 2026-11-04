@@ -847,11 +847,11 @@ class InitiativeApiTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void givenInitiativeWithCheckPastOnboardings_when_PUT_updateInitiativePublishedStatus_thenFieldIsForwardedUnaltered(boolean checkPastOnboardings) throws Exception {
+    void givenInitiativeWithCheckPastOnboardingsSeries_when_PUT_updateInitiativePublishedStatus_thenFieldIsForwardedUnaltered(boolean checkPastOnboardingsSeries) throws Exception {
         InitiativeOrganizationInfoDTO request = createInitiativeOrganizationInfoDTO();
         Initiative initiative = createStep5Initiative();
         initiative.getAdditionalInfo().setServiceIO(false);
-        initiative.getGeneral().setCheckPastOnboardings(checkPastOnboardings);
+        initiative.getGeneral().setCheckPastOnboardingsSeries(checkPastOnboardingsSeries);
 
         when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(initiative);
         doNothing().when(initiativeService).isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED, ROLE);
@@ -869,11 +869,11 @@ class InitiativeApiTest {
                 .andExpect(status().isNoContent())
                 .andDo(print());
 
-        //Verify the controller forwards the same checkPastOnboardings value to the rule engine notification, unaltered
+        //Verify the controller forwards the same checkPastOnboardingsSeries value to the rule engine notification, unaltered
         ArgumentCaptor<Initiative> initiativeCaptor = ArgumentCaptor.forClass(Initiative.class);
         verify(initiativeService).sendInitiativeInfoToRuleEngine(initiativeCaptor.capture());
         assertNotNull(initiativeCaptor.getValue().getGeneral());
-        assertEquals(checkPastOnboardings, initiativeCaptor.getValue().getGeneral().getCheckPastOnboardings());
+        assertEquals(checkPastOnboardingsSeries, initiativeCaptor.getValue().getGeneral().getCheckPastOnboardingsSeries());
     }
 
     @Test

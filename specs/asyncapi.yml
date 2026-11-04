@@ -193,7 +193,7 @@ components:
           type: string
           description: "Label identifying the program/series the initiative belongs to"
           example: "SERIES_2024"
-        checkPastOnboardings:
+        checkPastOnboardingsSeries:
           type: boolean
           description: "Flag indicating whether the initiative requires checking past onboardings"
           example: false

@@ -136,7 +136,7 @@ public class InitiativeGeneralDTO extends InitiativeOrganizationInfoDTO {
     @JsonProperty("initiativeSeries")
     private String initiativeSeries;
 
-    @JsonProperty("checkPastOnboardings")
-    private Boolean checkPastOnboardings;
+    @JsonProperty("checkPastOnboardingsSeries")
+    private Boolean checkPastOnboardingsSeries;
 
 }

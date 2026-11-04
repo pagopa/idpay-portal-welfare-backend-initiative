@@ -266,31 +266,31 @@ class InitiativeServiceTest {
     }
 
     @Test
-    void updateInitiativeGeneralInfo_defaultsCheckPastOnboardingsToFalse() {
+    void updateInitiativeGeneralInfo_defaultsCheckPastOnboardingsSeriesToFalse() {
         Initiative step2Initiative = createStep2Initiative();
         InitiativeGeneral initiativeGeneral = createInitiativeGeneral(true);
-        initiativeGeneral.setCheckPastOnboardings(null);
+        initiativeGeneral.setCheckPastOnboardingsSeries(null);
         step2Initiative.setGeneral(initiativeGeneral);
 
         when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step2Initiative);
 
         initiativeService.updateInitiativeGeneralInfo(ORGANIZATION_ID, INITIATIVE_ID, step2Initiative, ROLE, true);
 
-        assertEquals(Boolean.FALSE, step2Initiative.getGeneral().getCheckPastOnboardings());
+        assertEquals(Boolean.FALSE, step2Initiative.getGeneral().getCheckPastOnboardingsSeries());
     }
 
     @Test
-    void updateInitiativeGeneralInfo_keepsCheckPastOnboardingsWhenProvided() {
+    void updateInitiativeGeneralInfo_keepsCheckPastOnboardingsSeriesWhenProvided() {
         Initiative step2Initiative = createStep2Initiative();
         InitiativeGeneral initiativeGeneral = createInitiativeGeneral(true);
-        initiativeGeneral.setCheckPastOnboardings(true);
+        initiativeGeneral.setCheckPastOnboardingsSeries(true);
         step2Initiative.setGeneral(initiativeGeneral);
 
         when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step2Initiative);
 
         initiativeService.updateInitiativeGeneralInfo(ORGANIZATION_ID, INITIATIVE_ID, step2Initiative, ROLE, true);
 
-        assertEquals(Boolean.TRUE, step2Initiative.getGeneral().getCheckPastOnboardings());
+        assertEquals(Boolean.TRUE, step2Initiative.getGeneral().getCheckPastOnboardingsSeries());
     }
 
     @Test
@@ -1456,11 +1456,11 @@ class InitiativeServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void givenInitiativeWithCheckPastOnboardings_whenRuleEngineProduce_thenFieldIsPropagatedToProducer(boolean checkPastOnboardings) {
-        //Instruct Initiative with general.checkPastOnboardings valorized
+    void givenInitiativeWithCheckPastOnboardingsSeries_whenRuleEngineProduce_thenFieldIsPropagatedToProducer(boolean checkPastOnboardingsSeries) {
+        //Instruct Initiative with general.checkPastOnboardingsSeries valorized
         Initiative initiative = createStep5Initiative();
         InitiativeGeneral general = createInitiativeGeneral(true);
-        general.setCheckPastOnboardings(checkPastOnboardings);
+        general.setCheckPastOnboardingsSeries(checkPastOnboardingsSeries);
         initiative.setGeneral(general);
 
         when(initiativeProducer.sendPublishInitiative(any(Initiative.class))).thenReturn(true);
@@ -1472,7 +1472,7 @@ class InitiativeServiceTest {
         ArgumentCaptor<Initiative> initiativeCaptor = ArgumentCaptor.forClass(Initiative.class);
         verify(initiativeProducer).sendPublishInitiative(initiativeCaptor.capture());
         assertNotNull(initiativeCaptor.getValue().getGeneral());
-        assertEquals(checkPastOnboardings, initiativeCaptor.getValue().getGeneral().getCheckPastOnboardings());
+        assertEquals(checkPastOnboardingsSeries, initiativeCaptor.getValue().getGeneral().getCheckPastOnboardingsSeries());
     }
 
     @Test

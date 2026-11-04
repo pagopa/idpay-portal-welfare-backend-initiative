@@ -81,7 +81,7 @@ public class InitiativeDTOsToModelMapper {
                 .productTypeBudgetCents(generalDTO.getProductTypeBudget() != null ? productTypeBudgetToCents(generalDTO.getProductTypeBudget()) : null)
                 .voucherDurationDays(generalDTO.getVoucherDurationDays())
                 .initiativeSeries(generalDTO.getInitiativeSeries())
-                .checkPastOnboardings(generalDTO.getCheckPastOnboardings())
+                .checkPastOnboardingsSeries(generalDTO.getCheckPastOnboardingsSeries())
                 .build();
 
     }

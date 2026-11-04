@@ -50,7 +50,7 @@ public class InitiativeGeneral {
     /**
      * Whether the initiative requires checking past onboardings
      */
-    private Boolean checkPastOnboardings;
+    private Boolean checkPastOnboardingsSeries;
 
 
     /**
