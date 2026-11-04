@@ -332,15 +332,15 @@ class InitiativeDTOsToModelMapperTest {
     }
 
     @Test
-    void testToInitiative_mapsInitiativeSeriesAndCheckPastOnboardings() {
+    void testToInitiative_mapsInitiativeSeriesAndCheckPastOnboardingsSeries() {
         InitiativeGeneralDTO generalDTO = createInitiativeGeneralDTO();
         generalDTO.setInitiativeSeries("SERIES_2024");
-        generalDTO.setCheckPastOnboardings(true);
+        generalDTO.setCheckPastOnboardingsSeries(true);
 
         Initiative result = initiativeDTOsToModelMapper.toInitiative(generalDTO);
 
         assertEquals("SERIES_2024", result.getGeneral().getInitiativeSeries());
-        assertEquals(Boolean.TRUE, result.getGeneral().getCheckPastOnboardings());
+        assertEquals(Boolean.TRUE, result.getGeneral().getCheckPastOnboardingsSeries());
     }
 
     @Test

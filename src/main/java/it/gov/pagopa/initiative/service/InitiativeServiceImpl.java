@@ -192,8 +192,8 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             initiativeValidationService.checkProductTypeBudget(initiativeInfoModel);
         }
         initiative.setGeneral(initiativeInfoModel.getGeneral());
-        if (initiative.getGeneral() != null && initiative.getGeneral().getCheckPastOnboardings() == null) {
-            initiative.getGeneral().setCheckPastOnboardings(false);
+        if (initiative.getGeneral() != null && initiative.getGeneral().getCheckPastOnboardingsSeries() == null) {
+            initiative.getGeneral().setCheckPastOnboardingsSeries(false);
         }
         if (!initiative.getAdditionalInfo().getServiceName().equals(initiative.getInitiativeName())) {
             initiative.setInitiativeName(initiative.getAdditionalInfo().getServiceName());
