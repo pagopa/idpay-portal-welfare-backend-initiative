@@ -34,6 +34,7 @@ import org.apache.kafka.common.KafkaException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.security.autoconfigure.SecurityAutoConfiguration;
 import org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration;
@@ -73,6 +74,7 @@ import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.E
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.ADMIN;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.PAGOPA_ADMIN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -841,6 +843,37 @@ class InitiativeApiTest {
                                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
                 .andDo(print());
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void givenInitiativeWithCheckPastOnboardings_when_PUT_updateInitiativePublishedStatus_thenFieldIsForwardedUnaltered(boolean checkPastOnboardings) throws Exception {
+        InitiativeOrganizationInfoDTO request = createInitiativeOrganizationInfoDTO();
+        Initiative initiative = createStep5Initiative();
+        initiative.getAdditionalInfo().setServiceIO(false);
+        initiative.getGeneral().setCheckPastOnboardings(checkPastOnboardings);
+
+        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(initiative);
+        doNothing().when(initiativeService).isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED, ROLE);
+        doNothing().when(initiativeService).updateInitiative(any(Initiative.class));
+        doNothing().when(initiativeService).sendInitiativeInfoToRuleEngine(any(Initiative.class));
+        doNothing().when(initiativeService).sendEmailToPagoPA(any(), anyString(), anyString());
+        doNothing().when(initiativeService).sendEmailToCurrentOrg(any(), anyString(), anyString());
+        doNothing().when(initiativeService).initializeStatistics(INITIATIVE_ID, ORGANIZATION_ID);
+
+        mvc.perform(
+                        put(BASE_URL + String.format(PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andDo(print());
+
+        //Verify the controller forwards the same checkPastOnboardings value to the rule engine notification, unaltered
+        ArgumentCaptor<Initiative> initiativeCaptor = ArgumentCaptor.forClass(Initiative.class);
+        verify(initiativeService).sendInitiativeInfoToRuleEngine(initiativeCaptor.capture());
+        assertNotNull(initiativeCaptor.getValue().getGeneral());
+        assertEquals(checkPastOnboardings, initiativeCaptor.getValue().getGeneral().getCheckPastOnboardings());
     }
 
     @Test

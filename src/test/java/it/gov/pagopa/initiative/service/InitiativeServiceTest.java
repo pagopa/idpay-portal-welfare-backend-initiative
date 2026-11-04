@@ -44,6 +44,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.data.domain.Page;
@@ -1451,6 +1452,27 @@ class InitiativeServiceTest {
         Executable executable = () -> initiativeService.sendInitiativeInfoToRuleEngine(initiative);
 
         Assertions.assertDoesNotThrow(executable);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void givenInitiativeWithCheckPastOnboardings_whenRuleEngineProduce_thenFieldIsPropagatedToProducer(boolean checkPastOnboardings) {
+        //Instruct Initiative with general.checkPastOnboardings valorized
+        Initiative initiative = createStep5Initiative();
+        InitiativeGeneral general = createInitiativeGeneral(true);
+        general.setCheckPastOnboardings(checkPastOnboardings);
+        initiative.setGeneral(general);
+
+        when(initiativeProducer.sendPublishInitiative(any(Initiative.class))).thenReturn(true);
+
+        //Invoke the Real Service
+        initiativeService.sendInitiativeInfoToRuleEngine(initiative);
+
+        //Capture the Initiative actually forwarded to the Kafka producer and verify the field survived intact
+        ArgumentCaptor<Initiative> initiativeCaptor = ArgumentCaptor.forClass(Initiative.class);
+        verify(initiativeProducer).sendPublishInitiative(initiativeCaptor.capture());
+        assertNotNull(initiativeCaptor.getValue().getGeneral());
+        assertEquals(checkPastOnboardings, initiativeCaptor.getValue().getGeneral().getCheckPastOnboardings());
     }
 
     @Test
