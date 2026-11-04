@@ -117,6 +117,16 @@ components:
           type: boolean
           description: "Field that indicate if the initiative isn't deleted before publication"
           example: true
+        atecoCodes:
+          type: array
+          items:
+            type: string
+          description: "List of ATECO codes allowed to onboard the initiative"
+          example: ["01.11.00"]
+        emailFlux:
+          type: string
+          description: "Email used for notification flux"
+          example: "notify@example.com"
     InitiativeGeneral:
       type: object
       properties:
@@ -179,6 +189,14 @@ components:
           nullable: true
           description: "Validity in days of the extended-authorization voucher; when absent the consumer default applies"
           example: 30
+        initiativeSeries:
+          type: string
+          description: "Label identifying the program/series the initiative belongs to"
+          example: "SERIES_2024"
+        checkPastOnboardings:
+          type: boolean
+          description: "Flag indicating whether the initiative requires checking past onboardings"
+          example: false
     AdditionalInfo:
       type: object
       properties:

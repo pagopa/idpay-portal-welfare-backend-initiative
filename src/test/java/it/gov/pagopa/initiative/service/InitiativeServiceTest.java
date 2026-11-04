@@ -265,6 +265,34 @@ class InitiativeServiceTest {
     }
 
     @Test
+    void updateInitiativeGeneralInfo_defaultsCheckPastOnboardingsToFalse() {
+        Initiative step2Initiative = createStep2Initiative();
+        InitiativeGeneral initiativeGeneral = createInitiativeGeneral(true);
+        initiativeGeneral.setCheckPastOnboardings(null);
+        step2Initiative.setGeneral(initiativeGeneral);
+
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step2Initiative);
+
+        initiativeService.updateInitiativeGeneralInfo(ORGANIZATION_ID, INITIATIVE_ID, step2Initiative, ROLE, true);
+
+        assertEquals(Boolean.FALSE, step2Initiative.getGeneral().getCheckPastOnboardings());
+    }
+
+    @Test
+    void updateInitiativeGeneralInfo_keepsCheckPastOnboardingsWhenProvided() {
+        Initiative step2Initiative = createStep2Initiative();
+        InitiativeGeneral initiativeGeneral = createInitiativeGeneral(true);
+        initiativeGeneral.setCheckPastOnboardings(true);
+        step2Initiative.setGeneral(initiativeGeneral);
+
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step2Initiative);
+
+        initiativeService.updateInitiativeGeneralInfo(ORGANIZATION_ID, INITIATIVE_ID, step2Initiative, ROLE, true);
+
+        assertEquals(Boolean.TRUE, step2Initiative.getGeneral().getCheckPastOnboardings());
+    }
+
+    @Test
     void getInitiativeIdFromServiceId_thenValidationIsPassed() {
         Initiative step1Initiative = createStep1Initiative();
         when(initiativeRepository.retrieveByServiceId(SERVICE_ID)).thenReturn(Optional.ofNullable(step1Initiative));
@@ -2144,6 +2172,34 @@ class InitiativeServiceTest {
                         anyList(),
                         any(),
                         eq(pageable));
+    }
+
+    @Test
+    void getInitiativeIdsByInitiativeSeries_ok() {
+        String initiativeSeries = "SERIES_2024";
+        Initiative initiative1 = createStep2Initiative();
+        initiative1.setInitiativeId("ID1");
+        Initiative initiative2 = createStep2Initiative();
+        initiative2.setInitiativeId("ID2");
+
+        when(initiativeRepository.findByInitiativeSeries(initiativeSeries))
+                .thenReturn(List.of(initiative1, initiative2));
+
+        List<String> result = initiativeService.getInitiativeIdsByInitiativeSeries(initiativeSeries);
+
+        assertEquals(List.of("ID1", "ID2"), result);
+        verify(initiativeRepository, times(1)).findByInitiativeSeries(initiativeSeries);
+    }
+
+    @Test
+    void getInitiativeIdsByInitiativeSeries_empty() {
+        String initiativeSeries = "SERIES_UNKNOWN";
+        when(initiativeRepository.findByInitiativeSeries(initiativeSeries)).thenReturn(List.of());
+
+        List<String> result = initiativeService.getInitiativeIdsByInitiativeSeries(initiativeSeries);
+
+        assertTrue(result.isEmpty());
+        verify(initiativeRepository, times(1)).findByInitiativeSeries(initiativeSeries);
     }
 
     private ServiceResponseErrorDTO createServiceResponseErrorDTO(int httpStatus) {

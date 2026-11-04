@@ -761,6 +761,20 @@ class InitiativeModelToDTOMapperTest {
     }
 
     @Test
+    void testToInitiativeDTO_mapsInitiativeSeriesAndCheckPastOnboardings() {
+        Initiative step2Initiative = createStep2Initiative();
+        InitiativeGeneral general = createInitiativeGeneral();
+        general.setInitiativeSeries("SERIES_2024");
+        general.setCheckPastOnboardings(true);
+        step2Initiative.setGeneral(general);
+
+        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(step2Initiative, false);
+
+        assertEquals("SERIES_2024", initiativeDTO.getGeneral().getInitiativeSeries());
+        assertEquals(Boolean.TRUE, initiativeDTO.getGeneral().getCheckPastOnboardings());
+    }
+
+    @Test
     void testToInitiativeDataDto_onlyRuleDescription(){
         Initiative initiative = createFullInitiative();
 

@@ -129,6 +129,7 @@ class InitiativeApiTest {
     private static final String LOGICALLY_DELETE_INITIATIVE_URL = "/organization/%s/initiative/%s";
     private static final String GET_INITIATIVE_BENEFICIARY_DETAIL_URL = "/initiative/%s/detail";
     private static final String DELETE_INITIATIVE_URL = "/initiative/%s";
+    private static final String GET_INITIATIVE_IDS_BY_INITIATIVE_SERIES_URL = "/initiatives/series/%s";
 
     @MockitoBean
     private InitiativeService initiativeService;
@@ -683,6 +684,39 @@ class InitiativeApiTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    void getInitiativeIdsByInitiativeSeries_statusOk() throws Exception {
+        String initiativeSeries = "SERIES_2024";
+        List<String> initiativeIds = List.of("ID1", "ID2");
+
+        when(initiativeService.getInitiativeIdsByInitiativeSeries(initiativeSeries)).thenReturn(initiativeIds);
+
+        mvc.perform(
+                        get(BASE_URL + String.format(GET_INITIATIVE_IDS_BY_INITIATIVE_SERIES_URL, initiativeSeries))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(initiativeIds)))
+                .andDo(print());
+
+        verify(initiativeService, times(1)).getInitiativeIdsByInitiativeSeries(initiativeSeries);
+    }
+
+    @Test
+    void getInitiativeIdsByInitiativeSeries_statusOkWhenEmpty() throws Exception {
+        String initiativeSeries = "SERIES_UNKNOWN";
+
+        when(initiativeService.getInitiativeIdsByInitiativeSeries(initiativeSeries)).thenReturn(List.of());
+
+        mvc.perform(
+                        get(BASE_URL + String.format(GET_INITIATIVE_IDS_BY_INITIATIVE_SERIES_URL, initiativeSeries))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json("[]"))
                 .andDo(print());
     }
 
