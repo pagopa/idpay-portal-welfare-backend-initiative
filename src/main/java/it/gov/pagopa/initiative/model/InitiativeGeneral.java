@@ -43,6 +43,14 @@ public class InitiativeGeneral {
      * Validity in days of the extended-authorization voucher (nullable)
      */
     private Integer voucherDurationDays;
+    /**
+     * Label identifying the program/series the initiative belongs to
+     */
+    private String initiativeSeries;
+    /**
+     * Whether the initiative requires checking past onboardings
+     */
+    private Boolean checkPastOnboardingsSeries;
 
 
     /**

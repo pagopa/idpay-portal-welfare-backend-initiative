@@ -73,4 +73,6 @@ public interface InitiativeService {
             List<String> atecoCodes,
             String initiativeName,
             Pageable pageable);
+
+    List<String> getInitiativeIdsByInitiativeSeries(String initiativeSeries);
 }
