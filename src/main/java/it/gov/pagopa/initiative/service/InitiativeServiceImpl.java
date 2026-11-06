@@ -192,6 +192,9 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
             initiativeValidationService.checkProductTypeBudget(initiativeInfoModel);
         }
         initiative.setGeneral(initiativeInfoModel.getGeneral());
+        if (initiative.getGeneral() != null && initiative.getGeneral().getCheckPastOnboardingsSeries() == null) {
+            initiative.getGeneral().setCheckPastOnboardingsSeries(false);
+        }
         if (!initiative.getAdditionalInfo().getServiceName().equals(initiative.getInitiativeName())) {
             initiative.setInitiativeName(initiative.getAdditionalInfo().getServiceName());
         }
@@ -756,6 +759,13 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
                 .onboardStatus(item.getOnboardStatus())
                 .atecoCodes(item.getAtecoCodes())
                 .build();
+    }
+
+    @Override
+    public List<String> getInitiativeIdsByInitiativeSeries(String initiativeSeries) {
+        return initiativeRepository.findByInitiativeSeries(initiativeSeries).stream()
+                .map(Initiative::getInitiativeId)
+                .toList();
     }
 
     public void validate(String contentType, String fileName) {

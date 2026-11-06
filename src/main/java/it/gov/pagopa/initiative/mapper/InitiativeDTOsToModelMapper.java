@@ -80,6 +80,8 @@ public class InitiativeDTOsToModelMapper {
                 .descriptionMap(generalDTO.getDescriptionMap())
                 .productTypeBudgetCents(generalDTO.getProductTypeBudget() != null ? productTypeBudgetToCents(generalDTO.getProductTypeBudget()) : null)
                 .voucherDurationDays(generalDTO.getVoucherDurationDays())
+                .initiativeSeries(generalDTO.getInitiativeSeries())
+                .checkPastOnboardingsSeries(generalDTO.getCheckPastOnboardingsSeries())
                 .build();
 
     }
