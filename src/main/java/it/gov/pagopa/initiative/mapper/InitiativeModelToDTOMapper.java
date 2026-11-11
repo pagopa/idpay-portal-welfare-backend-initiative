@@ -190,6 +190,7 @@ public class InitiativeModelToDTOMapper {
                 .voucherDurationDays(general.getVoucherDurationDays())
                 .initiativeSeries(general.getInitiativeSeries())
                 .checkPastOnboardingsSeries(general.getCheckPastOnboardingsSeries())
+                .pdfVoucherTemplate(general.getPdfVoucherTemplate())
                 .build();
     }
 
