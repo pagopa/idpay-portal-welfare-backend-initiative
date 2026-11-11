@@ -44,6 +44,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.data.domain.Page;
@@ -262,6 +263,34 @@ class InitiativeServiceTest {
 
         initiativeService.insertInitiative(step2Initiative, ORGANIZATION_ID, ORGANIZATION_NAME, ROLE);
         assertEquals(InitiativeConstants.Status.DRAFT, step2Initiative.getStatus());
+    }
+
+    @Test
+    void updateInitiativeGeneralInfo_defaultsCheckPastOnboardingsSeriesToFalse() {
+        Initiative step2Initiative = createStep2Initiative();
+        InitiativeGeneral initiativeGeneral = createInitiativeGeneral(true);
+        initiativeGeneral.setCheckPastOnboardingsSeries(null);
+        step2Initiative.setGeneral(initiativeGeneral);
+
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step2Initiative);
+
+        initiativeService.updateInitiativeGeneralInfo(ORGANIZATION_ID, INITIATIVE_ID, step2Initiative, ROLE, true);
+
+        assertEquals(Boolean.FALSE, step2Initiative.getGeneral().getCheckPastOnboardingsSeries());
+    }
+
+    @Test
+    void updateInitiativeGeneralInfo_keepsCheckPastOnboardingsSeriesWhenProvided() {
+        Initiative step2Initiative = createStep2Initiative();
+        InitiativeGeneral initiativeGeneral = createInitiativeGeneral(true);
+        initiativeGeneral.setCheckPastOnboardingsSeries(true);
+        step2Initiative.setGeneral(initiativeGeneral);
+
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step2Initiative);
+
+        initiativeService.updateInitiativeGeneralInfo(ORGANIZATION_ID, INITIATIVE_ID, step2Initiative, ROLE, true);
+
+        assertEquals(Boolean.TRUE, step2Initiative.getGeneral().getCheckPastOnboardingsSeries());
     }
 
     @Test
@@ -1425,6 +1454,27 @@ class InitiativeServiceTest {
         Assertions.assertDoesNotThrow(executable);
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void givenInitiativeWithCheckPastOnboardingsSeries_whenRuleEngineProduce_thenFieldIsPropagatedToProducer(boolean checkPastOnboardingsSeries) {
+        //Instruct Initiative with general.checkPastOnboardingsSeries valorized
+        Initiative initiative = createStep5Initiative();
+        InitiativeGeneral general = createInitiativeGeneral(true);
+        general.setCheckPastOnboardingsSeries(checkPastOnboardingsSeries);
+        initiative.setGeneral(general);
+
+        when(initiativeProducer.sendPublishInitiative(any(Initiative.class))).thenReturn(true);
+
+        //Invoke the Real Service
+        initiativeService.sendInitiativeInfoToRuleEngine(initiative);
+
+        //Capture the Initiative actually forwarded to the Kafka producer and verify the field survived intact
+        ArgumentCaptor<Initiative> initiativeCaptor = ArgumentCaptor.forClass(Initiative.class);
+        verify(initiativeProducer).sendPublishInitiative(initiativeCaptor.capture());
+        assertNotNull(initiativeCaptor.getValue().getGeneral());
+        assertEquals(checkPastOnboardingsSeries, initiativeCaptor.getValue().getGeneral().getCheckPastOnboardingsSeries());
+    }
+
     @Test
     void givenInitiativeDTO_whenRuleEngineProduceIsNotValid_thenThrowException() {
         //Instruct Initiative
@@ -2144,6 +2194,34 @@ class InitiativeServiceTest {
                         anyList(),
                         any(),
                         eq(pageable));
+    }
+
+    @Test
+    void getInitiativeIdsByInitiativeSeries_ok() {
+        String initiativeSeries = "SERIES_2024";
+        Initiative initiative1 = createStep2Initiative();
+        initiative1.setInitiativeId("ID1");
+        Initiative initiative2 = createStep2Initiative();
+        initiative2.setInitiativeId("ID2");
+
+        when(initiativeRepository.findByInitiativeSeries(initiativeSeries))
+                .thenReturn(List.of(initiative1, initiative2));
+
+        List<String> result = initiativeService.getInitiativeIdsByInitiativeSeries(initiativeSeries);
+
+        assertEquals(List.of("ID1", "ID2"), result);
+        verify(initiativeRepository, times(1)).findByInitiativeSeries(initiativeSeries);
+    }
+
+    @Test
+    void getInitiativeIdsByInitiativeSeries_empty() {
+        String initiativeSeries = "SERIES_UNKNOWN";
+        when(initiativeRepository.findByInitiativeSeries(initiativeSeries)).thenReturn(List.of());
+
+        List<String> result = initiativeService.getInitiativeIdsByInitiativeSeries(initiativeSeries);
+
+        assertTrue(result.isEmpty());
+        verify(initiativeRepository, times(1)).findByInitiativeSeries(initiativeSeries);
     }
 
     private ServiceResponseErrorDTO createServiceResponseErrorDTO(int httpStatus) {

@@ -481,5 +481,15 @@ public interface InitiativeApi {
   ResponseEntity<PageResponse<InitiativeResponse>> searchInitiatives(
           @RequestBody InitiativeSearchRequest request,
           Pageable pageable);
+
+  @Operation(summary = "Returns the initiativeId list of the initiatives belonging to the given initiativeSeries", description = "")
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "200", description = "Ok"),
+          @ApiResponse(responseCode = "429", description = "Too many Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+          @ApiResponse(responseCode = "500", description = "Server ERROR", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))})
+  @GetMapping(value = "/idpay/initiatives/series/{initiativeSeries}",
+          produces = {"application/json"})
+  ResponseEntity<List<String>> getInitiativeIdsByInitiativeSeries(
+          @Parameter(in = ParameterIn.PATH, description = "The initiative series", required = true, schema = @Schema()) @PathVariable("initiativeSeries") String initiativeSeries);
 }
 
