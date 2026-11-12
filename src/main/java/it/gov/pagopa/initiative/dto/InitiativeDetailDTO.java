@@ -32,4 +32,5 @@ public class InitiativeDetailDTO {
     private String logoURL;
     private LocalDateTime updateDate;
     private String serviceId;
+    private Integer rewardBatchControlThreshold;
 }

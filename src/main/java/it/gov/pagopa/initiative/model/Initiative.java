@@ -9,6 +9,9 @@ import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -44,6 +47,9 @@ public class Initiative {
     private InitiativeTrxConditions trxRule;
     private InitiativeRefundRule refundRule;
     private Boolean enabled;
+    @Min(1)
+    @Max(100)
+    private Integer rewardBatchControlThreshold;
     private List<String> atecoCodes;
     private String emailFlux;
 }
