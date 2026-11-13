@@ -189,6 +189,8 @@ public class InitiativeModelToDTOMapper {
                 .descriptionMap(general.getDescriptionMap())
                 .productTypeBudget(general.getProductTypeBudgetCents() != null ? productTypeBudgetCentsToEuro(general.getProductTypeBudgetCents()) : null)
                 .voucherDurationDays(general.getVoucherDurationDays())
+                .initiativeSeries(general.getInitiativeSeries())
+                .checkPastOnboardingsSeries(general.getCheckPastOnboardingsSeries())
                 .build();
     }
 
