@@ -344,6 +344,16 @@ class InitiativeModelToDTOMapperTest {
 
         assertEquals(fullInitiativeDetailDTO, initiativeDetailDTO);
     }
+
+    @Test
+    void toInitiativeDetailDTO_mapsRewardBatchControlThreshold() {
+        fullInitiative.setRewardBatchControlThreshold(50);
+
+        InitiativeDetailDTO initiativeDetailDTO = initiativeModelToDTOMapper
+                .toInitiativeDetailDTO(fullInitiative, Locale.ITALIAN, false);
+
+        assertEquals(50, initiativeDetailDTO.getRewardBatchControlThreshold());
+    }
     @Test
     void toInitiativeDetailDTO_rewardNull() {
         Locale acceptLanguage = Locale.ITALIAN;
