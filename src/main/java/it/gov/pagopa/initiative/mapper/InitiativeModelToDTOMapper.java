@@ -120,6 +120,7 @@ public class InitiativeModelToDTOMapper {
                 .logoURL(logoURL)
                 .updateDate(initiative.getUpdateDate())
                 .serviceId(initiative.getAdditionalInfo().getServiceId())
+                .rewardBatchControlThreshold(initiative.getRewardBatchControlThreshold())
                 .build();
     }
 
