@@ -51,8 +51,8 @@ public class InitiativeDTOsToModelMapper {
             if(null != initiative.getAdditionalInfo().getEmailFlux()){
                 initiative.setEmailFlux(initiative.getAdditionalInfo().getEmailFlux());
             }
-            if(initiativeAdditionalDTO != null && null != initiativeAdditionalDTO.getRewardBatchControlThreshold()){
-                initiative.setRewardBatchControlThreshold(initiativeAdditionalDTO.getRewardBatchControlThreshold());
+            if(null != initiative.getAdditionalInfo().getRewardBatchControlThreshold()){
+                initiative.setRewardBatchControlThreshold(initiative.getAdditionalInfo().getRewardBatchControlThreshold());
             }
         }
 
@@ -115,6 +115,7 @@ public class InitiativeDTOsToModelMapper {
                 .websiteUrl(additionalDTO.getWebsiteUrl())
                 .supportUrl(additionalDTO.getSupportUrl())
                 .emailFlux(additionalDTO.getEmailFlux())
+                .rewardBatchControlThreshold(additionalDTO.getRewardBatchControlThreshold())
                 .build();
     }
 
