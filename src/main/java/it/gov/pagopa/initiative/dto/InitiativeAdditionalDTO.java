@@ -82,6 +82,9 @@ public class InitiativeAdditionalDTO extends InitiativeOrganizationInfoDTO {
   @JsonProperty("emailFlux")
   private String emailFlux;
 
+  @JsonProperty("rewardBatchControlThreshold")
+  private Integer rewardBatchControlThreshold;
+
   /**
    * Testi configurabili della label CTA della card IO, indicizzati per lingua ("it", "en").
    * Se assente/vuoto per una lingua si applica il fallback ai default in InitiativeConstants.CtaConstant.

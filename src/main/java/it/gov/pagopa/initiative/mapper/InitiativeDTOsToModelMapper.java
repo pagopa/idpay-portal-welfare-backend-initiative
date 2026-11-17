@@ -51,6 +51,9 @@ public class InitiativeDTOsToModelMapper {
             if(null != initiative.getAdditionalInfo().getEmailFlux()){
                 initiative.setEmailFlux(initiative.getAdditionalInfo().getEmailFlux());
             }
+            if(null != initiativeAdditionalDTO.getRewardBatchControlThreshold()){
+                initiative.setRewardBatchControlThreshold(initiativeAdditionalDTO.getRewardBatchControlThreshold());
+            }
         }
 
         return initiative;
@@ -83,6 +86,7 @@ public class InitiativeDTOsToModelMapper {
                 .initiativeSeries(generalDTO.getInitiativeSeries())
                 .checkPastOnboardingsSeries(generalDTO.getCheckPastOnboardingsSeries())
                 .pdfVoucherTemplate(generalDTO.getPdfVoucherTemplate())
+                .pdfLogoURL(generalDTO.getPdfLogoURL())
                 .build();
 
     }

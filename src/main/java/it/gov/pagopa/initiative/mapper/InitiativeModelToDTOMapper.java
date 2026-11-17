@@ -192,6 +192,7 @@ public class InitiativeModelToDTOMapper {
                 .initiativeSeries(general.getInitiativeSeries())
                 .checkPastOnboardingsSeries(general.getCheckPastOnboardingsSeries())
                 .pdfVoucherTemplate(general.getPdfVoucherTemplate())
+                .pdfLogoURL(general.getPdfLogoURL())
                 .build();
     }
 
