@@ -51,9 +51,8 @@ public class InitiativeDTOsToModelMapper {
             if(null != initiative.getAdditionalInfo().getEmailFlux()){
                 initiative.setEmailFlux(initiative.getAdditionalInfo().getEmailFlux());
             }
-            if(null != initiative.getAdditionalInfo().getRewardBatchControlThreshold()){
-                initiative.setRewardBatchControlThreshold(initiative.getAdditionalInfo().getRewardBatchControlThreshold());
-            }
+            initiative.setRewardBatchControlThreshold(initiative.getAdditionalInfo().getRewardBatchControlThreshold());
+
         }
 
         return initiative;
