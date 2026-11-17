@@ -797,6 +797,18 @@ class InitiativeModelToDTOMapperTest {
     }
 
     @Test
+    void testToInitiativeDTO_mapsPdfLogoURL() {
+        Initiative step2Initiative = createStep2Initiative();
+        InitiativeGeneral general = createInitiativeGeneral();
+        general.setPdfLogoURL("LOGO_2024");
+        step2Initiative.setGeneral(general);
+
+        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(step2Initiative, false);
+
+        assertEquals("LOGO_2024", initiativeDTO.getGeneral().getPdfLogoURL());
+    }
+
+    @Test
     void testToInitiativeDataDto_onlyRuleDescription(){
         Initiative initiative = createFullInitiative();
 
