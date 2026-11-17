@@ -52,6 +52,8 @@ public class InitiativeGeneral {
      */
     private Boolean checkPastOnboardingsSeries;
 
+    private String pdfVoucherTemplate;
+
 
     /**
      * Gets or Sets beneficiaryType

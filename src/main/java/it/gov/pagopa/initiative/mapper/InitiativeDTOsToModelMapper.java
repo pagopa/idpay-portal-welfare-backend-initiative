@@ -82,6 +82,7 @@ public class InitiativeDTOsToModelMapper {
                 .voucherDurationDays(generalDTO.getVoucherDurationDays())
                 .initiativeSeries(generalDTO.getInitiativeSeries())
                 .checkPastOnboardingsSeries(generalDTO.getCheckPastOnboardingsSeries())
+                .pdfVoucherTemplate(generalDTO.getPdfVoucherTemplate())
                 .build();
 
     }

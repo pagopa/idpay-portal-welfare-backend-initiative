@@ -344,6 +344,16 @@ class InitiativeDTOsToModelMapperTest {
     }
 
     @Test
+    void testToInitiative_mapsPdfVoucherTemplate() {
+        InitiativeGeneralDTO generalDTO = createInitiativeGeneralDTO();
+        generalDTO.setPdfVoucherTemplate("TEMPLATE_2024");
+
+        Initiative result = initiativeDTOsToModelMapper.toInitiative(generalDTO);
+
+        assertEquals("TEMPLATE_2024", result.getGeneral().getPdfVoucherTemplate());
+    }
+
+    @Test
     void testToInitiativeRewardRule_exception() {
         InitiativeRewardRuleDTO rewardRuleDTO = new InitiativeRewardRuleDTO() {};
         InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = new InitiativeRewardAndTrxRulesDTO();
