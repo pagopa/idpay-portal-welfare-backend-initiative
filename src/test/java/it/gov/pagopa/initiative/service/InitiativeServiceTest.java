@@ -726,19 +726,23 @@ class InitiativeServiceTest {
 
     @Test
     void updateInitiativeAdditionalInfo_ok() {
+        Initiative storedInitiative = createStep1Initiative();
+        storedInitiative.setRewardBatchControlThreshold(15);
         Initiative step2Initiative = createStep1Initiative();
+        step2Initiative.setRewardBatchControlThreshold(50);
         Initiative initiativeSavedExpected = createStep1Initiative();
 
         //Instruct the Repo Mock to return Dummy Initiatives
         when(initiativeRepository.save(any(Initiative.class))).thenReturn(initiativeSavedExpected);
         //Instruct the initiativeValidationService Mock to return Dummy Initiatives
-        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(step2Initiative);
+        when(initiativeValidationService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(storedInitiative);
 
         //Try to call the Real Service (which is using the instructed Repo)
         initiativeService.updateInitiativeAdditionalInfo(ORGANIZATION_ID, INITIATIVE_ID, step2Initiative, ROLE);
 
         // you are expecting initiativeValidationService to be called once with correct param
         verify(initiativeValidationService, times(1)).getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE);
+        assertEquals(50, storedInitiative.getRewardBatchControlThreshold());
         //Expecting repo to be called once with correct param
         verify(initiativeRepository, times(1)).save(any(Initiative.class));
     }

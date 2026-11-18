@@ -139,4 +139,10 @@ public class InitiativeGeneralDTO extends InitiativeOrganizationInfoDTO {
     @JsonProperty("checkPastOnboardingsSeries")
     private Boolean checkPastOnboardingsSeries;
 
+    @JsonProperty("pdfVoucherTemplate")
+    private String pdfVoucherTemplate;
+
+    @JsonProperty("pdfLogoURL")
+    private String pdfLogoURL;
+
 }

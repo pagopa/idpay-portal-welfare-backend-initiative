@@ -120,6 +120,7 @@ public class InitiativeModelToDTOMapper {
                 .logoURL(logoURL)
                 .updateDate(initiative.getUpdateDate())
                 .serviceId(initiative.getAdditionalInfo().getServiceId())
+                .rewardBatchControlThreshold(initiative.getRewardBatchControlThreshold())
                 .build();
     }
 
@@ -190,6 +191,8 @@ public class InitiativeModelToDTOMapper {
                 .voucherDurationDays(general.getVoucherDurationDays())
                 .initiativeSeries(general.getInitiativeSeries())
                 .checkPastOnboardingsSeries(general.getCheckPastOnboardingsSeries())
+                .pdfVoucherTemplate(general.getPdfVoucherTemplate())
+                .pdfLogoURL(general.getPdfLogoURL())
                 .build();
     }
 
@@ -214,6 +217,7 @@ public class InitiativeModelToDTOMapper {
                 .channels(toChannelsDTO(additional.getChannels()))
                 .logoFileName(additional.getLogoFileName())
                 .logoUploadDate(additional.getLogoUploadDate())
+                .rewardBatchControlThreshold(additional.getRewardBatchControlThreshold())
                 .ctaLabelMap(additional.getCtaLabelMap())
                 .websiteUrl(additional.getWebsiteUrl())
                 .supportUrl(additional.getSupportUrl())
