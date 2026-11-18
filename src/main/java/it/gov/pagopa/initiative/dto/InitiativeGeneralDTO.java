@@ -133,4 +133,16 @@ public class InitiativeGeneralDTO extends InitiativeOrganizationInfoDTO {
     @Positive(message = "voucherDurationDays should be at least 1", groups = ValidationApiEnabledGroup.class)
     private Integer voucherDurationDays;
 
+    @JsonProperty("initiativeSeries")
+    private String initiativeSeries;
+
+    @JsonProperty("checkPastOnboardingsSeries")
+    private Boolean checkPastOnboardingsSeries;
+
+    @JsonProperty("pdfVoucherTemplate")
+    private String pdfVoucherTemplate;
+
+    @JsonProperty("pdfLogoURL")
+    private String pdfLogoURL;
+
 }

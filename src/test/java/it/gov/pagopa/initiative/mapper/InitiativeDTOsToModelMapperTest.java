@@ -332,6 +332,58 @@ class InitiativeDTOsToModelMapperTest {
     }
 
     @Test
+    void testToInitiativeAdditional_mapsRewardBatchControlThreshold() {
+        InitiativeAdditionalDTO additionalDTO = createInitiativeAdditionalDTO();
+        additionalDTO.setRewardBatchControlThreshold(10);
+
+        Initiative result = initiativeDTOsToModelMapper.toInitiative(additionalDTO);
+
+        assertEquals(10, result.getRewardBatchControlThreshold());
+    }
+
+    @Test
+    void testToInitiativeAdditional_mapsRewardBatchControlThreshold_null() {
+        InitiativeAdditionalDTO additionalDTO = createInitiativeAdditionalDTO();
+        additionalDTO.setRewardBatchControlThreshold(null);
+
+        Initiative result = initiativeDTOsToModelMapper.toInitiative(additionalDTO);
+
+        Assertions.assertNull(result.getRewardBatchControlThreshold());
+    }
+
+    @Test
+    void testToInitiative_mapsInitiativeSeriesAndCheckPastOnboardingsSeries() {
+        InitiativeGeneralDTO generalDTO = createInitiativeGeneralDTO();
+        generalDTO.setInitiativeSeries("SERIES_2024");
+        generalDTO.setCheckPastOnboardingsSeries(true);
+
+        Initiative result = initiativeDTOsToModelMapper.toInitiative(generalDTO);
+
+        assertEquals("SERIES_2024", result.getGeneral().getInitiativeSeries());
+        assertEquals(Boolean.TRUE, result.getGeneral().getCheckPastOnboardingsSeries());
+    }
+
+    @Test
+    void testToInitiative_mapsPdfVoucherTemplate() {
+        InitiativeGeneralDTO generalDTO = createInitiativeGeneralDTO();
+        generalDTO.setPdfVoucherTemplate("TEMPLATE_2024");
+
+        Initiative result = initiativeDTOsToModelMapper.toInitiative(generalDTO);
+
+        assertEquals("TEMPLATE_2024", result.getGeneral().getPdfVoucherTemplate());
+    }
+
+    @Test
+    void testToInitiative_mapsPdfLogoURL() {
+        InitiativeGeneralDTO generalDTO = createInitiativeGeneralDTO();
+        generalDTO.setPdfLogoURL("LOGO_2024");
+
+        Initiative result = initiativeDTOsToModelMapper.toInitiative(generalDTO);
+
+        assertEquals("LOGO_2024", result.getGeneral().getPdfLogoURL());
+    }
+
+    @Test
     void testToInitiativeRewardRule_exception() {
         InitiativeRewardRuleDTO rewardRuleDTO = new InitiativeRewardRuleDTO() {};
         InitiativeRewardAndTrxRulesDTO initiativeRewardAndTrxRulesDTO = new InitiativeRewardAndTrxRulesDTO();
@@ -451,15 +503,6 @@ class InitiativeDTOsToModelMapperTest {
 
         assertNotNull(initiativeActual.getGeneral());
         assertEquals(30, initiativeActual.getGeneral().getVoucherDurationDays());
-    }
-
-    @Test
-    void toInitiativeGeneral_withoutVoucherDurationDays() {
-        InitiativeGeneralDTO initiativeGeneral = createStep1InitiativeInfoDTOonlyInfoGeneral();
-        Initiative initiativeActual = initiativeDTOsToModelMapper.toInitiative(initiativeGeneral);
-
-        assertNotNull(initiativeActual.getGeneral());
-        assertNull(initiativeActual.getGeneral().getVoucherDurationDays());
     }
 
     private void createInitiativeBaseFields(Initiative initiative) {

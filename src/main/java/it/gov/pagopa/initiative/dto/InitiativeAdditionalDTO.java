@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import it.gov.pagopa.initiative.utils.validator.ValidationApiEnabledGroup;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -81,6 +79,11 @@ public class InitiativeAdditionalDTO extends InitiativeOrganizationInfoDTO {
 
   @JsonProperty("emailFlux")
   private String emailFlux;
+
+  @Min(value = 1, groups = ValidationApiEnabledGroup.class)
+  @Max(value = 100, groups = ValidationApiEnabledGroup.class)
+  @JsonProperty("rewardBatchControlThreshold")
+  private Integer rewardBatchControlThreshold;
 
   /**
    * Testi configurabili della label CTA della card IO, indicizzati per lingua ("it", "en").

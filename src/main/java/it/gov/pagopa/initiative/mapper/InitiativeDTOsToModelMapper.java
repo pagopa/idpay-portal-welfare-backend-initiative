@@ -51,6 +51,8 @@ public class InitiativeDTOsToModelMapper {
             if(null != initiative.getAdditionalInfo().getEmailFlux()){
                 initiative.setEmailFlux(initiative.getAdditionalInfo().getEmailFlux());
             }
+            initiative.setRewardBatchControlThreshold(initiative.getAdditionalInfo().getRewardBatchControlThreshold());
+
         }
 
         return initiative;
@@ -80,6 +82,10 @@ public class InitiativeDTOsToModelMapper {
                 .descriptionMap(generalDTO.getDescriptionMap())
                 .productTypeBudgetCents(generalDTO.getProductTypeBudget() != null ? productTypeBudgetToCents(generalDTO.getProductTypeBudget()) : null)
                 .voucherDurationDays(generalDTO.getVoucherDurationDays())
+                .initiativeSeries(generalDTO.getInitiativeSeries())
+                .checkPastOnboardingsSeries(generalDTO.getCheckPastOnboardingsSeries())
+                .pdfVoucherTemplate(generalDTO.getPdfVoucherTemplate())
+                .pdfLogoURL(generalDTO.getPdfLogoURL())
                 .build();
 
     }
@@ -108,6 +114,7 @@ public class InitiativeDTOsToModelMapper {
                 .websiteUrl(additionalDTO.getWebsiteUrl())
                 .supportUrl(additionalDTO.getSupportUrl())
                 .emailFlux(additionalDTO.getEmailFlux())
+                .rewardBatchControlThreshold(additionalDTO.getRewardBatchControlThreshold())
                 .build();
     }
 

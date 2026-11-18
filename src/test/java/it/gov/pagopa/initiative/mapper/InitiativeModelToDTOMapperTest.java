@@ -771,6 +771,44 @@ class InitiativeModelToDTOMapperTest {
     }
 
     @Test
+    void testToInitiativeDTO_mapsInitiativeSeriesAndCheckPastOnboardingsSeries() {
+        Initiative step2Initiative = createStep2Initiative();
+        InitiativeGeneral general = createInitiativeGeneral();
+        general.setInitiativeSeries("SERIES_2024");
+        general.setCheckPastOnboardingsSeries(true);
+        step2Initiative.setGeneral(general);
+
+        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(step2Initiative, false);
+
+        assertEquals("SERIES_2024", initiativeDTO.getGeneral().getInitiativeSeries());
+        assertEquals(Boolean.TRUE, initiativeDTO.getGeneral().getCheckPastOnboardingsSeries());
+    }
+
+    @Test
+    void testToInitiativeDTO_mapsPdfVoucherTemplate() {
+        Initiative step2Initiative = createStep2Initiative();
+        InitiativeGeneral general = createInitiativeGeneral();
+        general.setPdfVoucherTemplate("TEMPLATE_2024");
+        step2Initiative.setGeneral(general);
+
+        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(step2Initiative, false);
+
+        assertEquals("TEMPLATE_2024", initiativeDTO.getGeneral().getPdfVoucherTemplate());
+    }
+
+    @Test
+    void testToInitiativeDTO_mapsPdfLogoURL() {
+        Initiative step2Initiative = createStep2Initiative();
+        InitiativeGeneral general = createInitiativeGeneral();
+        general.setPdfLogoURL("LOGO_2024");
+        step2Initiative.setGeneral(general);
+
+        InitiativeDTO initiativeDTO = initiativeModelToDTOMapper.toInitiativeDTO(step2Initiative, false);
+
+        assertEquals("LOGO_2024", initiativeDTO.getGeneral().getPdfLogoURL());
+    }
+
+    @Test
     void testToInitiativeDataDto_onlyRuleDescription(){
         Initiative initiative = createFullInitiative();
 

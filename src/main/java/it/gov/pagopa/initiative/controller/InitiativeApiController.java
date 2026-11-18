@@ -414,6 +414,12 @@ public class InitiativeApiController implements InitiativeApi {
         return ResponseEntity.ok(response);
     }
 
+    @Override
+    public ResponseEntity<List<String>> getInitiativeIdsByInitiativeSeries(String initiativeSeries) {
+        log.info("[GET_INITIATIVE_IDS_BY_INITIATIVE_SERIES] - InitiativeSeries: {}. Start processing...", sanitizeForLog(initiativeSeries));
+        return ResponseEntity.ok(this.initiativeService.getInitiativeIdsByInitiativeSeries(initiativeSeries));
+    }
+
     private void performanceLog(long startTime, String service){
         log.info(
                 "[PERFORMANCE_LOG] [{}] Time occurred to perform business logic: {} ms",
