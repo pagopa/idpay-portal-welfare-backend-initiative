@@ -482,6 +482,15 @@ class InitiativeModelToDTOMapperTest {
     }
 
     @Test
+    void toInitiativeDTOMapsRewardBatchControlThresholdInAdditionalInfo() {
+        fullInitiative.getAdditionalInfo().setRewardBatchControlThreshold(50);
+
+        InitiativeDTO result = initiativeModelToDTOMapper.toInitiativeDTO(fullInitiative, true);
+
+        assertEquals(50, result.getAdditionalInfo().getRewardBatchControlThreshold());
+    }
+
+    @Test
     void toInitiativeAdditionalDTO() {
         Initiative initiative = createStep1Initiative();
         initiative.setAdditionalInfo(null);

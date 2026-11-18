@@ -212,6 +212,7 @@ public class InitiativeServiceImpl extends InitiativeServiceRoot implements Init
         InitiativeAdditional infoOriginal = initiative.getAdditionalInfo();
         InitiativeAdditional infoNew = initiativeAdditionalInfo.getAdditionalInfo();
         BeanUtils.copyProperties(infoNew, infoOriginal, "logoFileName", "logoUploadDate", "serviceId", "primaryTokenIO", "secondaryTokenIO");
+        initiative.setRewardBatchControlThreshold(initiativeAdditionalInfo.getRewardBatchControlThreshold());
         initiative.setInitiativeName(infoNew.getServiceName());
         initiative.setStatus(InitiativeConstants.Status.DRAFT);
         this.initiativeRepository.save(initiative);

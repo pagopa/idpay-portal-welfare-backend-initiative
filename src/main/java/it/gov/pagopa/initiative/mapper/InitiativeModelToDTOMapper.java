@@ -217,6 +217,7 @@ public class InitiativeModelToDTOMapper {
                 .channels(toChannelsDTO(additional.getChannels()))
                 .logoFileName(additional.getLogoFileName())
                 .logoUploadDate(additional.getLogoUploadDate())
+                .rewardBatchControlThreshold(additional.getRewardBatchControlThreshold())
                 .ctaLabelMap(additional.getCtaLabelMap())
                 .websiteUrl(additional.getWebsiteUrl())
                 .supportUrl(additional.getSupportUrl())
