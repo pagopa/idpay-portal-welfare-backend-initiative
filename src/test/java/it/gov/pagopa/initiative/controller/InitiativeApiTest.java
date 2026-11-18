@@ -34,6 +34,7 @@ import org.apache.kafka.common.KafkaException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.security.autoconfigure.SecurityAutoConfiguration;
 import org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration;
@@ -73,6 +74,7 @@ import static it.gov.pagopa.initiative.constants.InitiativeConstants.Exception.E
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.ADMIN;
 import static it.gov.pagopa.initiative.constants.InitiativeConstants.Role.PAGOPA_ADMIN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -129,6 +131,7 @@ class InitiativeApiTest {
     private static final String LOGICALLY_DELETE_INITIATIVE_URL = "/organization/%s/initiative/%s";
     private static final String GET_INITIATIVE_BENEFICIARY_DETAIL_URL = "/initiative/%s/detail";
     private static final String DELETE_INITIATIVE_URL = "/initiative/%s";
+    private static final String GET_INITIATIVE_IDS_BY_INITIATIVE_SERIES_URL = "/initiatives/series/%s";
 
     @MockitoBean
     private InitiativeService initiativeService;
@@ -687,6 +690,39 @@ class InitiativeApiTest {
     }
 
     @Test
+    void getInitiativeIdsByInitiativeSeries_statusOk() throws Exception {
+        String initiativeSeries = "SERIES_2024";
+        List<String> initiativeIds = List.of("ID1", "ID2");
+
+        when(initiativeService.getInitiativeIdsByInitiativeSeries(initiativeSeries)).thenReturn(initiativeIds);
+
+        mvc.perform(
+                        get(BASE_URL + String.format(GET_INITIATIVE_IDS_BY_INITIATIVE_SERIES_URL, initiativeSeries))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(initiativeIds)))
+                .andDo(print());
+
+        verify(initiativeService, times(1)).getInitiativeIdsByInitiativeSeries(initiativeSeries);
+    }
+
+    @Test
+    void getInitiativeIdsByInitiativeSeries_statusOkWhenEmpty() throws Exception {
+        String initiativeSeries = "SERIES_UNKNOWN";
+
+        when(initiativeService.getInitiativeIdsByInitiativeSeries(initiativeSeries)).thenReturn(List.of());
+
+        mvc.perform(
+                        get(BASE_URL + String.format(GET_INITIATIVE_IDS_BY_INITIATIVE_SERIES_URL, initiativeSeries))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json("[]"))
+                .andDo(print());
+    }
+
+    @Test
     void anyUpdate_PUT_whenBodyRequestIsNotValid_then400BadRequest_MethodArgumentNotValidException() throws Exception {
         InitiativeRefundRuleDTO request = createRefundRuleWithAccumulatedAmountDTO_NotValid_ko();
 
@@ -807,6 +843,37 @@ class InitiativeApiTest {
                                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
                 .andDo(print());
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void givenInitiativeWithCheckPastOnboardingsSeries_when_PUT_updateInitiativePublishedStatus_thenFieldIsForwardedUnaltered(boolean checkPastOnboardingsSeries) throws Exception {
+        InitiativeOrganizationInfoDTO request = createInitiativeOrganizationInfoDTO();
+        Initiative initiative = createStep5Initiative();
+        initiative.getAdditionalInfo().setServiceIO(false);
+        initiative.getGeneral().setCheckPastOnboardingsSeries(checkPastOnboardingsSeries);
+
+        when(initiativeService.getInitiative(ORGANIZATION_ID, INITIATIVE_ID, ROLE)).thenReturn(initiative);
+        doNothing().when(initiativeService).isInitiativeAllowedToBeNextStatusThenThrows(initiative, InitiativeConstants.Status.PUBLISHED, ROLE);
+        doNothing().when(initiativeService).updateInitiative(any(Initiative.class));
+        doNothing().when(initiativeService).sendInitiativeInfoToRuleEngine(any(Initiative.class));
+        doNothing().when(initiativeService).sendEmailToPagoPA(any(), anyString(), anyString());
+        doNothing().when(initiativeService).sendEmailToCurrentOrg(any(), anyString(), anyString());
+        doNothing().when(initiativeService).initializeStatistics(INITIATIVE_ID, ORGANIZATION_ID);
+
+        mvc.perform(
+                        put(BASE_URL + String.format(PUT_INITIATIVE_TO_PUBLISHED_STATUS_URL, ORGANIZATION_ID, INITIATIVE_ID, ROLE))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andDo(print());
+
+        //Verify the controller forwards the same checkPastOnboardingsSeries value to the rule engine notification, unaltered
+        ArgumentCaptor<Initiative> initiativeCaptor = ArgumentCaptor.forClass(Initiative.class);
+        verify(initiativeService).sendInitiativeInfoToRuleEngine(initiativeCaptor.capture());
+        assertNotNull(initiativeCaptor.getValue().getGeneral());
+        assertEquals(checkPastOnboardingsSeries, initiativeCaptor.getValue().getGeneral().getCheckPastOnboardingsSeries());
     }
 
     @Test
